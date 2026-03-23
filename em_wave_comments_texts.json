@@ -1,0 +1,18 @@
+{
+  "el": {
+    "seeTitle": "Τι βλέπω",
+    "compareTitle": "Τι συγκρίνω",
+    "nextTitle": "Πώς συνεχίζω",
+    "seeText": "Πρόσεξε την κλίση του q(t). Η πράσινη εφαπτομένη δείχνει γιατί εδώ το i είναι θετικό.",
+    "compareText": "Κρύψε προσωρινά το B και δες αν η σχέση ανάμεσα σε V, q και i διαβάζεται πιο καθαρά.",
+    "nextText": "Πήγαινε βήμα-βήμα από 0 έως T/4 και σύγκρινε τη μεταβολή του q με την εμφάνιση των πρώτων γραμμών E."
+  },
+  "en": {
+    "seeTitle": "What I see",
+    "compareTitle": "What I compare",
+    "nextTitle": "What I do next",
+    "seeText": "Watch the slope of q(t). The green tangent shows why i is positive here.",
+    "compareText": "Temporarily hide B and check whether the relation among V, q and i becomes clearer.",
+    "nextText": "Move step by step from 0 to T/4 and compare the change of q with the appearance of the first E lines."
+  }
+}
