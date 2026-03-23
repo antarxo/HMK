@@ -942,9 +942,10 @@ async function loadResources(){
 
 
 function updatePlayButton(){
-  const btn = document.getElementById("playBtn");
-  if (!btn) return;
-  btn.textContent = sim && sim.state && sim.state.playing ? texts[currentLang].pause : texts[currentLang].play;
+  const btn = document.getElementById('playBtn');
+  if(!btn || !uiTexts || !currentLang) return;
+  const ui = uiTexts[currentLang];
+  btn.textContent = sim && sim.state && sim.state.playing ? ui.controls.pause : ui.controls.play;
 }
 
 function syncFieldButtons(){
