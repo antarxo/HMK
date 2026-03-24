@@ -1241,7 +1241,7 @@ function updateEPropagationOverlay(){
     const xRel = x - originX;
     let y = axisY;
     if (xRel <= frontLen){
-      y = axisY - 26 * Math.sin(2*Math.PI*(xRel/lambdaPx));
+      y = axisY - 26 * Math.cos(2*Math.PI*(xRel/lambdaPx));
     }
     probe.setAttribute('cx', x.toFixed(2));
     probe.setAttribute('cy', y.toFixed(2));
