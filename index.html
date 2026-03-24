@@ -760,11 +760,11 @@ button{font:inherit}
       const age = ageFromSpawn;
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age) * 0.78;
-      const alphaBase = 200 * fade;
+      const alphaBase = 232 * fade;
       const alpha = mode === 'back' ? alphaBase * 0.24 : alphaBase * 0.95;
-      const strokeW = 0.52 / scaleFactor;
+      const strokeW = 0.62 / scaleFactor;
       const isNegative = front.sign < 0;
-      const rgb = isNegative ? [168, 90, 220] : [60, 220, 120];
+      const rgb = isNegative ? [196, 92, 255] : [80, 245, 140];
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
