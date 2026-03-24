@@ -761,7 +761,7 @@ button{font:inherit}
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age) * 0.78;
       const alphaBase = 232 * fade;
-      const alpha = mode === 'back' ? alphaBase * 0.42 : alphaBase * 0.82;
+      const alpha = mode === 'back' ? alphaBase * 0.36 : alphaBase * 0.82;
       const strokeW = 0.62 / scaleFactor;
       const isNegative = front.sign < 0;
       const rgb = isNegative ? [196, 92, 255] : [80, 245, 140];
