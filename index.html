@@ -1199,10 +1199,9 @@ function updateEPropagationOverlay(){
   const h = Math.max(1, host.clientHeight);
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
-  const originX = (canvasRect.left - hostRect.left) + sim.state.x0;
   const axisY = (canvasRect.top - hostRect.top) + sim.state.centerY;
+  const xRod = (canvasRect.left - hostRect.left) + sim.state.x0;
   const rightLimit = (canvasRect.left - hostRect.left) + sim.state.canvasW - 18;
-  const maxLen = Math.max(0, rightLimit - originX);
   const t = Math.max(0, Math.min(1, sim.state.t));
 
   const axis = document.getElementById('ePropAxis');
@@ -1210,6 +1209,15 @@ function updateEPropagationOverlay(){
   const zero = document.getElementById('ePropZero');
   const pos = document.getElementById('ePropPos');
   const neg = document.getElementById('ePropNeg');
+
+  const pulseLocalAnchor = 142;
+  const d0 = sim.state.rodLengthPx * 0.5;
+  const localIntersect = 159; // same local x where the electric front crosses the propagation axis
+  const scale0 = (d0 + sim.state.lambdaPx * 0) / pulseLocalAnchor;
+  const scaleNow = (d0 + sim.state.lambdaPx * t) / pulseLocalAnchor;
+
+  const originX = xRod + localIntersect * scale0;
+  const frontX = Math.min(rightLimit, xRod + localIntersect * scaleNow);
 
   axis.setAttribute('x1', originX.toFixed(2));
   axis.setAttribute('y1', axisY.toFixed(2));
@@ -1226,23 +1234,20 @@ function updateEPropagationOverlay(){
     return;
   }
 
-  const frontLen = maxLen * t;
+  const frontLen = Math.max(0, frontX - originX);
   if(frontLen < 2){
     pos.setAttribute('d','');
     neg.setAttribute('d','');
     return;
   }
 
-  const ampPx = 26;
-  const lambdaPx = 220;
+  const ampPx = 26 * Math.abs(Math.sin(2*Math.PI*t));
+  const lambdaPx = sim.state.lambdaPx || 220;
   const d = buildPropagationPath(originX, axisY, frontLen, ampPx, lambdaPx, t);
 
   pos.setAttribute('d', d);
   neg.setAttribute('d', d);
 
-  // Clip by sign relative to axis with two masks using path duplication is expensive in SVG;
-  // use stroke-dash not possible. Keep both paths but hide the irrelevant one by current source sign at origin?
-  // Better: color by quarter at source, since this is a pedagogical first trial focused on birth and spreading.
   const sourcePositive = Math.sin(2*Math.PI*t) >= 0;
   pos.style.display = sourcePositive ? '' : 'none';
   neg.style.display = sourcePositive ? 'none' : '';
