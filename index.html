@@ -211,20 +211,6 @@ button{font:inherit}
 }
 .hint-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
 .hint-text{font-size:11px;line-height:1.2;color:#d4deee}
-
-.eprop-overlay{
-  position:absolute;
-  inset:8px 8px 8px 8px;
-  pointer-events:none;
-  z-index:6;
-}
-.eprop-svg{width:100%;height:100%;display:block;overflow:visible}
-.eprop-axis{stroke:rgba(190,204,224,.55);stroke-width:1}
-.eprop-wave-pos{stroke:#67a8ff;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.eprop-wave-neg{stroke:#ff4848;stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.eprop-origin{fill:#d8e8fb}
-.eprop-label{fill:#d8e8fb;font-size:10px;font-weight:600}
-
 .hide{display:none !important}
 
 @media (max-width:1220px){ :root{ --graphsW:314px; } }
@@ -287,9 +273,6 @@ button{font:inherit}
       <div class="stage-wrap" id="stageWrap">
         <div class="machine-shell">
 <div class="machine-host"><div id="machineMount" style="width:100%;height:100%"></div>
-            <div class="eprop-overlay" id="ePropOverlay">
-              <svg class="eprop-svg" id="ePropSvg"></svg>
-            </div>
 
             <div class="control-dock">
               <button class="ctrl" id="stepPrev">◀ Βήμα</button>
@@ -721,14 +704,17 @@ button{font:inherit}
         p.push();
         p.translate(x, y);
         p.rotate(p.radians(angleDeg + dir));
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.85);
         const k = 1 / scaleFactor;
-        p.beginShape();
-        p.vertex(2.7 * k, 0);
-        p.vertex(-1.45 * k, -1.8 * k);
-        p.vertex(-1.45 * k, 1.8 * k);
-        p.endShape(p.CLOSE);
+        const L = 13.5 * k;
+        const head = 4.2 * k;
+        const half = 2.6 * k;
+        p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
+        p.strokeWeight(1.25 * k);
+        p.strokeCap(p.ROUND);
+        p.line(-L * 0.5, 0, L * 0.5 - head, 0);
+        p.noStroke();
+        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.92);
+        p.triangle(L * 0.5, 0, L * 0.5 - head, -half, L * 0.5 - head, half);
         p.pop();
       };
       drawArrow(139.320, -115.360, 66.762);
@@ -1161,189 +1147,8 @@ function updateGraphs(){
   if (sim.state.showE) updateSingleGraph('E', frac);
   if (sim.state.showB) updateSingleGraph('B', frac);
 }
-
-function initEPropagationOverlay(){
-  const svg = document.getElementById('ePropSvg');
-  if(!svg) return;
-  let probes = '';
-  for(let i=0;i<14;i++){ probes += `<circle id="ePropProbe${i}" cx="0" cy="0" r="1.5" fill="rgba(220,230,245,.45)"/>`; }
-
-  let arrows = '';
-  for(let i=0;i<18;i++){
-    arrows += `<line id="eArrowPos${i}" class="eprop-arrow-pos" x1="0" y1="0" x2="0" y2="0"/>`;
-    arrows += `<line id="eArrowNeg${i}" class="eprop-arrow-neg" x1="0" y1="0" x2="0" y2="0"/>`;
-    arrows += `<polygon id="eArrowHeadPos${i}" fill="#67a8ff" points="0,0 0,0 0,0"/>`;
-    arrows += `<polygon id="eArrowHeadNeg${i}" fill="#ff4848" points="0,0 0,0 0,0"/>`;
-  }
-
-  svg.innerHTML = `
-    <line id="ePropAxis" class="eprop-axis" x1="0" y1="0" x2="0" y2="0"/>
-    <circle id="ePropOrigin" class="eprop-origin" cx="0" cy="0" r="2.2"/>
-    <text id="ePropZero" class="eprop-label" x="0" y="0">0</text>
-    <path id="eEnvelopePos" class="eprop-envelope-pos"/>
-    <path id="eEnvelopeNeg" class="eprop-envelope-neg"/>
-    ${arrows}
-    ${probes}
-  `;
-}
-function buildSegmentPath(originX, axisY, xStart, xEnd, ampPx, lambdaPx, frontLenPx){
-  const width = Math.max(0, xEnd - xStart);
-  const samples = Math.max(8, Math.floor(width / 5));
-  if (width <= 0.5) return '';
-  let d = '';
-  for(let i=0;i<=samples;i++){
-    const u = i / samples;
-    const x = xStart + width * u;
-    const xRel = x - originX;
-    let y = axisY;
-    if (xRel <= frontLenPx){
-      y = axisY - ampPx * Math.sin(2*Math.PI*(xRel / lambdaPx));
-    }
-    d += (i===0 ? 'M' : ' L') + x.toFixed(2) + ' ' + y.toFixed(2);
-  }
-  return d;
-}
-
-function buildEnvelopePath(points){
-  if(!points.length) return '';
-  let d = `M ${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;
-  for(let i=1;i<points.length;i++){
-    d += ` L ${points[i][0].toFixed(2)} ${points[i][1].toFixed(2)}`;
-  }
-  return d;
-}
-function setArrow(lineEl, headEl, x, y0, y1, color){
-  lineEl.setAttribute('x1', x.toFixed(2));
-  lineEl.setAttribute('y1', y0.toFixed(2));
-  lineEl.setAttribute('x2', x.toFixed(2));
-  lineEl.setAttribute('y2', y1.toFixed(2));
-  const dir = y1 < y0 ? -1 : 1;
-  const head = 4.2;
-  const baseY = y1 - dir * head;
-  headEl.setAttribute('points',
-    `${x.toFixed(2)},${y1.toFixed(2)} ${(x-2.6).toFixed(2)},${baseY.toFixed(2)} ${(x+2.6).toFixed(2)},${baseY.toFixed(2)}`
-  );
-  headEl.setAttribute('fill', color);
-}
-function updateEPropagationOverlay(){
-  const svg = document.getElementById('ePropSvg');
-  const host = document.getElementById('ePropOverlay');
-  if(!svg || !host || !sim || !sim.state) return;
-
-  const canvas = document.querySelector('#machineMount canvas');
-  if(!canvas) return;
-
-  const hostRect = host.getBoundingClientRect();
-  const canvasRect = canvas.getBoundingClientRect();
-  const w = Math.max(1, host.clientWidth);
-  const h = Math.max(1, host.clientHeight);
-  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-
-  const axisY = (canvasRect.top - hostRect.top) + sim.state.centerY;
-  const xRod = (canvasRect.left - hostRect.left) + sim.state.x0;
-  const rightLimit = (canvasRect.left - hostRect.left) + sim.state.canvasW - 18;
-  const t = Math.max(0, Math.min(1, sim.state.t));
-
-  const axis = document.getElementById('ePropAxis');
-  const dot = document.getElementById('ePropOrigin');
-  const zero = document.getElementById('ePropZero');
-  const envPos = document.getElementById('eEnvelopePos');
-  const envNeg = document.getElementById('eEnvelopeNeg');
-
-  const pulseLocalAnchor = 142;
-  const localIntersect = 159;
-  const d0 = sim.state.rodLengthPx * 0.5;
-  const lambdaPx = sim.state.lambdaPx || 220;
-  const scale0 = d0 / pulseLocalAnchor;
-  const originX = xRod + localIntersect * scale0;
-
-  const frontLen = Math.max(0, lambdaPx * t);
-  const frontX = Math.min(rightLimit, originX + frontLen);
-
-  axis.setAttribute('x1', originX.toFixed(2));
-  axis.setAttribute('y1', axisY.toFixed(2));
-  axis.setAttribute('x2', rightLimit.toFixed(2));
-  axis.setAttribute('y2', axisY.toFixed(2));
-  dot.setAttribute('cx', originX.toFixed(2));
-  dot.setAttribute('cy', axisY.toFixed(2));
-  zero.setAttribute('x', (originX - 5).toFixed(2));
-  zero.setAttribute('y', (axisY + 14).toFixed(2));
-
-  const ampPx = 26;
-  const N = 18;
-  const posPts = [];
-  const negPts = [];
-
-  for(let i=0;i<14;i++){
-    const probe = document.getElementById(`ePropProbe${i}`);
-    if(!probe) continue;
-    const u = i/13;
-    const x = originX + (rightLimit-originX)*u;
-    const xRel = x - originX;
-    let y = axisY;
-    if (xRel <= frontLen){
-      y = axisY - ampPx * Math.sin(2*Math.PI*(xRel/lambdaPx));
-    }
-    probe.setAttribute('cx', x.toFixed(2));
-    probe.setAttribute('cy', y.toFixed(2));
-  }
-
-  if(!sim.state.showE || frontLen < 2){
-    envPos.setAttribute('d','');
-    envNeg.setAttribute('d','');
-    for(let i=0;i<N;i++){
-      document.getElementById(`eArrowPos${i}`).style.display = 'none';
-      document.getElementById(`eArrowNeg${i}`).style.display = 'none';
-      document.getElementById(`eArrowHeadPos${i}`).style.display = 'none';
-      document.getElementById(`eArrowHeadNeg${i}`).style.display = 'none';
-    }
-    return;
-  }
-
-  for(let i=0;i<N;i++){
-    const u = i/(N-1);
-    const x = originX + (rightLimit-originX)*u;
-    const xRel = x - originX;
-    const posLine = document.getElementById(`eArrowPos${i}`);
-    const negLine = document.getElementById(`eArrowNeg${i}`);
-    const posHead = document.getElementById(`eArrowHeadPos${i}`);
-    const negHead = document.getElementById(`eArrowHeadNeg${i}`);
-
-    if (xRel > frontLen){
-      posLine.style.display = 'none';
-      negLine.style.display = 'none';
-      posHead.style.display = 'none';
-      negHead.style.display = 'none';
-      continue;
-    }
-
-    const value = Math.sin(2*Math.PI*(xRel/lambdaPx));
-    const yTip = axisY - ampPx * value;
-
-    if (value >= 0){
-      setArrow(posLine, posHead, x, axisY, yTip, '#67a8ff');
-      posLine.style.display = '';
-      posHead.style.display = '';
-      negLine.style.display = 'none';
-      negHead.style.display = 'none';
-      posPts.push([x, yTip]);
-    } else {
-      setArrow(negLine, negHead, x, axisY, yTip, '#ff4848');
-      negLine.style.display = '';
-      negHead.style.display = '';
-      posLine.style.display = 'none';
-      posHead.style.display = 'none';
-      negPts.push([x, yTip]);
-    }
-  }
-
-  envPos.setAttribute('d', buildEnvelopePath(posPts));
-  envNeg.setAttribute('d', buildEnvelopePath(negPts));
-}
-
 function graphLoop(){
   updateGraphs();
-  updateEPropagationOverlay();
   requestAnimationFrame(graphLoop);
 }
 
@@ -1360,7 +1165,6 @@ async function boot(){
   });
   sim.init();
   sim.stop();
-  initEPropagationOverlay();
   initGraphs();
   updatePlayButton();
   syncFieldButtons();
