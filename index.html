@@ -1165,22 +1165,28 @@ function updateGraphs(){
 function initEPropagationOverlay(){
   const svg = document.getElementById('ePropSvg');
   if(!svg) return;
+  let probes = '';
+  for(let i=0;i<14;i++){ probes += `<circle id="ePropProbe${i}" cx="0" cy="0" r="1.5" fill="rgba(220,230,245,.45)"/>`; }
   svg.innerHTML = `
     <line id="ePropAxis" class="eprop-axis" x1="0" y1="0" x2="0" y2="0"/>
     <circle id="ePropOrigin" class="eprop-origin" cx="0" cy="0" r="2.2"/>
     <text id="ePropZero" class="eprop-label" x="0" y="0">0</text>
     <path id="ePropPos" class="eprop-wave-pos"/>
     <path id="ePropNeg" class="eprop-wave-neg"/>
+    ${probes}
   `;
 }
-function buildPropagationPath(originX, axisY, lengthPx, ampPx, lambdaPx, tNorm){
-  const samples = Math.max(8, Math.floor(lengthPx / 6));
+function buildPropagationPath(originX, axisY, totalWidthPx, frontLenPx, ampPx, lambdaPx, tNorm){
+  const samples = Math.max(40, Math.floor(totalWidthPx / 5));
   let d = '';
   for(let i=0;i<=samples;i++){
     const u = i / samples;
-    const x = originX + lengthPx * u;
-    const xRel = lengthPx * u;
-    const y = axisY - ampPx * Math.sin(2*Math.PI*(xRel / lambdaPx - tNorm));
+    const x = originX + totalWidthPx * u;
+    const xRel = totalWidthPx * u;
+    let y = axisY;
+    if (xRel <= frontLenPx){
+      y = axisY - ampPx * Math.sin(2*Math.PI*(tNorm - xRel / lambdaPx));
+    }
     d += (i===0 ? 'M' : ' L') + x.toFixed(2) + ' ' + y.toFixed(2);
   }
   return d;
@@ -1223,6 +1229,19 @@ function updateEPropagationOverlay(){
   axis.setAttribute('y1', axisY.toFixed(2));
   axis.setAttribute('x2', rightLimit.toFixed(2));
   axis.setAttribute('y2', axisY.toFixed(2));
+  for(let i=0;i<14;i++){
+    const probe = document.getElementById(`ePropProbe${i}`);
+    if(!probe) continue;
+    const u = i/13;
+    const x = originX + (rightLimit-originX)*u;
+    const xRel = (rightLimit-originX)*u;
+    let y = axisY;
+    if (xRel <= Math.max(0, frontX-originX)){
+      y = axisY - 26 * Math.sin(2*Math.PI*(t - xRel/(sim.state.lambdaPx || 220)));
+    }
+    probe.setAttribute('cx', x.toFixed(2));
+    probe.setAttribute('cy', y.toFixed(2));
+  }
   dot.setAttribute('cx', originX.toFixed(2));
   dot.setAttribute('cy', axisY.toFixed(2));
   zero.setAttribute('x', (originX - 5).toFixed(2));
@@ -1235,15 +1254,16 @@ function updateEPropagationOverlay(){
   }
 
   const frontLen = Math.max(0, frontX - originX);
-  if(frontLen < 2){
-    pos.setAttribute('d','');
-    neg.setAttribute('d','');
+  if(frontLen < 1){
+    pos.setAttribute('d', `M ${originX.toFixed(2)} ${axisY.toFixed(2)} L ${rightLimit.toFixed(2)} ${axisY.toFixed(2)}`);
+    neg.setAttribute('d', `M ${originX.toFixed(2)} ${axisY.toFixed(2)} L ${rightLimit.toFixed(2)} ${axisY.toFixed(2)}`);
     return;
   }
 
-  const ampPx = 26 * Math.abs(Math.sin(2*Math.PI*t));
+  const ampPx = 26;
   const lambdaPx = sim.state.lambdaPx || 220;
-  const d = buildPropagationPath(originX, axisY, frontLen, ampPx, lambdaPx, t);
+  const totalWidth = Math.max(0, rightLimit - originX);
+  const d = buildPropagationPath(originX, axisY, totalWidth, frontLen, ampPx, lambdaPx, t);
 
   pos.setAttribute('d', d);
   neg.setAttribute('d', d);
