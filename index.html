@@ -1138,11 +1138,12 @@ function updateSingleGraph(kind, frac){
 function updateGraphs(){
   if(!sim || !sim.state) return;
   const frac = Math.max(0, Math.min(1, sim.state.t));
-  updateSingleGraph('V', frac);
-  updateSingleGraph('q', frac);
-  updateSingleGraph('i', frac);
-  if (sim.state.showE) updateSingleGraph('E', frac);
-  if (sim.state.showB) updateSingleGraph('B', frac);
+  const phaseFrac = Math.max(0, Math.min(1, sim.state.t + 0.25));
+  updateSingleGraph('V', phaseFrac);
+  updateSingleGraph('q', phaseFrac);
+  updateSingleGraph('i', phaseFrac);
+  if (sim.state.showE) updateSingleGraph('E', phaseFrac);
+  if (sim.state.showB) updateSingleGraph('B', phaseFrac);
 }
 function graphLoop(){
   updateGraphs();
