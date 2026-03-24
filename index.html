@@ -761,7 +761,7 @@ button{font:inherit}
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age) * 0.78;
       const alphaBase = 232 * fade;
-      const alpha = mode === 'back' ? alphaBase * 0.24 : alphaBase * 0.95;
+      const alpha = mode === 'back' ? alphaBase * 0.42 : alphaBase * 0.82;
       const strokeW = 0.62 / scaleFactor;
       const isNegative = front.sign < 0;
       const rgb = isNegative ? [196, 92, 255] : [80, 245, 140];
@@ -1071,9 +1071,9 @@ function initGraphs(){
         <clipPath id="clipQNeg"><rect x="${x0}" y="44" width="${x1-x0}" height="46"/></clipPath>
       </defs>
       <path id="qGhostPos" fill="none" stroke="#67a8ff55" stroke-width="1.3" stroke-linecap="round" clip-path="url(#clipQPos)"/>
-      <path id="qGhostNeg" fill="none" stroke="#f5717155" stroke-width="1.3" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
+      <path id="qGhostNeg" fill="none" stroke="#ff484855" stroke-width="1.3" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
       <path id="qActivePos" fill="none" stroke="#67a8ff" stroke-width="2.2" stroke-linecap="round" clip-path="url(#clipQPos)"/>
-      <path id="qActiveNeg" fill="none" stroke="#f57171" stroke-width="2.2" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
+      <path id="qActiveNeg" fill="none" stroke="#ff4848" stroke-width="2.2" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
       <line id="qTangent" class="tangent" x1="0" y1="0" x2="0" y2="0" />`;
     } else {
       const posColor = spec.label === 'V' ? '#ffd56b' : (spec.label === 'i' ? '#8df0b1' : (spec.label === 'E' ? '#67a8ff' : '#8df0b1'));
