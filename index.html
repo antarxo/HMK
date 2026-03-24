@@ -515,7 +515,7 @@ button{font:inherit}
       const usableBot = state.yBot - state.margin;
       const usableL = usableBot - usableTop;
       const d0 = usableL / (state.N - 1);
-      const phase = Math.PI / 2 + 2 * Math.PI * state.t;
+      const phase = Math.PI + 2 * Math.PI * state.t;
       const sField = -Math.sin(phase);
       const s = -sField;
       const sign = Math.sign(s) || -1;
@@ -1015,10 +1015,10 @@ function buildPath(fn, samples=160){
   return d;
 }
 const graphFns = {
-  V: u => Math.cos(2*Math.PI*u),
-  q: u => Math.cos(2*Math.PI*u),
-  i: u => Math.sin(2*Math.PI*u),
-  E: u => Math.cos(2*Math.PI*u),
+  V: u => Math.sin(2*Math.PI*u),
+  q: u => Math.sin(2*Math.PI*u),
+  i: u => Math.cos(2*Math.PI*u),
+  E: u => Math.sin(2*Math.PI*u),
   B: u => Math.sin(2*Math.PI*u)
 };
 function graphAxisMarkup(label){
@@ -1116,7 +1116,7 @@ function updateSingleGraph(kind, frac){
     });
     const tangent = document.getElementById('qTangent');
     if (tangent){
-      const deriv = -2*Math.PI*Math.sin(2*Math.PI*frac);
+      const deriv = 2*Math.PI*Math.cos(2*Math.PI*frac);
       const slope = -amp * deriv / (x1-x0);
       const dx = 28;
       tangent.setAttribute('x1', (x-dx).toFixed(2));
@@ -1138,12 +1138,11 @@ function updateSingleGraph(kind, frac){
 function updateGraphs(){
   if(!sim || !sim.state) return;
   const frac = Math.max(0, Math.min(1, sim.state.t));
-  const phaseFrac = Math.max(0, Math.min(1, sim.state.t + 0.25));
-  updateSingleGraph('V', phaseFrac);
-  updateSingleGraph('q', phaseFrac);
-  updateSingleGraph('i', phaseFrac);
-  if (sim.state.showE) updateSingleGraph('E', phaseFrac);
-  if (sim.state.showB) updateSingleGraph('B', phaseFrac);
+  updateSingleGraph('V', frac);
+  updateSingleGraph('q', frac);
+  updateSingleGraph('i', frac);
+  if (sim.state.showE) updateSingleGraph('E', frac);
+  if (sim.state.showB) updateSingleGraph('B', frac);
 }
 function graphLoop(){
   updateGraphs();
