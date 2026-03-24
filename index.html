@@ -211,6 +211,29 @@ button{font:inherit}
 }
 .hint-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
 .hint-text{font-size:11px;line-height:1.2;color:#d4deee}
+
+.prop-panel{
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:min(44%, 420px);
+  height:150px;
+  z-index:8;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), rgba(16,26,40,.46);
+  backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.prop-svg{width:100%;height:100%;display:block}
+.prop-label{fill:#d8e8fb;font-size:10px;font-weight:600}
+.prop-axis{stroke:#7f8fa6;stroke-width:.9}
+.prop-dash{stroke:#7f8fa6;stroke-width:.8;stroke-dasharray:4 4}
+.prop-e-pos{stroke:#67a8ff;fill:none;stroke-width:2.1;stroke-linecap:round}
+.prop-e-neg{stroke:#ff4848;fill:none;stroke-width:2.1;stroke-linecap:round}
+.prop-b-pos{stroke:#8df0b1;fill:none;stroke-width:2.0;stroke-linecap:round}
+.prop-b-neg{stroke:#d85bf7;fill:none;stroke-width:2.0;stroke-linecap:round}
+
 .hide{display:none !important}
 
 @media (max-width:1220px){ :root{ --graphsW:314px; } }
@@ -273,6 +296,10 @@ button{font:inherit}
       <div class="stage-wrap" id="stageWrap">
         <div class="machine-shell">
 <div class="machine-host"><div id="machineMount" style="width:100%;height:100%"></div>
+
+            <div class="prop-panel" id="propPanel">
+              <svg class="prop-svg" id="propSvg" viewBox="0 0 420 150" preserveAspectRatio="none"></svg>
+            </div>
 
             <div class="control-dock">
               <button class="ctrl" id="stepPrev">◀ Βήμα</button>
@@ -1146,11 +1173,82 @@ function updateGraphs(){
 }
 function graphLoop(){
   updateGraphs();
+  updatePropagationPanel();
   requestAnimationFrame(graphLoop);
 }
 
 
-async function boot(){
+async 
+function buildWavePath(fn, x0, x1, y0, amp, samples=180){
+  let d = '';
+  for(let i=0;i<=samples;i++){
+    const u = i / samples;
+    const x = x0 + (x1 - x0) * u;
+    const y = y0 - amp * fn(u);
+    d += (i===0 ? 'M' : ' L') + x.toFixed(2) + ' ' + y.toFixed(2);
+  }
+  return d;
+}
+function initPropagationPanel(){
+  const svg = document.getElementById('propSvg');
+  if(!svg) return;
+  svg.innerHTML = `
+    <line x1="24" y1="76" x2="396" y2="76" class="prop-axis"/>
+    <line x1="24" y1="76" x2="396" y2="76" class="prop-dash"/>
+    <line x1="58" y1="22" x2="58" y2="64" class="prop-axis"/>
+    <line x1="66" y1="112" x2="52" y2="132" class="prop-axis"/>
+    <text x="14" y="18" class="prop-label">διάδοση</text>
+    <text x="50" y="18" class="prop-label">E</text>
+    <text x="76" y="136" class="prop-label">B</text>
+    <text x="400" y="70" class="prop-label">x</text>
+
+    <defs>
+      <clipPath id="propEPosClip"><rect x="24" y="0" width="372" height="76"/></clipPath>
+      <clipPath id="propENegClip"><rect x="24" y="76" width="372" height="74"/></clipPath>
+      <clipPath id="propBPosClip"><polygon points="24,76 396,76 396,0 24,0"/></clipPath>
+      <clipPath id="propBNegClip"><polygon points="24,150 396,150 396,76 24,76"/></clipPath>
+    </defs>
+
+    <path id="propEPos" class="prop-e-pos" clip-path="url(#propEPosClip)"/>
+    <path id="propENeg" class="prop-e-neg" clip-path="url(#propENegClip)"/>
+
+    <path id="propBPos" class="prop-b-pos" clip-path="url(#propBPosClip)"/>
+    <path id="propBNeg" class="prop-b-neg" clip-path="url(#propBNegClip)"/>
+  `;
+}
+function updatePropagationPanel(){
+  const svg = document.getElementById('propSvg');
+  if(!svg || !sim || !sim.state) return;
+  const t = Math.max(0, Math.min(1, sim.state.t));
+  const x0 = 24, x1 = 396;
+
+  const ePhase = 2*Math.PI*t;
+  const bPhase = 2*Math.PI*t;
+  const eFn = u => Math.sin(2*Math.PI*(u - 0.60*t));
+  const bFn = u => Math.cos(2*Math.PI*(u - 0.60*t));
+
+  const ePath = buildWavePath(eFn, x0, x1, 76, 28);
+  const bPath = buildWavePath(bFn, x0, x1, 108, 20);
+
+  const ePos = document.getElementById('propEPos');
+  const eNeg = document.getElementById('propENeg');
+  const bPos = document.getElementById('propBPos');
+  const bNeg = document.getElementById('propBNeg');
+
+  if (ePos) ePos.setAttribute('d', ePath);
+  if (eNeg) eNeg.setAttribute('d', ePath);
+  if (bPos) bPos.setAttribute('d', bPath);
+  if (bNeg) bNeg.setAttribute('d', bPath);
+
+  const showE = !!sim.state.showE;
+  const showB = !!sim.state.showB;
+  if (ePos) ePos.style.display = showE ? '' : 'none';
+  if (eNeg) eNeg.style.display = showE ? '' : 'none';
+  if (bPos) bPos.style.display = showB ? '' : 'none';
+  if (bNeg) bNeg.style.display = showB ? '' : 'none';
+}
+
+function boot(){
   await loadResources();
   currentLang = uiConfig.defaultLang || 'el';
   sim = new EMWaveSimulation({
@@ -1162,6 +1260,7 @@ async function boot(){
   });
   sim.init();
   sim.stop();
+  initPropagationPanel();
   initGraphs();
   updatePlayButton();
   syncFieldButtons();
