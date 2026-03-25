@@ -497,7 +497,7 @@ button{font:inherit}
     _seedFront(tNorm, sign){
       const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
       const eAtBirth = -Math.sin(phaseEmit);
-      const arrowLen = 12 + 24 * Math.abs(eAtBirth);
+      const arrowLen = 24 * Math.abs(eAtBirth);
       this.state.fronts.push({
         t0: tNorm,
         sign,
@@ -696,8 +696,6 @@ button{font:inherit}
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
       const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
-      const envPosPts = [];
-      const envNegPts = [];
       for(const [sx, sy] of quads){
         p.beginShape();
         p.vertex(0 * sx, -142 * sy);
@@ -716,11 +714,6 @@ button{font:inherit}
         const tipBaseY = signY * Math.max(0, L - head);
         const tipY = signY * L;
 
-        if (xLocal >= 0) {
-          if (front.sign >= 0) envPosPts.push([xLocal, tipY]);
-          else envNegPts.push([xLocal, tipY]);
-        }
-
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
         p.strokeWeight(1.18 * k);
@@ -732,25 +725,6 @@ button{font:inherit}
         p.pop();
       };
       drawTravelArrow(159.000);
-
-      const drawEnvelope = (pts, rgbVals) => {
-        if (!pts.length) return;
-        const allPts = [[0, 0], ...pts];
-        p.push();
-        p.noFill();
-        p.stroke(rgbVals[0], rgbVals[1], rgbVals[2], alpha * 0.96);
-        p.strokeWeight(1.15 / scaleFactor);
-        p.strokeCap(p.ROUND);
-        p.drawingContext.setLineDash([4 / scaleFactor, 4 / scaleFactor]);
-        p.beginShape();
-        for (const [px, py] of allPts) p.vertex(px, py);
-        p.endShape();
-        p.drawingContext.setLineDash([]);
-        p.pop();
-      };
-
-      drawEnvelope(envPosPts, [90,175,255]);
-      drawEnvelope(envNegPts, [255,72,72]);
       p.pop();
     }
 
@@ -861,6 +835,49 @@ button{font:inherit}
         if(!onQuarterBoundary) this._seedBFront(tEmit, sign);
         this.state.bSlotIndex++;
       }
+    }
+
+    _drawEArrowTipsEnvelope(p, nowT){
+      const state = this.state;
+      const ptsPos = [];
+      const ptsNeg = [];
+
+      for(const front of state.fronts){
+        const age = nowT - front.t0;
+        if(age < 0 || age > 1) continue;
+
+        const scaleFactor = this._getPulseScale(age);
+        const xLocal = 159 * scaleFactor;
+        if (xLocal < 0) continue;
+
+        const k = 1 / scaleFactor;
+        const signY = front.sign >= 0 ? -1 : 1;
+        const L = (front.arrowLen || 0) * k;
+        const tipY = signY * L;
+
+        if(front.sign >= 0) ptsPos.push([xLocal, tipY]);
+        else ptsNeg.push([xLocal, tipY]);
+      }
+
+      const drawPolyline = (pts, rgb) => {
+        if(pts.length < 2) return;
+        pts.sort((a,b) => a[0] - b[0]);
+        p.push();
+        p.translate(state.x0, state.centerY);
+        p.noFill();
+        p.stroke(rgb[0], rgb[1], rgb[2], 230);
+        p.strokeWeight(1.0);
+        p.strokeCap(p.ROUND);
+        p.drawingContext.setLineDash([4,4]);
+        p.beginShape();
+        for(const [x,y] of pts) p.vertex(x, y);
+        p.endShape();
+        p.drawingContext.setLineDash([]);
+        p.pop();
+      };
+
+      drawPolyline(ptsPos, [90,175,255]);
+      drawPolyline(ptsNeg, [255,72,72]);
     }
 
     _mountP5(){
