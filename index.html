@@ -705,13 +705,6 @@ button{font:inherit}
         p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
         p.endShape();
       }
-      const addEnvelopeSegment = (x1, y1, x2, y2, sign) => {
-        if (sign > 0) {
-          envPosPts.push([x1, y1], [x2, y2], [x2, 0]);
-        } else {
-          envNegPts.push([x1, y1], [x2, y2], [x2, 0]);
-        }
-      };
 
       const drawTravelArrow = (xLocal) => {
         const k = 1 / scaleFactor;
@@ -723,7 +716,10 @@ button{font:inherit}
         const tipBaseY = signY * Math.max(0, L - head);
         const tipY = signY * L;
 
-        addEnvelopeSegment(xLocal, tipY, xLocal, 0, front.sign >= 0 ? 1 : -1);
+        if (xLocal >= 0) {
+          if (front.sign >= 0) envPosPts.push([xLocal, tipY]);
+          else envNegPts.push([xLocal, tipY]);
+        }
 
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
@@ -736,10 +732,10 @@ button{font:inherit}
         p.pop();
       };
       drawTravelArrow(159.000);
-      drawTravelArrow(-159.000);
 
       const drawEnvelope = (pts, rgbVals) => {
         if (!pts.length) return;
+        const allPts = [[0, 0], ...pts];
         p.push();
         p.noFill();
         p.stroke(rgbVals[0], rgbVals[1], rgbVals[2], alpha * 0.96);
@@ -747,7 +743,7 @@ button{font:inherit}
         p.strokeCap(p.ROUND);
         p.drawingContext.setLineDash([4 / scaleFactor, 4 / scaleFactor]);
         p.beginShape();
-        for (const [px, py] of pts) p.vertex(px, py);
+        for (const [px, py] of allPts) p.vertex(px, py);
         p.endShape();
         p.drawingContext.setLineDash([]);
         p.pop();
