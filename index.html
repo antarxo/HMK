@@ -495,11 +495,15 @@ button{font:inherit}
     }
 
     _seedFront(tNorm, sign){
+      const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
+      const eAtBirth = -Math.sin(phaseEmit);
+      const arrowLen = 10 + 18 * Math.abs(eAtBirth);
       this.state.fronts.push({
         t0: tNorm,
         sign,
         reverseArrows: sign > 0,
-        color: sign < 0 ? [255,72,72] : [90,175,255]
+        color: sign < 0 ? [255,72,72] : [90,175,255],
+        arrowLen
       });
       this.state.lastSpawnT = tNorm;
     }
@@ -703,10 +707,9 @@ button{font:inherit}
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
         const baseY = 0;
-        // fixed per emitted line: depends on sign/amplitude class at birth, not on later propagation scale
-        const L = 18 * k;
-        const head = 5.1 * k;
-        const half = 2.9 * k;
+        const L = (front.arrowLen || 18) * k;
+        const head = Math.min(5.1 * k, 0.34 * L);
+        const half = Math.min(2.9 * k, 0.22 * L);
         const shaftEnd = signY * Math.max(0, L - head);
         const tipY = signY * L;
         const tipBaseY = signY * Math.max(0, L - head);
