@@ -700,22 +700,23 @@ button{font:inherit}
         p.endShape();
       }
       const drawArrow = (x, y, angleDeg) => {
-        const dir = front.reverseArrows ? 180 : 0;
         p.push();
         p.translate(x, 0);
-        p.rotate(p.radians(angleDeg + dir));
         const k = 1 / scaleFactor;
+        const signY = y >= 0 ? 1 : -1;
         const L = Math.max(6.5 * k, Math.abs(y) * 0.92);
         const head = Math.min(4.8 * k, 0.34 * L);
         const half = Math.min(2.8 * k, 0.22 * L);
-        const shaftEnd = Math.max(0, L - head);
+        const shaftEnd = signY * Math.max(0, L - head);
+        const tipY = signY * L;
+        const baseY = signY * Math.max(0, L - head);
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
         p.strokeWeight(1.25 * k);
         p.strokeCap(p.ROUND);
-        p.line(0, 0, shaftEnd, 0);
+        p.line(0, 0, 0, shaftEnd);
         p.noStroke();
         p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.triangle(L, 0, L - head, -half, L - head, half);
+        p.triangle(0, tipY, -half, baseY, half, baseY);
         p.pop();
       };
       drawArrow(139.320, -115.360, 66.762);
