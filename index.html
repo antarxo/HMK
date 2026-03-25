@@ -497,7 +497,7 @@ button{font:inherit}
     _seedFront(tNorm, sign){
       const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
       const eAtBirth = -Math.sin(phaseEmit);
-      const arrowLen = 10 + 18 * Math.abs(eAtBirth);
+      const arrowLen = 12 + 24 * Math.abs(eAtBirth);
       this.state.fronts.push({
         t0: tNorm,
         sign,
@@ -696,6 +696,8 @@ button{font:inherit}
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
       const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
+      const envPosPts = [];
+      const envNegPts = [];
       for(const [sx, sy] of quads){
         p.beginShape();
         p.vertex(0 * sx, -142 * sy);
@@ -703,6 +705,14 @@ button{font:inherit}
         p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
         p.endShape();
       }
+      const addEnvelopeSegment = (x1, y1, x2, y2, sign) => {
+        if (sign > 0) {
+          envPosPts.push([x1, y1], [x2, y2], [x2, 0]);
+        } else {
+          envNegPts.push([x1, y1], [x2, y2], [x2, 0]);
+        }
+      };
+
       const drawTravelArrow = (xLocal) => {
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
@@ -710,9 +720,10 @@ button{font:inherit}
         const L = (front.arrowLen || 18) * k;
         const head = Math.min(5.1 * k, 0.34 * L);
         const half = Math.min(2.9 * k, 0.22 * L);
-        const shaftEnd = signY * Math.max(0, L - head);
-        const tipY = signY * L;
         const tipBaseY = signY * Math.max(0, L - head);
+        const tipY = signY * L;
+
+        addEnvelopeSegment(xLocal, tipY, xLocal, 0, front.sign >= 0 ? 1 : -1);
 
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
@@ -726,6 +737,24 @@ button{font:inherit}
       };
       drawTravelArrow(159.000);
       drawTravelArrow(-159.000);
+
+      const drawEnvelope = (pts, rgbVals) => {
+        if (!pts.length) return;
+        p.push();
+        p.noFill();
+        p.stroke(rgbVals[0], rgbVals[1], rgbVals[2], alpha * 0.96);
+        p.strokeWeight(1.15 / scaleFactor);
+        p.strokeCap(p.ROUND);
+        p.drawingContext.setLineDash([4 / scaleFactor, 4 / scaleFactor]);
+        p.beginShape();
+        for (const [px, py] of pts) p.vertex(px, py);
+        p.endShape();
+        p.drawingContext.setLineDash([]);
+        p.pop();
+      };
+
+      drawEnvelope(envPosPts, [90,175,255]);
+      drawEnvelope(envNegPts, [255,72,72]);
       p.pop();
     }
 
