@@ -699,30 +699,30 @@ button{font:inherit}
         p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
         p.endShape();
       }
-      const drawArrow = (x, y, angleDeg) => {
-        p.push();
-        p.translate(x, 0);
+      const drawTravelArrow = (xLocal) => {
         const k = 1 / scaleFactor;
-        const signY = y >= 0 ? 1 : -1;
-        const L = Math.max(6.5 * k, Math.abs(y) * 0.92);
-        const head = Math.min(4.8 * k, 0.34 * L);
-        const half = Math.min(2.8 * k, 0.22 * L);
+        const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
+        const baseY = 0;
+        // fixed per emitted line: depends on sign/amplitude class at birth, not on later propagation scale
+        const L = 18 * k;
+        const head = 5.1 * k;
+        const half = 2.9 * k;
         const shaftEnd = signY * Math.max(0, L - head);
         const tipY = signY * L;
-        const baseY = signY * Math.max(0, L - head);
+        const tipBaseY = signY * Math.max(0, L - head);
+
+        p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.strokeWeight(1.25 * k);
+        p.strokeWeight(1.18 * k);
         p.strokeCap(p.ROUND);
-        p.line(0, 0, 0, shaftEnd);
+        p.line(xLocal, baseY, xLocal, tipBaseY);
         p.noStroke();
         p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.triangle(0, tipY, -half, baseY, half, baseY);
+        p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
         p.pop();
       };
-      drawArrow(139.320, -115.360, 66.762);
-      drawArrow(139.320, 115.360, 113.238);
-      drawArrow(-139.320, -115.360, 113.238);
-      drawArrow(-139.320, 115.360, 66.762);
+      drawTravelArrow(159.000);
+      drawTravelArrow(-159.000);
       p.pop();
     }
 
