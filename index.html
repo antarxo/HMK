@@ -931,9 +931,9 @@ button{font:inherit}
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? [60, 220, 120]
           : [168, 90, 220];
-        // screen-angle sequence by T/4: 60, 120, 120, 60
-        // with canvas y-axis downward, the visible 120° orientation maps to -120 here
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 60 : -120;
+        // screen-angle test by T/4: 80, 100, 100, 80
+        // with canvas y-axis downward, the visible 100° orientation maps to -100 here
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 80 : -100;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 44 * Math.abs(bAtBirth);
