@@ -487,7 +487,6 @@ button{font:inherit}
       this.state.bFronts = [];
       this.state.eTipTable = [];
       this.state.eTipSlots = this.tables.E_FULL
-        .filter(t => Math.abs(t * 4 - Math.round(t * 4)) >= 1e-12)
         .map((tEmit, idx) => ({
           slotIndex: idx,
           tEmit,
@@ -840,8 +839,7 @@ button{font:inherit}
         const tEmit = E_FULL[this.state.eSlotIndex];
         const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
         const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
-        const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
-        if(!onQuarterBoundary) this._seedFront(tEmit, sign);
+        this._seedFront(tEmit, sign);
         this.state.eSlotIndex++;
       }
     }
@@ -933,9 +931,9 @@ button{font:inherit}
       p.translate(state.x0, state.centerY);
       p.noFill();
       p.stroke(255, 255, 255, 255);
-      p.strokeWeight(2.0);
+      p.strokeWeight(1.35);
       p.strokeCap(p.ROUND);
-      p.drawingContext.setLineDash([1.2,6]);
+      p.drawingContext.setLineDash([0.8,3.0]);
 
       // ΩΜΗ ΤΕΘΛΑΣΜΕΝΗ ΔΟΚΙΜΗΣ: ένωση κάθε δύο διαδοχικών ορατών tips με ευθύγραμμο τμήμα
       for(let i = 0; i < visibleRows.length - 1; i++){
@@ -999,7 +997,7 @@ button{font:inherit}
           p.background('#0c0d10');
           p.stroke('#4d535d');
           p.strokeWeight(0.83);
-          p.drawingContext.setLineDash([1.2,6]);
+          p.drawingContext.setLineDash([0.8,3.0]);
           p.line(30, state.centerY, state.canvasW - 30, state.centerY);
           p.drawingContext.setLineDash([]);
 
