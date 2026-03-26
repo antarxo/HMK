@@ -948,6 +948,34 @@ button{font:inherit}
       }
 
       p.drawingContext.setLineDash([]);
+
+      // extra βέλη του Ε κάτω από τη στικτή: μόνο στην κάτω κλάδο, χωρίς άλλη αλλαγή
+      const lowerRows = visibleRows.filter(row => row.tipY > 0);
+      const drawLowerArrow = (x, y, angleDeg) => {
+        p.push();
+        p.translate(x, y + 4.0);
+        p.rotate(p.radians(angleDeg));
+        p.noStroke();
+        p.fill(255, 255, 255, 230);
+        p.beginShape();
+        p.vertex(4.0, 0);
+        p.vertex(-2.2, -2.6);
+        p.vertex(-2.2,  2.6);
+        p.endShape(p.CLOSE);
+        p.pop();
+      };
+      for(let i = 0; i < lowerRows.length - 1; i++){
+        const a = lowerRows[i];
+        const b = lowerRows[i + 1];
+        const dx = b.xLocal - a.xLocal;
+        const dy = b.tipY - a.tipY;
+        if(Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) continue;
+        const xm = a.xLocal + 0.5 * dx;
+        const ym = a.tipY + 0.5 * dy;
+        const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+        drawLowerArrow(xm, ym, ang);
+      }
+
       p.pop();
     }
 
