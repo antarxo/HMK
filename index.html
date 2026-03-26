@@ -742,10 +742,9 @@ button{font:inherit}
       drawArrow(139.320, 115.360, 113.238);
       drawArrow(-139.320, -115.360, 113.238);
       drawArrow(-139.320, 115.360, 66.762);
-
       const drawTravelArrow = (xLocal) => {
         const k = 1 / scaleFactor;
-        const signY = front.sign >= 0 ? -1 : 1;
+        const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
         const baseY = 0;
         const L = (front.arrowLen || 18) * k;
         const head = Math.min(5.1 * k, 0.34 * L);
