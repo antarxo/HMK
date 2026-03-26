@@ -920,7 +920,9 @@ button{font:inherit}
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? [60, 220, 120]
           : [168, 90, 220];
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 1) ? -60 : 120;
+        // user-facing angles: -60 means clockwise 60° on screen, 120 means counterclockwise 120° on screen
+        // with canvas y-axis downward, that maps to +60 and -120 respectively
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 1) ? 60 : -120;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 24 * Math.abs(bAtBirth);
