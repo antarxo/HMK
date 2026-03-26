@@ -920,7 +920,7 @@ button{font:inherit}
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? [60, 220, 120]
           : [168, 90, 220];
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 2) ? -60 : 120;
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 1) ? -60 : 120;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 24 * Math.abs(bAtBirth);
