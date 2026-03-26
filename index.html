@@ -317,7 +317,10 @@ button{font:inherit}
         <button class="chip" id="toggleHints">Οδηγίες</button>
         <button class="chip" id="resetBtn">Επαναφορά</button>
         <button class="chip theme-chip" id="themeDefault" data-theme="default">Βάση</button>
+        <button class="chip theme-chip" id="themeScreen" data-theme="screen">Οθόνη</button>
         <button class="chip theme-chip" id="themeAcademic" data-theme="academic">Ήπια</button>
+        <button class="chip theme-chip" id="themePrint" data-theme="print">Print</button>
+        <button class="chip theme-chip" id="themePaperContrast" data-theme="paperContrast">Χαρτί+</button>
         <button class="chip theme-chip" id="themeCapture" data-theme="capture">Χαρτί</button>
       </div>
     </div>
@@ -503,7 +506,7 @@ const THEME_PRESETS = {
     key: 'capture',
     labels: { el: 'Χαρτί', en: 'Paper' },
     cssVars: {
-      '--bg':'#eee8dc','--bg2':'#e3dccf','--bg3':'#d8d0c2','--text':'#24303a','--muted':'#5b6673',
+      '--bg':'#f5f0e6','--bg2':'#ece4d6','--bg3':'#e0d5c5','--text':'#23303a','--muted':'#5d6874',
       '--green':'#3f9460','--red':'#b54e4e','--blue':'#4e78ae','--purple':'#7455b5','--rodNeutral':'#adb6c0',
       '--glass2':'rgba(255,255,255,.32)','--liftShadow':'7px 9px 18px rgba(35,32,25,.13)',
       '--bodyGlowA':'rgba(126,153,186,.06)','--bodyGlowB':'rgba(207,181,111,.06)',
@@ -512,9 +515,9 @@ const THEME_PRESETS = {
       '--titleBoxBg':'linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.20)), rgba(210,201,184,.56)',
       '--logoBg':'radial-gradient(circle at 35% 30%, rgba(255,255,255,.54), rgba(255,255,255,0) 42%), linear-gradient(135deg,#cbc1af 0%, #b4a892 100%)',
       '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.16)), rgba(210,201,184,.44)',
-      '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(229,224,215,.96) 0%, rgba(243,239,232,.84) 34%, rgba(241,237,230,1) 76%), linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0))',
-      '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.40), rgba(255,255,255,.08)), rgba(255,255,255,.18)',
-      '--machineAxis':'rgba(108,116,125,.46)',
+      '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,.98) 0%, rgba(246,241,233,.88) 36%, rgba(238,230,216,1) 82%), linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0))',
+      '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.12)), rgba(255,255,255,.24)',
+      '--machineAxis':'rgba(92,100,108,.44)',
       '--btnBorder':'rgba(62,73,84,.24)','--btnBorderHover':'rgba(62,73,84,.34)','--btnBorderOn':'rgba(62,73,84,.42)','--btnBorderOff':'rgba(62,73,84,.14)',
       '--btnText':'#26313b','--btnTextOff':'#647181','--btnTextActive':'#1e2832',
       '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.26)), rgba(214,206,192,.84)',
@@ -539,7 +542,7 @@ const THEME_PRESETS = {
       '--ellipseGreenStrong':'rgba(63,148,96,.28)','--ellipseGreenSoft':'rgba(63,148,96,.12)','--ellipsePurpleSoft':'rgba(116,85,181,.14)'
     },
     graphs: {
-      axis:'#6d7783', text:'#2e3944', marker:'#3f9460', time:'#3f4b57',
+      axis:'#59646f', text:'#23303a', marker:'#2b8453', time:'#2a3640',
       V:{pos:'#a6852e',neg:'#a6852e'},
       Q:{pos:'#4e78ae',neg:'#b54e4e'},
       I:{pos:'#3f9460',neg:'#7455b5'},
@@ -547,14 +550,14 @@ const THEME_PRESETS = {
       B:{pos:'#3f9460',neg:'#7455b5'}
     },
     sim: {
-      viewportBg:'#faf7f1', axis:'#7f868d', electronDot:[181,78,78],
-      ePositive:[78,120,174], eNegative:[181,78,78],
-      bGreen:[56,145,92], bPurple:[116,85,181],
+      viewportBg:'#fffdf9', axis:'#7d8380', electronDot:[181,78,78],
+      ePositive:[58,103,151], eNegative:[171,72,72],
+      bGreen:[43,132,83], bPurple:[110,76,176],
       currentPositive:[56,145,92], currentNegative:[116,85,181],
       rodPos:[78,120,174], rodNeg:[181,78,78], rodNeutral:[159,169,182],
       rodOutline:'rgba(98, 104, 112, 0.34)', rodHighlight:'rgba(255,255,255, 0.62)',
       chargePositive:'#277f95', chargeNegative:'#a94444',
-      eEnvelope:'rgba(82,88,96,0.18)', bEnvelope:'rgba(82,88,96,0.18)',
+      eEnvelope:'rgba(44,52,60,0.18)', bEnvelope:'rgba(44,52,60,0.18)',
       eCurveStrokeMul:0.88, bCurveStrokeMul:0.88,
       travelStrokeMul:0.92, envelopeStrokeWeight:0.95
     }
@@ -620,6 +623,138 @@ function normalizeSimThemeCompat(theme){
 
   return t;
 }
+
+function clonePlain(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+function mergeThemePreset(base, patch){
+  const out = clonePlain(base || {});
+  if (!patch || typeof patch !== 'object') return out;
+  Object.entries(patch).forEach(([k, v]) => {
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      out[k] = mergeThemePreset(out[k] || {}, v);
+    } else {
+      out[k] = v;
+    }
+  });
+  return out;
+}
+THEME_PRESETS.screen = mergeThemePreset(THEME_PRESETS.default, {
+  key: 'screen',
+  labels: { el: 'Οθόνη', en: 'Screen' },
+  cssVars: {
+    '--bg':'#050b12','--bg2':'#0d1725','--bg3':'#1a2d44','--text':'#f2f7ff','--muted':'#a2b7d2',
+    '--green':'#79ffb4','--red':'#ff7a7a','--blue':'#78baff','--purple':'#d486ff',
+    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)), rgba(4,10,18,.86)',
+    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0)), rgba(7,14,24,.70)',
+    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), rgba(32,63,97,.26)',
+    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(76,124,176,.62) 0%, rgba(16,28,44,.32) 34%, rgba(4,8,14,1) 78%), linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0))',
+    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)), rgba(7,15,26,.58)',
+    '--machineAxis':'rgba(205,220,240,.78)',
+    '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04)), rgba(20,45,76,.88)',
+    '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)), rgba(32,61,98,.92)',
+    '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.07)), rgba(46,82,128,.96)',
+    '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.04)), rgba(18,41,68,.86)',
+    '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06)), rgba(29,57,92,.92)',
+    '--ctrlText':'#f2f7ff'
+  },
+  graphs: {
+    axis:'#89a9d2', text:'#ecf5ff', marker:'#86ffc0', time:'#ffffff',
+    V:{pos:'#ffd36a',neg:'#ffd36a'},
+    Q:{pos:'#78baff',neg:'#ff7a7a'},
+    I:{pos:'#79ffb4',neg:'#d486ff'},
+    E:{pos:'#78baff',neg:'#ff7a7a'},
+    B:{pos:'#79ffb4',neg:'#d486ff'}
+  },
+  sim: {
+    viewportBg:'#060a10', axis:'#6d7c8f',
+    palette: {
+      ePositive:[120,195,255], eNegative:[255,110,110],
+      bGreen:[95,255,166], bPurple:[212,134,255],
+      eEnvelope:'rgba(255,255,255,0.42)', bEnvelope:'rgba(255,255,255,0.38)'
+    },
+    stroke: {
+      eCurveMul:1.08, bCurveMul:1.05, eTravelMul:1.08, bTravelMul:1.05, envelopeWeight:1.08
+    }
+  }
+});
+THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
+  key: 'print',
+  labels: { el: 'Print', en: 'Print' },
+  cssVars: {
+    '--bg':'#f7f2e8','--bg2':'#ede6d8','--bg3':'#e1d7c7','--text':'#23303a','--muted':'#596572',
+    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.30)), rgba(233,226,214,.86)',
+    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,.34)), rgba(226,217,203,.86)',
+    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.24)), rgba(227,219,205,.82)',
+    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(250,246,238,.98) 0%, rgba(241,236,228,.88) 36%, rgba(229,222,210,1) 82%), linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,0))',
+    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.12)), rgba(255,255,255,.28)',
+    '--machineAxis':'rgba(86,95,104,.42)',
+    '--btnText':'#24303a','--btnTextOff':'#66717c','--btnTextActive':'#18222b',
+    '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.42)), rgba(219,210,197,.92)',
+    '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.50)), rgba(210,199,184,.96)',
+    '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.56)), rgba(198,187,170,.98)',
+    '--layerBtnTextActive':'#18222b',
+    '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.38)), rgba(220,210,196,.90)',
+    '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.46)), rgba(208,197,182,.96)',
+    '--ctrlText':'#24303a'
+  },
+  graphs: {
+    axis:'#5d6772', text:'#22303a', marker:'#2f7f56', time:'#28343e',
+    V:{pos:'#ac8426',neg:'#ac8426'},
+    Q:{pos:'#3f6d9c',neg:'#a84b4b'},
+    I:{pos:'#2f7f56',neg:'#7452b5'},
+    E:{pos:'#3f6d9c',neg:'#a84b4b'},
+    B:{pos:'#2f7f56',neg:'#7452b5'}
+  },
+  sim: {
+    viewportBg:'#fcf9f3', axis:'#8b918d',
+    palette: {
+      ePositive:[63,109,156], eNegative:[168,75,75],
+      bGreen:[47,127,86], bPurple:[116,82,181],
+      eEnvelope:'rgba(42,50,58,0.16)', bEnvelope:'rgba(42,50,58,0.16)', axis:'#8b918d'
+    },
+    stroke: {
+      eCurveMul:1.02, bCurveMul:1.00, eTravelMul:1.00, bTravelMul:0.98, envelopeWeight:0.96, axisWeight:0.92
+    }
+  }
+});
+THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
+  key: 'paperContrast',
+  labels: { el: 'Χαρτί+', en: 'Paper Contrast' },
+  cssVars: {
+    '--bg':'#fcf8ef','--bg2':'#f2ebde','--bg3':'#e7dccb','--text':'#1f2a33','--muted':'#505b66',
+    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.34)), rgba(238,231,219,.90)',
+    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.42)), rgba(229,220,206,.90)',
+    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.26)), rgba(231,222,208,.88)',
+    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(248,243,234,.92) 38%, rgba(236,228,214,1) 84%), linear-gradient(180deg, rgba(255,255,255,.44), rgba(255,255,255,0))',
+    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.14)), rgba(255,255,255,.34)',
+    '--machineAxis':'rgba(70,80,88,.48)',
+    '--btnBorder':'rgba(47,59,70,.20)','--btnBorderHover':'rgba(47,59,70,.28)','--btnBorderOn':'rgba(47,59,70,.24)',
+    '--btnText':'#1f2a33','--btnTextOff':'#67727d','--btnTextActive':'#101820',
+    '--layerBtnTextActive':'#101820',
+    '--ctrlText':'#1f2a33'
+  },
+  graphs: {
+    axis:'#4f5b66', text:'#17212a', marker:'#237a4f', time:'#17212a',
+    V:{pos:'#9f7616',neg:'#9f7616'},
+    Q:{pos:'#315f90',neg:'#9f3e3e'},
+    I:{pos:'#237a4f',neg:'#6844a7'},
+    E:{pos:'#315f90',neg:'#9f3e3e'},
+    B:{pos:'#237a4f',neg:'#6844a7'}
+  },
+  sim: {
+    viewportBg:'#fffdf8', axis:'#777d7a',
+    palette: {
+      ePositive:[49,95,144], eNegative:[159,62,62],
+      bGreen:[35,122,79], bPurple:[104,68,167],
+      eEnvelope:'rgba(20,28,36,0.22)', bEnvelope:'rgba(20,28,36,0.22)', axis:'#777d7a'
+    },
+    stroke: {
+      eCurveMul:1.10, bCurveMul:1.08, eTravelMul:1.08, bTravelMul:1.04, envelopeWeight:1.04, axisWeight:0.98
+    }
+  }
+});
+THEME_PRESETS.paper = THEME_PRESETS.capture;
 
 Object.keys(THEME_PRESETS).forEach((key) => {
   THEME_PRESETS[key] = normalizeSimThemeCompat({ ...THEME_PRESETS[key], key });
@@ -1730,8 +1865,22 @@ function setLang(lang){
   });
 
   const themeLabels = (lang === 'en')
-    ? { themeDefault: THEME_PRESETS.default.labels.en, themeAcademic: THEME_PRESETS.academic.labels.en, themeCapture: THEME_PRESETS.capture.labels.en }
-    : { themeDefault: THEME_PRESETS.default.labels.el, themeAcademic: THEME_PRESETS.academic.labels.el, themeCapture: THEME_PRESETS.capture.labels.el };
+    ? {
+        themeDefault: THEME_PRESETS.default.labels.en,
+        themeScreen: THEME_PRESETS.screen.labels.en,
+        themeAcademic: THEME_PRESETS.academic.labels.en,
+        themePrint: THEME_PRESETS.print.labels.en,
+        themePaperContrast: THEME_PRESETS.paperContrast.labels.en,
+        themeCapture: THEME_PRESETS.capture.labels.en
+      }
+    : {
+        themeDefault: THEME_PRESETS.default.labels.el,
+        themeScreen: THEME_PRESETS.screen.labels.el,
+        themeAcademic: THEME_PRESETS.academic.labels.el,
+        themePrint: THEME_PRESETS.print.labels.el,
+        themePaperContrast: THEME_PRESETS.paperContrast.labels.el,
+        themeCapture: THEME_PRESETS.capture.labels.el
+      };
   Object.entries(themeLabels).forEach(([id, value]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
