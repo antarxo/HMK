@@ -738,11 +738,15 @@ button{font:inherit}
         p.endShape(p.CLOSE);
         p.pop();
       };
-      drawArrow(139.320, -115.360, 66.762);
-      drawArrow(139.320, 115.360, 113.238);
-      drawArrow(-139.320, -115.360, 113.238);
-      drawArrow(-139.320, 115.360, 66.762);
+      const hasEArrowMagnitude = (front.arrowLen || 0) > 0.25;
+      if(hasEArrowMagnitude){
+        drawArrow(139.320, -115.360, 66.762);
+        drawArrow(139.320, 115.360, 113.238);
+        drawArrow(-139.320, -115.360, 113.238);
+        drawArrow(-139.320, 115.360, 66.762);
+      }
       const drawTravelArrow = (xLocal) => {
+        if(!hasEArrowMagnitude) return;
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
         const baseY = 0;
@@ -973,7 +977,7 @@ button{font:inherit}
       // extra βέλη του Ε κάτω από τη στικτή:
       // οι ΑΙΧΜΕΣ των βελών πατάνε ακριβώς στα σημεία της στικτής.
       // Δεν αλλάζουμε τη στικτή· απλώς σχεδιάζουμε τα βέλη που της αντιστοιχούν.
-      const lowerRows = visibleRows.filter(row => row.tipY > 0);
+      const lowerRows = visibleRows.filter(row => row.tipY > 0.25);
       const drawLowerArrowAtTip = (xTip, yTip) => {
         const arrowLen = Math.max(8.0, Math.min(22.0, yTip * 0.42));
         const head = 5.2;
