@@ -864,9 +864,9 @@ button{font:inherit}
       p.translate(state.x0, state.centerY);
       p.noFill();
       p.stroke(255, 255, 255, 255);
-      p.strokeWeight(1.8);
+      p.strokeWeight(2.0);
       p.strokeCap(p.ROUND);
-      p.drawingContext.setLineDash([9,6]);
+      p.drawingContext.setLineDash([1.2,6]);
       p.beginShape();
       for(const [x,y] of pts) p.vertex(x, y);
       p.endShape();
@@ -925,7 +925,7 @@ button{font:inherit}
           p.background('#0c0d10');
           p.stroke('#4d535d');
           p.strokeWeight(0.83);
-          p.drawingContext.setLineDash([9,6]);
+          p.drawingContext.setLineDash([1.2,6]);
           p.line(30, state.centerY, state.canvasW - 30, state.centerY);
           p.drawingContext.setLineDash([]);
 
