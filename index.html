@@ -724,15 +724,15 @@ button{font:inherit}
         p.endShape();
       }
 
-      const drawTravelArrow = (xLocal) => {
+      const drawTravelArrow = (xLocal, yLocal) => {
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
-        const baseY = 0;
+        const baseY = yLocal;
         const L = (front.arrowLen || 18) * k;
         const head = Math.min(5.1 * k, 0.34 * L);
         const half = Math.min(2.9 * k, 0.22 * L);
-        const tipBaseY = signY * Math.max(0, L - head);
-        const tipY = signY * L;
+        const tipBaseY = baseY + signY * Math.max(0, L - head);
+        const tipY = baseY + signY * L;
 
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
@@ -744,7 +744,13 @@ button{font:inherit}
         p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
         p.pop();
       };
-      drawTravelArrow(159.000);
+      const eArrowAnchors = [
+        { x: 118.0, y: -92.0 },
+        { x: 118.0, y:  92.0 },
+        { x: -118.0, y: -92.0 },
+        { x: -118.0, y:  92.0 }
+      ];
+      for(const a of eArrowAnchors) drawTravelArrow(a.x, a.y);
       p.pop();
     }
 
