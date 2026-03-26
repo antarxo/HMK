@@ -560,14 +560,79 @@ const THEME_PRESETS = {
     }
   }
 };
+function normalizeSimThemeCompat(theme){
+  const t = theme || {};
+  const sim = t.sim || (t.sim = {});
+  const palette = sim.palette || (sim.palette = {});
+  const stroke = sim.stroke || (sim.stroke = {});
+
+  palette.axis = palette.axis ?? sim.axis ?? '#4d535d';
+  palette.electronDot = palette.electronDot ?? sim.electronDot ?? [255,82,82];
+  palette.ePositive = palette.ePositive ?? sim.ePositive ?? [90,175,255];
+  palette.eNegative = palette.eNegative ?? sim.eNegative ?? [255,72,72];
+  palette.bGreen = palette.bGreen ?? sim.bGreen ?? [60,220,120];
+  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [168,90,220];
+  palette.currentPositive = palette.currentPositive ?? sim.currentPositive ?? [74,215,110];
+  palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? [216,91,247];
+  palette.rodPos = palette.rodPos ?? sim.rodPos ?? [90,175,255];
+  palette.rodNeg = palette.rodNeg ?? sim.rodNeg ?? [255,82,82];
+  palette.rodNeutral = palette.rodNeutral ?? sim.rodNeutral ?? [188,198,214];
+  palette.rodOutline = palette.rodOutline ?? sim.rodOutline ?? 'rgba(12, 16, 22, 0.92)';
+  palette.rodHighlight = palette.rodHighlight ?? sim.rodHighlight ?? 'rgba(225, 232, 242, 0.30)';
+  palette.chargePositive = palette.chargePositive ?? sim.chargePositive ?? '#00E7FF';
+  palette.chargeNegative = palette.chargeNegative ?? sim.chargeNegative ?? '#FF0000';
+  palette.eEnvelope = palette.eEnvelope ?? sim.eEnvelope ?? 'rgba(255,255,255,0.43)';
+  palette.bEnvelope = palette.bEnvelope ?? sim.bEnvelope ?? 'rgba(255,255,255,0.43)';
+
+  stroke.eCurveMul = stroke.eCurveMul ?? sim.eCurveStrokeMul ?? 1.0;
+  stroke.bCurveMul = stroke.bCurveMul ?? sim.bCurveStrokeMul ?? 1.0;
+  stroke.eTravelMul = stroke.eTravelMul ?? sim.eTravelStrokeMul ?? sim.travelStrokeMul ?? 1.0;
+  stroke.bTravelMul = stroke.bTravelMul ?? sim.bTravelStrokeMul ?? sim.travelStrokeMul ?? 1.0;
+  stroke.envelopeWeight = stroke.envelopeWeight ?? sim.envelopeStrokeWeight ?? 1.15;
+  stroke.currentArrowMul = stroke.currentArrowMul ?? sim.currentArrowStrokeMul ?? 1.0;
+  stroke.axisWeight = stroke.axisWeight ?? sim.axisStrokeWeight ?? 0.83;
+
+  sim.axis = palette.axis;
+  sim.electronDot = palette.electronDot;
+  sim.ePositive = palette.ePositive;
+  sim.eNegative = palette.eNegative;
+  sim.bGreen = palette.bGreen;
+  sim.bPurple = palette.bPurple;
+  sim.currentPositive = palette.currentPositive;
+  sim.currentNegative = palette.currentNegative;
+  sim.rodPos = palette.rodPos;
+  sim.rodNeg = palette.rodNeg;
+  sim.rodNeutral = palette.rodNeutral;
+  sim.rodOutline = palette.rodOutline;
+  sim.rodHighlight = palette.rodHighlight;
+  sim.chargePositive = palette.chargePositive;
+  sim.chargeNegative = palette.chargeNegative;
+  sim.eEnvelope = palette.eEnvelope;
+  sim.bEnvelope = palette.bEnvelope;
+  sim.eCurveStrokeMul = stroke.eCurveMul;
+  sim.bCurveStrokeMul = stroke.bCurveMul;
+  sim.eTravelStrokeMul = stroke.eTravelMul;
+  sim.bTravelStrokeMul = stroke.bTravelMul;
+  sim.travelStrokeMul = stroke.eTravelMul;
+  sim.envelopeStrokeWeight = stroke.envelopeWeight;
+  sim.currentArrowStrokeMul = stroke.currentArrowMul;
+  sim.axisStrokeWeight = stroke.axisWeight;
+
+  return t;
+}
+
+Object.keys(THEME_PRESETS).forEach((key) => {
+  THEME_PRESETS[key] = normalizeSimThemeCompat({ ...THEME_PRESETS[key], key });
+});
+
 window.EMW_THEME_PRESETS = THEME_PRESETS;
-window.EMW_ACTIVE_THEME = JSON.parse(JSON.stringify(THEME_PRESETS.default));
+window.EMW_ACTIVE_THEME = normalizeSimThemeCompat(JSON.parse(JSON.stringify(THEME_PRESETS.default)));
 
 function getActiveTheme(){
   return window.EMW_ACTIVE_THEME || THEME_PRESETS.default;
 }
 function cloneTheme(theme){
-  return JSON.parse(JSON.stringify(theme));
+  return normalizeSimThemeCompat(JSON.parse(JSON.stringify(theme)));
 }
 function applyThemeVars(theme){
   const root = document.documentElement;
@@ -582,7 +647,7 @@ function syncThemeButtons(){
   });
 }
 function registerThemePreset(key, themeObj){
-  THEME_PRESETS[key] = { ...themeObj, key };
+  THEME_PRESETS[key] = normalizeSimThemeCompat({ ...themeObj, key });
 }
 function applyTheme(themeKeyOrObj, options = {}){
   const theme = typeof themeKeyOrObj === 'string'
@@ -604,6 +669,12 @@ function applyTheme(themeKeyOrObj, options = {}){
 }
 window.applyEMWTheme = applyTheme;
 window.registerEMWThemePreset = registerThemePreset;
+window.EMW_THEME_SCHEMA_HINT = {
+  sim: {
+    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[60,220,120], bPurple:[168,90,220], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
+    stroke: { eCurveMul:1.0, bCurveMul:1.0, eTravelMul:1.0, bTravelMul:1.0, envelopeWeight:1.15, currentArrowMul:1.0, axisWeight:0.83 }
+  }
+};
 
 (function(global){
   class EMWaveSimulation {
@@ -755,20 +826,31 @@ window.registerEMWThemePreset = registerThemePreset;
       return global.EMW_ACTIVE_THEME || global.EMW_THEME_PRESETS?.default || {};
     }
 
+    _simTheme(){
+      return normalizeSimThemeCompat(this._theme()).sim || {};
+    }
+
+    _simPalette(){
+      return this._simTheme().palette || {};
+    }
+
+    _simStroke(){
+      return this._simTheme().stroke || {};
+    }
+
     setTheme(theme){
       global.EMW_ACTIVE_THEME = cloneTheme(theme);
       return this;
     }
 
     refreshThemeColors(){
-      const theme = this._theme();
-      const simTheme = theme.sim || {};
+      const simPalette = this._simPalette();
       this.state.fronts.forEach(front => {
-        front.color = front.sign < 0 ? (simTheme.eNegative || [255,72,72]) : (simTheme.ePositive || [90,175,255]);
+        front.color = front.sign < 0 ? (simPalette.eNegative || [255,72,72]) : (simPalette.ePositive || [90,175,255]);
       });
       this.state.bFronts.forEach(front => {
         const q = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
-        front.rgb = (q === 0 || q === 3) ? (simTheme.bGreen || [60,220,120]) : (simTheme.bPurple || [168,90,220]);
+        front.rgb = (q === 0 || q === 3) ? (simPalette.bGreen || [60,220,120]) : (simPalette.bPurple || [168,90,220]);
       });
       return this;
     }
@@ -858,7 +940,7 @@ window.registerEMWThemePreset = registerThemePreset;
         t0: tNorm,
         sign,
         reverseArrows: sign > 0,
-        color: sign < 0 ? ((this._theme().sim || {}).eNegative || [255,72,72]) : ((this._theme().sim || {}).ePositive || [90,175,255]),
+        color: sign < 0 ? (this._simPalette().eNegative || [255,72,72]) : (this._simPalette().ePositive || [90,175,255]),
         arrowLen
       };
       this.state.fronts.push(front);
@@ -950,9 +1032,8 @@ window.registerEMWThemePreset = registerThemePreset;
       if(alignMode === 'bottom') cy = y - halfLen;
       p.push();
       p.strokeCap(p.ROUND);
-      const theme = this._theme();
-      const simTheme = theme.sim || {};
-      const col = isPositive ? p.color(simTheme.chargePositive || '#00E7FF') : p.color(simTheme.chargeNegative || '#FF0000');
+      const simPalette = this._simPalette();
+      const col = isPositive ? p.color(simPalette.chargePositive || '#00E7FF') : p.color(simPalette.chargeNegative || '#FF0000');
       col.setAlpha(alpha);
       p.stroke(col);
       p.strokeWeight(lw);
@@ -977,12 +1058,12 @@ window.registerEMWThemePreset = registerThemePreset;
       p.push();
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
-      const theme = this._theme();
-      const simTheme = theme.sim || {};
-      const arrowRGB = iSigned >= 0 ? (simTheme.currentPositive || [74, 215, 110]) : (simTheme.currentNegative || [216, 91, 247]);
+      const simPalette = this._simPalette();
+      const simStroke = this._simStroke();
+      const arrowRGB = iSigned >= 0 ? (simPalette.currentPositive || [74, 215, 110]) : (simPalette.currentNegative || [216, 91, 247]);
       p.stroke(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
       p.fill(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
-      p.strokeWeight(lineW);
+      p.strokeWeight(lineW * (simStroke.currentArrowMul || 1));
       const yBase = y2 - dir * head;
       p.line(xArrow, y1, xArrow, yBase);
       p.noStroke();
@@ -999,11 +1080,10 @@ window.registerEMWThemePreset = registerThemePreset;
       const state = this.state;
       const ctx = p.drawingContext;
       const rodGrad = ctx.createLinearGradient(state.x0, state.yTop, state.x0, state.yBot);
-      const theme = this._theme();
-      const simTheme = theme.sim || {};
-      const negColor = simTheme.rodNeg || [255, 82, 82];
-      const posColor = simTheme.rodPos || [90, 175, 255];
-      const neutralColor = simTheme.rodNeutral || [188, 198, 214];
+      const simPalette = this._simPalette();
+      const negColor = simPalette.rodNeg || [255, 82, 82];
+      const posColor = simPalette.rodPos || [90, 175, 255];
+      const neutralColor = simPalette.rodNeutral || [188, 198, 214];
       const topColor = topIsNegative ? negColor : posColor;
       const botColor = botIsNegative ? negColor : posColor;
       const topA = 0.10 + 0.82 * chargeTop;
@@ -1016,7 +1096,7 @@ window.registerEMWThemePreset = registerThemePreset;
       rodGrad.addColorStop(1.00, `rgba(${botColor[0]}, ${botColor[1]}, ${botColor[2]}, ${botA})`);
       ctx.save();
       ctx.lineCap = 'round';
-      ctx.strokeStyle = simTheme.rodOutline || 'rgba(12, 16, 22, 0.92)';
+      ctx.strokeStyle = simPalette.rodOutline || 'rgba(12, 16, 22, 0.92)';
       ctx.lineWidth = 5.55;
       ctx.beginPath();
       ctx.moveTo(state.x0, state.yTop);
@@ -1028,7 +1108,7 @@ window.registerEMWThemePreset = registerThemePreset;
       ctx.moveTo(state.x0, state.yTop);
       ctx.lineTo(state.x0, state.yBot);
       ctx.stroke();
-      ctx.strokeStyle = simTheme.rodHighlight || 'rgba(225, 232, 242, 0.30)';
+      ctx.strokeStyle = simPalette.rodHighlight || 'rgba(225, 232, 242, 0.30)';
       ctx.lineWidth = 0.72;
       ctx.beginPath();
       ctx.moveTo(state.x0, state.yTop);
@@ -1050,8 +1130,9 @@ window.registerEMWThemePreset = registerThemePreset;
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age);
       const alpha = 225 * fade;
-      const simTheme = (this._theme().sim || {});
-      const strokeW = (simTheme.eCurveStrokeMul || 1) * 0.56 / scaleFactor;
+      const simTheme = this._simTheme();
+      const simStroke = this._simStroke();
+      const strokeW = (simStroke.eCurveMul || 1) * 0.56 / scaleFactor;
       const rgb = front.color;
       p.push();
       p.translate(state.x0, state.centerY);
@@ -1107,7 +1188,7 @@ window.registerEMWThemePreset = registerThemePreset;
 
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.strokeWeight((simTheme.travelStrokeMul || 1) * 1.18 * k);
+        p.strokeWeight((simStroke.eTravelMul || 1) * 1.18 * k);
         p.strokeCap(p.ROUND);
         p.line(xLocal, baseY, xLocal, tipBaseY);
         p.noStroke();
@@ -1162,11 +1243,15 @@ window.registerEMWThemePreset = registerThemePreset;
       const fade = Math.exp(-state.fadeK * age) * 0.78;
       const alphaBase = 200 * fade;
       const alpha = mode === 'back' ? alphaBase * 0.24 : alphaBase * 0.95;
-      const simTheme = (this._theme().sim || {});
-      const strokeW = (simTheme.bCurveStrokeMul || 1) * 0.52 / scaleFactor;
+      const simTheme = this._simTheme();
+      const simPalette = this._simPalette();
+      const simStroke = this._simStroke();
+      const strokeW = (simStroke.bCurveMul || 1) * 0.52 / scaleFactor;
+      const frontQuarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
+      const isGreen = (frontQuarter === 0 || frontQuarter === 3);
       const rgb = Array.isArray(front.rgb)
         ? front.rgb
-        : (front.sign < 0 ? [168, 90, 220] : [60, 220, 120]);
+        : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [168, 90, 220]));
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
@@ -1185,7 +1270,6 @@ window.registerEMWThemePreset = registerThemePreset;
         ctx.stroke();
       }
       ctx.restore();
-      const isGreen = Array.isArray(rgb) && rgb[0] === 60 && rgb[1] === 220 && rgb[2] === 120;
       const ccw = isGreen; // ίδια φορά για ίδιο χρώμα: reference η πρώτη πράσινη
       const nominalTravelAngle = (typeof front.travelAngle === 'number') ? front.travelAngle : (front.sign > 0 ? -60 : 120);
       const isBackwardTravel = nominalTravelAngle < 0;
@@ -1231,7 +1315,7 @@ window.registerEMWThemePreset = registerThemePreset;
 
         p.push();
         p.stroke(rgb[0], rgb[1], rgb[2], travelAlpha);
-        p.strokeWeight((simTheme.travelStrokeMul || 1) * 1.18 * k);
+        p.strokeWeight((simStroke.bTravelMul || 1) * 1.18 * k);
         p.strokeCap(p.ROUND);
         p.line(baseX, baseY, tipBaseX, tipBaseY);
         p.noStroke();
@@ -1276,8 +1360,8 @@ window.registerEMWThemePreset = registerThemePreset;
         const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
         const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
-          ? (((this._theme().sim || {}).bGreen) || [60, 220, 120])
-          : (((this._theme().sim || {}).bPurple) || [168, 90, 220]);
+          ? ((this._simPalette().bGreen) || [60, 220, 120])
+          : ((this._simPalette().bPurple) || [168, 90, 220]);
         // screen-angle test by T/4: 85, 95, 95, 85
         // with canvas y-axis downward, the visible 95° orientation maps to -95 here
         const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 85 : -95;
@@ -1364,8 +1448,8 @@ window.registerEMWThemePreset = registerThemePreset;
       p.push();
       p.translate(state.x0, state.centerY);
       p.noFill();
-      p.stroke((this._theme().sim || {}).eEnvelope || 'rgba(255,255,255,0.43)');
-      p.strokeWeight(((this._theme().sim || {}).envelopeStrokeWeight || 1.15));
+      p.stroke((this._simPalette()).eEnvelope || 'rgba(255,255,255,0.43)');
+      p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
       p.strokeCap(p.ROUND);
       p.drawingContext.setLineDash([]);
 
@@ -1432,8 +1516,8 @@ window.registerEMWThemePreset = registerThemePreset;
 
       p.push();
       p.noFill();
-      p.stroke((this._theme().sim || {}).bEnvelope || 'rgba(255,255,255,0.43)');
-      p.strokeWeight(((this._theme().sim || {}).envelopeStrokeWeight || 1.15));
+      p.stroke((this._simPalette()).bEnvelope || 'rgba(255,255,255,0.43)');
+      p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
       p.strokeCap(p.ROUND);
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
@@ -1496,8 +1580,8 @@ window.registerEMWThemePreset = registerThemePreset;
 
           const simTheme = self._theme().sim || {};
           p.background(simTheme.viewportBg || '#0c0d10');
-          p.stroke(simTheme.axis || '#4d535d');
-          p.strokeWeight(0.83);
+          p.stroke((this._simPalette()).axis || '#4d535d');
+          p.strokeWeight((this._simStroke()).axisWeight || 0.83);
           p.drawingContext.setLineDash([0.8,3.0]);
           p.line(30, state.centerY, state.canvasW - 30, state.centerY);
           p.drawingContext.setLineDash([]);
