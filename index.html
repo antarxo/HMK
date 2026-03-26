@@ -369,6 +369,7 @@ button{font:inherit}
         fronts: [],
         bFronts: [],
         eTipTable: [],
+        bTipTable: [],
         fadeK: 0.36,
         eSlotIndex: 0,
         bSlotIndex: 0,
@@ -486,6 +487,7 @@ button{font:inherit}
       this.state.fronts = [];
       this.state.bFronts = [];
       this.state.eTipTable = [];
+      this.state.bTipTable = [];
       this.state.eTipSlots = this.tables.E_FULL
         .map((tEmit, idx) => ({
           slotIndex: idx,
@@ -836,7 +838,8 @@ button{font:inherit}
       else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
       ctx.stroke();
       ctx.restore();
-      const ccw = front.sign > 0; // μόνο τα βέλη αντιστραμμένα, όχι τα χρώματα
+      const isGreen = Array.isArray(rgb) && rgb[0] === 60 && rgb[1] === 220 && rgb[2] === 120;
+      const ccw = isGreen; // ίδια φορά για ίδιο χρώμα: reference η πρώτη πράσινη
       const arrowAlpha = alpha * (mode === 'back' ? 0.92 : 1.0);
       if(arrowAlpha > 8){
         const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
@@ -1024,6 +1027,62 @@ button{font:inherit}
       p.pop();
     }
 
+
+    _updateBArrowTipTable(nowT){
+      const state = this.state;
+      const rows = [];
+      for(const front of state.bFronts){
+        const age = nowT - front.t0;
+        if(age < 0 || age > 1) continue;
+        const scaleFactor = this._getPulseScale(age);
+        if(scaleFactor <= 0) continue;
+        const L = front.arrowLen || 0;
+        if(L <= 0.25) continue;
+        const angDeg = (typeof front.travelAngle === 'number') ? front.travelAngle : -60;
+        const angRad = angDeg * Math.PI / 180;
+        const baseX = 159 * scaleFactor;
+        const tipX = state.x0 + baseX + Math.cos(angRad) * L;
+        const tipY = state.centerY + Math.sin(angRad) * L;
+        const visible = (
+          tipX >= state.x0 &&
+          tipX <= state.canvasW - 1 &&
+          tipY >= 0 &&
+          tipY <= state.canvasH
+        );
+        rows.push({
+          tEmit: front.t0,
+          screenX: tipX,
+          screenY: tipY,
+          visible,
+          alive: true
+        });
+      }
+      rows.sort((a, b) => (a.screenX - b.screenX) || (a.tEmit - b.tEmit));
+      state.bTipTable = rows;
+      return rows;
+    }
+
+    _drawBArrowTipsEnvelope(p, nowT){
+      const state = this.state;
+      const tipRows = this._updateBArrowTipTable(nowT);
+      const visibleRows = tipRows.filter(row => row.alive && row.visible);
+      if(visibleRows.length < 2) return;
+
+      p.push();
+      p.noFill();
+      p.stroke(255, 255, 255, 255);
+      p.strokeWeight(1.15);
+      p.strokeCap(p.ROUND);
+      p.drawingContext.setLineDash([0.8,3.0]);
+      for(let i = 0; i < visibleRows.length - 1; i++){
+        const a = visibleRows[i];
+        const b = visibleRows[i + 1];
+        p.line(a.screenX, a.screenY, b.screenX, b.screenY);
+      }
+      p.drawingContext.setLineDash([]);
+      p.pop();
+    }
+
     _mountP5(){
       const self = this;
       this.p5Instance = new global.p5((p) => {
@@ -1103,6 +1162,7 @@ button{font:inherit}
           self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t);
           for(const item of bItems) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
+          if(state.showB) self._drawBArrowTipsEnvelope(p, state.t);
 
           p.noStroke(); p.fill(255, 82, 82);
           for(let k=0; k<state.N; k++) p.circle(state.x0, state.yDisplay[k], 2.5);
