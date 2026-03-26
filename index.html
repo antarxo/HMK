@@ -755,18 +755,22 @@ button{font:inherit}
       return ccw ? {x: tx, y: ty} : {x: -tx, y: -ty};
     }
 
-    _drawMagneticArrow(p, x, y, angleDeg, rgb, alpha, scaleFactor){
+    _drawMagneticArrow(p, x, y, angleDeg, arrowLen, rgb, alpha, scaleFactor){
+      const k = 1 / scaleFactor;
+      const L = Math.max(0, arrowLen) * k;
+      if(L <= 0.001) return;
+      const head = Math.max(2.8, Math.min(6.2, 0.34 * arrowLen)) * k;
+      const shaft = Math.max(0, L - head);
+      const half = head * 0.52;
       p.push();
       p.translate(x, y);
       p.rotate(p.radians(angleDeg));
-      p.noStroke();
+      p.stroke(rgb[0], rgb[1], rgb[2], alpha);
       p.fill(rgb[0], rgb[1], rgb[2], alpha);
-      const k = 1 / scaleFactor;
-      p.beginShape();
-      p.vertex(2.25 * k, 0);
-      p.vertex(-1.28 * k, -1.50 * k);
-      p.vertex(-1.28 * k,  1.50 * k);
-      p.endShape(p.CLOSE);
+      p.strokeWeight(1.1 * k);
+      p.line(0, 0, shaft, 0);
+      p.noStroke();
+      p.triangle(L, 0, shaft, -half, shaft, half);
       p.pop();
     }
 
@@ -781,7 +785,6 @@ button{font:inherit}
     }
 
     _drawMagneticEllipseSegment(p, front, nowT, mode){
-      // DEBUG B VERSION: only arrows, no ellipse arcs, no dot/cross symbols
       const state = this.state;
       const ageFromSpawn = nowT - front.t0;
       if(ageFromSpawn < 0 || ageFromSpawn > 1) return;
@@ -795,20 +798,28 @@ button{font:inherit}
       const rgb = isNegative ? [168, 90, 220] : [60, 220, 120];
       const a = 159;
       const b = 39.5;
+      const ctx = p.drawingContext;
       p.push();
       p.translate(state.x0, state.centerY);
       p.scale(scaleFactor);
-      const ccw = front.sign > 0; // μόνο τα βέλη αντιστραμμένα, όχι τα χρώματα
-      const arrowAlpha = alpha * (mode === 'back' ? 0.55 : 1.0);
-      if(arrowAlpha > 8){
-        const thetas = mode === 'back'
-          ? [Math.PI * 1.14, Math.PI * 1.32, Math.PI * 1.68, Math.PI * 1.86]
-          : [Math.PI * 0.14, Math.PI * 0.32, Math.PI * 0.68, Math.PI * 0.86];
-        for(const th of thetas){
-          const pt = this._ellipsePoint(a, b, th);
-          const tg = this._ellipseTangent(a, b, th, ccw);
-          const ang = Math.atan2(tg.y, tg.x) * 180 / Math.PI;
-          this._drawMagneticArrow(p, pt.x, pt.y, ang, rgb, arrowAlpha, scaleFactor);
+      ctx.save();
+      ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha/255})`;
+      ctx.lineWidth = strokeW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
+      else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
+      ctx.stroke();
+      ctx.restore();
+
+      if(mode === 'front'){
+        const arrowAlpha = Math.min(255, alphaBase * 0.98);
+        if(arrowAlpha > 8){
+          const angleDeg = front.sign > 0 ? -30 : 150;
+          const arrowLen = front.arrowLen;
+          this._drawMagneticArrow(p, -a, 0, angleDeg, arrowLen, rgb, arrowAlpha, scaleFactor);
+          this._drawMagneticArrow(p,  a, 0, angleDeg, arrowLen, rgb, arrowAlpha, scaleFactor);
         }
       }
       p.pop();
