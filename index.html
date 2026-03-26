@@ -486,6 +486,19 @@ button{font:inherit}
       this.state.fronts = [];
       this.state.bFronts = [];
       this.state.eTipTable = [];
+      this.state.eTipSlots = this.tables.E_FULL
+        .filter(t => Math.abs(t * 4 - Math.round(t * 4)) >= 1e-12)
+        .map((tEmit, idx) => ({
+          slotIndex: idx,
+          tEmit,
+          frontRef: null,
+          xLocal: null,
+          tipY: null,
+          screenX: null,
+          screenY: null,
+          visible: false,
+          alive: false
+        }));
       this.state.eSlotIndex = 0;
       this.state.bSlotIndex = 0;
       this.state.nextFrontId = 1;
@@ -502,14 +515,17 @@ button{font:inherit}
       const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
       const eAtBirth = -Math.sin(phaseEmit);
       const arrowLen = 24 * Math.abs(eAtBirth);
-      this.state.fronts.push({
+      const front = {
         id: this.state.nextFrontId++,
         t0: tNorm,
         sign,
         reverseArrows: sign > 0,
         color: sign < 0 ? [255,72,72] : [90,175,255],
         arrowLen
-      });
+      };
+      this.state.fronts.push(front);
+      const slot = (this.state.eTipSlots || []).find(s => s.frontRef === null && Math.abs(s.tEmit - tNorm) < 1e-12);
+      if(slot) slot.frontRef = front.id;
       this.state.lastSpawnT = tNorm;
     }
 
@@ -844,9 +860,26 @@ button{font:inherit}
 
     _updateEArrowTipTable(nowT){
       const state = this.state;
-      const tipRows = [];
+      const slots = state.eTipSlots || [];
+      const liveFrontMap = new Map();
 
       for(const front of state.fronts){
+        const age = nowT - front.t0;
+        if(age < 0 || age > 1) continue;
+        liveFrontMap.set(front.id, front);
+      }
+
+      for(const slot of slots){
+        slot.xLocal = null;
+        slot.tipY = null;
+        slot.screenX = null;
+        slot.screenY = null;
+        slot.visible = false;
+        slot.alive = false;
+
+        const front = liveFrontMap.get(slot.frontRef);
+        if(!front) continue;
+
         const age = nowT - front.t0;
         if(age < 0 || age > 1) continue;
 
@@ -854,40 +887,51 @@ button{font:inherit}
         if(scaleFactor <= 0) continue;
 
         const xLocal = 159 * scaleFactor;
-        const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1;
-        const L = (front.arrowLen || 0) * k;
-        const tipY = signY * L;
+        const screenTipY = signY * (front.arrowLen || 0);
+        const tipY = screenTipY / scaleFactor;
         const screenX = state.x0 + xLocal;
-        const screenY = state.centerY + tipY;
-        const visible = screenX >= 0 && screenX <= state.canvasW && screenY >= 0 && screenY <= state.canvasH;
+        const screenY = state.centerY + screenTipY;
 
-        tipRows.push({
-          frontId: front.id,
-          t0: front.t0,
-          xLocal,
-          tipY,
-          screenX,
-          screenY,
-          visible
-        });
+        const visible = (
+          screenX >= state.x0 &&
+          screenX <= state.canvasW - 1 &&
+          screenY >= 0 &&
+          screenY <= state.canvasH
+        );
+
+        slot.xLocal = xLocal;
+        slot.tipY = tipY;
+        slot.screenX = screenX;
+        slot.screenY = screenY;
+        slot.visible = visible;
+        slot.alive = true;
       }
 
-      tipRows.sort((a,b) => a.xLocal - b.xLocal);
-      state.eTipTable = tipRows;
-      return tipRows;
+      state.eTipTable = slots.map(s => ({
+        slotIndex: s.slotIndex,
+        tEmit: s.tEmit,
+        frontRef: s.frontRef,
+        xLocal: s.xLocal,
+        tipY: s.tipY,
+        screenX: s.screenX,
+        screenY: s.screenY,
+        visible: s.visible,
+        alive: s.alive
+      }));
+      return state.eTipTable;
     }
 
     _drawEArrowTipsEnvelope(p, nowT){
       const state = this.state;
       const tipRows = this._updateEArrowTipTable(nowT);
-      if(tipRows.length < 2) return;
+      if(!tipRows.length) return;
 
       const visibleRuns = [];
       let currentRun = [];
 
       for(const row of tipRows){
-        if(row.visible){
+        if(row.alive && row.visible && row.xLocal != null && row.tipY != null){
           currentRun.push(row);
         } else if(currentRun.length){
           visibleRuns.push(currentRun);
@@ -895,7 +939,9 @@ button{font:inherit}
         }
       }
       if(currentRun.length) visibleRuns.push(currentRun);
-      if(!visibleRuns.length) return;
+
+      const drawableRuns = visibleRuns.filter(run => run.length >= 2);
+      if(!drawableRuns.length) return;
 
       p.push();
       p.translate(state.x0, state.centerY);
@@ -905,8 +951,7 @@ button{font:inherit}
       p.strokeCap(p.ROUND);
       p.drawingContext.setLineDash([1.2,6]);
 
-      for(const run of visibleRuns){
-        if(run.length < 2) continue;
+      for(const run of drawableRuns){
         p.beginShape();
         for(const row of run) p.vertex(row.xLocal, row.tipY);
         p.endShape();
