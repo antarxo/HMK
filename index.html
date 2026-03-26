@@ -839,8 +839,7 @@ button{font:inherit}
 
     _drawEArrowTipsEnvelope(p, nowT){
       const state = this.state;
-      const ptsPos = [];
-      const ptsNeg = [];
+      const pts = [];
 
       for(const front of state.fronts){
         const age = nowT - front.t0;
@@ -855,29 +854,24 @@ button{font:inherit}
         const L = (front.arrowLen || 0) * k;
         const tipY = signY * L;
 
-        if(front.sign >= 0) ptsPos.push([xLocal, tipY]);
-        else ptsNeg.push([xLocal, tipY]);
+        pts.push([xLocal, tipY]);
       }
 
-      const drawPolyline = (pts, rgb) => {
-        if(pts.length < 2) return;
-        pts.sort((a,b) => a[0] - b[0]);
-        p.push();
-        p.translate(state.x0, state.centerY);
-        p.noFill();
-        p.stroke(255, 255, 255, 255);
-        p.strokeWeight(1.8);
-        p.strokeCap(p.ROUND);
-        p.drawingContext.setLineDash([9,6]);
-        p.beginShape();
-        for(const [x,y] of pts) p.vertex(x, y);
-        p.endShape();
-        p.drawingContext.setLineDash([]);
-        p.pop();
-      };
+      if(pts.length < 2) return;
+      pts.sort((a,b) => a[0] - b[0]);
 
-      drawPolyline(ptsPos, [90,175,255]);
-      drawPolyline(ptsNeg, [255,72,72]);
+      p.push();
+      p.translate(state.x0, state.centerY);
+      p.noFill();
+      p.stroke(255, 255, 255, 255);
+      p.strokeWeight(1.8);
+      p.strokeCap(p.ROUND);
+      p.drawingContext.setLineDash([9,6]);
+      p.beginShape();
+      for(const [x,y] of pts) p.vertex(x, y);
+      p.endShape();
+      p.drawingContext.setLineDash([]);
+      p.pop();
     }
 
     _mountP5(){
@@ -939,6 +933,7 @@ button{font:inherit}
           state.bFronts = state.bFronts.filter(front => (state.t - front.t0) <= 1.02);
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
           for(const item of bItems) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
+          if(state.showE) self._drawEArrowTipsEnvelope(p, state.t);
 
           const topComp = state.compTopSmooth;
           const botComp = state.compBotSmooth;
