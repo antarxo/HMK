@@ -974,27 +974,6 @@ button{font:inherit}
 
       p.drawingContext.setLineDash([]);
 
-      // extra βέλη του Ε κάτω από τη στικτή:
-      // οι ΑΙΧΜΕΣ των βελών πατάνε ακριβώς στα σημεία της στικτής.
-      // Δεν αλλάζουμε τη στικτή· απλώς σχεδιάζουμε τα βέλη που της αντιστοιχούν.
-      const lowerRows = visibleRows.filter(row => row.tipY > 0.25);
-      const drawLowerArrowAtTip = (xTip, yTip) => {
-        const arrowLen = Math.max(8.0, Math.min(22.0, yTip * 0.42));
-        const head = 5.2;
-        const yBase = yTip - arrowLen;
-        p.push();
-        p.stroke(255, 255, 255, 238);
-        p.strokeWeight(1.35);
-        p.strokeCap(p.ROUND);
-        p.line(xTip, yBase, xTip, yTip - head * 0.95);
-        p.noStroke();
-        p.fill(255, 255, 255, 238);
-        p.triangle(xTip, yTip, xTip - head * 0.55, yTip - head, xTip + head * 0.55, yTip - head);
-        p.pop();
-      };
-      for(const row of lowerRows){
-        drawLowerArrowAtTip(row.xLocal, row.tipY);
-      }
 
       p.pop();
     }
