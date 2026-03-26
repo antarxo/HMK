@@ -290,9 +290,80 @@ button{font:inherit}
   .control-dock{left:8px;right:86px;grid-template-columns:repeat(4,minmax(0,1fr));height:auto}
   .hint-frame{grid-template-columns:1fr;height:100%}
 }
+
+body.capture-view{
+  background:#f5f1e7 !important;
+  overflow:hidden;
+}
+body.capture-view .app{
+  padding:0;
+}
+body.capture-view .shell{
+  height:100dvh;
+  min-height:100dvh;
+  border-radius:0;
+  box-shadow:none;
+  background:#f5f1e7;
+}
+body.capture-view .topbar,
+body.capture-view .graphs-wrap,
+body.capture-view .layer-dock,
+body.capture-view .control-dock,
+body.capture-view .hint-frame,
+body.capture-view .machine-hud{
+  display:none !important;
+}
+body.capture-view .main{
+  grid-template-columns:1fr;
+  gap:0;
+  padding:0;
+}
+body.capture-view .stage-wrap{
+  grid-template-rows:minmax(0,1fr) 0px;
+  gap:0;
+}
+body.capture-view .machine-shell{
+  border-radius:0;
+  background:#fbf8f1;
+}
+body.capture-view .machine-host{
+  inset:0;
+  border-radius:0;
+  background:transparent;
+  backdrop-filter:none;
+}
+body.capture-view #machineMount{
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
+}
+.capture-fab{
+  position:fixed;
+  top:12px;
+  right:12px;
+  z-index:999;
+  display:none;
+  border:1px solid rgba(47,57,68,.24);
+  border-radius:999px;
+  padding:8px 12px;
+  background:rgba(255,255,255,.94);
+  color:#18222b;
+  font-size:12px;
+  line-height:1;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+  cursor:pointer;
+}
+body.capture-view .capture-fab{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
 </style>
 </head>
 <body>
+<button class="capture-fab" id="captureExitBtn">Έξοδος λήψης</button>
 <div class="app">
   <div class="shell">
     <div class="topbar">
@@ -322,6 +393,7 @@ button{font:inherit}
         <button class="chip theme-chip" id="themePrint" data-theme="print">Print</button>
         <button class="chip theme-chip" id="themePaperContrast" data-theme="paperContrast">Χαρτί+</button>
         <button class="chip theme-chip" id="themeCapture" data-theme="capture">Χαρτί</button>
+        <button class="chip" id="toggleCaptureView">Capture</button>
       </div>
     </div>
 
@@ -754,6 +826,41 @@ THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
     }
   }
 });
+
+THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
+  key: 'captureView',
+  labels: { el: 'Λήψη', en: 'Capture' },
+  cssVars: {
+    '--bg':'#f7f3ea','--bg2':'#f3ede1','--bg3':'#ebe2d2','--text':'#14202a','--muted':'#45525c',
+    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92)), #f6f1e6',
+    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(252,249,243,1) 42%, rgba(242,235,223,1) 100%), #faf7f0',
+    '--machineHostBg':'transparent',
+    '--machineAxis':'rgba(56,66,74,.42)',
+    '--btnText':'#17232c','--btnTextActive':'#101820','--btnTextOff':'#52616c',
+    '--ctrlText':'#17232c',
+    '--hintText':'#1f2b34'
+  },
+  graphs: {
+    axis:'#3d4c56', text:'#18242d', marker:'#16643e', time:'#18242d',
+    V:{pos:'#7e6110',neg:'#7e6110'},
+    Q:{pos:'#184f8a',neg:'#a13434'},
+    I:{pos:'#17643f',neg:'#6233a9'},
+    E:{pos:'#184f8a',neg:'#a13434'},
+    B:{pos:'#17643f',neg:'#6233a9'}
+  },
+  sim: {
+    viewportBg:'#fffdf8', axis:'#59636b',
+    ePositive:[24,79,138], eNegative:[165,48,48],
+    bGreen:[22,108,63], bPurple:[95,48,168],
+    currentPositive:[22,108,63], currentNegative:[95,48,168],
+    rodPos:[24,79,138], rodNeg:[165,48,48], rodNeutral:[144,153,165],
+    rodOutline:'rgba(75, 81, 89, 0.22)', rodHighlight:'rgba(255,255,255,0.82)',
+    chargePositive:'#155d78', chargeNegative:'#a43c3c',
+    eEnvelope:'rgba(25,32,38,0.12)', bEnvelope:'rgba(25,32,38,0.12)',
+    eCurveStrokeMul:1.22, bCurveStrokeMul:1.22, eTravelStrokeMul:1.18, bTravelStrokeMul:1.18, envelopeStrokeWeight:0.85
+  }
+});
+
 THEME_PRESETS.paper = THEME_PRESETS.capture;
 
 Object.keys(THEME_PRESETS).forEach((key) => {
@@ -1782,6 +1889,41 @@ async function loadResources(){
 
 window.getActiveTheme = getActiveTheme;
 
+const captureModeState = {
+  enabled: false,
+  previousThemeKey: 'default'
+};
+
+function syncCaptureButtons(){
+  const mainBtn = document.getElementById('toggleCaptureView');
+  const exitBtn = document.getElementById('captureExitBtn');
+  [mainBtn, exitBtn].forEach(btn => {
+    if(!btn) return;
+    btn.classList.toggle('is-on', captureModeState.enabled);
+    btn.classList.toggle('is-off', !captureModeState.enabled);
+    btn.setAttribute('aria-pressed', captureModeState.enabled ? 'true' : 'false');
+  });
+}
+
+function setCaptureMode(enabled){
+  const next = !!enabled;
+  if(next === captureModeState.enabled) return;
+  if(next){
+    captureModeState.previousThemeKey = (getActiveTheme() && getActiveTheme().key) || 'default';
+    applyTheme('captureView', { refreshGraphs:true, refreshSim:true });
+    document.body.classList.add('capture-view');
+  }else{
+    document.body.classList.remove('capture-view');
+    applyTheme(captureModeState.previousThemeKey || 'default', { refreshGraphs:true, refreshSim:true });
+  }
+  captureModeState.enabled = next;
+  syncCaptureButtons();
+}
+
+function toggleCaptureMode(){
+  setCaptureMode(!captureModeState.enabled);
+}
+
 function updatePlayButton(){
   const btn = document.getElementById('playBtn');
   if(!btn || !uiTexts || !currentLang) return;
@@ -1844,6 +1986,8 @@ function setLang(lang){
     speed025: ui.controls.speed025,
     speed05: ui.controls.speed05,
     speed1: ui.controls.speed1,
+    toggleCaptureView: (lang === 'en' ? 'Capture view' : 'Λήψη'),
+    captureExitBtn: (lang === 'en' ? 'Exit capture' : 'Έξοδος λήψης'),
     hintK1: cm.seeTitle,
     hintK2: cm.compareTitle,
     hintK3: cm.nextTitle,
@@ -1892,6 +2036,7 @@ function setLang(lang){
   updatePlayButton();
   syncFieldButtons();
   syncLayerButtons();
+  syncCaptureButtons();
 }
 
 
@@ -2070,7 +2215,15 @@ async function boot(){
   requestAnimationFrame(graphLoop);
 
   document.querySelectorAll(".lang-btn").forEach(btn => btn.addEventListener("click", () => setLang(btn.dataset.lang)));
-  document.querySelectorAll(".theme-chip").forEach(btn => btn.addEventListener("click", () => applyTheme(btn.dataset.theme)));
+  document.querySelectorAll(".theme-chip").forEach(btn => btn.addEventListener("click", () => {
+    if(captureModeState.enabled){
+      captureModeState.previousThemeKey = btn.dataset.theme;
+      return;
+    }
+    applyTheme(btn.dataset.theme);
+  }));
+  document.getElementById("toggleCaptureView").addEventListener("click", toggleCaptureMode);
+  document.getElementById("captureExitBtn").addEventListener("click", toggleCaptureMode);
   document.getElementById("toggleHints").addEventListener("click", () => {
     const hintStrip = document.getElementById("hintStrip");
     const stageWrap = document.getElementById("stageWrap");
@@ -2107,6 +2260,7 @@ async function boot(){
   });
   setLang(currentLang);
   syncThemeButtons();
+  syncCaptureButtons();
 }
 
 window.initGraphs = initGraphs;
