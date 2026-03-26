@@ -368,11 +368,13 @@ button{font:inherit}
 
         fronts: [],
         bFronts: [],
+        eTipTable: [],
         fadeK: 0.36,
         eSlotIndex: 0,
         bSlotIndex: 0,
         lastSpawnT: 0,
-        lastBSpawnT: 0
+        lastBSpawnT: 0,
+        nextFrontId: 1
       };
 
       this.tables = this._buildTables();
@@ -483,8 +485,10 @@ button{font:inherit}
     _resetFronts(){
       this.state.fronts = [];
       this.state.bFronts = [];
+      this.state.eTipTable = [];
       this.state.eSlotIndex = 0;
       this.state.bSlotIndex = 0;
+      this.state.nextFrontId = 1;
     }
 
     _clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
@@ -499,6 +503,7 @@ button{font:inherit}
       const eAtBirth = -Math.sin(phaseEmit);
       const arrowLen = 24 * Math.abs(eAtBirth);
       this.state.fronts.push({
+        id: this.state.nextFrontId++,
         t0: tNorm,
         sign,
         reverseArrows: sign > 0,
@@ -837,28 +842,60 @@ button{font:inherit}
       }
     }
 
-    _drawEArrowTipsEnvelope(p, nowT){
+    _updateEArrowTipTable(nowT){
       const state = this.state;
-      const pts = [];
+      const tipRows = [];
 
       for(const front of state.fronts){
         const age = nowT - front.t0;
         if(age < 0 || age > 1) continue;
 
         const scaleFactor = this._getPulseScale(age);
-        const xLocal = 159 * scaleFactor;
-        if (xLocal < 0) continue;
+        if(scaleFactor <= 0) continue;
 
+        const xLocal = 159 * scaleFactor;
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1;
         const L = (front.arrowLen || 0) * k;
         const tipY = signY * L;
+        const screenX = state.x0 + xLocal;
+        const screenY = state.centerY + tipY;
+        const visible = screenX >= 0 && screenX <= state.canvasW && screenY >= 0 && screenY <= state.canvasH;
 
-        pts.push([xLocal, tipY]);
+        tipRows.push({
+          frontId: front.id,
+          t0: front.t0,
+          xLocal,
+          tipY,
+          screenX,
+          screenY,
+          visible
+        });
       }
 
-      if(pts.length < 2) return;
-      pts.sort((a,b) => a[0] - b[0]);
+      tipRows.sort((a,b) => a.xLocal - b.xLocal);
+      state.eTipTable = tipRows;
+      return tipRows;
+    }
+
+    _drawEArrowTipsEnvelope(p, nowT){
+      const state = this.state;
+      const tipRows = this._updateEArrowTipTable(nowT);
+      if(tipRows.length < 2) return;
+
+      const visibleRuns = [];
+      let currentRun = [];
+
+      for(const row of tipRows){
+        if(row.visible){
+          currentRun.push(row);
+        } else if(currentRun.length){
+          visibleRuns.push(currentRun);
+          currentRun = [];
+        }
+      }
+      if(currentRun.length) visibleRuns.push(currentRun);
+      if(!visibleRuns.length) return;
 
       p.push();
       p.translate(state.x0, state.centerY);
@@ -867,9 +904,14 @@ button{font:inherit}
       p.strokeWeight(2.0);
       p.strokeCap(p.ROUND);
       p.drawingContext.setLineDash([1.2,6]);
-      p.beginShape();
-      for(const [x,y] of pts) p.vertex(x, y);
-      p.endShape();
+
+      for(const run of visibleRuns){
+        if(run.length < 2) continue;
+        p.beginShape();
+        for(const row of run) p.vertex(row.xLocal, row.tipY);
+        p.endShape();
+      }
+
       p.drawingContext.setLineDash([]);
       p.pop();
     }
