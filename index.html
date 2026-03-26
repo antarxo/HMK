@@ -137,6 +137,13 @@ button{font:inherit}
 }
 .machine-hud{position:absolute;top:8px;left:8px;z-index:7;display:flex;gap:5px}
 .machine-hud.right{left:auto;right:8px}
+.layer-dock{position:absolute;top:8px;left:8px;right:8px;z-index:9;display:flex;flex-wrap:wrap;gap:5px;align-items:center;pointer-events:auto}
+.layer-chip{border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(18,28,43,.68);color:#e8f0fb;border-radius:999px;padding:5px 9px;font-size:11px;line-height:1;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease, opacity .12s ease}
+.layer-chip:hover{background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.84);border-color:rgba(255,255,255,.16);box-shadow:0 4px 12px rgba(0,0,0,.22)}
+.layer-chip:active{transform:translateY(1px)}
+.layer-chip.is-on{background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.90);color:#ffffff;border-color:rgba(255,255,255,.18)}
+.layer-chip.is-off{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)), rgba(18,28,43,.40);color:#9fb0c7;border-color:rgba(255,255,255,.06);opacity:.88}
+.layer-sep{width:1px;height:18px;background:rgba(255,255,255,.12);margin:0 1px}
 .hud-pill{
   background:rgba(10,15,26,.46);border:none;border-radius:999px;padding:5px 9px;font-size:11px;line-height:1;color:#dce7f7;backdrop-filter:blur(8px)
 }
@@ -272,7 +279,16 @@ button{font:inherit}
 
       <div class="stage-wrap" id="stageWrap">
         <div class="machine-shell">
-<div class="machine-host"><div id="machineMount" style="width:100%;height:100%"></div>
+<div class="machine-host">
+            <div class="layer-dock" id="layerDock">
+              <button class="layer-chip" id="toggleECurves">E καμπύλες</button>
+              <button class="layer-chip" id="toggleETravel">E βέλη</button>
+              <button class="layer-chip" id="toggleEEnv">E περίβλημα</button>
+              <span class="layer-sep" aria-hidden="true"></span>
+              <button class="layer-chip" id="toggleBCurves">B καμπύλες</button>
+              <button class="layer-chip" id="toggleBTravel">B βέλη</button>
+              <button class="layer-chip" id="toggleBEnv">B περίβλημα</button>
+            </div><div id="machineMount" style="width:100%;height:100%"></div>
 
             <div class="control-dock">
               <button class="ctrl" id="stepPrev">◀ Βήμα</button>
@@ -334,6 +350,12 @@ button{font:inherit}
         playing: true,
         showE: true,
         showB: true,
+        showECurves: true,
+        showETravelArrows: true,
+        showEEnvelope: true,
+        showBCurves: true,
+        showBTravelArrows: true,
+        showBEnvelope: true,
         t: 0,
         periodSeconds: this.options.periodSeconds,
 
@@ -455,6 +477,16 @@ button{font:inherit}
     toggleField(kind){
       if (kind === 'E') this.state.showE = !this.state.showE;
       if (kind === 'B') this.state.showB = !this.state.showB;
+      return this;
+    }
+
+    setLayerVisibility(kind, visible){
+      if (Object.prototype.hasOwnProperty.call(this.state, kind)) this.state[kind] = !!visible;
+      return this;
+    }
+
+    toggleLayer(kind){
+      if (Object.prototype.hasOwnProperty.call(this.state, kind)) this.state[kind] = !this.state[kind];
       return this;
     }
 
@@ -717,7 +749,7 @@ button{font:inherit}
       p.strokeWeight(strokeW);
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
-      const hasENonZeroLobe = (front.arrowLen || 0) > 1e-9;
+      const hasENonZeroLobe = state.showECurves && (front.arrowLen || 0) > 1e-9;
       if(hasENonZeroLobe){
         const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
         for(const [sx, sy] of quads){
@@ -743,7 +775,7 @@ button{font:inherit}
         p.endShape(p.CLOSE);
         p.pop();
       };
-      const hasEArrowMagnitude = (front.arrowLen || 0) > 0.25;
+      const hasEArrowMagnitude = state.showECurves && (front.arrowLen || 0) > 0.25;
       if(hasEArrowMagnitude){
         drawArrow(139.320, -115.360, 66.762);
         drawArrow(139.320, 115.360, 113.238);
@@ -751,7 +783,7 @@ button{font:inherit}
         drawArrow(-139.320, 115.360, 66.762);
       }
       const drawTravelArrow = (xLocal) => {
-        if(!hasEArrowMagnitude) return;
+        if(!state.showETravelArrows || (front.arrowLen || 0) <= 0.25) return;
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
         const baseY = 0;
@@ -833,10 +865,12 @@ button{font:inherit}
       ctx.lineWidth = strokeW;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.beginPath();
-      if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
-      else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
-      ctx.stroke();
+      if(state.showBCurves){
+        ctx.beginPath();
+        if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
+        else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
+        ctx.stroke();
+      }
       ctx.restore();
       const isGreen = Array.isArray(rgb) && rgb[0] === 60 && rgb[1] === 220 && rgb[2] === 120;
       const ccw = isGreen; // ίδια φορά για ίδιο χρώμα: reference η πρώτη πράσινη
@@ -847,7 +881,7 @@ button{font:inherit}
       const arrowAlpha = (!isGreen && isBackwardTravel)
         ? Math.min(arrowAlphaBase, 34)
         : arrowAlphaBase;
-      if(arrowAlpha > 8){
+      if(state.showBCurves && arrowAlpha > 8){
         const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
         for(const th of thetas){
           const pt = this._ellipsePoint(a, b, th);
@@ -855,15 +889,15 @@ button{font:inherit}
           const ang = Math.atan2(tg.y, tg.x) * 180 / Math.PI;
           this._drawMagneticArrow(p, pt.x, pt.y, ang, rgb, arrowAlpha, scaleFactor);
         }
-        if(arrowLayerIsActive){
-          const anchorX = a;
-          const anchorY = 0;
-          this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, rgb, arrowAlpha, scaleFactor);
-        }
+      }
+      if(state.showBTravelArrows && arrowAlpha > 8 && arrowLayerIsActive){
+        const anchorX = a;
+        const anchorY = 0;
+        this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, rgb, arrowAlpha, scaleFactor);
       }
       const hasBTravelMagnitude = (front.arrowLen || 0) > 0.25;
       const drawBTravelArrow = () => {
-        if(!arrowLayerIsActive || !hasBTravelMagnitude) return;
+        if(!state.showBTravelArrows || !arrowLayerIsActive || !hasBTravelMagnitude) return;
         const k = 1 / scaleFactor;
         const baseX = a;
         const baseY = 0;
@@ -1158,7 +1192,7 @@ button{font:inherit}
           state.bFronts = state.bFronts.filter(front => (state.t - front.t0) <= 1.02);
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
           for(const item of bItems) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
-          if(state.showE) self._drawEArrowTipsEnvelope(p, state.t);
+          if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
 
           const topComp = state.compTopSmooth;
           const botComp = state.compBotSmooth;
@@ -1178,7 +1212,7 @@ button{font:inherit}
           self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t);
           for(const item of bItems) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
-          if(state.showB) self._drawBArrowTipsEnvelope(p, state.t);
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t);
 
           p.noStroke(); p.fill(255, 82, 82);
           for(let k=0; k<state.N; k++) p.circle(state.x0, state.yDisplay[k], 2.5);
@@ -1231,6 +1265,26 @@ function syncFieldButtons(){
   bBtn.setAttribute("aria-pressed", sim.state.showB ? "true" : "false");
 }
 
+function syncLayerButtons(){
+  if(!sim) return;
+  const ids = [
+    ['toggleECurves', 'showECurves'],
+    ['toggleETravel', 'showETravelArrows'],
+    ['toggleEEnv', 'showEEnvelope'],
+    ['toggleBCurves', 'showBCurves'],
+    ['toggleBTravel', 'showBTravelArrows'],
+    ['toggleBEnv', 'showBEnvelope']
+  ];
+  ids.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const on = !!sim.state[key];
+    el.classList.toggle('is-on', on);
+    el.classList.toggle('is-off', !on);
+    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
 function setLang(lang){
   currentLang = lang;
   const ui = uiTexts[lang];
@@ -1266,10 +1320,19 @@ function setLang(lang){
     if (el) el.textContent = value;
   });
 
+  const layerLabels = (lang === 'en')
+    ? { toggleECurves:'E curves', toggleETravel:'E arrows', toggleEEnv:'E envelope', toggleBCurves:'B curves', toggleBTravel:'B arrows', toggleBEnv:'B envelope' }
+    : { toggleECurves:'E καμπύλες', toggleETravel:'E βέλη', toggleEEnv:'E περίβλημα', toggleBCurves:'B καμπύλες', toggleBTravel:'B βέλη', toggleBEnv:'B περίβλημα' };
+  Object.entries(layerLabels).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  });
+
   document.querySelectorAll(".lang-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.lang === lang));
   initGraphs();
   updatePlayButton();
   syncFieldButtons();
+  syncLayerButtons();
 }
 
 
@@ -1436,6 +1499,7 @@ async function boot(){
   initGraphs();
   updatePlayButton();
   syncFieldButtons();
+  syncLayerButtons();
   updateGraphs();
   requestAnimationFrame(graphLoop);
 
@@ -1457,6 +1521,12 @@ async function boot(){
     document.querySelectorAll(".graph-b").forEach(el => el.classList.toggle("hide", !sim.state.showB));
     syncFieldButtons();
   });
+  document.getElementById("toggleECurves").addEventListener("click", () => { sim.toggleLayer('showECurves'); syncLayerButtons(); });
+  document.getElementById("toggleETravel").addEventListener("click", () => { sim.toggleLayer('showETravelArrows'); syncLayerButtons(); });
+  document.getElementById("toggleEEnv").addEventListener("click", () => { sim.toggleLayer('showEEnvelope'); syncLayerButtons(); });
+  document.getElementById("toggleBCurves").addEventListener("click", () => { sim.toggleLayer('showBCurves'); syncLayerButtons(); });
+  document.getElementById("toggleBTravel").addEventListener("click", () => { sim.toggleLayer('showBTravelArrows'); syncLayerButtons(); });
+  document.getElementById("toggleBEnv").addEventListener("click", () => { sim.toggleLayer('showBEnvelope'); syncLayerButtons(); });
   document.getElementById("playBtn").addEventListener("click", () => {
     sim.toggle();
     updatePlayButton();
@@ -1466,6 +1536,7 @@ async function boot(){
     sim.stop();
     updatePlayButton();
     syncFieldButtons();
+    syncLayerButtons();
   });
   setLang(currentLang);
 }
