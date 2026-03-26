@@ -888,10 +888,9 @@ button{font:inherit}
 
         const xLocal = 159 * scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1;
-        const screenTipY = signY * (front.arrowLen || 0);
-        const tipY = screenTipY / scaleFactor;
+        const tipY = signY * (front.arrowLen || 0); // σε local coords του envelope, χωρίς extra scaling
         const screenX = state.x0 + xLocal;
-        const screenY = state.centerY + screenTipY;
+        const screenY = state.centerY + tipY;
 
         const visible = (
           screenX >= state.x0 &&
@@ -927,21 +926,8 @@ button{font:inherit}
       const tipRows = this._updateEArrowTipTable(nowT);
       if(!tipRows.length) return;
 
-      const visibleRuns = [];
-      let currentRun = [];
-
-      for(const row of tipRows){
-        if(row.alive && row.visible && row.xLocal != null && row.tipY != null){
-          currentRun.push(row);
-        } else if(currentRun.length){
-          visibleRuns.push(currentRun);
-          currentRun = [];
-        }
-      }
-      if(currentRun.length) visibleRuns.push(currentRun);
-
-      const drawableRuns = visibleRuns.filter(run => run.length >= 2);
-      if(!drawableRuns.length) return;
+      const visibleRows = tipRows.filter(row => row.alive && row.visible && row.xLocal != null && row.tipY != null);
+      if(visibleRows.length < 2) return;
 
       p.push();
       p.translate(state.x0, state.centerY);
@@ -951,10 +937,11 @@ button{font:inherit}
       p.strokeCap(p.ROUND);
       p.drawingContext.setLineDash([1.2,6]);
 
-      for(const run of drawableRuns){
-        p.beginShape();
-        for(const row of run) p.vertex(row.xLocal, row.tipY);
-        p.endShape();
+      // ΩΜΗ ΤΕΘΛΑΣΜΕΝΗ ΔΟΚΙΜΗΣ: ένωση κάθε δύο διαδοχικών ορατών tips με ευθύγραμμο τμήμα
+      for(let i = 0; i < visibleRows.length - 1; i++){
+        const a = visibleRows[i];
+        const b = visibleRows[i + 1];
+        p.line(a.xLocal, a.tipY, b.xLocal, b.tipY);
       }
 
       p.drawingContext.setLineDash([]);
