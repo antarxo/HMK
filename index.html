@@ -759,7 +759,7 @@ button{font:inherit}
       const k = 1 / scaleFactor;
       const L = Math.max(0, arrowLen) * k;
       if(L <= 0.001) return;
-      const head = Math.max(5.2, Math.min(10.5, 0.42 * arrowLen)) * k;
+      const head = Math.max(8.0, Math.min(16.0, 0.52 * arrowLen)) * k;
       const shaft = Math.max(0, L - head);
       const half = head * 0.52;
       p.push();
@@ -767,7 +767,7 @@ button{font:inherit}
       p.rotate(p.radians(angleDeg));
       p.stroke(rgb[0], rgb[1], rgb[2], alpha);
       p.fill(rgb[0], rgb[1], rgb[2], alpha);
-      p.strokeWeight(1.9 * k);
+      p.strokeWeight(2.8 * k);
       p.line(0, 0, shaft, 0);
       p.noStroke();
       p.triangle(L, 0, shaft, -half, shaft, half);
@@ -816,8 +816,8 @@ button{font:inherit}
       if(mode === 'front'){
         const arrowAlpha = Math.min(255, alphaBase * 0.98);
         if(arrowAlpha > 8){
-          const angleDeg = front.sign > 0 ? 60 : 120;
-          const arrowLen = Math.max(16, (front.arrowLen || 0) * 1.8);
+          const angleDeg = front.sign > 0 ? -60 : 120;
+          const arrowLen = Math.max(28, (front.arrowLen || 0) * 3.2);
           this._drawMagneticArrow(p, -a, 0, angleDeg, arrowLen, rgb, arrowAlpha, scaleFactor);
           this._drawMagneticArrow(p,  a, 0, angleDeg, arrowLen, rgb, arrowAlpha, scaleFactor);
         }
