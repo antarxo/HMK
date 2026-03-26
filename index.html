@@ -781,6 +781,7 @@ button{font:inherit}
     }
 
     _drawMagneticEllipseSegment(p, front, nowT, mode){
+      // DEBUG B VERSION: only arrows, no ellipse arcs, no dot/cross symbols
       const state = this.state;
       const ageFromSpawn = nowT - front.t0;
       if(ageFromSpawn < 0 || ageFromSpawn > 1) return;
@@ -794,24 +795,15 @@ button{font:inherit}
       const rgb = isNegative ? [168, 90, 220] : [60, 220, 120];
       const a = 159;
       const b = 39.5;
-      const ctx = p.drawingContext;
       p.push();
       p.translate(state.x0, state.centerY);
       p.scale(scaleFactor);
-      ctx.save();
-      ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha/255})`;
-      ctx.lineWidth = strokeW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
-      else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
-      ctx.stroke();
-      ctx.restore();
       const ccw = front.sign > 0; // μόνο τα βέλη αντιστραμμένα, όχι τα χρώματα
-      const arrowAlpha = alpha * (mode === 'back' ? 0.92 : 1.0);
+      const arrowAlpha = alpha * (mode === 'back' ? 0.55 : 1.0);
       if(arrowAlpha > 8){
-        const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
+        const thetas = mode === 'back'
+          ? [Math.PI * 1.14, Math.PI * 1.32, Math.PI * 1.68, Math.PI * 1.86]
+          : [Math.PI * 0.14, Math.PI * 0.32, Math.PI * 0.68, Math.PI * 0.86];
         for(const th of thetas){
           const pt = this._ellipsePoint(a, b, th);
           const tg = this._ellipseTangent(a, b, th, ccw);
