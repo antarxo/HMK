@@ -528,8 +528,8 @@ button{font:inherit}
       this.state.lastSpawnT = tNorm;
     }
 
-    _seedBFront(tNorm, sign){
-      this.state.bFronts.push({ t0: tNorm, sign });
+    _seedBFront(tNorm, sign, rgb){
+      this.state.bFronts.push({ t0: tNorm, sign, rgb });
       this.state.lastBSpawnT = tNorm;
     }
 
@@ -723,25 +723,28 @@ button{font:inherit}
         p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
         p.endShape();
       }
-      const drawArrow = (x, y, angleDeg) => {
-        const dir = front.reverseArrows ? 180 : 0;
-        p.push();
-        p.translate(x, y);
-        p.rotate(p.radians(angleDeg + dir));
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.85);
+
+      const drawTravelArrow = (xLocal) => {
         const k = 1 / scaleFactor;
-        p.beginShape();
-        p.vertex(2.7 * k, 0);
-        p.vertex(-1.45 * k, -1.8 * k);
-        p.vertex(-1.45 * k, 1.8 * k);
-        p.endShape(p.CLOSE);
+        const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
+        const baseY = 0;
+        const L = (front.arrowLen || 18) * k;
+        const head = Math.min(5.1 * k, 0.34 * L);
+        const half = Math.min(2.9 * k, 0.22 * L);
+        const tipBaseY = signY * Math.max(0, L - head);
+        const tipY = signY * L;
+
+        p.push();
+        p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
+        p.strokeWeight(1.18 * k);
+        p.strokeCap(p.ROUND);
+        p.line(xLocal, baseY, xLocal, tipBaseY);
+        p.noStroke();
+        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.92);
+        p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
         p.pop();
       };
-      drawArrow(139.320, -115.360, 66.762);
-      drawArrow(139.320, 115.360, 113.238);
-      drawArrow(-139.320, -115.360, 113.238);
-      drawArrow(-139.320, 115.360, 66.762);
+      drawTravelArrow(159.000);
       p.pop();
     }
 
@@ -767,21 +770,6 @@ button{font:inherit}
       p.pop();
     }
 
-    _drawMagneticAxisArrow(p, x, y, angleDeg, rgb, alpha, scaleFactor){
-      p.push();
-      p.translate(x, y);
-      p.rotate(p.radians(angleDeg));
-      p.noStroke();
-      p.fill(rgb[0], rgb[1], rgb[2], alpha);
-      const k = 1 / scaleFactor;
-      p.beginShape();
-      p.vertex(2.7 * k, 0);
-      p.vertex(-1.45 * k, -1.8 * k);
-      p.vertex(-1.45 * k, 1.8 * k);
-      p.endShape(p.CLOSE);
-      p.pop();
-    }
-
     _drawEllipseArcBySampling(ctx, a, b, t1, t2, steps=64){
       for(let i=0; i<=steps; i++){
         const u = i / steps;
@@ -802,8 +790,7 @@ button{font:inherit}
       const alphaBase = 200 * fade;
       const alpha = mode === 'back' ? alphaBase * 0.24 : alphaBase * 0.95;
       const strokeW = 0.52 / scaleFactor;
-      const isNegative = front.sign < 0;
-      const rgb = isNegative ? [168, 90, 220] : [60, 220, 120];
+      const rgb = Array.isArray(front.rgb) ? front.rgb : [60, 220, 120];
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
@@ -820,26 +807,12 @@ button{font:inherit}
       else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
       ctx.stroke();
       ctx.restore();
-      const ccw = front.sign > 0; // μόνο τα βέλη αντιστραμμένα, όχι τα χρώματα
       const arrowAlpha = alpha * (mode === 'back' ? 0.92 : 1.0);
       if(arrowAlpha > 8){
-        const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
-        for(const th of thetas){
-          const pt = this._ellipsePoint(a, b, th);
-          const tg = this._ellipseTangent(a, b, th, ccw);
-          const ang = Math.atan2(tg.y, tg.x) * 180 / Math.PI;
-          this._drawMagneticArrow(p, pt.x, pt.y, ang, rgb, arrowAlpha, scaleFactor);
-        }
-      }
-
-      const quarter = Math.min(3, Math.floor(front.t0 * 4 + 1e-12));
-      const axisAngleDeg = (quarter === 0 || quarter === 1) ? -60 : 120;
-      const axisAlpha = alpha * (mode === 'back' ? 0.55 : 1.0);
-      if(axisAlpha > 8){
-        const axisPt1 = this._ellipsePoint(a, b, 0);
-        const axisPt2 = this._ellipsePoint(a, b, Math.PI);
-        this._drawMagneticAxisArrow(p, axisPt1.x, axisPt1.y, axisAngleDeg, rgb, axisAlpha, scaleFactor);
-        this._drawMagneticAxisArrow(p, axisPt2.x, axisPt2.y, axisAngleDeg, rgb, axisAlpha, scaleFactor);
+        const anchorX = a;
+        const anchorY = 0;
+        const ang = front.sign > 0 ? -60 : 120;
+        this._drawMagneticArrow(p, anchorX, anchorY, ang, rgb, arrowAlpha, scaleFactor);
       }
       p.pop();
     }
@@ -871,9 +844,10 @@ button{font:inherit}
       while(this.state.bSlotIndex < B_FULL.length && B_FULL[this.state.bSlotIndex] <= this.state.t + 1e-9){
         const tEmit = B_FULL[this.state.bSlotIndex];
         const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
-        const sign = (quarterFloat === 0 || quarterFloat === 3) ? 1 : -1; // Q1,Q4 πράσινα | Q2,Q3 μωβ
+        const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1; // 0..T/2 θετικό, T/2..T αρνητικό
+        const rgb = (quarterFloat === 0 || quarterFloat === 3) ? [60, 220, 120] : [168, 90, 220]; // πράσινο, μετά μωβ, μετά μωβ, μετά πράσινο
         const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
-        if(!onQuarterBoundary) this._seedBFront(tEmit, sign);
+        if(!onQuarterBoundary) this._seedBFront(tEmit, sign, rgb);
         this.state.bSlotIndex++;
       }
     }
