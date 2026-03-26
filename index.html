@@ -515,7 +515,7 @@ button{font:inherit}
     _seedFront(tNorm, sign){
       const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
       const eAtBirth = -Math.sin(phaseEmit);
-      const arrowLen = 24 * Math.abs(eAtBirth);
+      const arrowLen = 32 * Math.abs(eAtBirth);
       const front = {
         id: this.state.nextFrontId++,
         t0: tNorm,
