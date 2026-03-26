@@ -10,7 +10,7 @@
   --bg:#09101a; --bg2:#122033; --bg3:#1b2d43;
   --text:#e9eef7; --muted:#90a3be;
   --green:#8df0b1; --red:#f57171; --blue:#67a8ff; --purple:#d85bf7; --cyan:#b8f4ff; --amber:#ffd56b;
-  --shellPad:8px; --gap:6px; --graphsW:338px; --topH:72px; --controlH:50px; --hintH:74px;
+  --shellPad:8px; --gap:6px; --graphsW:338px; --topH:72px; --controlH:42px; --hintH:74px;
   --glass2:rgba(14,22,34,.42);
   --liftShadow:10px 12px 26px rgba(0,0,0,.26);
 }
@@ -155,7 +155,7 @@ button{font:inherit}
   backdrop-filter:blur(10px);
   overflow:hidden;
 }
-#machineMount{position:absolute;left:8px;top:8px;right:86px;bottom:calc(var(--controlH) + 16px);}
+#machineMount{position:absolute;left:8px;top:8px;right:86px;bottom:calc(var(--controlH) + 10px);}
 .machine-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px}
 .machine-viewport{width:min(100%,1180px);height:100%;position:relative}
 .machine-axis{position:absolute;left:4%;right:4%;top:50%;height:1px;background:rgba(176,188,204,.55);transform:translateY(-50%)}
@@ -176,21 +176,23 @@ button{font:inherit}
 .ellipse.e3{width:54%;height:43%;border:1px solid rgba(216,91,247,.28)}
 
 .control-dock{
-  position:absolute;left:8px;right:86px;bottom:8px;transform:none;
+  position:absolute;left:8px;right:86px;bottom:2px;transform:none;
   width:auto;height:var(--controlH);z-index:9;
-  border-radius:12px;background:rgba(20,27,40,.32);backdrop-filter:blur(10px);
-  display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;padding:5px;
+  border-radius:11px;background:rgba(20,27,40,.32);backdrop-filter:blur(10px);
+  display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;padding:4px;
 }
 .ctrl{
   border:1px solid rgba(255,255,255,.08);
-  border-radius:9px;
+  border-radius:8px;
   background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(22,36,56,.76);
   color:#e4edf9;
-  font-size:11px;
+  font-size:10px;
+  line-height:1;
   display:flex;
   align-items:center;
   justify-content:center;
   min-width:0;
+  min-height:0;
   white-space:nowrap;
   box-shadow:0 2px 8px rgba(0,0,0,.16);
   transition:transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
