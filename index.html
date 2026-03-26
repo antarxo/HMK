@@ -715,13 +715,16 @@ button{font:inherit}
       p.strokeWeight(strokeW);
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
-      const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
-      for(const [sx, sy] of quads){
-        p.beginShape();
-        p.vertex(0 * sx, -142 * sy);
-        p.bezierVertex(18 * sx, -158 * sy, 45 * sx, -178 * sy, 63 * sx, -178 * sy);
-        p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
-        p.endShape();
+      const hasENonZeroLobe = (front.arrowLen || 0) > 1e-9;
+      if(hasENonZeroLobe){
+        const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
+        for(const [sx, sy] of quads){
+          p.beginShape();
+          p.vertex(0 * sx, -142 * sy);
+          p.bezierVertex(18 * sx, -158 * sy, 45 * sx, -178 * sy, 63 * sx, -178 * sy);
+          p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
+          p.endShape();
+        }
       }
       const drawArrow = (x, y, angleDeg) => {
         const dir = front.reverseArrows ? 180 : 0;
@@ -806,6 +809,8 @@ button{font:inherit}
       const state = this.state;
       const ageFromSpawn = nowT - front.t0;
       if(ageFromSpawn < 0 || ageFromSpawn > 1) return;
+      const isZeroBFront = Math.abs(front.t0 * 4 - Math.round(front.t0 * 4)) < 1e-12;
+      if(isZeroBFront) return;
       const age = ageFromSpawn;
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age) * 0.78;
