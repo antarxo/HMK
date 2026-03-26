@@ -723,28 +723,25 @@ button{font:inherit}
         p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
         p.endShape();
       }
-
-      const drawTravelArrow = (xLocal) => {
-        const k = 1 / scaleFactor;
-        const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
-        const baseY = 0;
-        const L = (front.arrowLen || 18) * k;
-        const head = Math.min(5.1 * k, 0.34 * L);
-        const half = Math.min(2.9 * k, 0.22 * L);
-        const tipBaseY = signY * Math.max(0, L - head);
-        const tipY = signY * L;
-
+      const drawArrow = (x, y, angleDeg) => {
+        const dir = front.reverseArrows ? 180 : 0;
         p.push();
-        p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.strokeWeight(1.18 * k);
-        p.strokeCap(p.ROUND);
-        p.line(xLocal, baseY, xLocal, tipBaseY);
+        p.translate(x, y);
+        p.rotate(p.radians(angleDeg + dir));
         p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
+        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.85);
+        const k = 1 / scaleFactor;
+        p.beginShape();
+        p.vertex(2.7 * k, 0);
+        p.vertex(-1.45 * k, -1.8 * k);
+        p.vertex(-1.45 * k, 1.8 * k);
+        p.endShape(p.CLOSE);
         p.pop();
       };
-      drawTravelArrow(159.000);
+      drawArrow(139.320, -115.360, 66.762);
+      drawArrow(139.320, 115.360, 113.238);
+      drawArrow(-139.320, -115.360, 113.238);
+      drawArrow(-139.320, 115.360, 66.762);
       p.pop();
     }
 
