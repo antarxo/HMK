@@ -368,13 +368,11 @@ button{font:inherit}
 
         fronts: [],
         bFronts: [],
-        eTipTable: [],
         fadeK: 0.36,
         eSlotIndex: 0,
         bSlotIndex: 0,
         lastSpawnT: 0,
-        lastBSpawnT: 0,
-        nextFrontId: 1
+        lastBSpawnT: 0
       };
 
       this.tables = this._buildTables();
@@ -485,22 +483,8 @@ button{font:inherit}
     _resetFronts(){
       this.state.fronts = [];
       this.state.bFronts = [];
-      this.state.eTipTable = [];
-      this.state.eTipSlots = this.tables.E_FULL
-        .map((tEmit, idx) => ({
-          slotIndex: idx,
-          tEmit,
-          frontRef: null,
-          xLocal: null,
-          tipY: null,
-          screenX: null,
-          screenY: null,
-          visible: false,
-          alive: false
-        }));
       this.state.eSlotIndex = 0;
       this.state.bSlotIndex = 0;
-      this.state.nextFrontId = 1;
     }
 
     _clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
@@ -514,17 +498,13 @@ button{font:inherit}
       const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
       const eAtBirth = -Math.sin(phaseEmit);
       const arrowLen = 24 * Math.abs(eAtBirth);
-      const front = {
-        id: this.state.nextFrontId++,
+      this.state.fronts.push({
         t0: tNorm,
         sign,
         reverseArrows: sign > 0,
         color: sign < 0 ? [255,72,72] : [90,175,255],
         arrowLen
-      };
-      this.state.fronts.push(front);
-      const slot = (this.state.eTipSlots || []).find(s => s.frontRef === null && Math.abs(s.tEmit - tNorm) < 1e-12);
-      if(slot) slot.frontRef = front.id;
+      });
       this.state.lastSpawnT = tNorm;
     }
 
@@ -839,7 +819,8 @@ button{font:inherit}
         const tEmit = E_FULL[this.state.eSlotIndex];
         const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
         const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
-        this._seedFront(tEmit, sign);
+        const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
+        if(!onQuarterBoundary) this._seedFront(tEmit, sign);
         this.state.eSlotIndex++;
       }
     }
@@ -856,94 +837,47 @@ button{font:inherit}
       }
     }
 
-    _updateEArrowTipTable(nowT){
+    _drawEArrowTipsEnvelope(p, nowT){
       const state = this.state;
-      const slots = state.eTipSlots || [];
-      const liveFrontMap = new Map();
+      const ptsPos = [];
+      const ptsNeg = [];
 
       for(const front of state.fronts){
         const age = nowT - front.t0;
         if(age < 0 || age > 1) continue;
-        liveFrontMap.set(front.id, front);
-      }
-
-      for(const slot of slots){
-        slot.xLocal = null;
-        slot.tipY = null;
-        slot.screenX = null;
-        slot.screenY = null;
-        slot.visible = false;
-        slot.alive = false;
-
-        const front = liveFrontMap.get(slot.frontRef);
-        if(!front) continue;
-
-        const age = nowT - front.t0;
-        if(age < 0 || age > 1) continue;
 
         const scaleFactor = this._getPulseScale(age);
-        if(scaleFactor <= 0) continue;
-
         const xLocal = 159 * scaleFactor;
+        if (xLocal < 0) continue;
+
+        const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1;
-        const tipY = signY * (front.arrowLen || 0); // σε local coords του envelope, χωρίς extra scaling
-        const screenX = state.x0 + xLocal;
-        const screenY = state.centerY + tipY;
+        const L = (front.arrowLen || 0) * k;
+        const tipY = signY * L;
 
-        const visible = (
-          screenX >= state.x0 &&
-          screenX <= state.canvasW - 1 &&
-          screenY >= 0 &&
-          screenY <= state.canvasH
-        );
-
-        slot.xLocal = xLocal;
-        slot.tipY = tipY;
-        slot.screenX = screenX;
-        slot.screenY = screenY;
-        slot.visible = visible;
-        slot.alive = true;
+        if(front.sign >= 0) ptsPos.push([xLocal, tipY]);
+        else ptsNeg.push([xLocal, tipY]);
       }
 
-      state.eTipTable = slots.map(s => ({
-        slotIndex: s.slotIndex,
-        tEmit: s.tEmit,
-        frontRef: s.frontRef,
-        xLocal: s.xLocal,
-        tipY: s.tipY,
-        screenX: s.screenX,
-        screenY: s.screenY,
-        visible: s.visible,
-        alive: s.alive
-      }));
-      return state.eTipTable;
-    }
+      const drawPolyline = (pts, rgb) => {
+        if(pts.length < 2) return;
+        pts.sort((a,b) => a[0] - b[0]);
+        p.push();
+        p.translate(state.x0, state.centerY);
+        p.noFill();
+        p.stroke(255, 255, 255, 255);
+        p.strokeWeight(1.8);
+        p.strokeCap(p.ROUND);
+        p.drawingContext.setLineDash([9,6]);
+        p.beginShape();
+        for(const [x,y] of pts) p.vertex(x, y);
+        p.endShape();
+        p.drawingContext.setLineDash([]);
+        p.pop();
+      };
 
-    _drawEArrowTipsEnvelope(p, nowT){
-      const state = this.state;
-      const tipRows = this._updateEArrowTipTable(nowT);
-      if(!tipRows.length) return;
-
-      const visibleRows = tipRows.filter(row => row.alive && row.visible && row.xLocal != null && row.tipY != null);
-      if(visibleRows.length < 2) return;
-
-      p.push();
-      p.translate(state.x0, state.centerY);
-      p.noFill();
-      p.stroke(255, 255, 255, 255);
-      p.strokeWeight(1.35);
-      p.strokeCap(p.ROUND);
-      p.drawingContext.setLineDash([0.8,3.0]);
-
-      // ΩΜΗ ΤΕΘΛΑΣΜΕΝΗ ΔΟΚΙΜΗΣ: ένωση κάθε δύο διαδοχικών ορατών tips με ευθύγραμμο τμήμα
-      for(let i = 0; i < visibleRows.length - 1; i++){
-        const a = visibleRows[i];
-        const b = visibleRows[i + 1];
-        p.line(a.xLocal, a.tipY, b.xLocal, b.tipY);
-      }
-
-      p.drawingContext.setLineDash([]);
-      p.pop();
+      drawPolyline(ptsPos, [90,175,255]);
+      drawPolyline(ptsNeg, [255,72,72]);
     }
 
     _mountP5(){
@@ -997,7 +931,7 @@ button{font:inherit}
           p.background('#0c0d10');
           p.stroke('#4d535d');
           p.strokeWeight(0.83);
-          p.drawingContext.setLineDash([0.8,3.0]);
+          p.drawingContext.setLineDash([9,6]);
           p.line(30, state.centerY, state.canvasW - 30, state.centerY);
           p.drawingContext.setLineDash([]);
 
@@ -1005,7 +939,6 @@ button{font:inherit}
           state.bFronts = state.bFronts.filter(front => (state.t - front.t0) <= 1.02);
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
           for(const item of bItems) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
-          if(state.showE) self._drawEArrowTipsEnvelope(p, state.t);
 
           const topComp = state.compTopSmooth;
           const botComp = state.compBotSmooth;
