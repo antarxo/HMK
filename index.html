@@ -67,7 +67,7 @@
   --ringBlueSoft:rgba(103,168,255,.28);
   --ellipseGreenStrong:rgba(141,240,177,.56);
   --ellipseGreenSoft:rgba(141,240,177,.28);
-  --ellipsePurpleSoft:rgba(216,91,247,.28);
+  --ellipsePurpleSoft:rgba(232,138,47,.28);
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -472,7 +472,7 @@ const THEME_PRESETS = {
     labels: { el: 'Βάση', en: 'Base' },
     cssVars: {
       '--bg':'#09101a','--bg2':'#122033','--bg3':'#1b2d43','--text':'#e9eef7','--muted':'#90a3be',
-      '--green':'#8df0b1','--red':'#f57171','--blue':'#67a8ff','--purple':'#d85bf7','--rodNeutral':'#cad5e4',
+      '--green':'#8df0b1','--red':'#f57171','--blue':'#67a8ff','--purple':'#e88a2f','--rodNeutral':'#cad5e4',
       '--glass2':'rgba(14,22,34,.42)','--liftShadow':'10px 12px 26px rgba(0,0,0,.26)',
       '--bodyGlowA':'rgba(67,168,255,.12)','--bodyGlowB':'rgba(255,213,107,.10)',
       '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), rgba(8,14,24,.78)',
@@ -504,7 +504,7 @@ const THEME_PRESETS = {
       '--chargeTopBg':'rgba(245,113,113,.24)','--chargeTopGlow':'rgba(245,113,113,.32)',
       '--chargeBottomBg':'rgba(103,168,255,.24)','--chargeBottomGlow':'rgba(103,168,255,.32)',
       '--ringRedStrong':'rgba(245,113,113,.56)','--ringRedSoft':'rgba(245,113,113,.28)','--ringBlueSoft':'rgba(103,168,255,.28)',
-      '--ellipseGreenStrong':'rgba(141,240,177,.56)','--ellipseGreenSoft':'rgba(141,240,177,.28)','--ellipsePurpleSoft':'rgba(216,91,247,.28)'
+      '--ellipseGreenStrong':'rgba(141,240,177,.56)','--ellipseGreenSoft':'rgba(141,240,177,.28)','--ellipsePurpleSoft':'rgba(232,138,47,.28)'
     },
     graphs: {
       axis:'#6f87a6', text:'#d8e8fb', marker:'#8df0b1', time:'#ffffff',
@@ -512,12 +512,12 @@ const THEME_PRESETS = {
       Q:{pos:'#67a8ff',neg:'#f57171'},
       I:{pos:'#8df0b1',neg:'#d85bf7'},
       E:{pos:'#67a8ff',neg:'#f57171'},
-      B:{pos:'#8df0b1',neg:'#d85bf7'}
+      B:{pos:'#8df0b1',neg:'#e88a2f'}
     },
     sim: {
       viewportBg:'#0c0d10', axis:'#4d535d', electronDot:[255,82,82],
       ePositive:[90,175,255], eNegative:[255,72,72],
-      bGreen:[60,220,120], bPurple:[168,90,220],
+      bGreen:[60,220,120], bPurple:[232,138,47],
       currentPositive:[74,215,110], currentNegative:[216,91,247],
       rodPos:[90,175,255], rodNeg:[255,82,82], rodNeutral:[188,198,214],
       rodOutline:'rgba(12, 16, 22, 0.92)', rodHighlight:'rgba(225, 232, 242, 0.30)',
@@ -531,7 +531,7 @@ const THEME_PRESETS = {
     labels: { el: 'Ήπια', en: 'Academic' },
     cssVars: {
       '--bg':'#20242a','--bg2':'#2d333b','--bg3':'#3a424c','--text':'#eef2f5','--muted':'#b0bac5',
-      '--green':'#86bfa0','--red':'#c88989','--blue':'#88a3c4','--purple':'#a490cc','--rodNeutral':'#d7dde5',
+      '--green':'#86bfa0','--red':'#c88989','--blue':'#88a3c4','--purple':'#d08c52','--rodNeutral':'#d7dde5',
       '--glass2':'rgba(255,255,255,.06)','--liftShadow':'8px 10px 20px rgba(0,0,0,.22)',
       '--bodyGlowA':'rgba(255,255,255,.02)','--bodyGlowB':'rgba(255,255,255,.02)',
       '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), rgba(35,40,47,.84)',
@@ -563,7 +563,7 @@ const THEME_PRESETS = {
       '--chargeTopBg':'rgba(200,137,137,.20)','--chargeTopGlow':'rgba(200,137,137,.24)',
       '--chargeBottomBg':'rgba(136,163,196,.20)','--chargeBottomGlow':'rgba(136,163,196,.24)',
       '--ringRedStrong':'rgba(200,137,137,.42)','--ringRedSoft':'rgba(200,137,137,.20)','--ringBlueSoft':'rgba(136,163,196,.20)',
-      '--ellipseGreenStrong':'rgba(134,191,160,.42)','--ellipseGreenSoft':'rgba(134,191,160,.20)','--ellipsePurpleSoft':'rgba(164,144,204,.22)'
+      '--ellipseGreenStrong':'rgba(134,191,160,.42)','--ellipseGreenSoft':'rgba(134,191,160,.20)','--ellipsePurpleSoft':'rgba(208,140,82,.22)'
     },
     graphs: {
       axis:'#aab5c1', text:'#e7edf3', marker:'#8ac6a4', time:'#f0f4f8',
@@ -571,12 +571,12 @@ const THEME_PRESETS = {
       Q:{pos:'#88a3c4',neg:'#c88989'},
       I:{pos:'#86bfa0',neg:'#a490cc'},
       E:{pos:'#88a3c4',neg:'#c88989'},
-      B:{pos:'#86bfa0',neg:'#a490cc'}
+      B:{pos:'#86bfa0',neg:'#d08c52'}
     },
     sim: {
       viewportBg:'#1b2026', axis:'#818b96', electronDot:[206,130,130],
       ePositive:[125,152,191], eNegative:[200,122,122],
-      bGreen:[112,176,140], bPurple:[156,136,196],
+      bGreen:[112,176,140], bPurple:[208,140,82],
       currentPositive:[118,184,146], currentNegative:[164,144,204],
       rodPos:[125,152,191], rodNeg:[200,122,122], rodNeutral:[211,218,227],
       rodOutline:'rgba(23, 27, 32, 0.86)', rodHighlight:'rgba(238, 243, 248, 0.26)',
@@ -590,7 +590,7 @@ const THEME_PRESETS = {
     labels: { el: 'Χαρτί', en: 'Paper' },
     cssVars: {
       '--bg':'#f6efe2','--bg2':'#ede3d2','--bg3':'#dfd2be','--text':'#1f2b34','--muted':'#51606d',
-      '--green':'#22764a','--red':'#9f3b3b','--blue':'#2f5d91','--purple':'#5f3fa4','--rodNeutral':'#9ea8b3',
+      '--green':'#22764a','--red':'#9f3b3b','--blue':'#2f5d91','--purple':'#b8681e','--rodNeutral':'#9ea8b3',
       '--glass2':'rgba(255,255,255,.52)','--liftShadow':'6px 8px 16px rgba(45,39,30,.10)',
       '--bodyGlowA':'rgba(255,255,255,0)','--bodyGlowB':'rgba(255,255,255,0)',
       '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.34)), rgba(236,228,214,.94)',
@@ -635,7 +635,7 @@ const THEME_PRESETS = {
     sim: {
       viewportBg:'#fffefb', axis:'#707774', electronDot:[159,59,59],
       ePositive:[38,86,138], eNegative:[151,48,48],
-      bGreen:[28,110,66], bPurple:[88,57,155],
+      bGreen:[28,110,66], bPurple:[176,102,28],
       currentPositive:[33,118,74], currentNegative:[95,63,164],
       rodPos:[47,93,145], rodNeg:[159,59,59], rodNeutral:[151,161,174],
       rodOutline:'rgba(82, 89, 97, 0.28)', rodHighlight:'rgba(255,255,255, 0.74)',
@@ -747,13 +747,13 @@ THEME_PRESETS.screen = mergeThemePreset(THEME_PRESETS.default, {
     Q:{pos:'#64c0ff',neg:'#ff6868'},
     I:{pos:'#54ffac',neg:'#d76dff'},
     E:{pos:'#64c0ff',neg:'#ff6868'},
-    B:{pos:'#54ffac',neg:'#d76dff'}
+    B:{pos:'#54ffac',neg:'#ff9a36'}
   },
   sim: {
     viewportBg:'#03070e', axis:'#88a0be',
     palette: {
       ePositive:[112,208,255], eNegative:[255,104,104],
-      bGreen:[84,255,172], bPurple:[215,109,255],
+      bGreen:[84,255,172], bPurple:[255,148,48],
       eEnvelope:'rgba(255,255,255,0.48)', bEnvelope:'rgba(255,255,255,0.42)'
     },
     stroke: {
@@ -787,13 +787,13 @@ THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
     Q:{pos:'#224f80',neg:'#8e3030'},
     I:{pos:'#176d42',neg:'#55359a'},
     E:{pos:'#224f80',neg:'#8e3030'},
-    B:{pos:'#176d42',neg:'#55359a'}
+    B:{pos:'#176d42',neg:'#b06414'}
   },
   sim: {
     viewportBg:'#ffffff', axis:'#7f8682',
     palette: {
       ePositive:[31,79,128], eNegative:[142,48,48],
-      bGreen:[23,109,66], bPurple:[85,53,154],
+      bGreen:[23,109,66], bPurple:[170,98,28],
       eEnvelope:'rgba(20,28,36,0.18)', bEnvelope:'rgba(20,28,36,0.18)', axis:'#7f8682'
     },
     stroke: {
@@ -807,7 +807,7 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
   labels: { el: 'Print Sharp', en: 'Print Sharp' },
   cssVars: {
     '--bg':'#ffffff','--bg2':'#fbfaf7','--bg3':'#eee7dc','--text':'#0f1820','--muted':'#42505c',
-    '--green':'#008749','--red':'#bb2424','--blue':'#005bb4','--purple':'#6d23b8',
+    '--green':'#008749','--red':'#bb2424','--blue':'#005bb4','--purple':'#d26f00',
     '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.72)), rgba(245,240,232,.96)',
     '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.76)), rgba(238,231,220,.94)',
     '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.56)), rgba(238,231,220,.92)',
@@ -826,13 +826,13 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
     Q:{pos:'#0058ad',neg:'#ad1e1e'},
     I:{pos:'#00723d',neg:'#6b23b3'},
     E:{pos:'#0058ad',neg:'#ad1e1e'},
-    B:{pos:'#00723d',neg:'#6b23b3'}
+    B:{pos:'#00723d',neg:'#d26f00'}
   },
   sim: {
     viewportBg:'#ffffff', axis:'#37424a',
     palette: {
       ePositive:[0,118,238], eNegative:[230,28,28],
-      bGreen:[0,170,86], bPurple:[132,18,224],
+      bGreen:[0,170,86], bPurple:[224,118,0],
       currentPositive:[0,150,76], currentNegative:[126,18,214],
       rodPos:[0,118,238], rodNeg:[230,28,28], rodNeutral:[122,132,144],
       rodOutline:'rgba(34, 40, 46, 0.34)', rodHighlight:'rgba(255,255,255,0.96)',
@@ -867,13 +867,13 @@ THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
     Q:{pos:'#153f71',neg:'#7f2222'},
     I:{pos:'#0f6f3f',neg:'#4c2796'},
     E:{pos:'#153f71',neg:'#7f2222'},
-    B:{pos:'#0f6f3f',neg:'#4c2796'}
+    B:{pos:'#0f6f3f',neg:'#a85c12'}
   },
   sim: {
     viewportBg:'#ffffff', axis:'#6a706c',
     palette: {
       ePositive:[21,63,113], eNegative:[127,34,34],
-      bGreen:[15,111,63], bPurple:[76,39,150],
+      bGreen:[15,111,63], bPurple:[160,92,20],
       eEnvelope:'rgba(10,16,22,0.24)', bEnvelope:'rgba(10,16,22,0.24)', axis:'#6a706c'
     },
     stroke: {
@@ -901,12 +901,12 @@ THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
     Q:{pos:'#184f8a',neg:'#a13434'},
     I:{pos:'#17643f',neg:'#6233a9'},
     E:{pos:'#184f8a',neg:'#a13434'},
-    B:{pos:'#17643f',neg:'#6233a9'}
+    B:{pos:'#17643f',neg:'#b86416'}
   },
   sim: {
     viewportBg:'#fffdf8', axis:'#59636b',
     ePositive:[24,79,138], eNegative:[165,48,48],
-    bGreen:[22,108,63], bPurple:[95,48,168],
+    bGreen:[22,108,63], bPurple:[180,102,28],
     currentPositive:[22,108,63], currentNegative:[95,48,168],
     rodPos:[24,79,138], rodNeg:[165,48,48], rodNeutral:[144,153,165],
     rodOutline:'rgba(75, 81, 89, 0.22)', rodHighlight:'rgba(255,255,255,0.82)',
@@ -968,7 +968,7 @@ window.applyEMWTheme = applyTheme;
 window.registerEMWThemePreset = registerThemePreset;
 window.EMW_THEME_SCHEMA_HINT = {
   sim: {
-    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[60,220,120], bPurple:[168,90,220], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
+    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[60,220,120], bPurple:[232,138,47], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
     stroke: { eCurveMul:1.0, bCurveMul:1.0, eTravelMul:1.0, bTravelMul:1.0, envelopeWeight:1.15, currentArrowMul:1.0, axisWeight:0.83 }
   }
 };
@@ -1852,7 +1852,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 172;
+        const fillAlpha = 208;
         p.fill(34, 38, 46, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
