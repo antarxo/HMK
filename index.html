@@ -1541,7 +1541,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age) * 0.78;
       const alphaBase = 200 * fade;
-      const alpha = mode === 'back' ? alphaBase * 0.24 : alphaBase * 0.95;
+      const alpha = mode === 'back' ? alphaBase * 0.42 : alphaBase * 0.95;
       const simTheme = this._simTheme();
       const simPalette = this._simPalette();
       const simStroke = this._simStroke();
@@ -1551,6 +1551,9 @@ window.EMW_THEME_SCHEMA_HINT = {
       const rgb = Array.isArray(front.rgb)
         ? front.rgb
         : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [255, 208, 24]));
+      const curveRgb = mode === 'back'
+        ? rgb.map(v => Math.min(255, Math.round(v * 1.08 + 10)))
+        : rgb;
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
@@ -1558,7 +1561,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       p.translate(state.x0, state.centerY);
       p.scale(scaleFactor);
       ctx.save();
-      ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha/255})`;
+      ctx.strokeStyle = `rgba(${curveRgb[0]},${curveRgb[1]},${curveRgb[2]},${alpha/255})`;
       ctx.lineWidth = strokeW;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
