@@ -1853,48 +1853,51 @@ window.EMW_THEME_SCHEMA_HINT = {
       return state.bTipTable;
     }
 
-    _drawBArrowTipsEnvelope(p, nowT, layer = 'all'){
+    _drawBArrowTipsEnvelope(p, nowT, layer = 'all', part = 'all'){
       const state = this.state;
       const tipRows = this._updateBArrowTipTable(nowT);
       const visibleRows = tipRows.filter(row => row.alive && row.visible);
       if(visibleRows.length < 2) return;
 
       p.push();
-      // neutral dark smoked-glass fill between successive B travel arrows
-      // so the arrows keep strong contrast regardless of phase color.
-      p.noStroke();
-      for(let i = 0; i < visibleRows.length - 1; i++){
-        const a = visibleRows[i];
-        const b = visibleRows[i + 1];
-        const segFront = this._isBFrontRelative(b.quarter);
-        if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const isGreen = (b.quarter === 0 || b.quarter === 3);
-        const fillAlpha = isGreen ? 186 : 194;
-        const r = isGreen ? 18 : 14;
-        const g = isGreen ? 24 : 16;
-        const bl = isGreen ? 22 : 10;
-        p.fill(r, g, bl, fillAlpha);
-        p.quad(
-          a.baseScreenX, a.baseScreenY,
-          a.screenX, a.screenY,
-          b.screenX, b.screenY,
-          b.baseScreenX, b.baseScreenY
-        );
+      if(part === 'all' || part === 'fill'){
+        // Keep the smoked-glass fill below the B arrows so the arrows stay crisp.
+        p.noStroke();
+        for(let i = 0; i < visibleRows.length - 1; i++){
+          const a = visibleRows[i];
+          const b = visibleRows[i + 1];
+          const segFront = this._isBFrontRelative(b.quarter);
+          if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
+          const isGreen = (b.quarter === 0 || b.quarter === 3);
+          const fillAlpha = isGreen ? 186 : 194;
+          const r = isGreen ? 18 : 14;
+          const g = isGreen ? 24 : 16;
+          const bl = isGreen ? 22 : 10;
+          p.fill(r, g, bl, fillAlpha);
+          p.quad(
+            a.baseScreenX, a.baseScreenY,
+            a.screenX, a.screenY,
+            b.screenX, b.screenY,
+            b.baseScreenX, b.baseScreenY
+          );
+        }
       }
-      p.noFill();
-      p.stroke((this._simPalette()).bEnvelope || 'rgba(255,255,255,0.43)');
-      p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
-      p.strokeCap(p.ROUND);
-      for(let i = 0; i < visibleRows.length - 1; i++){
-        const a = visibleRows[i];
-        const b = visibleRows[i + 1];
-        const segFront = this._isBFrontRelative(b.quarter);
-        if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const useContinuous = !!(a.isContinuous && b.isContinuous && a.quarter === b.quarter);
-        p.drawingContext.setLineDash(useContinuous ? [] : [0.8,3.0]);
-        p.line(a.screenX, a.screenY, b.screenX, b.screenY);
+      if(part === 'all' || part === 'line'){
+        p.noFill();
+        p.stroke((this._simPalette()).bEnvelope || 'rgba(255,255,255,0.43)');
+        p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
+        p.strokeCap(p.ROUND);
+        for(let i = 0; i < visibleRows.length - 1; i++){
+          const a = visibleRows[i];
+          const b = visibleRows[i + 1];
+          const segFront = this._isBFrontRelative(b.quarter);
+          if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
+          const useContinuous = !!(a.isContinuous && b.isContinuous && a.quarter === b.quarter);
+          p.drawingContext.setLineDash(useContinuous ? [] : [0.8,3.0]);
+          p.line(a.screenX, a.screenY, b.screenX, b.screenY);
+        }
+        p.drawingContext.setLineDash([]);
       }
-      p.drawingContext.setLineDash([]);
       p.pop();
     }
 
@@ -1959,9 +1962,10 @@ window.EMW_THEME_SCHEMA_HINT = {
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
           const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
           const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
           for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
           for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
           if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
 
           const topComp = state.compTopSmooth;
@@ -1982,10 +1986,11 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
           for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
 
           const dotColor = (self._theme().sim || {}).electronDot || [255, 82, 82];
           p.noStroke(); p.fill(dotColor[0], dotColor[1], dotColor[2]);
