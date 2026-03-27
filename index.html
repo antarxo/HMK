@@ -1670,9 +1670,9 @@ window.EMW_THEME_SCHEMA_HINT = {
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? ((this._simPalette().bGreen) || [60, 220, 120])
           : ((this._simPalette().bPurple) || [168, 90, 220]);
-        // screen-angle test by T/4: 85, 95, 95, 85
-        // with canvas y-axis downward, the visible 95° orientation maps to -95 here
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 85 : -95;
+        // screen-angle test by T/4: 70, 110, 110, 70
+        // with canvas y-axis downward, the visible 110° orientation maps to -110 here
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 70 : -110;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 34 * Math.abs(bAtBirth);
@@ -1852,8 +1852,8 @@ window.EMW_THEME_SCHEMA_HINT = {
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 255;
-        p.fill(176, 180, 188, fillAlpha);
+        const fillAlpha = 118;
+        p.fill(122, 132, 148, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
           a.screenX, a.screenY,
