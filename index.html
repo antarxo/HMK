@@ -1852,7 +1852,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 97;
+        const fillAlpha = 255;
         p.fill(176, 180, 188, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
