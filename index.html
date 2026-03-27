@@ -1420,7 +1420,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       return (d0 + this.state.lambdaPx * progress) / pulseLocalAnchor;
     }
 
-    _drawElectronFront(p, front, nowT){
+    _drawElectronFront(p, front, nowT, travelLayer = 'all'){
       const state = this.state;
       const age = nowT - front.t0;
       if(age < 0 || age > 1) return;
@@ -1474,6 +1474,8 @@ window.EMW_THEME_SCHEMA_HINT = {
       }
       const drawTravelArrow = (xLocal) => {
         if(!state.showETravelArrows || (front.arrowLen || 0) <= 0.25) return;
+        const dirLayer = front.sign >= 0 ? 'up' : 'down';
+        if(!(travelLayer === 'all' || travelLayer === dirLayer)) return;
         const k = 1 / scaleFactor;
         const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
         const baseY = 0;
@@ -1493,7 +1495,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
         p.pop();
       };
-      drawTravelArrow(159.000);
+      if(travelLayer !== 'none') drawTravelArrow(159.000);
       p.pop();
     }
 
@@ -1637,6 +1639,15 @@ window.EMW_THEME_SCHEMA_HINT = {
       });
       items.sort((a,b) => a.z - b.z);
       return items;
+    }
+
+    _frontQuarterIndex(tEmit){
+      return tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
+    }
+
+    _isBFrontRelative(frontOrQuarter){
+      const q = typeof frontOrQuarter === 'number' ? frontOrQuarter : this._frontQuarterIndex(frontOrQuarter.t0);
+      return q === 0 || q === 3;
     }
 
     _emitContinuousFronts(){
@@ -1807,7 +1818,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       return state.bTipTable;
     }
 
-    _drawBArrowTipsEnvelope(p, nowT){
+    _drawBArrowTipsEnvelope(p, nowT, layer = 'all'){
       const state = this.state;
       const tipRows = this._updateBArrowTipTable(nowT);
       const visibleRows = tipRows.filter(row => row.alive && row.visible);
@@ -1820,6 +1831,8 @@ window.EMW_THEME_SCHEMA_HINT = {
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
+        const segFront = this._isBFrontRelative(b.quarter);
+        if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
         const fillAlpha = 24;
         p.fill(176, 180, 188, fillAlpha);
         p.quad(
@@ -1836,6 +1849,8 @@ window.EMW_THEME_SCHEMA_HINT = {
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
+        const segFront = this._isBFrontRelative(b.quarter);
+        if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
         const useContinuous = !!(a.isContinuous && b.isContinuous && a.quarter === b.quarter);
         p.drawingContext.setLineDash(useContinuous ? [] : [0.8,3.0]);
         p.line(a.screenX, a.screenY, b.screenX, b.screenY);
@@ -1903,7 +1918,11 @@ window.EMW_THEME_SCHEMA_HINT = {
           state.fronts = state.fronts.filter(front => (state.t - front.t0) <= 1.02);
           state.bFronts = state.bFronts.filter(front => (state.t - front.t0) <= 1.02);
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
-          for(const item of bItems) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
+          const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
+          const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
+          for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
+          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back');
           if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
 
           const topComp = state.compTopSmooth;
@@ -1922,9 +1941,12 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
           self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t);
-          for(const item of bItems) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t);
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
+          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
+          for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front');
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
 
           const dotColor = (self._theme().sim || {}).electronDot || [255, 82, 82];
           p.noStroke(); p.fill(dotColor[0], dotColor[1], dotColor[2]);
