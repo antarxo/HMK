@@ -1764,7 +1764,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
-        const fillAlpha = 8;
+        const fillAlpha = 68;
         p.fill(196, 208, 220, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
@@ -1852,7 +1852,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 10;
+        const fillAlpha = 92;
         p.fill(176, 180, 188, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
@@ -1956,10 +1956,10 @@ window.EMW_THEME_SCHEMA_HINT = {
           const topIsNegative = negTop > posTop;
           const botIsNegative = negBot > posBot;
           self._drawRod(p, chargeTop, chargeBot, topIsNegative, botIsNegative);
+          self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
           const chargeX = state.x0 + 24;
           if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
-          self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
           for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
