@@ -1510,9 +1510,10 @@ window.EMW_THEME_SCHEMA_HINT = {
       p.push();
       p.translate(x, y);
       p.rotate(p.radians(angleDeg));
-      p.noStroke();
-      p.fill(rgb[0], rgb[1], rgb[2], alpha);
       const k = 1 / scaleFactor;
+      p.stroke(12, 14, 18, Math.min(190, alpha * 0.82));
+      p.strokeWeight(0.72 * k);
+      p.fill(rgb[0], rgb[1], rgb[2], alpha);
       p.beginShape();
       p.vertex(2.25 * k, 0);
       p.vertex(-1.28 * k, -1.50 * k);
@@ -1576,23 +1577,25 @@ window.EMW_THEME_SCHEMA_HINT = {
       const nominalTravelAngle = (typeof front.travelAngle === 'number') ? front.travelAngle : (front.sign > 0 ? -60 : 120);
       const isBackwardTravel = nominalTravelAngle < 0;
       const arrowLayerIsActive = isBackwardTravel ? (mode === 'back') : (mode === 'front');
-      const arrowAlphaBase = alpha * (mode === 'back' ? 0.92 : 1.0);
-      const arrowAlpha = (!isGreen && isBackwardTravel)
-        ? Math.min(arrowAlphaBase, 34)
-        : arrowAlphaBase;
+      const arrowRgb = rgb.map(v => Math.min(255, Math.round(v * 1.16 + 8)));
+      const arrowAlphaBase = alpha * (mode === 'back' ? 0.96 : 1.0);
+      const arrowAlpha = Math.max(
+        (!isGreen && isBackwardTravel) ? arrowAlphaBase * 0.92 : arrowAlphaBase,
+        mode === 'back' ? 150 : 176
+      );
       if(state.showBCurves && arrowAlpha > 8){
         const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
         for(const th of thetas){
           const pt = this._ellipsePoint(a, b, th);
           const tg = this._ellipseTangent(a, b, th, ccw);
           const ang = Math.atan2(tg.y, tg.x) * 180 / Math.PI;
-          this._drawMagneticArrow(p, pt.x, pt.y, ang, rgb, arrowAlpha, scaleFactor);
+          this._drawMagneticArrow(p, pt.x, pt.y, ang, arrowRgb, arrowAlpha, scaleFactor);
         }
       }
       if(state.showBTravelArrows && arrowAlpha > 8 && arrowLayerIsActive){
         const anchorX = a;
         const anchorY = 0;
-        this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, rgb, arrowAlpha, scaleFactor);
+        this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, arrowRgb, arrowAlpha, scaleFactor);
       }
       const hasBTravelMagnitude = (front.arrowLen || 0) > 0.25;
       const drawBTravelArrow = () => {
@@ -1613,15 +1616,25 @@ window.EMW_THEME_SCHEMA_HINT = {
         const tipBaseY = tipY - uy * head;
         const px = -uy;
         const py = ux;
-        const travelAlpha = (!isGreen && isBackwardTravel) ? 34 : alpha * 0.92;
+        const travelRgb = arrowRgb;
+        const travelAlpha = Math.max((!isGreen && isBackwardTravel) ? 176 : alpha * 0.96, 184);
 
         p.push();
-        p.stroke(rgb[0], rgb[1], rgb[2], travelAlpha);
-        p.strokeWeight((simStroke.bTravelMul || 1) * 1.18 * k);
+        p.stroke(12, 14, 18, Math.min(190, travelAlpha * 0.78));
+        p.strokeWeight((simStroke.bTravelMul || 1) * 2.18 * k);
         p.strokeCap(p.ROUND);
         p.line(baseX, baseY, tipBaseX, tipBaseY);
+        p.stroke(travelRgb[0], travelRgb[1], travelRgb[2], travelAlpha);
+        p.strokeWeight((simStroke.bTravelMul || 1) * 1.42 * k);
+        p.line(baseX, baseY, tipBaseX, tipBaseY);
         p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], travelAlpha);
+        p.fill(12, 14, 18, Math.min(190, travelAlpha * 0.78));
+        p.triangle(
+          tipX, tipY,
+          tipBaseX + px * (half * 1.08), tipBaseY + py * (half * 1.08),
+          tipBaseX - px * (half * 1.08), tipBaseY - py * (half * 1.08)
+        );
+        p.fill(travelRgb[0], travelRgb[1], travelRgb[2], travelAlpha);
         p.triangle(
           tipX, tipY,
           tipBaseX + px * half, tipBaseY + py * half,
