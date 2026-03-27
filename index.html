@@ -1686,9 +1686,9 @@ window.EMW_THEME_SCHEMA_HINT = {
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? ((this._simPalette().bGreen) || [60, 220, 120])
           : ((this._simPalette().bPurple) || [168, 90, 220]);
-        // screen-angle test by T/4: 70, 110, 110, 70
-        // with canvas y-axis downward, the visible 110° orientation maps to -110 here
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 70 : -110;
+        // screen-angle test by T/4: 105, 85, 85, 105
+        // with canvas y-axis downward, the visible 85° orientation maps to -85 here
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 105 : -85;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 34 * Math.abs(bAtBirth);
@@ -1963,10 +1963,9 @@ window.EMW_THEME_SCHEMA_HINT = {
           const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
           const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
-          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
-          if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
+          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
 
           const topComp = state.compTopSmooth;
           const botComp = state.compBotSmooth;
@@ -1984,11 +1983,13 @@ window.EMW_THEME_SCHEMA_HINT = {
           const chargeX = state.x0 + 24;
           if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
+
+          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
+          if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
-          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
 
