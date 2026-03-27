@@ -517,7 +517,7 @@ const THEME_PRESETS = {
     sim: {
       viewportBg:'#0c0d10', axis:'#4d535d', electronDot:[255,82,82],
       ePositive:[90,175,255], eNegative:[255,72,72],
-      bGreen:[68,214,112], bPurple:[255,182,34],
+      bGreen:[68,214,112], bPurple:[255,208,24],
       currentPositive:[74,215,110], currentNegative:[216,91,247],
       rodPos:[90,175,255], rodNeg:[255,82,82], rodNeutral:[188,198,214],
       rodOutline:'rgba(12, 16, 22, 0.92)', rodHighlight:'rgba(225, 232, 242, 0.30)',
@@ -657,7 +657,7 @@ function normalizeSimThemeCompat(theme){
   palette.ePositive = palette.ePositive ?? sim.ePositive ?? [90,175,255];
   palette.eNegative = palette.eNegative ?? sim.eNegative ?? [255,72,72];
   palette.bGreen = palette.bGreen ?? sim.bGreen ?? [60,220,120];
-  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [255,182,34];
+  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [255,208,24];
   palette.currentPositive = palette.currentPositive ?? sim.currentPositive ?? [74,215,110];
   palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? [216,91,247];
   palette.rodPos = palette.rodPos ?? sim.rodPos ?? [90,175,255];
@@ -968,7 +968,7 @@ window.applyEMWTheme = applyTheme;
 window.registerEMWThemePreset = registerThemePreset;
 window.EMW_THEME_SCHEMA_HINT = {
   sim: {
-    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[68,214,112], bPurple:[255,182,34], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
+    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[68,214,112], bPurple:[255,208,24], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
     stroke: { eCurveMul:1.0, bCurveMul:1.0, eTravelMul:1.0, bTravelMul:1.0, envelopeWeight:1.15, currentArrowMul:1.0, axisWeight:0.83 }
   }
 };
@@ -1545,12 +1545,12 @@ window.EMW_THEME_SCHEMA_HINT = {
       const simTheme = this._simTheme();
       const simPalette = this._simPalette();
       const simStroke = this._simStroke();
-      const strokeW = (simStroke.bCurveMul || 1) * 0.68 / scaleFactor;
+      const strokeW = (simStroke.bCurveMul || 1) * 0.82 / scaleFactor;
       const frontQuarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
       const isGreen = (frontQuarter === 0 || frontQuarter === 3);
       const rgb = Array.isArray(front.rgb)
         ? front.rgb
-        : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [255, 182, 34]));
+        : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [255, 208, 24]));
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
@@ -1844,23 +1844,19 @@ window.EMW_THEME_SCHEMA_HINT = {
       if(visibleRows.length < 2) return;
 
       p.push();
-      // darker glass-like tint between successive B travel arrows:
-      // green phase gets a cool green smoke, amber phase gets a warm orange-yellow smoke.
+      // neutral dark smoked-glass fill between successive B travel arrows
+      // so the arrows keep strong contrast regardless of phase color.
       p.noStroke();
-      const simPalette = this._simPalette();
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
         const isGreen = (b.quarter === 0 || b.quarter === 3);
-        const tint = isGreen
-          ? (simPalette.bGreen || [68, 214, 112])
-          : (simPalette.bPurple || [255, 182, 34]);
-        const fillAlpha = 188;
-        const r = Math.round(tint[0] * 0.30 + 8);
-        const g = Math.round(tint[1] * 0.30 + 10);
-        const bl = Math.round(tint[2] * 0.30 + 12);
+        const fillAlpha = isGreen ? 186 : 194;
+        const r = isGreen ? 18 : 14;
+        const g = isGreen ? 24 : 16;
+        const bl = isGreen ? 22 : 10;
         p.fill(r, g, bl, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
