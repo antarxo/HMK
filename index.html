@@ -1691,7 +1691,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 105 : -85;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
-        const arrowLen = 34 * Math.abs(bAtBirth);
+        const arrowLen = 26 * Math.abs(bAtBirth);
         const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
         if(!onQuarterBoundary) this._seedBFront(tEmit, sign, rgb, travelAngle, arrowLen);
         this.state.bSlotIndex++;
