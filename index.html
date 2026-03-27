@@ -401,6 +401,7 @@ body.capture-view .capture-fab{
         <button class="chip theme-chip" id="themeScreen" data-theme="screen">Οθόνη</button>
         <button class="chip theme-chip" id="themeAcademic" data-theme="academic">Ήπια</button>
         <button class="chip theme-chip" id="themePrint" data-theme="print">Print</button>
+        <button class="chip theme-chip" id="themePrintSharp" data-theme="printSharp">Print Sharp</button>
         <button class="chip theme-chip" id="themePaperContrast" data-theme="paperContrast">Χαρτί+</button>
         <button class="chip theme-chip" id="themeCapture" data-theme="capture">Χαρτί</button>
         <button class="chip" id="toggleCaptureView">Capture</button>
@@ -800,6 +801,50 @@ THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
     }
   }
 });
+
+THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
+  key: 'printSharp',
+  labels: { el: 'Print Sharp', en: 'Print Sharp' },
+  cssVars: {
+    '--bg':'#ffffff','--bg2':'#fbfaf7','--bg3':'#eee7dc','--text':'#0f1820','--muted':'#42505c',
+    '--green':'#008749','--red':'#bb2424','--blue':'#005bb4','--purple':'#6d23b8',
+    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.72)), rgba(245,240,232,.96)',
+    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.76)), rgba(238,231,220,.94)',
+    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.56)), rgba(238,231,220,.92)',
+    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(252,250,246,1) 34%, rgba(240,234,224,1) 88%), linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0))',
+    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.22)), rgba(255,255,255,.52)',
+    '--machineAxis':'rgba(46,58,68,.66)',
+    '--btnBorder':'rgba(24,34,44,.30)','--btnBorderHover':'rgba(24,34,44,.38)','--btnBorderOn':'rgba(24,34,44,.44)','--btnBorderOff':'rgba(24,34,44,.14)',
+    '--btnText':'#0f1820','--btnTextOff':'#52606d','--btnTextActive':'#000000',
+    '--layerBtnTextActive':'#000000',
+    '--ctrlText':'#0f1820',
+    '--hintText':'#17222b'
+  },
+  graphs: {
+    axis:'#2f3a44', text:'#0f1820', marker:'#00723d', time:'#0f1820',
+    V:{pos:'#775400',neg:'#775400'},
+    Q:{pos:'#0058ad',neg:'#ad1e1e'},
+    I:{pos:'#00723d',neg:'#6b23b3'},
+    E:{pos:'#0058ad',neg:'#ad1e1e'},
+    B:{pos:'#00723d',neg:'#6b23b3'}
+  },
+  sim: {
+    viewportBg:'#ffffff', axis:'#59646c',
+    palette: {
+      ePositive:[0,91,180], eNegative:[187,36,36],
+      bGreen:[0,135,73], bPurple:[109,35,184],
+      currentPositive:[0,125,68], currentNegative:[107,35,179],
+      rodPos:[0,91,180], rodNeg:[187,36,36], rodNeutral:[142,151,161],
+      rodOutline:'rgba(54, 60, 68, 0.28)', rodHighlight:'rgba(255,255,255,0.86)',
+      chargePositive:'#005b8f', chargeNegative:'#ad2323',
+      eEnvelope:'rgba(18,24,30,0.10)', bEnvelope:'rgba(18,24,30,0.10)', axis:'#59646c'
+    },
+    stroke: {
+      eCurveMul:1.38, bCurveMul:1.34, eTravelMul:1.22, bTravelMul:1.18, envelopeWeight:0.90, axisWeight:1.05
+    }
+  }
+});
+
 THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
   key: 'paperContrast',
   labels: { el: 'Χαρτί+', en: 'Paper Contrast' },
@@ -2024,6 +2069,7 @@ function setLang(lang){
         themeScreen: THEME_PRESETS.screen.labels.en,
         themeAcademic: THEME_PRESETS.academic.labels.en,
         themePrint: THEME_PRESETS.print.labels.en,
+        themePrintSharp: THEME_PRESETS.printSharp.labels.en,
         themePaperContrast: THEME_PRESETS.paperContrast.labels.en,
         themeCapture: THEME_PRESETS.capture.labels.en
       }
@@ -2032,6 +2078,7 @@ function setLang(lang){
         themeScreen: THEME_PRESETS.screen.labels.el,
         themeAcademic: THEME_PRESETS.academic.labels.el,
         themePrint: THEME_PRESETS.print.labels.el,
+        themePrintSharp: THEME_PRESETS.printSharp.labels.el,
         themePaperContrast: THEME_PRESETS.paperContrast.labels.el,
         themeCapture: THEME_PRESETS.capture.labels.el
       };
