@@ -1686,9 +1686,9 @@ window.EMW_THEME_SCHEMA_HINT = {
         const rgb = (quarterFloat === 0 || quarterFloat === 3)
           ? ((this._simPalette().bGreen) || [60, 220, 120])
           : ((this._simPalette().bPurple) || [168, 90, 220]);
-        // screen-angle test by T/4: 105, 65, 65, 105
-        // with canvas y-axis downward, the visible 65° orientation maps to -65 here
-        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 105 : -65;
+        // screen-angle test by T/4: 105, 55, 55, 105
+        // with canvas y-axis downward, the visible 55° orientation maps to -55 here
+        const travelAngle = (quarterFloat === 0 || quarterFloat === 3) ? 105 : -55;
         const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 26 * Math.abs(bAtBirth);
