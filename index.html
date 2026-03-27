@@ -1715,6 +1715,8 @@ window.EMW_THEME_SCHEMA_HINT = {
         const tipY = signY * (front.arrowLen || 0); // σε local coords του envelope, χωρίς extra scaling
         const screenX = state.x0 + xLocal;
         const screenY = state.centerY + tipY;
+        const baseScreenX = screenX;
+        const baseScreenY = state.centerY;
 
         const visible = (
           screenX >= state.x0 &&
@@ -1727,6 +1729,8 @@ window.EMW_THEME_SCHEMA_HINT = {
         slot.tipY = tipY;
         slot.screenX = screenX;
         slot.screenY = screenY;
+        slot.baseScreenX = baseScreenX;
+        slot.baseScreenY = baseScreenY;
         slot.visible = visible;
         slot.alive = true;
       }
@@ -1739,6 +1743,8 @@ window.EMW_THEME_SCHEMA_HINT = {
         tipY: s.tipY,
         screenX: s.screenX,
         screenY: s.screenY,
+        baseScreenX: s.baseScreenX,
+        baseScreenY: s.baseScreenY,
         visible: s.visible,
         alive: s.alive
       }));
@@ -1754,6 +1760,19 @@ window.EMW_THEME_SCHEMA_HINT = {
       if(visibleRows.length < 2) return;
 
       p.push();
+      p.noStroke();
+      for(let i = 0; i < visibleRows.length - 1; i++){
+        const a = visibleRows[i];
+        const b = visibleRows[i + 1];
+        const fillAlpha = 8;
+        p.fill(196, 208, 220, fillAlpha);
+        p.quad(
+          a.baseScreenX, a.baseScreenY,
+          a.screenX, a.screenY,
+          b.screenX, b.screenY,
+          b.baseScreenX, b.baseScreenY
+        );
+      }
       p.translate(state.x0, state.centerY);
       p.noFill();
       p.stroke((this._simPalette()).eEnvelope || 'rgba(255,255,255,0.43)');
@@ -1833,7 +1852,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 24;
+        const fillAlpha = 10;
         p.fill(176, 180, 188, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
