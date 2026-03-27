@@ -517,7 +517,7 @@ const THEME_PRESETS = {
     sim: {
       viewportBg:'#0c0d10', axis:'#4d535d', electronDot:[255,82,82],
       ePositive:[90,175,255], eNegative:[255,72,72],
-      bGreen:[60,220,120], bPurple:[232,138,47],
+      bGreen:[68,214,112], bPurple:[255,182,34],
       currentPositive:[74,215,110], currentNegative:[216,91,247],
       rodPos:[90,175,255], rodNeg:[255,82,82], rodNeutral:[188,198,214],
       rodOutline:'rgba(12, 16, 22, 0.92)', rodHighlight:'rgba(225, 232, 242, 0.30)',
@@ -576,7 +576,7 @@ const THEME_PRESETS = {
     sim: {
       viewportBg:'#1b2026', axis:'#818b96', electronDot:[206,130,130],
       ePositive:[125,152,191], eNegative:[200,122,122],
-      bGreen:[112,176,140], bPurple:[208,140,82],
+      bGreen:[112,176,140], bPurple:[224,168,76],
       currentPositive:[118,184,146], currentNegative:[164,144,204],
       rodPos:[125,152,191], rodNeg:[200,122,122], rodNeutral:[211,218,227],
       rodOutline:'rgba(23, 27, 32, 0.86)', rodHighlight:'rgba(238, 243, 248, 0.26)',
@@ -635,7 +635,7 @@ const THEME_PRESETS = {
     sim: {
       viewportBg:'#fffefb', axis:'#707774', electronDot:[159,59,59],
       ePositive:[38,86,138], eNegative:[151,48,48],
-      bGreen:[28,110,66], bPurple:[176,102,28],
+      bGreen:[28,110,66], bPurple:[214,144,20],
       currentPositive:[33,118,74], currentNegative:[95,63,164],
       rodPos:[47,93,145], rodNeg:[159,59,59], rodNeutral:[151,161,174],
       rodOutline:'rgba(82, 89, 97, 0.28)', rodHighlight:'rgba(255,255,255, 0.74)',
@@ -657,7 +657,7 @@ function normalizeSimThemeCompat(theme){
   palette.ePositive = palette.ePositive ?? sim.ePositive ?? [90,175,255];
   palette.eNegative = palette.eNegative ?? sim.eNegative ?? [255,72,72];
   palette.bGreen = palette.bGreen ?? sim.bGreen ?? [60,220,120];
-  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [168,90,220];
+  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [255,182,34];
   palette.currentPositive = palette.currentPositive ?? sim.currentPositive ?? [74,215,110];
   palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? [216,91,247];
   palette.rodPos = palette.rodPos ?? sim.rodPos ?? [90,175,255];
@@ -753,7 +753,7 @@ THEME_PRESETS.screen = mergeThemePreset(THEME_PRESETS.default, {
     viewportBg:'#03070e', axis:'#88a0be',
     palette: {
       ePositive:[112,208,255], eNegative:[255,104,104],
-      bGreen:[84,255,172], bPurple:[255,148,48],
+      bGreen:[84,255,172], bPurple:[255,196,46],
       eEnvelope:'rgba(255,255,255,0.48)', bEnvelope:'rgba(255,255,255,0.42)'
     },
     stroke: {
@@ -793,7 +793,7 @@ THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
     viewportBg:'#ffffff', axis:'#7f8682',
     palette: {
       ePositive:[31,79,128], eNegative:[142,48,48],
-      bGreen:[23,109,66], bPurple:[170,98,28],
+      bGreen:[23,109,66], bPurple:[218,150,18],
       eEnvelope:'rgba(20,28,36,0.18)', bEnvelope:'rgba(20,28,36,0.18)', axis:'#7f8682'
     },
     stroke: {
@@ -832,7 +832,7 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
     viewportBg:'#ffffff', axis:'#37424a',
     palette: {
       ePositive:[0,118,238], eNegative:[230,28,28],
-      bGreen:[0,170,86], bPurple:[224,118,0],
+      bGreen:[0,170,86], bPurple:[255,170,0],
       currentPositive:[0,150,76], currentNegative:[126,18,214],
       rodPos:[0,118,238], rodNeg:[230,28,28], rodNeutral:[122,132,144],
       rodOutline:'rgba(34, 40, 46, 0.34)', rodHighlight:'rgba(255,255,255,0.96)',
@@ -873,7 +873,7 @@ THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
     viewportBg:'#ffffff', axis:'#6a706c',
     palette: {
       ePositive:[21,63,113], eNegative:[127,34,34],
-      bGreen:[15,111,63], bPurple:[160,92,20],
+      bGreen:[15,111,63], bPurple:[212,142,18],
       eEnvelope:'rgba(10,16,22,0.24)', bEnvelope:'rgba(10,16,22,0.24)', axis:'#6a706c'
     },
     stroke: {
@@ -906,7 +906,7 @@ THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
   sim: {
     viewportBg:'#fffdf8', axis:'#59636b',
     ePositive:[24,79,138], eNegative:[165,48,48],
-    bGreen:[22,108,63], bPurple:[180,102,28],
+    bGreen:[22,108,63], bPurple:[224,154,22],
     currentPositive:[22,108,63], currentNegative:[95,48,168],
     rodPos:[24,79,138], rodNeg:[165,48,48], rodNeutral:[144,153,165],
     rodOutline:'rgba(75, 81, 89, 0.22)', rodHighlight:'rgba(255,255,255,0.82)',
@@ -968,7 +968,7 @@ window.applyEMWTheme = applyTheme;
 window.registerEMWThemePreset = registerThemePreset;
 window.EMW_THEME_SCHEMA_HINT = {
   sim: {
-    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[60,220,120], bPurple:[232,138,47], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
+    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[68,214,112], bPurple:[255,182,34], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
     stroke: { eCurveMul:1.0, bCurveMul:1.0, eTravelMul:1.0, bTravelMul:1.0, envelopeWeight:1.15, currentArrowMul:1.0, axisWeight:0.83 }
   }
 };
@@ -1550,7 +1550,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       const isGreen = (frontQuarter === 0 || frontQuarter === 3);
       const rgb = Array.isArray(front.rgb)
         ? front.rgb
-        : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [168, 90, 220]));
+        : (isGreen ? (simPalette.bGreen || [60, 220, 120]) : (simPalette.bPurple || [255, 182, 34]));
       const a = 159;
       const b = 39.5;
       const ctx = p.drawingContext;
@@ -1844,16 +1844,24 @@ window.EMW_THEME_SCHEMA_HINT = {
       if(visibleRows.length < 2) return;
 
       p.push();
-      // subtle gray fill in the quadrilateral area between two successive B travel arrows,
-      // directly under the B envelope, so the near-vertical propagation reads more clearly in 2D.
+      // darker glass-like tint between successive B travel arrows:
+      // green phase gets a cool green smoke, amber phase gets a warm orange-yellow smoke.
       p.noStroke();
+      const simPalette = this._simPalette();
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
         const segFront = this._isBFrontRelative(b.quarter);
         if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-        const fillAlpha = 208;
-        p.fill(34, 38, 46, fillAlpha);
+        const isGreen = (b.quarter === 0 || b.quarter === 3);
+        const tint = isGreen
+          ? (simPalette.bGreen || [68, 214, 112])
+          : (simPalette.bPurple || [255, 182, 34]);
+        const fillAlpha = 188;
+        const r = Math.round(tint[0] * 0.30 + 8);
+        const g = Math.round(tint[1] * 0.30 + 10);
+        const bl = Math.round(tint[2] * 0.30 + 12);
+        p.fill(r, g, bl, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
           a.screenX, a.screenY,
