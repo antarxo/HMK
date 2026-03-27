@@ -314,29 +314,39 @@ body.capture-view .machine-hud{
   display:none !important;
 }
 body.capture-view .main{
-  grid-template-columns:1fr;
-  gap:0;
+  display:block;
+  width:100vw;
+  height:100dvh;
   padding:0;
+  margin:0;
 }
 body.capture-view .stage-wrap{
-  grid-template-rows:minmax(0,1fr) 0px;
-  gap:0;
+  display:block;
+  width:100vw;
+  height:100dvh;
+  min-height:100dvh;
+  margin:0;
+  padding:0;
 }
 body.capture-view .machine-shell{
-  border-radius:0;
-  background:#fbf8f1;
-}
-body.capture-view .machine-host{
+  position:fixed;
   inset:0;
+  width:100vw;
+  height:100dvh;
+  min-height:100dvh;
   border-radius:0;
   background:transparent;
+}
+body.capture-view .machine-host{
+  position:absolute;
+  inset:0;
+  border-radius:0;
+  background:#fbf8f1;
   backdrop-filter:none;
 }
 body.capture-view #machineMount{
-  left:0;
-  top:0;
-  right:0;
-  bottom:0;
+  position:absolute;
+  inset:0;
 }
 .capture-fab{
   position:fixed;
