@@ -1962,10 +1962,10 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
           for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front');
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
 
           const dotColor = (self._theme().sim || {}).electronDot || [255, 82, 82];
           p.noStroke(); p.fill(dotColor[0], dotColor[1], dotColor[2]);
