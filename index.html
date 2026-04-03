@@ -2047,7 +2047,6 @@ window.EMW_THEME_SCHEMA_HINT = {
           const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
           const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
           for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
 
@@ -2074,6 +2073,7 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
 
