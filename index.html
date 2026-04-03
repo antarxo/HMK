@@ -1479,9 +1479,9 @@ window.EMW_THEME_SCHEMA_HINT = {
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age);
       const alpha = 225 * fade;
-      const curveAlpha = alpha * ((simStroke.eCurveAlphaMul || 1));
       const simTheme = this._simTheme();
       const simStroke = this._simStroke();
+      const curveAlpha = alpha * ((simStroke.eCurveAlphaMul || 1));
       const strokeW = (simStroke.eCurveMul || 1) * 0.56 / scaleFactor;
       const rgb = front.color;
       p.push();
