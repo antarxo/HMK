@@ -846,7 +846,7 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
       eEnvelope:'rgba(20,26,32,0.08)', bEnvelope:'rgba(20,26,32,0.08)', axis:'#37424a'
     },
     stroke: {
-      eCurveMul:1.46, bCurveMul:1.42, eTravelMul:1.28, bTravelMul:1.24, envelopeWeight:0.84, axisWeight:1.10
+      eCurveMul:1.46, bCurveMul:1.42, eTravelMul:1.28, bTravelMul:1.24, envelopeWeight:0.84, axisWeight:1.10, eCurveAlphaMul:0.72
     }
   }
 });
@@ -1479,6 +1479,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       const scaleFactor = this._getPulseScale(age);
       const fade = Math.exp(-state.fadeK * age);
       const alpha = 225 * fade;
+      const curveAlpha = alpha * ((simStroke.eCurveAlphaMul || 1));
       const simTheme = this._simTheme();
       const simStroke = this._simStroke();
       const strokeW = (simStroke.eCurveMul || 1) * 0.56 / scaleFactor;
@@ -1487,7 +1488,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       p.translate(state.x0, state.centerY);
       p.scale(scaleFactor);
       p.noFill();
-      p.stroke(rgb[0], rgb[1], rgb[2], alpha);
+      p.stroke(rgb[0], rgb[1], rgb[2], curveAlpha);
       p.strokeWeight(strokeW);
       p.strokeCap(p.ROUND);
       p.strokeJoin(p.ROUND);
@@ -1563,8 +1564,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       p.translate(x, y);
       p.rotate(p.radians(angleDeg));
       const k = 1 / scaleFactor;
-      p.stroke(12, 14, 18, Math.min(190, alpha * 0.82));
-      p.strokeWeight(0.72 * k);
+      p.noStroke();
       p.fill(rgb[0], rgb[1], rgb[2], alpha);
       p.beginShape();
       p.vertex(2.25 * k, 0);
@@ -1839,7 +1839,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       for(let i = 0; i < visibleRows.length - 1; i++){
         const a = visibleRows[i];
         const b = visibleRows[i + 1];
-        const fillAlpha = 68;
+        const fillAlpha = 118;
         p.fill(196, 208, 220, fillAlpha);
         p.quad(
           a.baseScreenX, a.baseScreenY,
@@ -1952,7 +1952,7 @@ window.EMW_THEME_SCHEMA_HINT = {
           const segFront = this._isBFrontRelative(segQuarter);
           if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
           const isGreen = (segQuarter === 0 || segQuarter === 3);
-          const fillAlpha = isGreen ? 186 : 194;
+          const fillAlpha = isGreen ? 132 : 140;
           const r = isGreen ? 18 : 14;
           const g = isGreen ? 24 : 16;
           const bl = isGreen ? 22 : 10;
