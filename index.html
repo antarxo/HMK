@@ -516,7 +516,7 @@ const THEME_PRESETS = {
       axis:'#6f87a6', text:'#d8e8fb', marker:'#8df0b1', time:'#ffffff',
       V:{pos:'#ffd56b',neg:'#ffd56b'},
       Q:{pos:'#67a8ff',neg:'#f57171'},
-      I:{pos:'#8df0b1',neg:'#d85bf7'},
+      I:{pos:'#8df0b1',neg:'#ffba12'},
       E:{pos:'#67a8ff',neg:'#f57171'},
       B:{pos:'#8df0b1',neg:'#e88a2f'}
     },
@@ -524,7 +524,7 @@ const THEME_PRESETS = {
       viewportBg:'#0c0d10', axis:'#4d535d', electronDot:[255,82,82],
       ePositive:[90,175,255], eNegative:[255,72,72],
       bGreen:[68,214,112], bPurple:[255,208,24],
-      currentPositive:[74,215,110], currentNegative:[216,91,247],
+      currentPositive:[74,215,110], currentNegative:[255,186,18],
       rodPos:[90,175,255], rodNeg:[255,82,82], rodNeutral:[188,198,214],
       rodOutline:'rgba(12, 16, 22, 0.92)', rodHighlight:'rgba(225, 232, 242, 0.30)',
       chargePositive:'#00E7FF', chargeNegative:'#FF0000',
@@ -575,7 +575,7 @@ const THEME_PRESETS = {
       axis:'#aab5c1', text:'#e7edf3', marker:'#8ac6a4', time:'#f0f4f8',
       V:{pos:'#cdb676',neg:'#cdb676'},
       Q:{pos:'#88a3c4',neg:'#c88989'},
-      I:{pos:'#86bfa0',neg:'#a490cc'},
+      I:{pos:'#86bfa0',neg:'#ecaa18'},
       E:{pos:'#88a3c4',neg:'#c88989'},
       B:{pos:'#86bfa0',neg:'#d08c52'}
     },
@@ -583,7 +583,7 @@ const THEME_PRESETS = {
       viewportBg:'#1b2026', axis:'#818b96', electronDot:[206,130,130],
       ePositive:[125,152,191], eNegative:[200,122,122],
       bGreen:[112,176,140], bPurple:[224,168,76],
-      currentPositive:[118,184,146], currentNegative:[164,144,204],
+      currentPositive:[118,184,146], currentNegative:[236,170,24],
       rodPos:[125,152,191], rodNeg:[200,122,122], rodNeutral:[211,218,227],
       rodOutline:'rgba(23, 27, 32, 0.86)', rodHighlight:'rgba(238, 243, 248, 0.26)',
       chargePositive:'#a9d8ea', chargeNegative:'#d27b7b',
@@ -634,7 +634,7 @@ const THEME_PRESETS = {
       axis:'#4d5964', text:'#1f2b34', marker:'#1f6f46', time:'#202b34',
       V:{pos:'#8e6f1b',neg:'#8e6f1b'},
       Q:{pos:'#2f5d91',neg:'#9f3b3b'},
-      I:{pos:'#22764a',neg:'#5f3fa4'},
+      I:{pos:'#22764a',neg:'#eeac16'},
       E:{pos:'#2f5d91',neg:'#9f3b3b'},
       B:{pos:'#22764a',neg:'#5f3fa4'}
     },
@@ -642,7 +642,7 @@ const THEME_PRESETS = {
       viewportBg:'#fffefb', axis:'#707774', electronDot:[159,59,59],
       ePositive:[38,86,138], eNegative:[151,48,48],
       bGreen:[28,110,66], bPurple:[214,144,20],
-      currentPositive:[33,118,74], currentNegative:[95,63,164],
+      currentPositive:[33,118,74], currentNegative:[238,172,22],
       rodPos:[47,93,145], rodNeg:[159,59,59], rodNeutral:[151,161,174],
       rodOutline:'rgba(82, 89, 97, 0.28)', rodHighlight:'rgba(255,255,255, 0.74)',
       chargePositive:'#1f6f88', chargeNegative:'#983b3b',
@@ -666,6 +666,7 @@ function applyPaletteFamily(theme, family){
   const sim = theme.sim || (theme.sim = {});
   const palette = sim.palette || (sim.palette = {});
   const cssVars = theme.cssVars || (theme.cssVars = {});
+  const graphs = theme.graphs || (theme.graphs = {});
   palette.ePositive = family.ePositive.slice();
   palette.eNegative = family.eNegative.slice();
   palette.bGreen = family.bGreen.slice();
@@ -676,19 +677,34 @@ function applyPaletteFamily(theme, family){
   palette.rodNeg = family.eNegative.slice();
   palette.chargePositive = rgbToHex(family.ePositive);
   palette.chargeNegative = rgbToHex(family.eNegative);
+  graphs.Q = graphs.Q || {};
+  graphs.I = graphs.I || {};
+  graphs.E = graphs.E || {};
+  graphs.B = graphs.B || {};
+  graphs.Q.pos = rgbToHex(family.ePositive);
+  graphs.Q.neg = rgbToHex(family.eNegative);
+  graphs.I.pos = rgbToHex(family.bGreen);
+  graphs.I.neg = rgbToHex(family.bPurple);
+  graphs.E.pos = rgbToHex(family.ePositive);
+  graphs.E.neg = rgbToHex(family.eNegative);
+  graphs.B.pos = rgbToHex(family.bGreen);
+  graphs.B.neg = rgbToHex(family.bPurple);
   cssVars['--blue'] = rgbToHex(family.ePositive);
   cssVars['--red'] = rgbToHex(family.eNegative);
   cssVars['--green'] = rgbToHex(family.bGreen);
   cssVars['--purple'] = rgbToHex(family.bPurple);
+  sim.stroke = sim.stroke || {};
+  if (family.eCurveAlphaMul != null) sim.stroke.eCurveAlphaMul = family.eCurveAlphaMul;
+  if (family.bCurveMul != null) sim.stroke.bCurveMul = family.bCurveMul;
 }
 const EMW_PALETTE_FAMILIES = {
-  default:      { ePositive:[79,168,216], eNegative:[232,90,90], bGreen:[56,182,107], bPurple:[242,163,27] },
-  screen:       { ePositive:[84,180,230], eNegative:[236,96,96], bGreen:[64,194,114], bPurple:[248,172,32] },
-  academic:     { ePositive:[75,148,187], eNegative:[201,96,82], bGreen:[74,160,106], bPurple:[217,154,26] },
-  print:        { ePositive:[74,150,196], eNegative:[198,92,82], bGreen:[72,156,100], bPurple:[214,150,24] },
-  printSharp:   { ePositive:[68,162,214], eNegative:[220,84,74], bGreen:[54,176,104], bPurple:[244,168,18] },
-  paperContrast:{ ePositive:[73,146,192], eNegative:[210,96,84], bGreen:[73,162,102], bPurple:[226,158,24] },
-  capture:      { ePositive:[76,154,202], eNegative:[214,98,86], bGreen:[70,168,105], bPurple:[228,160,28] }
+  default:      { ePositive:[78,156,202], eNegative:[226,106,94], bGreen:[34,198,100], bPurple:[255,186,18], eCurveAlphaMul:0.78, bCurveMul:1.10 },
+  screen:       { ePositive:[84,166,214], eNegative:[232,110,96], bGreen:[40,208,108], bPurple:[255,194,22], eCurveAlphaMul:0.80, bCurveMul:1.12 },
+  academic:     { ePositive:[74,144,182], eNegative:[198,98,86], bGreen:[48,174,96], bPurple:[236,170,24], eCurveAlphaMul:0.76, bCurveMul:1.08 },
+  print:        { ePositive:[76,148,190], eNegative:[202,96,84], bGreen:[52,178,98], bPurple:[238,172,22], eCurveAlphaMul:0.74, bCurveMul:1.10 },
+  printSharp:   { ePositive:[72,160,208], eNegative:[220,94,82], bGreen:[46,188,100], bPurple:[255,184,18], eCurveAlphaMul:0.72, bCurveMul:1.14 },
+  paperContrast:{ ePositive:[74,146,188], eNegative:[206,98,86], bGreen:[52,182,100], bPurple:[244,176,20], eCurveAlphaMul:0.70, bCurveMul:1.14 },
+  capture:      { ePositive:[76,152,194], eNegative:[210,100,88], bGreen:[50,184,102], bPurple:[248,180,22], eCurveAlphaMul:0.72, bCurveMul:1.12 }
 };
 Object.entries(EMW_PALETTE_FAMILIES).forEach(([key, family]) => {
   if (THEME_PRESETS[key]) applyPaletteFamily(THEME_PRESETS[key], family);
@@ -707,7 +723,7 @@ function normalizeSimThemeCompat(theme){
   palette.bGreen = palette.bGreen ?? sim.bGreen ?? [60,220,120];
   palette.bPurple = palette.bPurple ?? sim.bPurple ?? [255,208,24];
   palette.currentPositive = palette.currentPositive ?? sim.currentPositive ?? palette.bGreen ?? [74,215,110];
-  palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? palette.bPurple ?? [242,163,27];
+  palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? palette.bPurple ?? [255,186,18];
   palette.rodPos = palette.rodPos ?? sim.rodPos ?? palette.ePositive ?? [79,168,216];
   palette.rodNeg = palette.rodNeg ?? sim.rodNeg ?? palette.eNegative ?? [232,90,90];
   palette.rodNeutral = palette.rodNeutral ?? sim.rodNeutral ?? [188,198,214];
@@ -793,7 +809,7 @@ THEME_PRESETS.screen = mergeThemePreset(THEME_PRESETS.default, {
     axis:'#9dc3f0', text:'#f1f8ff', marker:'#5dffb0', time:'#ffffff',
     V:{pos:'#ffd65d',neg:'#ffd65d'},
     Q:{pos:'#64c0ff',neg:'#ff6868'},
-    I:{pos:'#54ffac',neg:'#d76dff'},
+    I:{pos:'#54ffac',neg:'#ffbe18'},
     E:{pos:'#64c0ff',neg:'#ff6868'},
     B:{pos:'#54ffac',neg:'#ff9a36'}
   },
@@ -833,7 +849,7 @@ THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
     axis:'#43505b', text:'#16212a', marker:'#176d42', time:'#16212a',
     V:{pos:'#876814',neg:'#876814'},
     Q:{pos:'#224f80',neg:'#8e3030'},
-    I:{pos:'#176d42',neg:'#55359a'},
+    I:{pos:'#176d42',neg:'#e6a71a'},
     E:{pos:'#224f80',neg:'#8e3030'},
     B:{pos:'#176d42',neg:'#b06414'}
   },
@@ -872,7 +888,7 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
     axis:'#2f3a44', text:'#0f1820', marker:'#00723d', time:'#0f1820',
     V:{pos:'#775400',neg:'#775400'},
     Q:{pos:'#0058ad',neg:'#ad1e1e'},
-    I:{pos:'#00723d',neg:'#6b23b3'},
+    I:{pos:'#00723d',neg:'#f4b012'},
     E:{pos:'#0058ad',neg:'#ad1e1e'},
     B:{pos:'#00723d',neg:'#d26f00'}
   },
@@ -881,7 +897,7 @@ THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
     palette: {
       ePositive:[0,118,238], eNegative:[230,28,28],
       bGreen:[0,170,86], bPurple:[255,170,0],
-      currentPositive:[0,150,76], currentNegative:[126,18,214],
+      currentPositive:[0,150,76], currentNegative:[244,176,20],
       rodPos:[0,118,238], rodNeg:[230,28,28], rodNeutral:[122,132,144],
       rodOutline:'rgba(34, 40, 46, 0.34)', rodHighlight:'rgba(255,255,255,0.96)',
       chargePositive:'#0069d9', chargeNegative:'#d81f1f',
@@ -913,7 +929,7 @@ THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
     axis:'#34414b', text:'#0d161d', marker:'#0f6f3f', time:'#0d161d',
     V:{pos:'#7a5b0a',neg:'#7a5b0a'},
     Q:{pos:'#153f71',neg:'#7f2222'},
-    I:{pos:'#0f6f3f',neg:'#4c2796'},
+    I:{pos:'#0f6f3f',neg:'#f0aa16'},
     E:{pos:'#153f71',neg:'#7f2222'},
     B:{pos:'#0f6f3f',neg:'#a85c12'}
   },
@@ -947,7 +963,7 @@ THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
     axis:'#3d4c56', text:'#18242d', marker:'#16643e', time:'#18242d',
     V:{pos:'#7e6110',neg:'#7e6110'},
     Q:{pos:'#184f8a',neg:'#a13434'},
-    I:{pos:'#17643f',neg:'#6233a9'},
+    I:{pos:'#17643f',neg:'#f8b416'},
     E:{pos:'#184f8a',neg:'#a13434'},
     B:{pos:'#17643f',neg:'#b86416'}
   },
@@ -955,7 +971,7 @@ THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
     viewportBg:'#fffdf8', axis:'#59636b',
     ePositive:[24,79,138], eNegative:[165,48,48],
     bGreen:[22,108,63], bPurple:[224,154,22],
-    currentPositive:[22,108,63], currentNegative:[95,48,168],
+    currentPositive:[22,108,63], currentNegative:[248,180,22],
     rodPos:[24,79,138], rodNeg:[165,48,48], rodNeutral:[144,153,165],
     rodOutline:'rgba(75, 81, 89, 0.22)', rodHighlight:'rgba(255,255,255,0.82)',
     chargePositive:'#155d78', chargeNegative:'#a43c3c',
@@ -1451,7 +1467,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       p.strokeJoin(p.ROUND);
       const simPalette = this._simPalette();
       const simStroke = this._simStroke();
-      const arrowRGB = iSigned >= 0 ? (simPalette.currentPositive || [74, 215, 110]) : (simPalette.currentNegative || [216, 91, 247]);
+      const arrowRGB = iSigned >= 0 ? (simPalette.currentPositive || [74, 215, 110]) : (simPalette.currentNegative || [255, 186, 18]);
       p.stroke(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
       p.fill(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
       p.strokeWeight(lineW * (simStroke.currentArrowMul || 1));
