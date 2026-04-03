@@ -1745,9 +1745,10 @@ window.EMW_THEME_SCHEMA_HINT = {
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 26 * Math.abs(bAtBirth);
         const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
-        if(onQuarterBoundary){
-          // Keep an invisible boundary anchor for the B fill/envelope geometry at zero crossings.
-          // It must participate in tip-table interpolation, but not generate visible ellipse shells.
+        const isZeroCrossing = onQuarterBoundary && Math.abs(bAtBirth) < 1e-9;
+        if(isZeroCrossing){
+          // Keep an invisible boundary anchor only at true zero crossings of B.
+          // At maxima/minima (e.g. T/2) we must still emit a normal visible front.
           this._seedBFront(tEmit, sign, rgb, travelAngle, 0, { anchorOnly: true });
         } else {
           this._seedBFront(tEmit, sign, rgb, travelAngle, arrowLen);
