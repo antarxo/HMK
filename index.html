@@ -2127,16 +2127,19 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
 
-          // E internal layering test: lobes first, then E fill/envelope, then the E travel arrows on top.
+          // E first: lobes, then E fill/envelope, then E travel arrows.
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
-          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
-          for(const item of bBackOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
           if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
+
+          // Lower B ellipses sit above the E arrows, but still below B travel arrows.
+          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
+
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
+          for(const item of bBackOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
           for(const item of bFrontOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
