@@ -260,6 +260,12 @@ button{font:inherit}
   color:var(--ctrlPlayText);
   border-color:var(--ctrlPlayBorder);
 }
+.ctrl.is-active{
+  background:var(--ctrlPlayBg);
+  color:var(--ctrlPlayText);
+  border-color:var(--ctrlPlayBorder);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 4px 12px rgba(0,0,0,.22);
+}
 
 .hint-frame{
   min-height:0;
@@ -1009,6 +1015,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         showBEnvelope: true,
         t: 0,
         periodSeconds: this.options.periodSeconds,
+        playbackRate: 1,
 
         canvasW: this.options.width,
         canvasH: this.options.height,
@@ -1178,11 +1185,49 @@ window.EMW_THEME_SCHEMA_HINT = {
     stop(){ this.state.playing = false; this._syncButtons(); return this; }
     toggle(){ this.state.playing = !this.state.playing; this._syncButtons(); return this; }
 
-    reset(){
-      this.state.t = 0;
-      this.state.playing = true;
+    setPlaybackRate(rate){
+      const next = Number(rate);
+      if (!Number.isFinite(next) || next <= 0) return this;
+      this.state.playbackRate = next;
+      return this;
+    }
+
+    _seekTo(tNorm, { keepPlaying = false } = {}){
+      const state = this.state;
+      state.t = this._clamp(tNorm, 0, 1);
+      state.playing = !!keepPlaying;
       this._resetFronts();
+      this._emitContinuousFronts();
+      this._emitContinuousBFronts();
+      const { s } = this._computeTargets();
+      for(let k=0; k<state.N; k++) state.yDisplay[k] = state.yTarget[k];
+      const { compTop, compBot } = this._edgeAccumulation(state.yDisplay);
+      state.compTopSmooth = compTop;
+      state.compBotSmooth = compBot;
+      state.signedChargeView = s;
       this._syncButtons();
+      if (typeof window.updateGraphs === 'function') window.updateGraphs();
+      return this;
+    }
+
+    stepBy(delta){
+      return this._seekTo(this.state.t + delta, { keepPlaying: false });
+    }
+
+    stepQuarter(dir){
+      const t = this.state.t;
+      const eps = 1e-9;
+      let target;
+      if (dir > 0){
+        target = (Math.floor((t + eps) * 4) + 1) / 4;
+      }else{
+        target = (Math.ceil((t - eps) * 4) - 1) / 4;
+      }
+      return this._seekTo(target, { keepPlaying: false });
+    }
+
+    reset(){
+      this._seekTo(0, { keepPlaying: false });
       return this;
     }
 
@@ -1930,7 +1975,7 @@ window.EMW_THEME_SCHEMA_HINT = {
           const state = self.state;
           const dt = Math.min(1/120, p.deltaTime / 1000);
           if(state.playing){
-            state.t += dt / state.periodSeconds;
+            state.t += (dt * (state.playbackRate || 1)) / state.periodSeconds;
             if(state.t >= 1){
               state.t = 1;
               state.playing = false;
@@ -2068,6 +2113,22 @@ function updatePlayButton(){
   if(!btn || !uiTexts || !currentLang) return;
   const ui = uiTexts[currentLang];
   btn.textContent = sim && sim.state && sim.state.playing ? ui.controls.pause : ui.controls.play;
+}
+
+function syncSpeedButtons(){
+  if(!sim) return;
+  const speedMap = [
+    ['speed025', 0.25],
+    ['speed05', 0.5],
+    ['speed1', 1]
+  ];
+  speedMap.forEach(([id, rate]) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const on = Math.abs((sim.state.playbackRate || 1) - rate) < 1e-9;
+    el.classList.toggle('is-active', on);
+    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 
 function syncFieldButtons(){
@@ -2350,6 +2411,7 @@ async function boot(){
   sim.stop();
   initGraphs();
   updatePlayButton();
+  syncSpeedButtons();
   syncFieldButtons();
   syncLayerButtons();
   updateGraphs();
@@ -2396,12 +2458,46 @@ async function boot(){
     sim.reset();
     sim.stop();
     updatePlayButton();
+    syncSpeedButtons();
     syncFieldButtons();
     syncLayerButtons();
+  });
+  document.getElementById("stepPrev").addEventListener("click", () => {
+    sim.stepBy(-1/32);
+    updatePlayButton();
+    syncSpeedButtons();
+  });
+  document.getElementById("stepNext").addEventListener("click", () => {
+    sim.stepBy(1/32);
+    updatePlayButton();
+    syncSpeedButtons();
+  });
+  document.getElementById("qPrev").addEventListener("click", () => {
+    sim.stepQuarter(-1);
+    updatePlayButton();
+    syncSpeedButtons();
+  });
+  document.getElementById("qNext").addEventListener("click", () => {
+    sim.stepQuarter(1);
+    updatePlayButton();
+    syncSpeedButtons();
+  });
+  document.getElementById("speed025").addEventListener("click", () => {
+    sim.setPlaybackRate(0.25);
+    syncSpeedButtons();
+  });
+  document.getElementById("speed05").addEventListener("click", () => {
+    sim.setPlaybackRate(0.5);
+    syncSpeedButtons();
+  });
+  document.getElementById("speed1").addEventListener("click", () => {
+    sim.setPlaybackRate(1);
+    syncSpeedButtons();
   });
   setLang(currentLang);
   syncThemeButtons();
   syncCaptureButtons();
+  syncSpeedButtons();
 }
 
 window.initGraphs = initGraphs;
