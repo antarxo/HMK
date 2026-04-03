@@ -1642,8 +1642,11 @@ window.EMW_THEME_SCHEMA_HINT = {
       }
     }
 
-    _drawMagneticEllipseSegment(p, front, nowT, mode){
+    _drawMagneticEllipseSegment(p, front, nowT, mode, options = {}){
       const state = this.state;
+      const drawCurves = options.drawCurves !== false;
+      const drawEllipseArrows = options.drawEllipseArrows !== false;
+      const drawTravelArrows = options.drawTravelArrows !== false;
       const ageFromSpawn = nowT - front.t0;
       if(ageFromSpawn < 0 || ageFromSpawn > 1) return;
       const isZeroBFront = Math.abs(front.t0 * 4 - Math.round(front.t0 * 4)) < 1e-12;
@@ -1676,7 +1679,7 @@ window.EMW_THEME_SCHEMA_HINT = {
       ctx.lineWidth = strokeW;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      if(state.showBCurves){
+      if(state.showBCurves && drawCurves){
         ctx.beginPath();
         if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
         else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
@@ -1693,7 +1696,7 @@ window.EMW_THEME_SCHEMA_HINT = {
         (!isGreen && isBackwardTravel) ? arrowAlphaBase * 0.92 : arrowAlphaBase,
         mode === 'back' ? 150 : 176
       );
-      if(state.showBCurves && arrowAlpha > 8){
+      if(state.showBCurves && drawEllipseArrows && arrowAlpha > 8){
         const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
         for(const th of thetas){
           const pt = this._ellipsePoint(a, b, th);
@@ -1702,14 +1705,14 @@ window.EMW_THEME_SCHEMA_HINT = {
           this._drawMagneticArrow(p, pt.x, pt.y, ang, arrowRgb, arrowAlpha, scaleFactor);
         }
       }
-      if(state.showBTravelArrows && arrowAlpha > 8 && arrowLayerIsActive){
+      if(state.showBTravelArrows && drawTravelArrows && arrowAlpha > 8 && arrowLayerIsActive){
         const anchorX = a;
         const anchorY = 0;
         this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, arrowRgb, arrowAlpha, scaleFactor);
       }
       const hasBTravelMagnitude = (front.arrowLen || 0) > 0.25;
       const drawBTravelArrow = () => {
-        if(!state.showBTravelArrows || !arrowLayerIsActive || !hasBTravelMagnitude) return;
+        if(!state.showBTravelArrows || !drawTravelArrows || !arrowLayerIsActive || !hasBTravelMagnitude) return;
         const k = 1 / scaleFactor;
         const baseX = a;
         const baseY = 0;
@@ -2104,9 +2107,8 @@ window.EMW_THEME_SCHEMA_HINT = {
           const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
           const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
           const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
-          for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
-          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back');
+          for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back', { drawTravelArrows: false });
+          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back', { drawTravelArrows: false });
 
           const topComp = state.compTopSmooth;
           const botComp = state.compBotSmooth;
@@ -2127,14 +2129,17 @@ window.EMW_THEME_SCHEMA_HINT = {
 
           // E internal layering test: lobes first, then E fill/envelope, then the E travel arrows on top.
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
-          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
+          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
+          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
+          for(const item of bBackOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
           if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
+          for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
-          for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
+          for(const item of bFrontOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
 
           const dotColor = (self._theme().sim || {}).electronDot || [255, 82, 82];
           p.noStroke(); p.fill(dotColor[0], dotColor[1], dotColor[2]);
