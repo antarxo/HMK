@@ -1291,8 +1291,15 @@ window.EMW_THEME_SCHEMA_HINT = {
       this.state.lastSpawnT = tNorm;
     }
 
-    _seedBFront(tNorm, sign, rgb, travelAngle, arrowLen){
-      this.state.bFronts.push({ t0: tNorm, sign, rgb, travelAngle, arrowLen });
+    _seedBFront(tNorm, sign, rgb, travelAngle, arrowLen, opts = {}){
+      this.state.bFronts.push({
+        t0: tNorm,
+        sign,
+        rgb,
+        travelAngle,
+        arrowLen,
+        anchorOnly: !!opts.anchorOnly
+      });
       this.state.lastBSpawnT = tNorm;
     }
 
@@ -1692,7 +1699,7 @@ window.EMW_THEME_SCHEMA_HINT = {
     }
 
     _buildBLayerItems(nowT){
-      const visible = this.state.bFronts.filter(f => (nowT - f.t0) >= 0 && (nowT - f.t0) <= 1.0);
+      const visible = this.state.bFronts.filter(f => !f.anchorOnly && (nowT - f.t0) >= 0 && (nowT - f.t0) <= 1.0);
       const items = [];
       visible.forEach((front, idx) => {
         items.push({ kind: 'ellipseTop', front, z: 1 + idx });
@@ -1738,7 +1745,13 @@ window.EMW_THEME_SCHEMA_HINT = {
         const bAtBirth = -Math.cos(phaseEmit);
         const arrowLen = 26 * Math.abs(bAtBirth);
         const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
-        if(!onQuarterBoundary) this._seedBFront(tEmit, sign, rgb, travelAngle, arrowLen);
+        if(onQuarterBoundary){
+          // Keep an invisible boundary anchor for the B fill/envelope geometry at zero crossings.
+          // It must participate in tip-table interpolation, but not generate visible ellipse shells.
+          this._seedBFront(tEmit, sign, rgb, travelAngle, 0, { anchorOnly: true });
+        } else {
+          this._seedBFront(tEmit, sign, rgb, travelAngle, arrowLen);
+        }
         this.state.bSlotIndex++;
       }
     }
