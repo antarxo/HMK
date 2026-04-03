@@ -1863,27 +1863,36 @@ window.EMW_THEME_SCHEMA_HINT = {
         if(age < 0 || age > 1) continue;
         const scaleFactor = this._getPulseScale(age);
         if(scaleFactor <= 0) continue;
-        const L = front.arrowLen || 0;
-        if(L <= 0.25) continue;
+        const rawL = front.arrowLen || 0;
+        const hasVisibleArrow = rawL > 0.25;
+        const L = hasVisibleArrow ? rawL : 0;
         const angDeg = (typeof front.travelAngle === 'number') ? front.travelAngle : -60;
         const angRad = angDeg * Math.PI / 180;
         const baseX = 159 * scaleFactor;
-        const tipX = state.x0 + baseX + Math.cos(angRad) * L;
-        const tipY = state.centerY + Math.sin(angRad) * L;
-        const visible = (
+        const baseScreenX = state.x0 + baseX;
+        const baseScreenY = state.centerY;
+        const tipX = baseScreenX + Math.cos(angRad) * L;
+        const tipY = baseScreenY + Math.sin(angRad) * L;
+        const visible = hasVisibleArrow ? (
           tipX >= state.x0 &&
           tipX <= state.canvasW - 1 &&
           tipY >= 0 &&
           tipY <= state.canvasH
+        ) : (
+          baseScreenX >= state.x0 &&
+          baseScreenX <= state.canvasW - 1 &&
+          baseScreenY >= 0 &&
+          baseScreenY <= state.canvasH
         );
         rows.push({
           tEmit: front.t0,
           screenX: tipX,
           screenY: tipY,
-          baseScreenX: state.x0 + baseX,
-          baseScreenY: state.centerY,
+          baseScreenX,
+          baseScreenY,
           visible,
-          alive: true
+          alive: true,
+          isZeroAnchor: !hasVisibleArrow
         });
       }
       rows.sort((a, b) => (a.screenX - b.screenX) || (a.tEmit - b.tEmit));
