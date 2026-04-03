@@ -2125,12 +2125,12 @@ window.EMW_THEME_SCHEMA_HINT = {
           if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
           if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
 
-          // E-down stays on the rod layer so the lower B ellipses can hide it when it drops below their plane.
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
+          // E internal layering test: lobes first, then E fill/envelope, then the E travel arrows on top.
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
           for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
           if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
+          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
           if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
           if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
           for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front');
