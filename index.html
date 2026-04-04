@@ -3,66 +3,79 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v2 Projection Skeleton v5</title>
+  <title>EMW v2 Projection Skeleton v3</title>
   <style>
     :root{
-      --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
-      --e1:#e85a5a; --e2:#4fa8d8; --b1:#38b66b; --b2:#f2a31b; --rod:#d8dee7; --accent:#b7c6db;
+      --bg:#0b0f14;
+      --panel:#111822;
+      --axis:#6f7f95;
+      --text:#e8eef7;
+      --muted:#9aa8bc;
+      --e1:#e85a5a;
+      --e2:#4fa8d8;
+      --b1:#38b66b;
+      --b2:#f2a31b;
+      --rod:#d8dee7;
+      --accent:#b7c6db;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif}
     .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
-    .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
-    .title{font-size:18px;font-weight:700}.sub{color:var(--muted);margin-top:4px}
-    .main{display:grid;grid-template-columns:minmax(250px, 28vw) 1fr;gap:12px;padding:12px;min-height:0}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0}
-    .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
-    .card .body{padding:10px}
-    .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
-    .row label{color:var(--muted);font-size:12px}
-    input[type="range"]{width:min(160px, 34vw)}
-    input[type="checkbox"]{transform:scale(.95)}
-    .viewport{position:relative;min-height:72vh}
-    canvas{display:block;width:100%;height:100%}
-    .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-    button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
-    button:hover{background:rgba(255,255,255,.1)}
-    .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
-    .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
-    .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
-    code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px}
-    @media (max-width: 980px){
-      .main{grid-template-columns:1fr;gap:10px;padding:10px}
-      .viewport{min-height:58vh}
-      .top{padding:10px 12px}
-      .title{font-size:16px}
-      .sub{font-size:12px}
-      .card .body{padding:9px}
-      .row{margin:6px 0}
-      input[type="range"]{width:min(170px, 45vw)}
+    .top{
+      padding:12px 16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
+    .title{font-size:18px;font-weight:700}
+    .sub{color:var(--muted);margin-top:4px}
+    .main{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .card h3{margin:0;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+    .card .body{padding:12px}
+    .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0}
+    .row label{color:var(--muted)}
+    input[type="range"]{width:170px}
+    .viewport{position:relative;min-height:74vh}
+    canvas{display:block;width:100%;height:100%}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:7px 10px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    button:hover{background:rgba(255,255,255,.1)}
+    .legend{display:grid;gap:8px;margin-top:10px}
+    .sw{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:8px;vertical-align:-2px}
+    .foot{padding:10px 16px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
+    code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px}
   </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW v2 – Projection Skeleton v5</div>
-    <div class="sub">Auto-fit στο viewport, fronts που γεννιούνται από το (0,0,0), και ράβδος χωριστά από την αρχή των αξόνων.</div>
+    <div class="title">EMW v2 – Projection Skeleton v3</div>
+    <div class="sub">Δυναμικός σκελετός 2.5D με fronts του E στο x–y και του B στο x–z.</div>
   </div>
 
   <div class="main">
     <div class="card">
-      <h3>Κάδρο / σκηνή</h3>
+      <h3>Κάμερα / σκηνή</h3>
       <div class="body">
-        <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-24"></div>
-        <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
+        <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-28"></div>
+        <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="18"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
-        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
-        <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
+        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="118"></div>
+        <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="82"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
-        <div class="row"><label>Auto fit</label><input id="autoFit" type="checkbox" checked></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
-        <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
         <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
@@ -73,9 +86,10 @@
         </div>
 
         <div class="legend">
-          <div><span class="sw" style="background:#e85a5a"></span>E fronts στο x–y</div>
-          <div><span class="sw" style="background:#38b66b"></span>B fronts στο x–z</div>
-          <div><span class="sw" style="background:#b7c6db"></span>source zone στο (0,0,0)</div>
+          <div><span class="sw" style="background:#e85a5a"></span>E front (+)</div>
+          <div><span class="sw" style="background:#4fa8d8"></span>E front (−)</div>
+          <div><span class="sw" style="background:#38b66b"></span>B front (+)</div>
+          <div><span class="sw" style="background:#f2a31b"></span>B front (−)</div>
         </div>
       </div>
     </div>
@@ -86,7 +100,8 @@
   </div>
 
   <div class="foot">
-    v5: το συνολικό projected setup χωράει αυτόματα μέσα στο viewport και οι καμπύλες εκκινούν από την αρχή των αξόνων.
+    Σειρά λογικής: <code>3D scene → projection → render passes</code>.  
+    Εδώ δοκιμάζουμε τη νέα γεωμετρία σε κίνηση, όχι ακόμη το πλήρες visual system.
   </div>
 </div>
 
@@ -101,30 +116,13 @@ const ui = {
   scale: document.getElementById('scale'),
   speed: document.getElementById('speed'),
   count: document.getElementById('count'),
-  autoFit: document.getElementById('autoFit'),
   axes: document.getElementById('axes'),
-  sourceZone: document.getElementById('sourceZone'),
   showE: document.getElementById('showE'),
   showB: document.getElementById('showB'),
   showRod: document.getElementById('showRod'),
   playBtn: document.getElementById('playBtn'),
   resetBtn: document.getElementById('resetBtn')
 };
-
-const COLORS = {
-  bg:'#0b0f14', axis:'#6f7f95', rod:'#d8dee7',
-  ePos:'#e85a5a', eNeg:'#4fa8d8', bPos:'#38b66b', bNeg:'#f2a31b',
-  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)'
-};
-
-const state = { t:0, playing:true };
-const rodX = -0.10;
-
-ui.playBtn.addEventListener('click', () => {
-  state.playing = !state.playing;
-  ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
-});
-ui.resetBtn.addEventListener('click', () => { state.t = 0; });
 
 function resizeCanvas(){
   const r = cv.getBoundingClientRect();
@@ -136,18 +134,56 @@ function resizeCanvas(){
 window.addEventListener('resize', resizeCanvas);
 setTimeout(resizeCanvas, 0);
 
+const COLORS = {
+  bg: '#0b0f14',
+  axis: '#6f7f95',
+  rod: '#d8dee7',
+  ePos: '#e85a5a',
+  eNeg: '#4fa8d8',
+  bPos: '#38b66b',
+  bNeg: '#f2a31b'
+};
+
+const state = {
+  t: 0,
+  playing: true
+};
+
+ui.playBtn.addEventListener('click', () => {
+  state.playing = !state.playing;
+  ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
+});
+ui.resetBtn.addEventListener('click', () => { state.t = 0; });
+
 function deg(a){ return a*Math.PI/180; }
-function rotateY(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:c*p.x+s*p.z,y:p.y,z:-s*p.x+c*p.z}; }
-function rotateX(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:p.x,y:c*p.y-s*p.z,z:s*p.y+c*p.z}; }
-function transformPoint(p, cam){ return rotateX(rotateY(p, cam.yaw), cam.pitch); }
-function projectRaw(p, cam){
+
+function rotateY(p, a){
+  const c = Math.cos(a), s = Math.sin(a);
+  return {x: c*p.x + s*p.z, y: p.y, z: -s*p.x + c*p.z};
+}
+function rotateX(p, a){
+  const c = Math.cos(a), s = Math.sin(a);
+  return {x: p.x, y: c*p.y - s*p.z, z: s*p.y + c*p.z};
+}
+function transformPoint(p, cam){
+  let q = rotateY(p, cam.yaw);
+  q = rotateX(q, cam.pitch);
+  return q;
+}
+function project(p, cam, vp){
   const q = transformPoint(p, cam);
   const z = q.z + cam.distance;
   const k = cam.focal / Math.max(40, z);
-  return { x:q.x * cam.scale * k, y:-q.y * cam.scale * k, depth:z };
+  return {
+    x: vp.cx + q.x * cam.scale * k,
+    y: vp.cy - q.y * cam.scale * k,
+    depth: z
+  };
 }
-function fitPoint(p, fit){ return { x:(p.x-fit.minX)*fit.scale + fit.offX, y:(p.y-fit.minY)*fit.scale + fit.offY, depth:p.depth }; }
-function pathFit(points, fit){ return points.map(p => fitPoint(p, fit)); }
+
+function pathProjected(points, cam, vp){
+  return points.map(p => project(p, cam, vp));
+}
 
 function drawPolyline(pts2, color, width=2, alpha=1){
   if(pts2.length < 2) return;
@@ -161,151 +197,81 @@ function drawPolyline(pts2, color, width=2, alpha=1){
   ctx.stroke();
   ctx.restore();
 }
-function drawCirclePoint(p2, r, color){
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(p2.x, p2.y, r, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
-}
 
-function makeEFront(leadX, amp=0.62, sign=1, n=80){
-  const pts = [];
-  for(let i=0;i<n;i++){
-    const t = i/(n-1);
-    pts.push({ x:leadX*t, y:sign*amp*Math.sin(Math.PI*t), z:0 });
-  }
-  return pts;
-}
-function makeBFront(leadX, bz=0.33, sign=1, n=96){
-  const pts = [];
-  const a = Math.max(0.02, leadX/2);
-  const cx = a;
-  for(let i=0;i<n;i++){
-    const t = (i/(n-1))*Math.PI*2;
-    pts.push({ x:cx + a*Math.cos(t), y:0, z:sign*bz*Math.sin(t) });
-  }
-  return pts;
-}
-
-function getSceneGeometry(){
-  const objects = [];
-  const count = +ui.count.value;
-  const lead0 = state.t * (+ui.speed.value/100);
-  const step = 0.34;
-
-  if(ui.axes.checked){
-    objects.push({kind:'line', color:'#8ca0b8', width:1.6, alpha:1, pts:[{x:-0.2,y:0,z:0},{x:3.0,y:0,z:0}]});
-    objects.push({kind:'line', color:COLORS.ePos, width:1.6, alpha:1, pts:[{x:0,y:-1.1,z:0},{x:0,y:1.1,z:0}]});
-    objects.push({kind:'line', color:COLORS.bPos, width:1.6, alpha:1, pts:[{x:0,y:0,z:-1.1},{x:0,y:0,z:1.1}]});
-  }
-
-  if(ui.sourceZone.checked){
-    const loopXY = [];
-    const loopXZ = [];
-    const r1 = 0.42, rx = 0.28, rz = 0.22, n = 80;
-    for(let i=0;i<n;i++){
-      const t = (i/(n-1))*Math.PI*2;
-      loopXY.push({x:0, y:r1*Math.sin(t), z:0.10*Math.cos(t)});
-      loopXZ.push({x:rx*(1+Math.cos(t))/2, y:0, z:rz*Math.sin(t)});
-    }
-    objects.push({kind:'line', color:COLORS.sourceLine, width:1.2, alpha:0.9, pts:loopXY, dashed:true});
-    objects.push({kind:'line', color:COLORS.sourceLine, width:1.4, alpha:0.95, pts:loopXZ});
-    objects.push({kind:'point', color:COLORS.source, r:4, p:{x:0,y:0,z:0}});
-  }
-
-  if(ui.showRod.checked){
-    objects.push({kind:'line', color:COLORS.rod, width:5, alpha:1, pts:[{x:rodX,y:-0.80,z:0},{x:rodX,y:0.80,z:0}]});
-  }
-
-  if(ui.showE.checked){
-    for(let i=0;i<count;i++){
-      const leadX = lead0 - i*step;
-      if(leadX <= 0) continue;
-      objects.push({
-        kind:'line',
-        color:(i%2===0 ? COLORS.ePos : COLORS.eNeg),
-        width:2.2,
-        alpha:Math.max(0.30, 0.86 - i*0.08),
-        pts:makeEFront(leadX, 0.62, i%2===0 ? 1 : -1)
-      });
-    }
-  }
-
-  if(ui.showB.checked){
-    for(let i=0;i<count;i++){
-      const leadX = lead0 - i*step;
-      if(leadX <= 0) continue;
-      objects.push({
-        kind:'line',
-        color:(i%2===0 ? COLORS.bPos : COLORS.bNeg),
-        width:2.3,
-        alpha:Math.max(0.32, 0.90 - i*0.08),
-        pts:makeBFront(leadX, 0.33, i%2===0 ? 1 : -1)
-      });
-    }
-  }
-
-  return objects;
-}
-
-function computeFit(objects, cam, w, h){
-  const rawPoints = [];
-  objects.forEach(obj => {
-    if(obj.kind === 'line'){
-      obj.rawPts = obj.pts.map(p => projectRaw(p, cam));
-      rawPoints.push(...obj.rawPts);
-    } else if(obj.kind === 'point'){
-      obj.rawP = projectRaw(obj.p, cam);
-      rawPoints.push(obj.rawP);
-    }
-  });
-
-  if(rawPoints.length === 0){
-    return {scale:1, minX:0, minY:0, offX:w/2, offY:h/2};
-  }
-
-  let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
-  rawPoints.forEach(p => {
-    if(p.x < minX) minX = p.x;
-    if(p.x > maxX) maxX = p.x;
-    if(p.y < minY) minY = p.y;
-    if(p.y > maxY) maxY = p.y;
-  });
-
-  const margin = Math.min(w, h) * 0.05;
-  const bw = Math.max(1, maxX - minX);
-  const bh = Math.max(1, maxY - minY);
-  let scale = 1;
-  if(ui.autoFit.checked){
-    scale = Math.min((w - 2*margin)/bw, (h - 2*margin)/bh, 1.0);
-  }
-  const offX = margin + (w - 2*margin - bw*scale)/2;
-  const offY = margin + (h - 2*margin - bh*scale)/2;
-
-  return {scale, minX, minY, offX, offY};
-}
-
-function drawAxesLabels(cam, fit){
-  const labels = [
-    {p:{x:3.0,y:0,z:0}, c:'#8ca0b8', txt:'x'},
-    {p:{x:0,y:1.1,z:0}, c:COLORS.ePos, txt:'y'},
-    {p:{x:0,y:0,z:1.1}, c:COLORS.bPos, txt:'z'},
+function drawAxes(cam, vp){
+  const axes = [
+    {a:{x:-1.1,y:0,z:0}, b:{x:2.5,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
+    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
-  labels.forEach(l => {
-    const q = fitPoint(projectRaw(l.p, cam), fit);
-    ctx.fillStyle = l.c;
-    ctx.fillText(l.txt, q.x + 6, q.y - 4);
+  axes.forEach(ax => {
+    const A = project(ax.a, cam, vp), B = project(ax.b, cam, vp);
+    ctx.strokeStyle = ax.c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y);
+    ctx.lineTo(B.x,B.y);
+    ctx.stroke();
+    ctx.fillStyle = ax.c;
+    ctx.fillText(ax.label, B.x+6, B.y-4);
   });
-  if(ui.sourceZone.checked){
-    const q = fitPoint(projectRaw({x:0,y:0,z:0}, cam), fit);
-    ctx.fillStyle = COLORS.source;
-    ctx.fillText('πηγή / source zone', q.x + 10, q.y - 8);
-  }
   ctx.restore();
+}
+
+function drawRod(cam, vp){
+  const p1 = project({x:0,y:-0.78,z:0}, cam, vp);
+  const p2 = project({x:0,y: 0.78,z:0}, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.rod;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(p1.x,p1.y);
+  ctx.lineTo(p2.x,p2.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function makeEFront(x0, amp=0.62, len=0.48, sign=1, n=80){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = i/(n-1);
+    pts.push({
+      x: x0 + (t-0.5)*len,
+      y: sign * amp * Math.sin(Math.PI*t),
+      z: 0
+    });
+  }
+  return pts;
+}
+
+function makeBFront(x0, bx=0.22, bz=0.34, sign=1, n=96){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = (i/(n-1))*Math.PI*2;
+    pts.push({
+      x: x0 + bx*Math.cos(t),
+      y: 0,
+      z: sign * bz*Math.sin(t)
+    });
+  }
+  return pts;
+}
+
+function getFronts(){
+  const count = +ui.count.value;
+  const step = 0.34;
+  const lead = state.t * (+ui.speed.value/100);
+  const e = [];
+  const b = [];
+  for(let i=0;i<count;i++){
+    const x = 0.25 + lead - i*step;
+    if(x < -0.6 || x > 2.3) continue;
+    e.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.ePos:COLORS.eNeg)});
+    b.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
+  }
+  return {e,b};
 }
 
 let lastTs = performance.now();
@@ -324,25 +290,34 @@ function render(ts){
     pitch: deg(+ui.pitch.value),
     focal: +ui.focal.value,
     scale: +ui.scale.value/100,
-    distance: 4.6
+    distance: 4.4
   };
+  const vp = {cx:w*0.56, cy:h*0.54};
 
-  const objects = getSceneGeometry();
-  const fit = computeFit(objects, cam, w, h);
+  const back = [];
+  const mid = [];
+  const front = [];
 
-  objects.forEach(obj => {
-    if(obj.kind === 'line'){
-      const pts2 = pathFit(obj.rawPts, fit);
-      ctx.save();
-      if(obj.dashed) ctx.setLineDash([5,5]);
-      drawPolyline(pts2, obj.color, obj.width, obj.alpha);
-      ctx.restore();
-    } else if(obj.kind === 'point'){
-      drawCirclePoint(fitPoint(obj.rawP, fit), obj.r, obj.color);
-    }
-  });
+  if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
+  if(ui.showRod.checked) mid.push(() => drawRod(cam, vp));
 
-  drawAxesLabels(cam, fit);
+  const fronts = getFronts();
+
+  if(ui.showE.checked){
+    fronts.e.forEach((fr, i) => {
+      const pts = pathProjected(makeEFront(fr.x, 0.62, 0.48, fr.sign), cam, vp);
+      back.push(() => drawPolyline(pts, fr.color, 2.2, 0.84 - i*0.08));
+    });
+  }
+
+  if(ui.showB.checked){
+    fronts.b.forEach((fr, i) => {
+      const pts = pathProjected(makeBFront(fr.x, 0.22, 0.34, fr.sign), cam, vp);
+      front.push(() => drawPolyline(pts, fr.color, 2.3, 0.88 - i*0.08));
+    });
+  }
+
+  [...back, ...mid, ...front].forEach(fn => fn());
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
