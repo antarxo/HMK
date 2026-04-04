@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EMW v2 Projection Skeleton v1</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#111822;
+      --axis:#6f7f95;
+      --text:#e8eef7;
+      --muted:#9aa8bc;
+      --e1:#e85a5a;
+      --e2:#4fa8d8;
+      --b1:#38b66b;
+      --b2:#f2a31b;
+      --rod:#d8dee7;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif}
+    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100%}
+    .top{
+      padding:12px 16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .title{font-size:18px;font-weight:700}
+    .sub{color:var(--muted);margin-top:4px}
+    .main{display:grid;grid-template-columns:300px 1fr;gap:14px;padding:14px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .card h3{margin:0;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+    .card .body{padding:12px}
+    .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0}
+    .row label{color:var(--muted)}
+    input[type="range"]{width:160px}
+    .viewport{position:relative;min-height:72vh}
+    canvas{display:block;width:100%;height:100%}
+    .foot{padding:10px 16px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
+    code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="title">EMW v2 – Projection Skeleton v1</div>
+    <div class="sub">Νέα βάση 2.5D / projected-3D με scene, camera και render passes.</div>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h3>Έλεγχος κάμερας / σκηνής</h3>
+      <div class="body">
+        <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-28"></div>
+        <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="18"></div>
+        <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
+        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="120"></div>
+        <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show E lobes</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show B ellipses</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
+      </div>
+    </div>
+
+    <div class="card viewport">
+      <canvas id="cv" width="1400" height="900"></canvas>
+    </div>
+  </div>
+
+  <div class="foot">
+    Σκελετός: <code>scene → projection → back/mid/front passes</code>.
+    Όχι τελική μηχανή, αλλά σωστή νέα αρχιτεκτονική εκκίνησης.
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+const controls = {
+  yaw: document.getElementById('yaw'),
+  pitch: document.getElementById('pitch'),
+  focal: document.getElementById('focal'),
+  scale: document.getElementById('scale'),
+  axes: document.getElementById('axes'),
+  showE: document.getElementById('showE'),
+  showB: document.getElementById('showB'),
+  showRod: document.getElementById('showRod'),
+};
+
+function resizeCanvas(){
+  const r = cv.getBoundingClientRect();
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  cv.width = Math.round(r.width * dpr);
+  cv.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 0);
+
+const COLORS = {
+  bg: '#0b0f14',
+  axis: '#6f7f95',
+  rod: '#d8dee7',
+  ePos: '#e85a5a',
+  eNeg: '#4fa8d8',
+  bPos: '#38b66b',
+  bNeg: '#f2a31b'
+};
+
+function deg(a){ return a*Math.PI/180; }
+
+function rotateY(p, a){
+  const c = Math.cos(a), s = Math.sin(a);
+  return {x: c*p.x + s*p.z, y: p.y, z: -s*p.x + c*p.z};
+}
+function rotateX(p, a){
+  const c = Math.cos(a), s = Math.sin(a);
+  return {x: p.x, y: c*p.y - s*p.z, z: s*p.y + c*p.z};
+}
+function transformPoint(p, cam){
+  let q = rotateY(p, cam.yaw);
+  q = rotateX(q, cam.pitch);
+  return q;
+}
+function project(p, cam, vp){
+  const q = transformPoint(p, cam);
+  const z = q.z + cam.distance;
+  const k = cam.focal / Math.max(40, z);
+  return {
+    x: vp.cx + q.x * cam.scale * k,
+    y: vp.cy - q.y * cam.scale * k
+  };
+}
+
+function sampleLobe(x0, amp=0.65, len=0.55, sign=1, n=70){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = i/(n-1);
+    const x = x0 + (t-0.5)*len;
+    const y = sign * amp * Math.sin(Math.PI*t);
+    pts.push({x, y, z:0});
+  }
+  return pts;
+}
+function sampleEllipse(x0, by=0.56, bz=0.36, phase=0, n=90){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = (i/(n-1))*Math.PI*2;
+    pts.push({
+      x: x0,
+      y: by*Math.cos(t+phase),
+      z: bz*Math.sin(t+phase)
+    });
+  }
+  return pts;
+}
+
+function pathProjected(points, cam, vp){
+  return points.map(p => project(p, cam, vp));
+}
+
+function drawPolyline(pts2, color, width=2, alpha=1){
+  if(pts2.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts2[0].x, pts2[0].y);
+  for(let i=1;i<pts2.length;i++) ctx.lineTo(pts2[i].x, pts2[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAxes(cam, vp){
+  const axes = [
+    {a:{x:-1.1,y:0,z:0}, b:{x:2.4,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
+    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
+  ];
+  ctx.save();
+  ctx.font = '12px system-ui';
+  for(const ax of axes){
+    const A = project(ax.a, cam, vp), B = project(ax.b, cam, vp);
+    ctx.strokeStyle = ax.c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y);
+    ctx.lineTo(B.x,B.y);
+    ctx.stroke();
+    ctx.fillStyle = ax.c;
+    ctx.fillText(ax.label, B.x+6, B.y-4);
+  }
+  ctx.restore();
+}
+
+function drawRod(cam, vp){
+  const p1 = project({x:0,y:-0.78,z:0}, cam, vp);
+  const p2 = project({x:0,y: 0.78,z:0}, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.rod;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(p1.x,p1.y);
+  ctx.lineTo(p2.x,p2.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function render(){
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0,0,w,h);
+
+  const cam = {
+    yaw: deg(+controls.yaw.value),
+    pitch: deg(+controls.pitch.value),
+    focal: +controls.focal.value,
+    scale: +controls.scale.value/100,
+    distance: 4.4
+  };
+  const vp = {cx:w*0.56, cy:h*0.54};
+
+  const back = [];
+  const mid = [];
+  const front = [];
+
+  if(controls.axes.checked) mid.push(() => drawAxes(cam, vp));
+  if(controls.showRod.checked) mid.push(() => drawRod(cam, vp));
+
+  if(controls.showE.checked){
+    const xs = [0.25, 0.70, 1.15, 1.60];
+    xs.forEach((x,i) => {
+      const sign = (i % 2 === 0) ? 1 : -1;
+      const pts = pathProjected(sampleLobe(x, 0.62, 0.48, sign), cam, vp);
+      back.push(() => drawPolyline(pts, sign > 0 ? COLORS.ePos : COLORS.eNeg, 2.2, 0.80));
+    });
+  }
+
+  if(controls.showB.checked){
+    const xs = [0.25, 0.70, 1.15, 1.60];
+    xs.forEach((x,i) => {
+      const pts = pathProjected(sampleEllipse(x, 0.56, 0.34, i*0.3), cam, vp);
+      front.push(() => drawPolyline(pts, i % 2 === 0 ? COLORS.bPos : COLORS.bNeg, 2.3, 0.88));
+    });
+  }
+
+  [...back, ...mid, ...front].forEach(fn => fn());
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
