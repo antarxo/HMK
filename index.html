@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v2 Projection Skeleton v1</title>
+  <title>EMW v2 Projection Skeleton v3</title>
   <style>
     :root{
       --bg:#0b0f14;
@@ -16,6 +16,7 @@
       --b1:#38b66b;
       --b2:#f2a31b;
       --rod:#d8dee7;
+      --accent:#b7c6db;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif}
@@ -27,7 +28,7 @@
     }
     .title{font-size:18px;font-weight:700}
     .sub{color:var(--muted);margin-top:4px}
-    .main{display:grid;grid-template-columns:300px 1fr;gap:14px;padding:14px}
+    .main{display:grid;grid-template-columns:320px 1fr;gap:14px;padding:14px}
     .card{
       background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
       border:1px solid rgba(255,255,255,.08);
@@ -38,9 +39,21 @@
     .card .body{padding:12px}
     .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin:10px 0}
     .row label{color:var(--muted)}
-    input[type="range"]{width:160px}
-    .viewport{position:relative;min-height:72vh}
+    input[type="range"]{width:170px}
+    .viewport{position:relative;min-height:74vh}
     canvas{display:block;width:100%;height:100%}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:7px 10px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    button:hover{background:rgba(255,255,255,.1)}
+    .legend{display:grid;gap:8px;margin-top:10px}
+    .sw{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:8px;vertical-align:-2px}
     .foot{padding:10px 16px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
     code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px}
   </style>
@@ -48,22 +61,36 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW v2 – Projection Skeleton v1</div>
-    <div class="sub">Νέα βάση 2.5D / projected-3D με scene, camera και render passes.</div>
+    <div class="title">EMW v2 – Projection Skeleton v3</div>
+    <div class="sub">Δυναμικός σκελετός 2.5D με fronts του E στο x–y και του B στο x–z.</div>
   </div>
 
   <div class="main">
     <div class="card">
-      <h3>Έλεγχος κάμερας / σκηνής</h3>
+      <h3>Κάμερα / σκηνή</h3>
       <div class="body">
         <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-28"></div>
         <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="18"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
-        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="120"></div>
+        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="118"></div>
+        <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="82"></div>
+        <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
-        <div class="row"><label>Show E lobes</label><input id="showE" type="checkbox" checked></div>
-        <div class="row"><label>Show B ellipses</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
+
+        <div class="controls">
+          <button id="playBtn">Παύση</button>
+          <button id="resetBtn">Επαναφορά</button>
+        </div>
+
+        <div class="legend">
+          <div><span class="sw" style="background:#e85a5a"></span>E front (+)</div>
+          <div><span class="sw" style="background:#4fa8d8"></span>E front (−)</div>
+          <div><span class="sw" style="background:#38b66b"></span>B front (+)</div>
+          <div><span class="sw" style="background:#f2a31b"></span>B front (−)</div>
+        </div>
       </div>
     </div>
 
@@ -73,8 +100,8 @@
   </div>
 
   <div class="foot">
-    Σκελετός: <code>scene → projection → back/mid/front passes</code>.
-    Όχι τελική μηχανή, αλλά σωστή νέα αρχιτεκτονική εκκίνησης.
+    Σειρά λογικής: <code>3D scene → projection → render passes</code>.  
+    Εδώ δοκιμάζουμε τη νέα γεωμετρία σε κίνηση, όχι ακόμη το πλήρες visual system.
   </div>
 </div>
 
@@ -82,15 +109,19 @@
 const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 
-const controls = {
+const ui = {
   yaw: document.getElementById('yaw'),
   pitch: document.getElementById('pitch'),
   focal: document.getElementById('focal'),
   scale: document.getElementById('scale'),
+  speed: document.getElementById('speed'),
+  count: document.getElementById('count'),
   axes: document.getElementById('axes'),
   showE: document.getElementById('showE'),
   showB: document.getElementById('showB'),
   showRod: document.getElementById('showRod'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn')
 };
 
 function resizeCanvas(){
@@ -113,6 +144,17 @@ const COLORS = {
   bNeg: '#f2a31b'
 };
 
+const state = {
+  t: 0,
+  playing: true
+};
+
+ui.playBtn.addEventListener('click', () => {
+  state.playing = !state.playing;
+  ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
+});
+ui.resetBtn.addEventListener('click', () => { state.t = 0; });
+
 function deg(a){ return a*Math.PI/180; }
 
 function rotateY(p, a){
@@ -134,31 +176,9 @@ function project(p, cam, vp){
   const k = cam.focal / Math.max(40, z);
   return {
     x: vp.cx + q.x * cam.scale * k,
-    y: vp.cy - q.y * cam.scale * k
+    y: vp.cy - q.y * cam.scale * k,
+    depth: z
   };
-}
-
-function sampleLobe(x0, amp=0.65, len=0.55, sign=1, n=70){
-  const pts = [];
-  for(let i=0;i<n;i++){
-    const t = i/(n-1);
-    const x = x0 + (t-0.5)*len;
-    const y = sign * amp * Math.sin(Math.PI*t);
-    pts.push({x, y, z:0});
-  }
-  return pts;
-}
-function sampleEllipse(x0, bx=0.22, bz=0.36, phase=0, n=90){
-  const pts = [];
-  for(let i=0;i<n;i++){
-    const t = (i/(n-1))*Math.PI*2;
-    pts.push({
-      x: x0 + bx*Math.cos(t+phase),
-      y: 0,
-      z: bz*Math.sin(t+phase)
-    });
-  }
-  return pts;
 }
 
 function pathProjected(points, cam, vp){
@@ -180,13 +200,13 @@ function drawPolyline(pts2, color, width=2, alpha=1){
 
 function drawAxes(cam, vp){
   const axes = [
-    {a:{x:-1.1,y:0,z:0}, b:{x:2.4,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:-1.1,y:0,z:0}, b:{x:2.5,y:0,z:0}, c:'#8ca0b8', label:'x'},
     {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
     {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
-  for(const ax of axes){
+  axes.forEach(ax => {
     const A = project(ax.a, cam, vp), B = project(ax.b, cam, vp);
     ctx.strokeStyle = ax.c;
     ctx.lineWidth = 1.6;
@@ -196,7 +216,7 @@ function drawAxes(cam, vp){
     ctx.stroke();
     ctx.fillStyle = ax.c;
     ctx.fillText(ax.label, B.x+6, B.y-4);
-  }
+  });
   ctx.restore();
 }
 
@@ -213,17 +233,63 @@ function drawRod(cam, vp){
   ctx.restore();
 }
 
-function render(){
+function makeEFront(x0, amp=0.62, len=0.48, sign=1, n=80){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = i/(n-1);
+    pts.push({
+      x: x0 + (t-0.5)*len,
+      y: sign * amp * Math.sin(Math.PI*t),
+      z: 0
+    });
+  }
+  return pts;
+}
+
+function makeBFront(x0, bx=0.22, bz=0.34, sign=1, n=96){
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = (i/(n-1))*Math.PI*2;
+    pts.push({
+      x: x0 + bx*Math.cos(t),
+      y: 0,
+      z: sign * bz*Math.sin(t)
+    });
+  }
+  return pts;
+}
+
+function getFronts(){
+  const count = +ui.count.value;
+  const step = 0.34;
+  const lead = state.t * (+ui.speed.value/100);
+  const e = [];
+  const b = [];
+  for(let i=0;i<count;i++){
+    const x = 0.25 + lead - i*step;
+    if(x < -0.6 || x > 2.3) continue;
+    e.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.ePos:COLORS.eNeg)});
+    b.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
+  }
+  return {e,b};
+}
+
+let lastTs = performance.now();
+function render(ts){
+  const dt = Math.min(0.04, (ts - lastTs)/1000);
+  lastTs = ts;
+  if(state.playing) state.t += dt;
+
   const w = cv.clientWidth, h = cv.clientHeight;
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle = COLORS.bg;
   ctx.fillRect(0,0,w,h);
 
   const cam = {
-    yaw: deg(+controls.yaw.value),
-    pitch: deg(+controls.pitch.value),
-    focal: +controls.focal.value,
-    scale: +controls.scale.value/100,
+    yaw: deg(+ui.yaw.value),
+    pitch: deg(+ui.pitch.value),
+    focal: +ui.focal.value,
+    scale: +ui.scale.value/100,
     distance: 4.4
   };
   const vp = {cx:w*0.56, cy:h*0.54};
@@ -232,23 +298,22 @@ function render(){
   const mid = [];
   const front = [];
 
-  if(controls.axes.checked) mid.push(() => drawAxes(cam, vp));
-  if(controls.showRod.checked) mid.push(() => drawRod(cam, vp));
+  if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
+  if(ui.showRod.checked) mid.push(() => drawRod(cam, vp));
 
-  if(controls.showE.checked){
-    const xs = [0.25, 0.70, 1.15, 1.60];
-    xs.forEach((x,i) => {
-      const sign = (i % 2 === 0) ? 1 : -1;
-      const pts = pathProjected(sampleLobe(x, 0.62, 0.48, sign), cam, vp);
-      back.push(() => drawPolyline(pts, sign > 0 ? COLORS.ePos : COLORS.eNeg, 2.2, 0.80));
+  const fronts = getFronts();
+
+  if(ui.showE.checked){
+    fronts.e.forEach((fr, i) => {
+      const pts = pathProjected(makeEFront(fr.x, 0.62, 0.48, fr.sign), cam, vp);
+      back.push(() => drawPolyline(pts, fr.color, 2.2, 0.84 - i*0.08));
     });
   }
 
-  if(controls.showB.checked){
-    const xs = [0.25, 0.70, 1.15, 1.60];
-    xs.forEach((x,i) => {
-      const pts = pathProjected(sampleEllipse(x, 0.22, 0.34, i*0.3), cam, vp);
-      front.push(() => drawPolyline(pts, i % 2 === 0 ? COLORS.bPos : COLORS.bNeg, 2.3, 0.88));
+  if(ui.showB.checked){
+    fronts.b.forEach((fr, i) => {
+      const pts = pathProjected(makeBFront(fr.x, 0.22, 0.34, fr.sign), cam, vp);
+      front.push(() => drawPolyline(pts, fr.color, 2.3, 0.88 - i*0.08));
     });
   }
 
