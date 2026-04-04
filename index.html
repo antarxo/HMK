@@ -118,7 +118,7 @@ const COLORS = {
 };
 
 const state = { t:0, playing:true };
-const rodX = -0.10; // η ράβδος μένει χωριστά από το origin
+const rodX = -0.10;
 
 ui.playBtn.addEventListener('click', () => {
   state.playing = !state.playing;
@@ -161,7 +161,6 @@ function drawPolyline(pts2, color, width=2, alpha=1){
   ctx.stroke();
   ctx.restore();
 }
-
 function drawCirclePoint(p2, r, color){
   ctx.save();
   ctx.fillStyle = color;
@@ -172,7 +171,6 @@ function drawCirclePoint(p2, r, color){
 }
 
 function makeEFront(leadX, amp=0.62, sign=1, n=80){
-  // Όλη η καμπύλη εκκινεί από το x=0 και απλώνεται προς το leadX
   const pts = [];
   for(let i=0;i<n;i++){
     const t = i/(n-1);
@@ -181,7 +179,6 @@ function makeEFront(leadX, amp=0.62, sign=1, n=80){
   return pts;
 }
 function makeBFront(leadX, bz=0.33, sign=1, n=96){
-  // Έλλειψη στο x-z με αριστερό άκρο στο origin x=0
   const pts = [];
   const a = Math.max(0.02, leadX/2);
   const cx = a;
