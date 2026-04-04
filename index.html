@@ -199,7 +199,7 @@
         <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
         <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
         <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
-        <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-40" max="40" value="-10"></div>
+        <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
@@ -336,74 +336,35 @@ function drawRod(cam, vp){
 }
 
 function drawSourceZone(cam, vp){
-  const loopXY = [];
-  const loopXZ = [];
-  const r1 = 0.42;
-  const rx = 0.28, rz = 0.22;
-  const n = 80;
-  for(let i=0;i<n;i++){
-    const t = (i/(n-1))*Math.PI*2;
-    loopXY.push({x:0, y:r1*Math.sin(t), z:0.10*Math.cos(t)});
-    loopXZ.push({x:0 + rx*Math.cos(t), y:0, z:rz*Math.sin(t)});
-  }
-  const pxy = pathProjected(loopXY, cam, vp);
-  const pxz = pathProjected(loopXZ, cam, vp);
-
-  ctx.save();
-  ctx.strokeStyle = COLORS.sourceLine;
-  ctx.fillStyle = COLORS.sourceSoft;
-  ctx.lineWidth = 1.4;
-
-  ctx.beginPath();
-  ctx.moveTo(pxz[0].x, pxz[0].y);
-  for(let i=1;i<pxz.length;i++) ctx.lineTo(pxz[i].x, pxz[i].y);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.setLineDash([5,5]);
-  ctx.beginPath();
-  ctx.moveTo(pxy[0].x, pxy[0].y);
-  for(let i=1;i<pxy.length;i++) ctx.lineTo(pxy[i].x, pxy[i].y);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  const c = project({x:0,y:0,z:0}, cam, vp);
-  ctx.fillStyle = COLORS.source;
-  ctx.beginPath();
-  ctx.arc(c.x, c.y, 4, 0, Math.PI*2);
-  ctx.fill();
-  ctx.font = '12px system-ui';
-  ctx.fillText('πηγή / source zone', c.x + 10, c.y - 8);
-  ctx.restore();
+  // intentionally blank for now
 }
 
-function makeEFront(leadX, amp=0.62, len=0.48, sign=1, n=80){
+function makeEFront(originX, travelX, amp=0.62, len=0.48, sign=1, n=80){
   const pts = [];
-  const xMax = Math.max(0, leadX);
-  const grow = Math.max(0.02, Math.min(1, xMax / len));
+  const grow = Math.max(0, Math.min(1, travelX / len));
+  const shapeLen = len * grow;
   for(let i=0;i<n;i++){
-    const t = i/(n-1);
+    const u = i/(n-1);
     pts.push({
-      x:xMax * t,
-      y:sign * amp * grow * Math.sin(Math.PI*t),
+      x:originX + travelX + u * shapeLen,
+      y:sign * amp * grow * Math.sin(Math.PI*u),
       z:0
     });
   }
   return pts;
 }
-function makeBFront(leadX, bx=0.20, bz=0.33, sign=1, n=96){
+function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, n=96){
   const pts = [];
-  const xMax = Math.max(0, leadX);
-  const a = Math.max(0.012, xMax / 2);
-  const cz = sign * bz * Math.max(0.02, Math.min(1, xMax / (2*bx)));
+  const grow = Math.max(0, Math.min(1, travelX / (2*bx)));
+  const a = bx * grow;
+  const cz = sign * bz * grow;
+  const cx = originX + travelX + a;
   for(let i=0;i<n;i++){
     const t = (i/(n-1))*Math.PI*2;
     pts.push({
-      x:a + a*Math.cos(t),
+      x:cx + a*Math.cos(t),
       y:0,
-      z:cz * Math.sin(t)
+      z:cz*Math.sin(t)
     });
   }
   return pts;
@@ -411,14 +372,17 @@ function makeBFront(leadX, bx=0.20, bz=0.33, sign=1, n=96){
 
 function getFronts(){
   const count = +ui.count.value;
-  const step = 0.34;
-  const lead = state.t * (+ui.speed.value/100);
+  const speedWU = (+ui.speed.value/100);
+  const stepDistance = 0.34;
+  const emitPeriod = stepDistance / Math.max(0.05, speedWU);
   const e = [], b = [];
   for(let i=0;i<count;i++){
-    const x = lead - i*step;
-    if(x <= 0 || x > 2.8) continue;
-    e.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.ePos:COLORS.eNeg)});
-    b.push({x, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
+    const age = state.t - i * emitPeriod;
+    if(age <= 0) continue;
+    const travelX = age * speedWU;
+    if(travelX > 2.8) continue;
+    e.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.ePos:COLORS.eNeg)});
+    b.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
   }
   return {e,b};
 }
