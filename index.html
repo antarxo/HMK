@@ -148,13 +148,13 @@ function sampleLobe(x0, amp=0.65, len=0.55, sign=1, n=70){
   }
   return pts;
 }
-function sampleEllipse(x0, by=0.56, bz=0.36, phase=0, n=90){
+function sampleEllipse(x0, bx=0.22, bz=0.36, phase=0, n=90){
   const pts = [];
   for(let i=0;i<n;i++){
     const t = (i/(n-1))*Math.PI*2;
     pts.push({
-      x: x0,
-      y: by*Math.cos(t+phase),
+      x: x0 + bx*Math.cos(t+phase),
+      y: 0,
       z: bz*Math.sin(t+phase)
     });
   }
@@ -247,7 +247,7 @@ function render(){
   if(controls.showB.checked){
     const xs = [0.25, 0.70, 1.15, 1.60];
     xs.forEach((x,i) => {
-      const pts = pathProjected(sampleEllipse(x, 0.56, 0.34, i*0.3), cam, vp);
+      const pts = pathProjected(sampleEllipse(x, 0.22, 0.34, i*0.3), cam, vp);
       front.push(() => drawPolyline(pts, i % 2 === 0 ? COLORS.bPos : COLORS.bNeg, 2.3, 0.88));
     });
   }
