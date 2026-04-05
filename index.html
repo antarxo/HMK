@@ -352,35 +352,32 @@ function computeElectronTargets(rodState){
   const q = Math.abs(rodState.chargeSigned);
   const moveUp = rodState.chargeSigned < 0;
 
-  // Θέλουμε:
-  // - όταν κινούνται προς τα πάνω, ΜΟΝΟ το πάνω πάνω να μένει σταθερό
-  // - όλα τα υπόλοιπα να καταλήγουν με κενά σε Α.Π. από το συσσωρευμένο άκρο προς τα κάτω
-  // - το πρώτο κενό λίγο μεγαλύτερο για να φαίνεται καθαρά η λογική
-  const gapCount = N - 1;
-  const firstGap = 0.16;   // λίγο μεγαλύτερο πρώτο κενό
-  const stepGap  = 0.018;  // κοινή διαφορά της Α.Π.
-
-  const targetGaps = new Array(gapCount);
-  for(let i=0;i<gapCount;i++){
-    targetGaps[i] = firstGap + i * stepGap;
+  // Ζητούμενο:
+  // τελικά κενά = a, 2a, 3a, 4a, 5a, 6a
+  // με a μικρότερο από το αρχικό ομοιόμορφο κενό.
+  // Επειδή 1+2+...+6 = 21, παίρνουμε a = L/21.
+  const a = L / 21;
+  const targetGaps = new Array(N - 1);
+  for(let i=0;i<N-1;i++){
+    targetGaps[i] = (i + 1) * a;
   }
 
-  const d0 = L / gapCount;
-  const gaps = new Array(gapCount);
-  for(let i=0;i<gapCount;i++){
+  const d0 = L / (N - 1);  // αρχικό ομοιόμορφο κενό
+  const gaps = new Array(N - 1);
+  for(let i=0;i<N-1;i++){
     gaps[i] = d0 + q * (targetGaps[i] - d0);
   }
 
   const ys = new Array(N);
 
   if(moveUp){
-    // πάνω άκρο αγκυρωμένο
+    // όταν κινούνται προς τα πάνω, το πάνω πάνω μένει σταθερό
     ys[0] = usableTop;
     for(let i=1;i<N;i++){
       ys[i] = ys[i-1] + gaps[i-1];
     }
   } else {
-    // κάτω άκρο αγκυρωμένο
+    // στην αντίστροφη κίνηση, το κάτω κάτω μένει σταθερό
     ys[N-1] = usableBot;
     for(let i=N-2;i>=0;i--){
       ys[i] = ys[i+1] - gaps[i];
