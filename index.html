@@ -352,31 +352,40 @@ function computeElectronTargets(rodState){
   const q = Math.abs(rodState.chargeSigned);
   const moveUp = rodState.chargeSigned < 0;
 
-  // Στόχος στο μέγιστο φορτίο: τα τελικά κενά να είναι σε αριθμητική πρόοδο
-  // και να βαίνουν αυξανόμενα απομακρυνόμενα από το συσσωρευμένο άκρο.
-  // Κρατάμε το πρώτο κενό λίγο μεγαλύτερο για να μη φαίνεται "κόλλημα".
+  // Θέλουμε:
+  // - όταν κινούνται προς τα πάνω, ΜΟΝΟ το πάνω πάνω να μένει σταθερό
+  // - όλα τα υπόλοιπα να καταλήγουν με κενά σε Α.Π. από το συσσωρευμένο άκρο προς τα κάτω
+  // - το πρώτο κενό λίγο μεγαλύτερο για να φαίνεται καθαρά η λογική
   const gapCount = N - 1;
-  const firstGap = 0.14;   // λίγο μεγαλύτερο πρώτο κενό
-  const avgGap = L / gapCount;
-  const stepGap = Math.max(0, 2 * (avgGap - firstGap) / (gapCount - 1));
+  const firstGap = 0.16;   // λίγο μεγαλύτερο πρώτο κενό
+  const stepGap  = 0.018;  // κοινή διαφορά της Α.Π.
 
-  const targetTopGaps = new Array(gapCount);
-  for(let i=0;i<gapCount;i++) targetTopGaps[i] = firstGap + i * stepGap;
-
-  const targetBotGaps = new Array(gapCount);
-  for(let i=0;i<gapCount;i++) targetBotGaps[i] = firstGap + (gapCount - 1 - i) * stepGap;
-
-  // από την ομοιόμορφη κατανομή κινούμαστε προοδευτικά προς την τελική Α.Π.
-  const d0 = avgGap;
-  const gaps = new Array(gapCount);
-  const target = moveUp ? targetTopGaps : targetBotGaps;
+  const targetGaps = new Array(gapCount);
   for(let i=0;i<gapCount;i++){
-    gaps[i] = d0 + q * (target[i] - d0);
+    targetGaps[i] = firstGap + i * stepGap;
+  }
+
+  const d0 = L / gapCount;
+  const gaps = new Array(gapCount);
+  for(let i=0;i<gapCount;i++){
+    gaps[i] = d0 + q * (targetGaps[i] - d0);
   }
 
   const ys = new Array(N);
-  ys[0] = usableTop;
-  for(let i=1;i<N;i++) ys[i] = ys[i-1] + gaps[i-1];
+
+  if(moveUp){
+    // πάνω άκρο αγκυρωμένο
+    ys[0] = usableTop;
+    for(let i=1;i<N;i++){
+      ys[i] = ys[i-1] + gaps[i-1];
+    }
+  } else {
+    // κάτω άκρο αγκυρωμένο
+    ys[N-1] = usableBot;
+    for(let i=N-2;i>=0;i--){
+      ys[i] = ys[i+1] - gaps[i];
+    }
+  }
 
   return ys;
 }
