@@ -205,6 +205,7 @@
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show μεγάλα βέλη E</label><input id="showEArrows" type="checkbox" checked></div>
         <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
 
@@ -215,6 +216,7 @@
 
         <div class="legend">
           <div><span class="sw" style="background:#e85a5a"></span>E fronts στο x–y</div>
+          <div><span class="sw" style="background:#e85a5a"></span>μεγάλα βέλη E</div>
           <div><span class="sw" style="background:#38b66b"></span>B fronts στο x–z</div>
           <div><span class="sw" style="background:#b7c6db"></span>source neighborhood</div>
         </div>
@@ -250,6 +252,7 @@ const ui = {
   axes: document.getElementById('axes'),
   sourceZone: document.getElementById('sourceZone'),
   showE: document.getElementById('showE'),
+  showEArrows: document.getElementById('showEArrows'),
   showB: document.getElementById('showB'),
   showRod: document.getElementById('showRod'),
   playBtn: document.getElementById('playBtn'),
@@ -424,6 +427,13 @@ function render(ts){
     });
   }
 
+  const eArrowPass = [];
+  if(ui.showEArrows.checked){
+    fronts.e.forEach((fr, i) => {
+      eArrowPass.push(() => drawEArrowProjected(cam, vp, fr.travelX, fr.sign, fr.color, Math.max(0.34, 0.94 - i*0.08)));
+    });
+  }
+
   if(ui.showB.checked){
     fronts.b.forEach((fr, i) => {
       const pts = pathProjected(makeBFront(0, fr.travelX, 0.20, 0.33, fr.sign), cam, vp);
@@ -431,7 +441,7 @@ function render(ts){
     });
   }
 
-  [...back, ...mid, ...front].forEach(fn => fn());
+  [...back, ...mid, ...eArrowPass, ...front].forEach(fn => fn());
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
