@@ -248,7 +248,10 @@ function getPhase(){
 
 function getRodState(){
   const phase = getPhase();
-  const chargeSigned = -Math.sin(phase);
+  // Keep the same phase logic as the mature 2D basis:
+  // s = sin(phase), iSigned = -cos(phase)
+  // when s < 0 the top side becomes negative, when s > 0 the bottom side becomes negative.
+  const chargeSigned = Math.sin(phase);
   const currentSigned = -Math.cos(phase);
   const chargeMag = Math.abs(chargeSigned);
   const currentMag = Math.abs(currentSigned);
@@ -259,14 +262,27 @@ function drawRodProjected(cam, vp, rodShift, rodState){
   const yTop = 0.80, yBot = -0.80;
   const topColor = rodState.chargeSigned >= 0 ? COLORS.ePos : COLORS.eNeg;
   const botColor = rodState.chargeSigned >= 0 ? COLORS.eNeg : COLORS.ePos;
+  const mag = rodState.chargeMag;
 
   const pTop = project({x:rodShift, y:yTop, z:0}, cam, vp);
   const pBot = project({x:rodShift, y:yBot, z:0}, cam, vp);
 
-  const grad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
-  grad.addColorStop(0.00, topColor);
-  grad.addColorStop(0.50, COLORS.rod);
-  grad.addColorStop(1.00, botColor);
+  const topA = 0.10 + 0.82 * mag;
+  const botA = 0.10 + 0.82 * mag;
+  const midA = 0.07 + 0.10 * mag;
+
+  const rgba = (hex, a) => {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  };
+
+  const rodGrad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
+  rodGrad.addColorStop(0.00, rgba(topColor, topA));
+  rodGrad.addColorStop(0.16, rgba(topColor, 0.32 * topA + 0.04));
+  rodGrad.addColorStop(0.50, rgba(COLORS.rod, midA));
+  rodGrad.addColorStop(0.84, rgba(botColor, 0.32 * botA + 0.04));
+  rodGrad.addColorStop(1.00, rgba(botColor, botA));
 
   ctx.save();
   ctx.strokeStyle = 'rgba(12,16,22,0.92)';
@@ -277,7 +293,7 @@ function drawRodProjected(cam, vp, rodShift, rodState){
   ctx.lineTo(pBot.x, pBot.y);
   ctx.stroke();
 
-  ctx.strokeStyle = grad;
+  ctx.strokeStyle = rodGrad;
   ctx.lineWidth = 4.1;
   ctx.beginPath();
   ctx.moveTo(pTop.x, pTop.y);
@@ -312,6 +328,45 @@ function drawChargeSymbols(cam, vp, rodShift, rodState){
   drawText2D(botSymbol, botP.x, botP.y, botPositive ? COLORS.ePos : COLORS.eNeg, 0.35 + 0.65*mag, 18);
 }
 
+function computeElectronTargets(rodState){
+  const N = 7;
+  const usableTop = -0.68;
+  const usableBot = 0.68;
+  const d0 = (usableBot - usableTop) / (N - 1);
+  const minSep = 0.11;
+  const ell = 1.6;
+  const signed = rodState.chargeSigned;
+  const sign = Math.sign(signed) || -1;
+  const absS = Math.abs(signed);
+  const maxGapCompression = Math.max(0, d0 - minSep);
+  const gapScale = 0.95 * maxGapCompression * absS;
+  const gaps = new Array(N - 1).fill(d0);
+
+  if(sign <= 0){
+    for(let i=0; i<N-1; i++){
+      const profile = Math.exp(-i / ell);
+      gaps[i] = d0 - gapScale * profile;
+    }
+  }else{
+    for(let i=0; i<N-1; i++){
+      const profile = Math.exp(-((N - 2 - i) / ell));
+      gaps[i] = d0 - gapScale * profile;
+    }
+  }
+
+  const ys = new Array(N);
+  ys[0] = usableTop;
+  for(let i=1; i<N; i++) ys[i] = ys[i-1] + gaps[i-1];
+
+  const centerCompressed = 0.5 * (ys[0] + ys[N-1]);
+  const centerBase = 0.5 * (usableTop + usableBot);
+  const shiftAmp = 0.08;
+  const centerOffset = centerBase - centerCompressed + shiftAmp * signed;
+  for(let i=0; i<N; i++) ys[i] += centerOffset;
+
+  return ys.map(v => Math.max(usableTop, Math.min(usableBot, v)));
+}
+
 function drawCurrentArrowProjected(cam, vp, rodShift, rodState){
   const iSigned = rodState.currentSigned;
   const mag = rodState.currentMag;
@@ -335,16 +390,10 @@ function drawCurrentArrowProjected(cam, vp, rodShift, rodState){
 }
 
 function drawElectronsProjected(cam, vp, rodShift, rodState){
-  const phase = rodState.phase;
-  const chargeSigned = rodState.chargeSigned;
-  const drift = 0.18 * chargeSigned; // displacement basis
-  const jitter = 0.015 * Math.sin(2*phase);
-  const ys = [-0.58, -0.38, -0.18, 0.02, 0.22, 0.42, 0.62];
-
-  ys.forEach((y0, i) => {
-    const y = Math.max(-0.70, Math.min(0.70, y0 + drift + jitter*(i-3)));
+  const ys = computeElectronTargets(rodState);
+  ys.forEach((y, i) => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, 4.2, COLORS.eNeg, 0.85);
+    drawCircle2D(p, 2.7, COLORS.eNeg, 0.88);
   });
 }
 
