@@ -419,14 +419,14 @@ function render(ts){
 
   if(ui.showE.checked){
     fronts.e.forEach((fr, i) => {
-      const pts = pathProjected(makeEFront(fr.x, 0.62, 0.48, fr.sign), cam, vp);
+      const pts = pathProjected(makeEFront(0, fr.travelX, 0.62, 0.48, fr.sign), cam, vp);
       back.push(() => drawPolyline(pts, fr.color, 2.2, Math.max(0.30, 0.86 - i*0.08)));
     });
   }
 
   if(ui.showB.checked){
     fronts.b.forEach((fr, i) => {
-      const pts = pathProjected(makeBFront(fr.x, 0.20, 0.33, fr.sign), cam, vp);
+      const pts = pathProjected(makeBFront(0, fr.travelX, 0.20, 0.33, fr.sign), cam, vp);
       front.push(() => drawPolyline(pts, fr.color, 2.3, Math.max(0.32, 0.90 - i*0.08)));
     });
   }
