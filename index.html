@@ -197,8 +197,7 @@
         <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
         <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
-        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
-        <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
+                <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
         <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
@@ -235,7 +234,7 @@
   </div>
 
   <div class="foot">
-    Στόχος v4: να κάτσει σωστά η σκηνή μέσα στο viewport πριν φορτωθούν μεγάλα βέλη / περιβάλλουσες / τοπικές δομές γύρω από την πηγή.
+    Rod-centered E/B emission, μία περίοδος εκπομπής και μετά freeze όλου του συστήματος.
   </div>
 </div>
 
@@ -248,7 +247,6 @@ const ui = {
   pitch: document.getElementById('pitch'),
   focal: document.getElementById('focal'),
   scale: document.getElementById('scale'),
-  shiftX: document.getElementById('shiftX'),
   shiftY: document.getElementById('shiftY'),
   rodX: document.getElementById('rodX'),
   speed: document.getElementById('speed'),
@@ -281,7 +279,7 @@ ui.playBtn.addEventListener('click', () => {
   state.playing = !state.playing;
   ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
 });
-ui.resetBtn.addEventListener('click', () => { state.t = 0; });
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.playing = true; ui.playBtn.textContent = 'Παύση'; });
 
 function resizeCanvas(){
   const wrap = cv.parentElement.getBoundingClientRect();
@@ -391,8 +389,8 @@ function drawChargeGlyph(text, x, y, color, mag){
   ctx.fillText(text, x, y);
   ctx.restore();
 }
-function chargeAndCurrent(t, speedWU){
-  const phase = 2 * Math.PI * t * speedWU;
+function chargeAndCurrent(u){
+  const phase = 2 * Math.PI * u;
   const chargeSigned = -Math.sin(phase);
   const currentSigned = -Math.cos(phase);
   return { phase, chargeSigned, currentSigned };
@@ -473,9 +471,10 @@ function drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned){
   drawChargeGlyph(botNegative ? '−' : '+', botP.x, botP.y, botNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
 }
 function drawElectronsProjected(cam, vp, rodShift, ys, r){
+  const electronRadiusPx = 4.1 / 2; // diameter = rod core width
   ys.forEach(y => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, r * 100 * (+ui.scale.value/100) * 0.43, COLORS.electron, 0.92);
+    drawCircle2D(p, electronRadiusPx, COLORS.electron, 0.92);
   });
 }
 function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
@@ -709,14 +708,19 @@ function render(ts){
     distance: 4.6
   };
   const vp = {
-    cx: w * (+ui.shiftX.value / 100),
+    cx: w * 0.50,
     cy: h * (+ui.shiftY.value / 100)
   };
 
   const back = [], mid = [], front = [];
   const rodShift = (+ui.rodX.value || 0) / 100;
   const speedWU = (+ui.speed.value / 100);
-  const { chargeSigned, currentSigned } = chargeAndCurrent(state.t, speedWU);
+  const u = Math.min(1, state.t * speedWU);
+  if(state.playing && u >= 1){
+    state.playing = false;
+    ui.playBtn.textContent = 'Έναρξη';
+  }
+  const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const { ys, r } = electronCenters(chargeSigned);
 
   if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
@@ -726,7 +730,6 @@ function render(ts){
   if(ui.showElectrons.checked) mid.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
   if(ui.showCurrent.checked) mid.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
-  const u = state.t * speedWU;
   const eFronts = seededEFrontsAbsolute(u);
   const bFronts = seededBFrontsAbsolute(u);
 
