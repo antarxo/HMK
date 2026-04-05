@@ -526,15 +526,16 @@ function drawZAxisHalf(cam, vp, which){
   ctx.lineWidth = 1.6;
   ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
   if(which === 'front'){
-    const labelP = project({x:0,y:0,z:1.1}, cam, vp);
     ctx.fillStyle = COLORS.bPos;
+    const labelP = project({x:0,y:0,z:1.1}, cam, vp);
     ctx.fillText('z', labelP.x+6, labelP.y-4);
   }
   ctx.restore();
 }
 
 function drawRod(cam, vp){
-  const { chargeSigned } = chargeAndCurrent(Math.min(1, state.t * (+ui.speed.value/100)));
+  const speedWU = (+ui.speed.value / 100);
+  const { chargeSigned } = chargeAndCurrent(state.t, speedWU);
   drawRodProjected(cam, vp, ROD_SHIFT_FIXED, chargeSigned);
 }
 
@@ -555,13 +556,13 @@ const B_FULL = [
   0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
 ];
 const WORLD_PER_LOCAL = 0.8 / 142;
-const ROD_HALF_LENGTH = 0.8;
 const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const ROD_SHIFT_FIXED = -E_BIRTH_HALF_WIDTH;
-const E_SCALE_GROWTH = ((2 * (2 * ROD_HALF_LENGTH)) / (2 * E_BIRTH_HALF_WIDTH)) - 1; // makes final width about 2*rod length
 function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
-function getPulseScale(age){
-  return 1 + E_SCALE_GROWTH * age;
+function getPulseScale(age, rodLengthPx, lambdaPx){
+  const pulseLocalAnchor = 142;
+  const d0 = rodLengthPx * 0.5;
+  return (d0 + lambdaPx * age) / pulseLocalAnchor;
 }
 function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal){
   return { x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal, y: yLocal * WORLD_PER_LOCAL * scaleLocal, z: 0 };
@@ -671,7 +672,8 @@ function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx)
   if(age < 0 || age > 1) return;
   const fade = Math.exp(-0.22 * age);
   const alpha = 225 * fade / 255;
-  const scaleLocal = getPulseScale(age);
+  const lambdaPx = 2 * rodLengthPx;
+  const scaleLocal = getPulseScale(age, rodLengthPx, lambdaPx);
   const color = front.color;
   if(front.arrowLen > 1e-9){
     const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
@@ -754,7 +756,9 @@ function render(ts){
   const eFronts = seededEFrontsAbsolute(u);
   const bFronts = seededBFrontsAbsolute(u);
 
-  const rodLengthPx = 2 * ROD_HALF_LENGTH;
+  const rodTopP = project({x:rodShift, y:-0.80, z:0}, cam, vp);
+  const rodBotP = project({x:rodShift, y: 0.80, z:0}, cam, vp);
+  const rodLengthPx = Math.hypot(rodBotP.x - rodTopP.x, rodBotP.y - rodTopP.y);
 
   if(ui.showE.checked){
     eFronts.forEach(fr => {
