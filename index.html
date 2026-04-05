@@ -191,6 +191,22 @@ function drawText2D(text, x, y, color, alpha=1, size=14){
   ctx.restore();
 }
 
+function drawChargeGlyph(text, x, y, color, mag){
+  const size = 12 + 11 * mag;
+  const strokeW = 0.3 + 2.1 * mag;
+  ctx.save();
+  ctx.globalAlpha = 0.28 + 0.72 * mag;
+  ctx.font = `${600 + Math.round(250 * mag)} ${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = strokeW;
+  ctx.strokeStyle = 'rgba(12,16,22,0.88)';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
 function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   const dx = tip.x - base.x;
   const dy = tip.y - base.y;
@@ -313,13 +329,13 @@ function drawChargeSymbols(cam, vp, rodShift, rodVisual){
     const topP = project({x:rodShift + 0.08, y:0.86, z:0}, cam, vp);
     const topSymbol = rodVisual.topIsNegative ? '−' : '+';
     const topColor = rodVisual.topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-    drawText2D(topSymbol, topP.x, topP.y, topColor, 0.35 + 0.65*rodVisual.chargeTop, 18);
+    drawChargeGlyph(topSymbol, topP.x, topP.y, topColor, rodVisual.chargeTop);
   }
   if(rodVisual.chargeBot > 0.01){
     const botP = project({x:rodShift + 0.08, y:-0.86, z:0}, cam, vp);
     const botSymbol = rodVisual.botIsNegative ? '−' : '+';
     const botColor = rodVisual.botIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-    drawText2D(botSymbol, botP.x, botP.y, botColor, 0.35 + 0.65*rodVisual.chargeBot, 18);
+    drawChargeGlyph(botSymbol, botP.x, botP.y, botColor, rodVisual.chargeBot);
   }
 }
 
@@ -336,24 +352,31 @@ function computeElectronTargets(rodState){
   const q = Math.abs(rodState.chargeSigned);
   const moveUp = rodState.chargeSigned < 0;
 
-  // λογική που περιέγραψες:
-  // 1ο ακίνητο, 2ο μετατόπιση d, 3ο 2d, 4ο 3d ... 7ο 6d
-  // άρα οι τελικές μετατοπίσεις είναι σε αριθμητική πρόοδο.
-  const d0 = L / (N - 1);
-  const minGap = 0.10;
-  const maxStep = d0 - minGap;   // στο μέγιστο φορτίο τα κενά μικραίνουν αλλά δεν μηδενίζονται
-  const step = maxStep * q;
+  // Στόχος στο μέγιστο φορτίο: τα τελικά κενά να είναι σε αριθμητική πρόοδο
+  // και να βαίνουν αυξανόμενα απομακρυνόμενα από το συσσωρευμένο άκρο.
+  // Κρατάμε το πρώτο κενό λίγο μεγαλύτερο για να μη φαίνεται "κόλλημα".
+  const gapCount = N - 1;
+  const firstGap = 0.14;   // λίγο μεγαλύτερο πρώτο κενό
+  const avgGap = L / gapCount;
+  const stepGap = Math.max(0, 2 * (avgGap - firstGap) / (gapCount - 1));
+
+  const targetTopGaps = new Array(gapCount);
+  for(let i=0;i<gapCount;i++) targetTopGaps[i] = firstGap + i * stepGap;
+
+  const targetBotGaps = new Array(gapCount);
+  for(let i=0;i<gapCount;i++) targetBotGaps[i] = firstGap + (gapCount - 1 - i) * stepGap;
+
+  // από την ομοιόμορφη κατανομή κινούμαστε προοδευτικά προς την τελική Α.Π.
+  const d0 = avgGap;
+  const gaps = new Array(gapCount);
+  const target = moveUp ? targetTopGaps : targetBotGaps;
+  for(let i=0;i<gapCount;i++){
+    gaps[i] = d0 + q * (target[i] - d0);
+  }
 
   const ys = new Array(N);
-  if(moveUp){
-    for(let i=0;i<N;i++){
-      ys[i] = base[i] - i * step;
-    }
-  } else {
-    for(let i=0;i<N;i++){
-      ys[i] = base[i] + (N - 1 - i) * step;
-    }
-  }
+  ys[0] = usableTop;
+  for(let i=1;i<N;i++) ys[i] = ys[i-1] + gaps[i-1];
 
   return ys;
 }
@@ -427,7 +450,7 @@ function drawElectronsProjected(cam, vp, rodShift){
   const ys = state.electronDisplayYs || [];
   ys.forEach(y => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, 1.9, COLORS.electron, 0.90);
+    drawCircle2D(p, 1.8, COLORS.electron, 0.90);
   });
 }
 
