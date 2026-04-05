@@ -329,39 +329,30 @@ function computeElectronTargets(rodState){
   const usableBot = 0.68;
   const L = usableBot - usableTop;
 
-  // base equally spaced distribution
+  // αρχική ομοιόμορφη κατανομή
   const base = new Array(N);
   for(let i=0;i<N;i++) base[i] = usableTop + (L * i / (N - 1));
 
   const q = Math.abs(rodState.chargeSigned);
-  const accumulateTop = rodState.chargeSigned < 0;
+  const moveUp = rodState.chargeSigned < 0;
 
-  // final packed distribution at max charge:
-  // first gap = g, second = 2g, third = 3g ... (triangular spacing)
-  const triSum = ((N - 1) * N) / 2; // 1+2+...+(N-1)
-  const g = L / triSum;
+  // λογική που περιέγραψες:
+  // 1ο ακίνητο, 2ο μετατόπιση d, 3ο 2d, 4ο 3d ... 7ο 6d
+  // άρα οι τελικές μετατοπίσεις είναι σε αριθμητική πρόοδο.
+  const d0 = L / (N - 1);
+  const minGap = 0.10;
+  const maxStep = d0 - minGap;   // στο μέγιστο φορτίο τα κενά μικραίνουν αλλά δεν μηδενίζονται
+  const step = maxStep * q;
 
-  const packedTop = new Array(N);
-  packedTop[0] = usableTop;
-  for(let i=1;i<N;i++) packedTop[i] = packedTop[i-1] + i * g;
-
-  const packedBot = new Array(N);
-  packedBot[N-1] = usableBot;
-  for(let i=N-2;i>=0;i--) packedBot[i] = packedBot[i+1] - (N-1-i) * g;
-
-  const packed = accumulateTop ? packedTop : packedBot;
-
-  // staged arrival: first reaches early and stays, next later, etc.
-  // this is the key "first stops, then second, then next..." rule.
   const ys = new Array(N);
-  const order = accumulateTop ? [...Array(N).keys()] : [...Array(N).keys()].reverse();
-  const finishBase = 0.18;       // first can finish early
-  const finishSpan = 0.82;       // last finishes at q=1
-  for(let rank=0; rank<N; rank++){
-    const idx = order[rank];
-    const finishQ = finishBase + finishSpan * (rank / (N - 1));
-    const p = Math.max(0, Math.min(1, q / finishQ));
-    ys[idx] = base[idx] + (packed[idx] - base[idx]) * p;
+  if(moveUp){
+    for(let i=0;i<N;i++){
+      ys[i] = base[i] - i * step;
+    }
+  } else {
+    for(let i=0;i<N;i++){
+      ys[i] = base[i] + (N - 1 - i) * step;
+    }
   }
 
   return ys;
@@ -472,13 +463,13 @@ function render(ts){
     state.compTopSmooth = comps0.compTop;
     state.compBotSmooth = comps0.compBot;
   } else {
-    const k = 1 - Math.exp(-9 * dt);
+    const k = 1 - Math.exp(-11 * dt);
     for(let i=0; i<electronTargets.length; i++){
       state.electronDisplayYs[i] += (electronTargets[i] - state.electronDisplayYs[i]) * k;
     }
     const comps = edgeAccumulation(state.electronDisplayYs);
-    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-9 * dt));
-    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-9 * dt));
+    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-11 * dt));
+    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-11 * dt));
   }
   const rodVisual = getRodVisualState(rodState);
 
