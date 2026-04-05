@@ -683,7 +683,7 @@ function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx)
   }
   drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, front.sign, front.arrowLen, color, alpha*0.92);
 }
-const B_RADIUS_END = 2 * (2 * ROD_HALF_LENGTH); // 2L
+const B_RADIUS_BIRTH = Math.abs(ROD_SHIFT_FIXED); // rod-to-origin distance at birth
 
 function seededBFrontsAbsolute(u){
   const fronts = [];
@@ -702,8 +702,7 @@ function seededBFrontsAbsolute(u){
       sign,
       color,
       amp: Math.abs(bAtBirth),
-      radius: B_RADIUS_END,                 // first born already has radius D
-      centerTravelX: B_RADIUS_END * age     // what propagates is the center position
+      radius: B_RADIUS_BIRTH * getPulseScale(age) // same growth law as E lobes
     });
   }
   return fronts;
@@ -779,7 +778,7 @@ function render(ts){
 
   if(ui.showB.checked){
     bFronts.forEach((fr, i) => {
-      const pts = pathProjected(makeBCircleFront(rodShift + fr.centerTravelX, fr.radius), cam, vp);
+      const pts = pathProjected(makeBCircleFront(rodShift, fr.radius), cam, vp);
       const alpha = Math.max(0.22, (0.20 + 0.80 * fr.amp) * Math.exp(-0.16 * fr.age));
       const width = Math.max(0.6, 0.56 / getPulseScale(fr.age)); // same rule as E lobes
       front.push(() => drawPolyline(pts, fr.color, width, alpha));
