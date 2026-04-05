@@ -707,7 +707,6 @@ function render(ts){
   if(ui.showElectrons.checked) mid.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
   if(ui.showCurrent.checked) mid.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
-  const speedWU = (+ui.speed.value / 100);
   const tNorm = (state.t * speedWU) % 1;
   const eFronts = seededEFronts(tNorm);
   const bFronts = getBFronts();
