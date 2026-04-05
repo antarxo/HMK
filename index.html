@@ -197,7 +197,6 @@
         <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
         <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
-        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="50"></div>
                 <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
         <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
@@ -248,7 +247,6 @@ const ui = {
   pitch: document.getElementById('pitch'),
   focal: document.getElementById('focal'),
   scale: document.getElementById('scale'),
-  shiftX: document.getElementById('shiftX'),
   shiftY: document.getElementById('shiftY'),
   rodX: document.getElementById('rodX'),
   speed: document.getElementById('speed'),
@@ -495,10 +493,11 @@ function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
   drawText2D('I', labelP.x, labelP.y, color, 0.3 + 0.7*imag, 16);
 }
 
-function drawAxesXY(cam, vp){
+function drawAxes(cam, vp){
   const axes = [
     {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
-    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'}
+    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
+    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
@@ -509,28 +508,6 @@ function drawAxesXY(cam, vp){
     ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
     ctx.fillStyle = ax.c;
     ctx.fillText(ax.label, B.x+6, B.y-4);
-  }
-  ctx.restore();
-}
-function zAxisFrontIsPositive(cam){
-  const pPos = transformPoint({x:0,y:0,z:1}, cam);
-  const pNeg = transformPoint({x:0,y:0,z:-1}, cam);
-  return (pPos.z + cam.distance) < (pNeg.z + cam.distance);
-}
-function drawZAxisHalf(cam, vp, which){
-  const frontPositive = zAxisFrontIsPositive(cam);
-  const drawPositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
-  const a3 = drawPositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-1.1};
-  const b3 = drawPositive ? {x:0,y:0,z:1.1} : {x:0,y:0,z:0};
-  const A = project(a3, cam, vp), B = project(b3, cam, vp);
-  ctx.save();
-  ctx.strokeStyle = COLORS.bPos;
-  ctx.lineWidth = 1.6;
-  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
-  if(which === 'front'){
-    ctx.fillStyle = COLORS.bPos;
-    const labelP = project({x:0,y:0,z:1.1}, cam, vp);
-    ctx.fillText('z', labelP.x+6, labelP.y-4);
   }
   ctx.restore();
 }
@@ -568,21 +545,8 @@ function getPulseScale(age, rodLengthPx, lambdaPx){
 function localToWorld(rodShift, scaleLocal, xLocal, yLocal){
   return { x: rodShift + xLocal * WORLD_PER_LOCAL * scaleLocal, y: yLocal * WORLD_PER_LOCAL * scaleLocal, z: 0 };
 }
-function localEToWorld(rodShift, scaleLocal, xLocal, yLocal){
-  const nx = Math.max(-159, Math.min(159, xLocal)) / 159;
-  let xWorld;
-  if(nx >= 0){
-    // right branch: cusp on rod, tangent region on y-axis (x=0)
-    xWorld = rodShift + (0 - rodShift) * nx;
-  } else {
-    // left branch: continue symmetrically to the other side
-    xWorld = rodShift + (-rodShift - rodShift) * (-nx);
-  }
-  const yWorld = yLocal * WORLD_PER_LOCAL * scaleLocal;
-  return { x: xWorld, y: yWorld, z: 0 };
-}
 function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha){
-  const pts = ptsLocal.map(([x,y]) => project(localEToWorld(rodShift, scaleLocal, x, y), cam, vp));
+  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
@@ -616,7 +580,7 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
       x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
       y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
     }
-    segments.push(project(localEToWorld(rodShift, scaleLocal, x, y), cam, vp));
+    segments.push(project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
   }
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -652,8 +616,8 @@ function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen,
   const half = Math.min(2.9 * k, 0.22 * L);
   const tipBaseY = signY * Math.max(0, L - head);
   const tipY = signY * L;
-  const a = project(localEToWorld(rodShift, scaleLocal, xLocal, baseY), cam, vp);
-  const b = project(localEToWorld(rodShift, scaleLocal, xLocal, tipBaseY), cam, vp);
+  const a = project(localToWorld(rodShift, scaleLocal, xLocal, baseY), cam, vp);
+  const b = project(localToWorld(rodShift, scaleLocal, xLocal, tipBaseY), cam, vp);
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.strokeStyle = color;
@@ -744,7 +708,7 @@ function render(ts){
     distance: 4.6
   };
   const vp = {
-    cx: w * (+ui.shiftX.value / 100),
+    cx: w * 0.50,
     cy: h * (+ui.shiftY.value / 100)
   };
 
@@ -759,8 +723,7 @@ function render(ts){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const { ys, r } = electronCenters(chargeSigned);
 
-  if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
-  if(ui.axes.checked) mid.push(() => drawAxesXY(cam, vp));
+  if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
   if(ui.sourceZone.checked) mid.push(() => drawSourceZone(cam, vp));
   if(ui.showRod.checked) mid.push(() => drawRodProjected(cam, vp, rodShift, chargeSigned));
   if(ui.showCharges.checked) mid.push(() => drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned));
@@ -789,7 +752,6 @@ function render(ts){
     });
   }
 
-  if(ui.axes.checked) front.unshift(() => drawZAxisHalf(cam, vp, 'front'));
   [...back, ...mid, ...eArrowPass, ...front].forEach(fn => fn());
   requestAnimationFrame(render);
 }
