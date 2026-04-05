@@ -65,7 +65,7 @@
         <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
         <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
         <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
-        <div class="row"><label>Playback speed</label><input id="speed" type="range" min="5" max="180" value="45"></div>
+        <div class="row"><label>Playback speed</label><input id="speed" type="range" min="3" max="180" value="28"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
@@ -128,13 +128,13 @@ const COLORS = {
   electron:'#7ee8ff'
 };
 
-const state = { t:0, playing:true, electronDisplayYs:null, signedChargeView:0, compTopSmooth:0, compBotSmooth:0 };
+const state = { t:0, playing:true, electronDisplayYs:null, compTopSmooth:0, compBotSmooth:0 };
 
 ui.playBtn.addEventListener('click', () => {
   state.playing = !state.playing;
   ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
 });
-ui.resetBtn.addEventListener('click', () => { state.t = 0; state.electronDisplayYs = null; state.signedChargeView = 0; state.compTopSmooth = 0; state.compBotSmooth = 0; });
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.electronDisplayYs = null; state.compTopSmooth = 0; state.compBotSmooth = 0; });
 
 function resizeCanvas(){
   const wrap = cv.parentElement.getBoundingClientRect();
@@ -327,47 +327,44 @@ function computeElectronTargets(rodState){
   const N = 7;
   const usableTop = -0.68;
   const usableBot = 0.68;
-  const d0 = (usableBot - usableTop) / (N - 1);
-  const minSep = 0.11;
-  const ell = 1.6;
-  const signed = rodState.chargeSigned;
-  const sign = Math.sign(signed) || -1;
-  const absS = Math.abs(signed);
-  const maxGapCompression = Math.max(0, d0 - minSep);
-  const gapScale = 0.95 * maxGapCompression * absS;
-  const gaps = new Array(N - 1).fill(d0);
+  const L = usableBot - usableTop;
 
-  if(sign <= 0){
-    for(let i=0; i<N-1; i++){
-      const profile = Math.exp(-i / ell);
-      gaps[i] = d0 - gapScale * profile;
-    }
-  }else{
-    for(let i=0; i<N-1; i++){
-      const profile = Math.exp(-((N - 2 - i) / ell));
-      gaps[i] = d0 - gapScale * profile;
-    }
-  }
+  // base equally spaced distribution
+  const base = new Array(N);
+  for(let i=0;i<N;i++) base[i] = usableTop + (L * i / (N - 1));
 
+  const q = Math.abs(rodState.chargeSigned);
+  const accumulateTop = rodState.chargeSigned < 0;
+
+  // final packed distribution at max charge:
+  // first gap = g, second = 2g, third = 3g ... (triangular spacing)
+  const triSum = ((N - 1) * N) / 2; // 1+2+...+(N-1)
+  const g = L / triSum;
+
+  const packedTop = new Array(N);
+  packedTop[0] = usableTop;
+  for(let i=1;i<N;i++) packedTop[i] = packedTop[i-1] + i * g;
+
+  const packedBot = new Array(N);
+  packedBot[N-1] = usableBot;
+  for(let i=N-2;i>=0;i--) packedBot[i] = packedBot[i+1] - (N-1-i) * g;
+
+  const packed = accumulateTop ? packedTop : packedBot;
+
+  // staged arrival: first reaches early and stays, next later, etc.
+  // this is the key "first stops, then second, then next..." rule.
   const ys = new Array(N);
-  ys[0] = usableTop;
-  for(let i=1; i<N; i++) ys[i] = ys[i-1] + gaps[i-1];
-
-  const centerCompressed = 0.5 * (ys[0] + ys[N-1]);
-  const centerBase = 0.5 * (usableTop + usableBot);
-  const centerOffset = centerBase - centerCompressed;
-  for(let i=0; i<N; i++) ys[i] += centerOffset;
-
-  if(ys[0] < usableTop){
-    const shift = usableTop - ys[0];
-    for(let i=0; i<N; i++) ys[i] += shift;
-  }
-  if(ys[N-1] > usableBot){
-    const shift = ys[N-1] - usableBot;
-    for(let i=0; i<N; i++) ys[i] -= shift;
+  const order = accumulateTop ? [...Array(N).keys()] : [...Array(N).keys()].reverse();
+  const finishBase = 0.18;       // first can finish early
+  const finishSpan = 0.82;       // last finishes at q=1
+  for(let rank=0; rank<N; rank++){
+    const idx = order[rank];
+    const finishQ = finishBase + finishSpan * (rank / (N - 1));
+    const p = Math.max(0, Math.min(1, q / finishQ));
+    ys[idx] = base[idx] + (packed[idx] - base[idx]) * p;
   }
 
-  return ys.map(v => Math.max(usableTop, Math.min(usableBot, v)));
+  return ys;
 }
 
 function edgeAccumulation(displayArray){
@@ -390,21 +387,26 @@ function edgeAccumulation(displayArray){
 }
 
 function getRodVisualState(rodState){
-  const signed = state.signedChargeView;
-  const negTop = Math.max(0, -signed);
-  const posTop = Math.max(0, signed);
-  const negBot = Math.max(0, signed);
-  const posBot = Math.max(0, -signed);
+  const topComp = state.compTopSmooth || 0;
+  const botComp = state.compBotSmooth || 0;
+  const bias = topComp - botComp;
 
-  const chargeTop = Math.max(negTop, posTop) * state.compTopSmooth;
-  const chargeBot = Math.max(negBot, posBot) * state.compBotSmooth;
-  const topIsNegative = negTop > posTop;
-  const botIsNegative = negBot > posBot;
+  let topIsNegative, botIsNegative;
+  if(Math.abs(bias) < 0.02){
+    topIsNegative = rodState.chargeSigned < 0;
+    botIsNegative = !topIsNegative;
+  } else {
+    topIsNegative = topComp > botComp;
+    botIsNegative = !topIsNegative;
+  }
 
   return {
     currentSigned: rodState.currentSigned,
     currentMag: rodState.currentMag,
-    chargeTop, chargeBot, topIsNegative, botIsNegative
+    chargeTop: topComp,
+    chargeBot: botComp,
+    topIsNegative,
+    botIsNegative
   };
 }
 
@@ -434,7 +436,7 @@ function drawElectronsProjected(cam, vp, rodShift){
   const ys = state.electronDisplayYs || [];
   ys.forEach(y => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, 2.2, COLORS.electron, 0.88);
+    drawCircle2D(p, 1.9, COLORS.electron, 0.90);
   });
 }
 
@@ -466,19 +468,17 @@ function render(ts){
   const electronTargets = computeElectronTargets(rodState);
   if(!state.electronDisplayYs || state.electronDisplayYs.length !== electronTargets.length){
     state.electronDisplayYs = electronTargets.slice();
-    state.signedChargeView = rodState.chargeSigned;
     const comps0 = edgeAccumulation(state.electronDisplayYs);
     state.compTopSmooth = comps0.compTop;
     state.compBotSmooth = comps0.compBot;
   } else {
-    const k = 1 - Math.exp(-14 * dt);
+    const k = 1 - Math.exp(-9 * dt);
     for(let i=0; i<electronTargets.length; i++){
       state.electronDisplayYs[i] += (electronTargets[i] - state.electronDisplayYs[i]) * k;
     }
     const comps = edgeAccumulation(state.electronDisplayYs);
-    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-14 * dt));
-    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-14 * dt));
-    state.signedChargeView += (rodState.chargeSigned - state.signedChargeView) * (1 - Math.exp(-10 * dt));
+    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-9 * dt));
+    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-9 * dt));
   }
   const rodVisual = getRodVisualState(rodState);
 
