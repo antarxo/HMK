@@ -308,6 +308,54 @@ function drawPolyline(pts2, color, width=2, alpha=1){
   ctx.restore();
 }
 
+function drawArrow2D(base, tip, color, width=2.2, alpha=1){
+  const dx = tip.x - base.x;
+  const dy = tip.y - base.y;
+  const L = Math.hypot(dx, dy);
+  if(L < 1e-6) return;
+
+  const ux = dx / L;
+  const uy = dy / L;
+  const head = Math.min(14, Math.max(8, L * 0.22));
+  const half = head * 0.42;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+
+  const shaftX = tip.x - ux * head;
+  const shaftY = tip.y - uy * head;
+
+  ctx.beginPath();
+  ctx.moveTo(base.x, base.y);
+  ctx.lineTo(shaftX, shaftY);
+  ctx.stroke();
+
+  const px = -uy;
+  const py = ux;
+  ctx.beginPath();
+  ctx.moveTo(tip.x, tip.y);
+  ctx.lineTo(shaftX + px * half, shaftY + py * half);
+  ctx.lineTo(shaftX - px * half, shaftY - py * half);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawEArrowProjected(cam, vp, travelX, sign, color, alpha=1){
+  const amp = 0.62;
+  const len = 0.48;
+  const grow = Math.max(0, Math.min(1, travelX / len));
+  const base3 = {x: travelX, y: 0, z: 0};
+  const tip3  = {x: travelX, y: sign * amp * grow, z: 0};
+  const base2 = project(base3, cam, vp);
+  const tip2  = project(tip3, cam, vp);
+  drawArrow2D(base2, tip2, color, 2.4, alpha);
+}
+
 function drawAxes(cam, vp){
   const axes = [
     {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
