@@ -688,7 +688,7 @@ const B_RADIUS_END = 2 * (2 * ROD_HALF_LENGTH); // 2L
 function seededBFrontsAbsolute(u){
   const fronts = [];
   for(const tEmit of B_FULL){
-    if(tEmit > 1 + 1e-9) continue;           // one-period spawning only
+    if(tEmit > 1 + 1e-9) continue; // one-period spawning only
     const age = u - tEmit;
     if(age < 0 || age > 1) continue;
     const quarter = frontQuarterIndex(tEmit);
@@ -702,7 +702,8 @@ function seededBFrontsAbsolute(u){
       sign,
       color,
       amp: Math.abs(bAtBirth),
-      radius: B_RADIUS_END * age
+      radius: B_RADIUS_END,                 // first born already has radius D
+      centerTravelX: B_RADIUS_END * age     // what propagates is the center position
     });
   }
   return fronts;
@@ -778,9 +779,9 @@ function render(ts){
 
   if(ui.showB.checked){
     bFronts.forEach((fr, i) => {
-      const pts = pathProjected(makeBCircleFront(rodShift, fr.radius), cam, vp);
+      const pts = pathProjected(makeBCircleFront(rodShift + fr.centerTravelX, fr.radius), cam, vp);
       const alpha = Math.max(0.22, (0.20 + 0.80 * fr.amp) * Math.exp(-0.16 * fr.age));
-      const width = 1.9 + 0.8 * fr.amp;
+      const width = Math.max(0.6, 0.56 / getPulseScale(fr.age)); // same rule as E lobes
       front.push(() => drawPolyline(pts, fr.color, width, alpha));
     });
   }
