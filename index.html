@@ -205,7 +205,7 @@
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
-        <div class="row"><label>Show μεγάλα βέλη E</label><input id="showEArrows" type="checkbox" checked></div>
+        <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
         <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
@@ -355,20 +355,7 @@ function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   ctx.restore();
 }
 
-function drawEArrowProjected(cam, vp, front, alpha=1){
-  const amp = 0.62;
-  const len = 0.48;
-  const grow = Math.max(0, Math.min(1, front.travelX / len));
-  const arrowMag = Math.max(0, Math.min(1, front.arrowMag || 0));
-  if(arrowMag < 0.01) return;
-  const xArrow = front.travelX + len * grow;
-  const yAmp = front.sign * amp * arrowMag * grow;
-  const base3 = {x: xArrow, y: 0, z: 0};
-  const tip3  = {x: xArrow, y: yAmp, z: 0};
-  const base2 = project(base3, cam, vp);
-  const tip2  = project(tip3,  cam, vp);
-  drawArrow2D(base2, tip2, front.color, 2.4, alpha);
-}
+
 
 function drawCircle2D(p, r, color, alpha=1){
   ctx.save();
@@ -412,16 +399,30 @@ function chargeAndCurrent(t, speedWU){
 }
 function electronCenters(chargeSigned){
   const N = 7;
-  const r = 0.036, d = 2*r;
-  const top = -0.68, bot = 0.68;
+  const r = 0.036;
+  const d = 2 * r;
+  const top = -0.68;
+  const bot =  0.68;
   const a = 0.020;
-  const tri = [0,1,3,6,10,15,21];
+
+  // approved center-position pattern:
+  // 0
+  // a + d
+  // 3a + 2d
+  // 6a + 3d
+  // 10a + 4d
+  // 15a + 5d
+  // 21a + 6d
+  const tri = [0, 1, 3, 6, 10, 15, 21];
   const targetOffsets = tri.map((t, i) => t * a + i * d);
+
   const span = bot - top;
   const uniformGap = span / (N - 1);
   const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
+
   const q = Math.abs(chargeSigned);
   const moveUp = chargeSigned < 0;
+
   const ys = new Array(N);
   if(moveUp){
     for(let i=0;i<N;i++){
@@ -523,20 +524,120 @@ function drawSourceZone(cam, vp){
   // intentionally blank for now
 }
 
-function makeEFront(originX, travelX, amp=0.62, len=0.48, sign=1, n=80){
-  const pts = [];
-  const grow = Math.max(0, Math.min(1, travelX / len));
-  const shapeLen = len * grow;
-  for(let i=0;i<n;i++){
-    const u = i/(n-1);
-    pts.push({
-      x:originX + travelX + u * shapeLen,
-      y:sign * amp * grow * Math.sin(Math.PI*u),
-      z:0
+const E_FULL = [
+  0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
+  0.2538, 0.2651, 0.2835, 0.3085, 0.3393, 0.3750, 0.4145, 0.4566, 0.5000,
+  0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500,
+  0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000
+];
+
+function frontQuarterIndex(tEmit){
+  return tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
+}
+
+function seededEFronts(tNorm){
+  const fronts = [];
+  for(const tEmit of E_FULL){
+    let age = tNorm - tEmit;
+    if(age < 0) age += 1;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const eAtBirth = -Math.sin(phaseEmit);
+    const arrowLen = 80 * Math.abs(eAtBirth);
+    fronts.push({
+      t0: tEmit,
+      age,
+      sign,
+      reverseArrows: sign > 0,
+      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+      arrowLen
     });
   }
-  return pts;
+  return fronts;
 }
+
+function getPulseScale(age, rodLengthPx, lambdaPx){
+  const pulseLocalAnchor = 142;
+  const d0 = rodLengthPx * 0.5;
+  return (d0 + lambdaPx * age) / pulseLocalAnchor;
+}
+
+function drawSeededElectronFront(cam, vp, front, rodLengthPx){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+
+  const fadeK = 0.22;
+  const fade = Math.exp(-fadeK * age);
+  const alpha = 225 * fade;
+  const lambdaPx = 2 * rodLengthPx;
+  const scaleFactor = getPulseScale(age, rodLengthPx, lambdaPx);
+  const strokeW = 0.56 / scaleFactor;
+
+  const origin = project({x:0, y:0, z:0}, cam, vp);
+  const rgbHex = front.color;
+  const rgb = rgbHex === COLORS.eNeg ? [79,168,216] : [232,90,90];
+
+  ctx.save();
+  ctx.translate(origin.x, origin.y);
+  ctx.scale(scaleFactor, scaleFactor);
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha/255})`;
+  ctx.lineWidth = strokeW;
+  ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${(alpha*0.85)/255})`;
+
+  if(front.arrowLen > 1e-9){
+    const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
+    for(const [sx, sy] of quads){
+      ctx.beginPath();
+      ctx.moveTo(0 * sx, -142 * sy);
+      ctx.bezierCurveTo(18 * sx, -158 * sy, 45 * sx, -178 * sy, 63 * sx, -178 * sy);
+      ctx.bezierCurveTo(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
+      ctx.stroke();
+    }
+  }
+
+  const drawArrow = (x, y, angleDeg) => {
+    const dir = front.reverseArrows ? Math.PI : 0;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((angleDeg * Math.PI / 180) + dir);
+    const k = 1 / scaleFactor;
+    ctx.beginPath();
+    ctx.moveTo(2.7 * k, 0);
+    ctx.lineTo(-1.45 * k, -1.8 * k);
+    ctx.lineTo(-1.45 * k,  1.8 * k);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  };
+
+  if(front.arrowLen > 1e-9){
+    const lenBase = 18 + 54 * (front.arrowLen / 80);
+    const arrowLayerIsActive = true;
+    if(arrowLayerIsActive){
+      if(age < 0.25){
+        drawArrow(159, -60, -47);
+        drawArrow(159,  60,  47);
+      } else if(age < 0.5){
+        drawArrow(159, -60,  47);
+        drawArrow(159,  60, -47);
+      } else if(age < 0.75){
+        drawArrow(159, -60, 133);
+        drawArrow(159,  60,-133);
+      } else {
+        drawArrow(159, -60,-133);
+        drawArrow(159,  60, 133);
+      }
+    }
+  }
+  ctx.restore();
+}
+
+
 function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, n=96){
   const pts = [];
   const grow = Math.max(0, Math.min(1, travelX / (2*bx)));
@@ -554,52 +655,20 @@ function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, n=96){
   return pts;
 }
 
-function getFronts(){
+function getBFronts(){
   const count = +ui.count.value;
   const speedWU = (+ui.speed.value/100);
-  const waveSpeed = speedWU;
-  const emitPeriod = 0.125 / Math.max(0.05, speedWU); // 1/8 period emission cadence
-  const e = [], b = [];
-  const maxEmitIndex = Math.floor(state.t / emitPeriod);
-
-  for(let k=0; k<count; k++){
-    const emitIndex = maxEmitIndex - k;
-    if(emitIndex < 0) continue;
-
-    const tEmit = emitIndex * emitPeriod;
-    const age = state.t - tEmit;
-    if(age < 0) continue;
-    const travelX = age * waveSpeed;
+  const stepDistance = 0.34;
+  const emitPeriod = stepDistance / Math.max(0.05, speedWU);
+  const b = [];
+  for(let i=0;i<count;i++){
+    const age = state.t - i * emitPeriod;
+    if(age <= 0) continue;
+    const travelX = age * speedWU;
     if(travelX > 2.8) continue;
-
-    const tNorm = ((tEmit * speedWU) % 1 + 1) % 1;
-    const quarterFloat = tNorm >= 1 ? 3 : Math.floor(tNorm * 4);
-    const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
-
-    const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
-    const eAtBirth = -Math.sin(phaseEmit);
-    const bAtBirth = -Math.cos(phaseEmit);
-
-    e.push({
-      tEmit,
-      tNorm,
-      travelX,
-      sign,
-      reverseArrows: sign > 0,
-      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
-      arrowMag: Math.abs(eAtBirth)
-    });
-
-    b.push({
-      tEmit,
-      tNorm,
-      travelX,
-      sign,
-      color: (quarterFloat === 0 || quarterFloat === 3) ? COLORS.bNeg : COLORS.bPos,
-      arrowMag: Math.abs(bAtBirth)
-    });
+    b.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
   }
-  return {e,b};
+  return b;
 }
 
 let lastTs = performance.now();
@@ -638,24 +707,25 @@ function render(ts){
   if(ui.showElectrons.checked) mid.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
   if(ui.showCurrent.checked) mid.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
-  const fronts = getFronts();
+  const speedWU = (+ui.speed.value / 100);
+  const tNorm = (state.t * speedWU) % 1;
+  const eFronts = seededEFronts(tNorm);
+  const bFronts = getBFronts();
+
+  const rodTopP = project({x:rodShift, y:-0.80, z:0}, cam, vp);
+  const rodBotP = project({x:rodShift, y: 0.80, z:0}, cam, vp);
+  const rodLengthPx = Math.hypot(rodBotP.x - rodTopP.x, rodBotP.y - rodTopP.y);
 
   if(ui.showE.checked){
-    fronts.e.forEach((fr, i) => {
-      const pts = pathProjected(makeEFront(0, fr.travelX, 0.62, 0.48, fr.sign), cam, vp);
-      back.push(() => drawPolyline(pts, fr.color, 2.2, Math.max(0.30, 0.86 - i*0.08)));
+    eFronts.forEach(fr => {
+      back.push(() => drawSeededElectronFront(cam, vp, fr, rodLengthPx));
     });
   }
 
   const eArrowPass = [];
-  if(ui.showEArrows.checked){
-    fronts.e.forEach((fr, i) => {
-      eArrowPass.push(() => drawEArrowProjected(cam, vp, fr, Math.max(0.34, 0.94 - i*0.08)));
-    });
-  }
 
   if(ui.showB.checked){
-    fronts.b.forEach((fr, i) => {
+    bFronts.forEach((fr, i) => {
       const pts = pathProjected(makeBFront(0, fr.travelX, 0.20, 0.33, fr.sign), cam, vp);
       front.push(() => drawPolyline(pts, fr.color, 2.3, Math.max(0.32, 0.90 - i*0.08)));
     });
