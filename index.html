@@ -355,15 +355,19 @@ function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   ctx.restore();
 }
 
-function drawEArrowProjected(cam, vp, travelX, sign, color, alpha=1){
+function drawEArrowProjected(cam, vp, front, alpha=1){
   const amp = 0.62;
   const len = 0.48;
-  const grow = Math.max(0, Math.min(1, travelX / len));
-  const base3 = {x: travelX, y: 0, z: 0};
-  const tip3  = {x: travelX, y: sign * amp * grow, z: 0};
+  const grow = Math.max(0, Math.min(1, front.travelX / len));
+  const arrowMag = Math.max(0, Math.min(1, front.arrowMag || 0));
+  if(arrowMag < 0.01) return;
+  const xArrow = front.travelX + len * grow;
+  const yAmp = front.sign * amp * arrowMag * grow;
+  const base3 = {x: xArrow, y: 0, z: 0};
+  const tip3  = {x: xArrow, y: yAmp, z: 0};
   const base2 = project(base3, cam, vp);
-  const tip2  = project(tip3, cam, vp);
-  drawArrow2D(base2, tip2, color, 2.4, alpha);
+  const tip2  = project(tip3,  cam, vp);
+  drawArrow2D(base2, tip2, front.color, 2.4, alpha);
 }
 
 function drawCircle2D(p, r, color, alpha=1){
@@ -408,7 +412,7 @@ function chargeAndCurrent(t, speedWU){
 }
 function electronCenters(chargeSigned){
   const N = 7;
-  const r = 0.045, d = 2*r;
+  const r = 0.036, d = 2*r;
   const top = -0.68, bot = 0.68;
   const a = 0.020;
   const tri = [0,1,3,6,10,15,21];
@@ -553,16 +557,47 @@ function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, n=96){
 function getFronts(){
   const count = +ui.count.value;
   const speedWU = (+ui.speed.value/100);
-  const stepDistance = 0.34;
-  const emitPeriod = stepDistance / Math.max(0.05, speedWU);
+  const waveSpeed = speedWU;
+  const emitPeriod = 0.125 / Math.max(0.05, speedWU); // 1/8 period emission cadence
   const e = [], b = [];
-  for(let i=0;i<count;i++){
-    const age = state.t - i * emitPeriod;
-    if(age <= 0) continue;
-    const travelX = age * speedWU;
+  const maxEmitIndex = Math.floor(state.t / emitPeriod);
+
+  for(let k=0; k<count; k++){
+    const emitIndex = maxEmitIndex - k;
+    if(emitIndex < 0) continue;
+
+    const tEmit = emitIndex * emitPeriod;
+    const age = state.t - tEmit;
+    if(age < 0) continue;
+    const travelX = age * waveSpeed;
     if(travelX > 2.8) continue;
-    e.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.ePos:COLORS.eNeg)});
-    b.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
+
+    const tNorm = ((tEmit * speedWU) % 1 + 1) % 1;
+    const quarterFloat = tNorm >= 1 ? 3 : Math.floor(tNorm * 4);
+    const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
+
+    const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
+    const eAtBirth = -Math.sin(phaseEmit);
+    const bAtBirth = -Math.cos(phaseEmit);
+
+    e.push({
+      tEmit,
+      tNorm,
+      travelX,
+      sign,
+      reverseArrows: sign > 0,
+      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+      arrowMag: Math.abs(eAtBirth)
+    });
+
+    b.push({
+      tEmit,
+      tNorm,
+      travelX,
+      sign,
+      color: (quarterFloat === 0 || quarterFloat === 3) ? COLORS.bNeg : COLORS.bPos,
+      arrowMag: Math.abs(bAtBirth)
+    });
   }
   return {e,b};
 }
@@ -615,7 +650,7 @@ function render(ts){
   const eArrowPass = [];
   if(ui.showEArrows.checked){
     fronts.e.forEach((fr, i) => {
-      eArrowPass.push(() => drawEArrowProjected(cam, vp, fr.travelX, fr.sign, fr.color, Math.max(0.34, 0.94 - i*0.08)));
+      eArrowPass.push(() => drawEArrowProjected(cam, vp, fr, Math.max(0.34, 0.94 - i*0.08)));
     });
   }
 
