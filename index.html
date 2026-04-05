@@ -206,7 +206,7 @@ function render(ts){
   const cy = h*0.5;
 
   const { chargeSigned, currentSigned } = chargeAndCurrent(state.t);
-  const { ys, r, a, surfaceGaps, moveUp } = electronCenters(chargeSigned);
+  const { ys, r, d, a, centerGaps, surfaceGaps, moveUp } = electronCenters(chargeSigned);
 
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle = COLORS.bg;
