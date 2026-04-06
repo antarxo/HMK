@@ -633,7 +633,7 @@ function getPulseScale(age){
 function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal){
   return {
     x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
-    y: yLocal * WORLD_PER_LOCAL,
+    y: yLocal * WORLD_PER_LOCAL * scaleLocal,
     z: 0
   };
 }
