@@ -278,7 +278,7 @@ const COLORS = {
   electron:'#7ee8ff',
   source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
   planeXYFill:'rgba(255,255,255,0.09)', planeXYStroke:'rgba(255,255,255,0.22)',
-  planeXZFill:'rgba(0,0,0,0.16)', planeXZStroke:'rgba(0,0,0,0.34)',
+  planeXZFill:'rgba(88,106,132,0.10)', planeXZStroke:'rgba(88,106,132,0.24)',
   xLine:'rgba(220,232,247,0.88)'
 };
 
@@ -372,6 +372,38 @@ function drawCircle2D(p, r, color, alpha=1){
   ctx.arc(p.x, p.y, r, 0, Math.PI*2);
   ctx.fill();
   ctx.restore();
+}
+
+function drawArrowheadScreen(x, y, angleRad, sizePx, color, alpha=1){
+  const pts = [
+    [ sizePx, 0 ],
+    [ -0.55 * sizePx, -0.72 * sizePx ],
+    [ -0.55 * sizePx,  0.72 * sizePx ]
+  ].map(([px,py]) => {
+    const rx = px * Math.cos(angleRad) - py * Math.sin(angleRad) + x;
+    const ry = px * Math.sin(angleRad) + py * Math.cos(angleRad) + y;
+    return [rx, ry];
+  });
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  ctx.lineTo(pts[1][0], pts[1][1]);
+  ctx.lineTo(pts[2][0], pts[2][1]);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function screenAngleFromWorldTangent(cam, vp, pWorld, tangentWorld){
+  const p0 = project(pWorld, cam, vp);
+  const p1 = project({
+    x: pWorld.x + tangentWorld.x * 0.05,
+    y: pWorld.y + tangentWorld.y * 0.05,
+    z: pWorld.z + tangentWorld.z * 0.05
+  }, cam, vp);
+  return Math.atan2(p1.y - p0.y, p1.x - p0.x);
 }
 function drawText2D(text, x, y, color, alpha=1, size=14){
   ctx.save();
@@ -523,7 +555,7 @@ function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, wi
 function currentEPlaneExtents(u){
   const halfW = 0.5 * E_TARGET_TOTAL_WIDTH * u;
   const halfHCore = 0.5 * (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * u);
-  const halfH = halfHCore + 0.25 * ROD_LENGTH * u;
+  const halfH = halfHCore + 0.55 * ROD_LENGTH * u;
   return {
     x0: -halfW,
     x1:  halfW,
@@ -775,15 +807,29 @@ function drawSeededElectronPerimeterArrowsProjected(cam, vp, rodShift, front){
   const age = front.age;
   if(age < 0 || age > 1) return;
   if((front.arrowLen || 0) <= 0.25) return;
+
   const fade = Math.exp(-0.22 * age);
-  const alpha = Math.min(1, (225 * fade / 255) * 1.25);
+  const alpha = Math.min(1, (225 * fade / 255) * 1.10);
   const scaleX = getPulseScaleX(age);
   const scaleY = getPulseScaleY(age);
   const color = front.color;
-  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, alpha);
-  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, alpha);
-  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, alpha);
-  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, alpha);
+
+  const specs = [
+    [ 139.320, -115.360,  66.762],
+    [ 139.320,  115.360, 113.238],
+    [-139.320, -115.360, 113.238],
+    [-139.320,  115.360,  66.762],
+  ];
+
+  for(const [x, y, aDeg] of specs){
+    const p = localToWorldXY(rodShift, scaleX, scaleY, x, y);
+    const dir = front.reverseArrows ? Math.PI : 0;
+    const a = aDeg * Math.PI / 180 + dir;
+    const tangent = {x: Math.cos(a), y: Math.sin(a), z: 0};
+    const ps = project(p, cam, vp);
+    const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 7.0, color, alpha);
+  }
 }
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
 
@@ -858,22 +904,23 @@ function drawMagneticArrowCircle(cam, vp, x, z, angleDeg, color, alpha, radius){
 
 function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
   const r = Math.max(0.0001, radius);
-  if(r < 0.10 * B_RADIUS_FINAL) return;
+  if(r < 0.16 * B_RADIUS_FINAL) return;
+
   const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
   const isGreen = (quarter === 0 || quarter === 3);
   const ccw = isGreen;
   const color = front.color;
 
   const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
-  const arrowAlpha = Math.min(1, alpha);
   for(const th of thetas){
-    const x = centerX + r * Math.cos(th);
-    const z = r * Math.sin(th);
-    let tx = -r * Math.sin(th);
-    let tz =  r * Math.cos(th);
-    if(!ccw){ tx = -tx; tz = -tz; }
-    const ang = Math.atan2(tz, tx) * 180 / Math.PI;
-    drawMagneticArrowCircle(cam, vp, x, z, ang, color, arrowAlpha, radius);
+    const p = { x: centerX + r * Math.cos(th), y: 0, z: r * Math.sin(th) };
+    let tangent = { x: -Math.sin(th), y: 0, z: Math.cos(th) };
+    if(!ccw){
+      tangent = { x: -tangent.x, y: 0, z: -tangent.z };
+    }
+    const ps = project(p, cam, vp);
+    const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 5.8, color, Math.min(1, alpha * 0.92));
   }
 }
 let lastTs = performance.now();
