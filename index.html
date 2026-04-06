@@ -436,11 +436,6 @@ function electronCenters(chargeSigned){
 }
 function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
-  const topIsNeg = chargeSigned < 0;
-  topCharge.material.color.setHex(topIsNeg ? COLORS.chargeNeg : COLORS.chargePos);
-  topCharge.material.emissive.setHex(topIsNeg ? COLORS.chargeNeg : COLORS.chargePos);
-  botCharge.material.color.setHex(topIsNeg ? COLORS.chargePos : COLORS.chargeNeg);
-  botCharge.material.emissive.setHex(topIsNeg ? COLORS.chargePos : COLORS.chargeNeg);
   const ys = electronCenters(chargeSigned);
   electrons.forEach((e, idx) => e.position.set(0, ys[idx], 0));
   const arrowColor = currentSigned >= 0 ? COLORS.bPos : COLORS.bNeg;
@@ -460,7 +455,7 @@ function applyUI(){
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
-  particleGroup.visible = topCharge.visible = botCharge.visible = ui.showParticles.checked;
+  particleGroup.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
 }
 for(const key of ['zoom','speed','count','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
