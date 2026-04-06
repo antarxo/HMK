@@ -3,11 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v2 scaffold</title>
+<title>EMW true 3D v3 seeded machine</title>
 <style>
-  :root{
-    --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px;
-  }
+  :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
   .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
@@ -34,22 +32,22 @@
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
   .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
-  @media (max-width: 900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} }
+  @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v2 <span class="badge">scaffold για κανονικό χτίσιμο</span></div>
-    <div class="sub">Νέα καθαρή 3D βάση. Πιο αραιό Β κοντά στην πηγή, ίδιο πάχος Ε/Β, τίμια depth cues και χωρίς canvas τρικ.</div>
+    <div class="title">EMW true 3D v3 <span class="badge">seeded μηχανή Ε/Β</span></div>
+    <div class="sub">Πρώτη 3D βάση που πατάει στην παλιά μηχανή: μηλοειδείς Ε, ημικύκλια Β και ο μηχανισμός γέννησής τους πάνω στη ράβδο.</div>
   </div>
   <div class="main">
     <div class="card sidebar">
       <h3>Έλεγχοι</h3>
       <div class="body">
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="14" max="220" value="58"></div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="14" max="240" value="64"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
-        <div class="row"><label>Πλήθος μετώπων</label><input id="count" type="range" min="2" max="7" value="5"></div>
+        <div class="row"><label>Ενεργά fronts ανά πεδίο</label><input id="count" type="range" min="2" max="10" value="6"></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
         <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="28" value="6"></div>
         <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
@@ -72,16 +70,16 @@
           <button id="lectureBtn">Lecture view</button>
         </div>
         <div class="legend">
-          <div><span class="sw" style="background:#e85a5a"></span>E fronts / E planes</div>
-          <div><span class="sw" style="background:#38b66b"></span>B fronts / B planes</div>
-          <div><span class="sw" style="background:#7ee8ff"></span>ηλεκτρόνια</div>
+          <div><span class="sw" style="background:#e85a5a"></span>μηλοειδείς E / πάνω–κάτω ημιεπίπεδα</div>
+          <div><span class="sw" style="background:#38b66b"></span>ημικύκλια B / πίσω–μπροστινό ημιεπίπεδο</div>
+          <div><span class="sw" style="background:#7ee8ff"></span>ηλεκτρόνια / φορτία / ρεύμα</div>
           <div><span class="sw" style="background:#d8dee7"></span>ράβδος / άξονες</div>
         </div>
       </div>
     </div>
     <div class="card viewport"><div id="stage"></div></div>
   </div>
-  <div class="foot">Αυτό είναι scaffold για να δούμε αν η κατεύθυνση αξίζει. Θέλει internet επειδή φορτώνει το Three.js από CDN.</div>
+  <div class="foot">Πρωτότυπο 3D μεταφοράς της μηχανής. Δεν είναι ακόμα πλήρες port όλων των λεπτομερειών του canvas, αλλά πλέον δεν είναι άδειο scaffold.</div>
 </div>
 
 <script type="module">
@@ -101,24 +99,25 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, Math.max(1, stage.clientWidth / stage.clientHeight), 0.1, 250);
 camera.position.set(0, 0, 42);
 
-scene.add(new THREE.AmbientLight(0xffffff, 1.4));
-const key1 = new THREE.DirectionalLight(0xffffff, 0.78); key1.position.set(8, 10, 11); scene.add(key1);
-const key2 = new THREE.DirectionalLight(0xa7d0ff, 0.28); key2.position.set(-8, -5, 9); scene.add(key2);
+scene.add(new THREE.AmbientLight(0xffffff, 1.36));
+const key1 = new THREE.DirectionalLight(0xffffff, 0.84); key1.position.set(8, 10, 11); scene.add(key1);
+const key2 = new THREE.DirectionalLight(0xa7d0ff, 0.26); key2.position.set(-8, -5, 9); scene.add(key2);
 
 const root = new THREE.Group();
 scene.add(root);
 
 function setHome(){
-  root.rotation.y = THREE.MathUtils.degToRad(-26);
+  root.rotation.y = THREE.MathUtils.degToRad(-25);
   root.rotation.x = THREE.MathUtils.degToRad(15);
 }
 function setLectureView(){
-  root.rotation.y = THREE.MathUtils.degToRad(-12);
+  root.rotation.y = THREE.MathUtils.degToRad(-10);
   root.rotation.x = THREE.MathUtils.degToRad(7);
 }
 setHome();
 
 const COLORS = {
+  bg:0x0b0f14,
   axis:0x7a8ca5,
   rod:0xd8dee7,
   electron:0x7ee8ff,
@@ -134,14 +133,35 @@ const COLORS = {
   planeBNeg:0x9c6810
 };
 
-const lineRadius = 0.05;
+const E_FULL = [
+  0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
+  0.2538, 0.2651, 0.2835, 0.3085, 0.3393, 0.3750, 0.4145, 0.4566, 0.5000,
+  0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500,
+  0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000
+];
+const B_FULL = [
+  0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500,
+  0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000,
+  0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500,
+  0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
+];
+const WORLD_PER_LOCAL = 0.8 / 142;
+const ROD_HALF_LENGTH = 0.8;
+const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
+const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
+const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;
+const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;
+const B_RADIUS_FINAL = 2 * ROD_LENGTH;
+const lineRadius = 0.045;
+const PLANE_LEN = 6.0 * ROD_LENGTH;
+const PLANE_HALF_H = 1.6 * ROD_LENGTH;
 
-function solidMat(color, emissiveIntensity=0.16){
+function solidMat(color, emissiveIntensity=0.14){
   return new THREE.MeshStandardMaterial({
     color,
     emissive:color,
     emissiveIntensity,
-    roughness:0.42,
+    roughness:0.44,
     metalness:0.05
   });
 }
@@ -157,99 +177,56 @@ function planeMaterial(color, opacity){
 
 const planes = new THREE.Group();
 root.add(planes);
-const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(25, 5.2), planeMaterial(COLORS.planeEPos, 0.07));
-ePlaneUpper.position.set(7.2, 2.6, 0);
-planes.add(ePlaneUpper);
-const ePlaneLower = new THREE.Mesh(new THREE.PlaneGeometry(25, 5.2), planeMaterial(COLORS.planeENeg, 0.07));
-ePlaneLower.position.set(7.2, -2.6, 0);
-planes.add(ePlaneLower);
-const bPlaneBack = new THREE.Mesh(new THREE.PlaneGeometry(25, 5.2), planeMaterial(COLORS.planeBPos, 0.06));
-bPlaneBack.rotation.x = -Math.PI / 2;
-bPlaneBack.position.set(7.2, 0, -2.6);
-planes.add(bPlaneBack);
-const bPlaneFront = new THREE.Mesh(new THREE.PlaneGeometry(25, 5.2), planeMaterial(COLORS.planeBNeg, 0.06));
-bPlaneFront.rotation.x = -Math.PI / 2;
-bPlaneFront.position.set(7.2, 0, 2.6);
-planes.add(bPlaneFront);
+const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeEPos, 0.07));
+ePlaneUpper.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0.5 * PLANE_HALF_H, 0); ePlaneUpper.renderOrder = 1; planes.add(ePlaneUpper);
+const ePlaneLower = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeENeg, 0.07));
+ePlaneLower.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, -0.5 * PLANE_HALF_H, 0); ePlaneLower.renderOrder = 4; planes.add(ePlaneLower);
+const bPlaneBack = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeBPos, 0.06));
+bPlaneBack.rotation.x = -Math.PI / 2; bPlaneBack.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0, -0.5 * PLANE_HALF_H); bPlaneBack.renderOrder = 0; planes.add(bPlaneBack);
+const bPlaneFront = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeBNeg, 0.06));
+bPlaneFront.rotation.x = -Math.PI / 2; bPlaneFront.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0, 0.5 * PLANE_HALF_H); bPlaneFront.renderOrder = 5; planes.add(bPlaneFront);
 
 const axes = new THREE.Group();
 root.add(axes);
 function axisCylinder(length, radius, color, axis){
-  const m = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 14), new THREE.MeshStandardMaterial({ color, roughness:0.54, metalness:0.1 }));
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, length, 14), new THREE.MeshStandardMaterial({ color, roughness:0.58, metalness:0.08 }));
   if(axis === 'x') m.rotation.z = -Math.PI / 2;
   if(axis === 'z') m.rotation.x = -Math.PI / 2;
   return m;
 }
-const xAxis = axisCylinder(24, 0.022, COLORS.axis, 'x'); xAxis.position.x = 6; axes.add(xAxis);
-axes.add(axisCylinder(11.5, 0.022, COLORS.axis, 'y'));
-axes.add(axisCylinder(11.5, 0.022, COLORS.axis, 'z'));
+const xAxis = axisCylinder(PLANE_LEN, 0.022, COLORS.axis, 'x'); xAxis.position.x = PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH; axes.add(xAxis);
+axes.add(axisCylinder(2 * PLANE_HALF_H, 0.022, COLORS.axis, 'y'));
+axes.add(axisCylinder(2 * PLANE_HALF_H, 0.022, COLORS.axis, 'z'));
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
-const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 6.4, 26), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.22, metalness:0.24 }));
+const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 2 * ROD_HALF_LENGTH, 26), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.22, metalness:0.24 }));
 rodGroup.add(rod);
-const capGeo = new THREE.SphereGeometry(0.24, 20, 20);
-const topCharge = new THREE.Mesh(capGeo, solidMat(COLORS.chargeNeg, 0.22)); topCharge.position.y = 3.28; rodGroup.add(topCharge);
-const botCharge = new THREE.Mesh(capGeo, solidMat(COLORS.chargePos, 0.22)); botCharge.position.y = -3.28; rodGroup.add(botCharge);
+const capGeo = new THREE.SphereGeometry(0.21, 20, 20);
+const topCharge = new THREE.Mesh(capGeo, solidMat(COLORS.chargeNeg, 0.22)); topCharge.position.y = ROD_HALF_LENGTH + 0.08; rodGroup.add(topCharge);
+const botCharge = new THREE.Mesh(capGeo, solidMat(COLORS.chargePos, 0.22)); botCharge.position.y = -ROD_HALF_LENGTH - 0.08; rodGroup.add(botCharge);
 
 const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 for(let i=0;i<7;i++){
-  const e = new THREE.Mesh(new THREE.SphereGeometry(0.14, 18, 18), solidMat(COLORS.electron, 0.26));
+  const e = new THREE.Mesh(new THREE.SphereGeometry(0.08, 18, 18), solidMat(COLORS.electron, 0.26));
   electrons.push(e);
   particleGroup.add(e);
 }
 
 const currentGroup = new THREE.Group();
-currentGroup.position.set(-2.7, 0, 0);
+currentGroup.position.set(-1.2, 0, 0);
 root.add(currentGroup);
-const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.2, 14), solidMat(COLORS.bPos, 0.22));
+const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 14), solidMat(COLORS.bPos, 0.22));
 currentGroup.add(currentShaft);
-const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 18), solidMat(COLORS.bPos, 0.28));
-currentHead.position.y = 1.3;
-currentGroup.add(currentHead);
+const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.26, 18), solidMat(COLORS.bPos, 0.28));
+currentHead.position.y = 0.62; currentGroup.add(currentHead);
 
-function buildCurve(points, color, headScale=1){
-  const curve = new THREE.CatmullRomCurve3(points);
-  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 56, lineRadius, 12, false), solidMat(color, 0.17));
-  const pos = curve.getPoint(0.995);
-  const tan = curve.getTangent(0.98).normalize();
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.13 * headScale, 0.34 * headScale, 18), solidMat(color, 0.2));
-  cone.position.copy(pos);
-  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tan);
-  const g = new THREE.Group();
-  g.add(tube, cone);
-  return g;
-}
-
-function makeEPoints(x0, width, amp, sign){
-  const pts = [];
-  for(let i=0;i<=44;i++){
-    const s = i / 44;
-    const x = x0 + width * (1 - Math.cos(Math.PI * s));
-    const y = sign * amp * Math.sin(Math.PI * s);
-    pts.push(new THREE.Vector3(x, y, 0));
-  }
-  return pts;
-}
-
-function makeBArcPoints(x0, radius, zSign){
-  const pts = [];
-  const start = zSign > 0 ? -0.24 * Math.PI : 1.24 * Math.PI;
-  const span = 0.96 * Math.PI;
-  for(let i=0;i<=42;i++){
-    const s = i / 42;
-    const a = start + (zSign > 0 ? 1 : -1) * span * s;
-    pts.push(new THREE.Vector3(x0, radius * Math.sin(a), radius * Math.cos(a)));
-  }
-  return pts;
-}
-
-const eUpperGroup = new THREE.Group();
-const eLowerGroup = new THREE.Group();
-const bBackGroup = new THREE.Group();
-const bFrontGroup = new THREE.Group();
+const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
+const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
+const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
+const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
 root.add(eUpperGroup, eLowerGroup, bBackGroup, bFrontGroup);
 
 function disposeGroup(group){
@@ -266,55 +243,214 @@ function disposeGroup(group){
   }
 }
 
-function rebuildFields(){
+function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
+function getPulseScaleX(age){ return (E_TARGET_TOTAL_WIDTH * age) / (2 * E_BIRTH_HALF_WIDTH); }
+function getPulseScaleY(age){ return (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * age) / ROD_LENGTH; }
+function localToWorldXY(scaleX, scaleY, xLocal, yLocal){
+  return new THREE.Vector3(xLocal * WORLD_PER_LOCAL * scaleX, yLocal * WORLD_PER_LOCAL * scaleY, 0);
+}
+function cubicPoint(p0,c1,c2,p3,t){
+  const mt = 1 - t;
+  return [
+    mt*mt*mt*p0[0] + 3*mt*mt*t*c1[0] + 3*mt*t*t*c2[0] + t*t*t*p3[0],
+    mt*mt*mt*p0[1] + 3*mt*mt*t*c1[1] + 3*mt*t*t*c2[1] + t*t*t*p3[1]
+  ];
+}
+function makeLobePoints(scaleX, scaleY, sx, sy){
+  const pts = [];
+  const steps = 52;
+  const p0 = [0 * sx, -142 * sy];
+  const c1 = [18 * sx, -158 * sy];
+  const c2 = [45 * sx, -178 * sy];
+  const p3 = [63 * sx, -178 * sy];
+  const d1 = [112 * sx, -178 * sy];
+  const d2 = [159 * sx, -122 * sy];
+  const p6 = [159 * sx, 0 * sy];
+  for(let i=0;i<=steps;i++){
+    const t = i / steps;
+    let x, y;
+    if(t <= 0.5){ [x,y] = cubicPoint(p0, c1, c2, p3, t / 0.5); }
+    else { [x,y] = cubicPoint(p3, d1, d2, p6, (t - 0.5) / 0.5); }
+    pts.push(localToWorldXY(scaleX, scaleY, x, y));
+  }
+  return pts;
+}
+function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56){
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 12, false), solidMat(color, 0.17));
+  const pos = curve.getPoint(0.995);
+  const tan = curve.getTangent(0.98).normalize();
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.12 * headScale, 0.30 * headScale, 16), solidMat(color, 0.18));
+  cone.position.copy(pos);
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tan);
+  const g = new THREE.Group();
+  g.add(tube, cone);
+  return g;
+}
+function buildArrowHead(position, tangent, color, headScale=1){
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.11 * headScale, 0.26 * headScale, 16), solidMat(color, 0.18));
+  cone.position.copy(position);
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tangent.clone().normalize());
+  return cone;
+}
+function seededEFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of E_FULL){
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const eAtBirth = -Math.sin(phaseEmit);
+    fronts.push({
+      t0: tEmit,
+      age,
+      sign,
+      reverseArrows: sign > 0,
+      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+      arrowLen: 80 * Math.abs(eAtBirth)
+    });
+  }
+  return fronts;
+}
+function seededBFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of B_FULL){
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const bAtBirth = -Math.cos(phaseEmit);
+    const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
+    fronts.push({
+      t0: tEmit,
+      age,
+      sign,
+      color,
+      amp: Math.abs(bAtBirth),
+      radius: B_RADIUS_FINAL * age
+    });
+  }
+  return fronts;
+}
+function makeBCircleHalf(centerX, radius, which='front', n=46){
+  const r = Math.max(0.0001, radius);
+  const t0 = which === 'front' ? 0 : Math.PI;
+  const t1 = which === 'front' ? Math.PI : 2 * Math.PI;
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = t0 + (t1 - t0) * (i/(n-1));
+    pts.push(new THREE.Vector3(centerX + r * Math.cos(t), 0, r * Math.sin(t)));
+  }
+  return pts;
+}
+function limitRecent(fronts, n){
+  if(fronts.length <= n) return fronts;
+  return fronts.slice(fronts.length - n);
+}
+function addEFront3D(group, front, which){
+  const age = front.age;
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+  const signY = which === 'upper' ? -1 : 1;
+  const lobes = [[1, signY], [-1, signY]];
+  for(const [sx, sy] of lobes){
+    group.add(buildCurve(makeLobePoints(scaleX, scaleY, sx, sy), color, lineRadius, 0.90, 48));
+  }
+  if((front.arrowLen || 0) > 0.25){
+    const specs = [
+      [ 139.320, -115.360,  66.762],
+      [ 139.320,  115.360, 113.238],
+      [-139.320, -115.360, 113.238],
+      [-139.320,  115.360,  66.762],
+    ];
+    for(const [x,y,aDeg] of specs){
+      const isUpper = y > 0;
+      if((which === 'upper' && !isUpper) || (which === 'lower' && isUpper)) continue;
+      const pos = localToWorldXY(scaleX, scaleY, x, y);
+      const a = THREE.MathUtils.degToRad(aDeg) + (front.reverseArrows ? Math.PI : 0);
+      const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
+      group.add(buildArrowHead(pos, tangent, color, 0.88));
+    }
+  }
+}
+function addBFront3D(group, front, which){
+  const r = front.radius;
+  if(r < 0.16 * B_RADIUS_FINAL) return;
+  const color = front.color;
+  group.add(buildCurve(makeBCircleHalf(0, r, which, 52), color, lineRadius, 0.88, 44));
+  const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
+  const isGreen = (quarter === 0 || quarter === 3);
+  const ccw = isGreen;
+  const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
+  for(const th of thetas){
+    const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
+    let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
+    if(!ccw) tangent.multiplyScalar(-1);
+    group.add(buildArrowHead(p, tangent, color, 0.84));
+  }
+}
+function rebuildFields(u){
   disposeGroup(eUpperGroup);
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
   disposeGroup(bFrontGroup);
-
-  const count = +ui.count.value;
-  for(let i=0;i<count;i++){
-    const x0 = 0.9 + i * 2.55;
-    const width = 0.7 + i * 0.58;
-    const amp = 0.62 + i * 0.40;
-
-    eUpperGroup.add(buildCurve(makeEPoints(x0, width, amp, +1), COLORS.ePos, 0.95));
-    eLowerGroup.add(buildCurve(makeEPoints(x0, width, amp, -1), COLORS.eNeg, 0.95));
-
-    // Το Β ξεκινά λίγο πιο έξω για να μην πολτοποιείται γύρω από τη ράβδο.
-    const xB = 1.9 + i * 2.55;
-    const r = 1.08 + i * 0.46;
-    bBackGroup.add(buildCurve(makeBArcPoints(xB, r, -1), COLORS.bPos, 0.92));
-    bFrontGroup.add(buildCurve(makeBArcPoints(xB, r, +1), COLORS.bNeg, 0.92));
-  }
+  const activeCount = +ui.count.value;
+  const eFronts = limitRecent(seededEFrontsAbsolute(u), activeCount);
+  const bFronts = limitRecent(seededBFrontsAbsolute(u), activeCount);
+  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper'));
+  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower'));
+  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back'));
+  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front'));
 }
-rebuildFields();
-
-function updateParticles(u){
+function chargeAndCurrent(u){
   const phase = 2 * Math.PI * u;
-  const q = -Math.sin(phase);
-  const current = -Math.cos(phase);
-  const topIsNeg = q < 0;
-
+  return { chargeSigned: -Math.sin(phase), currentSigned: -Math.cos(phase) };
+}
+function electronCenters(chargeSigned){
+  const N = 7;
+  const r = 0.036;
+  const d = 2 * r;
+  const top = -0.68;
+  const bot =  0.68;
+  const a = 0.020;
+  const tri = [0, 1, 3, 6, 10, 15, 21];
+  const targetOffsets = tri.map((t, i) => t * a + i * d);
+  const span = bot - top;
+  const uniformGap = span / (N - 1);
+  const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
+  const q = Math.abs(chargeSigned);
+  const moveUp = chargeSigned < 0;
+  const ys = new Array(N);
+  if(moveUp){
+    for(let i=0;i<N;i++){
+      const target = top + targetOffsets[i];
+      ys[i] = base[i] + q * (target - base[i]);
+    }
+  } else {
+    for(let i=0;i<N;i++){
+      const target = bot - targetOffsets[N - 1 - i];
+      ys[i] = base[i] + q * (target - base[i]);
+    }
+  }
+  return ys.map(v => v * (ROD_LENGTH / 1.6));
+}
+function updateParticles(u){
+  const { chargeSigned, currentSigned } = chargeAndCurrent(u);
+  const topIsNeg = chargeSigned < 0;
   topCharge.material.color.setHex(topIsNeg ? COLORS.chargeNeg : COLORS.chargePos);
   topCharge.material.emissive.setHex(topIsNeg ? COLORS.chargeNeg : COLORS.chargePos);
   botCharge.material.color.setHex(topIsNeg ? COLORS.chargePos : COLORS.chargeNeg);
   botCharge.material.emissive.setHex(topIsNeg ? COLORS.chargePos : COLORS.chargeNeg);
-
-  const base = [-2.35,-1.58,-0.8,0,0.8,1.58,2.35];
-  const shift = 0.72 * q;
-  electrons.forEach((e, idx) => {
-    e.position.set(0, base[idx] + shift * (0.40 + idx * 0.08), 0);
-  });
-
-  const arrowColor = current >= 0 ? COLORS.bPos : COLORS.bNeg;
-  currentGroup.rotation.z = current >= 0 ? 0 : Math.PI;
-  currentShaft.material.color.setHex(arrowColor);
-  currentShaft.material.emissive.setHex(arrowColor);
-  currentHead.material.color.setHex(arrowColor);
-  currentHead.material.emissive.setHex(arrowColor);
+  const ys = electronCenters(chargeSigned);
+  electrons.forEach((e, idx) => e.position.set(0, ys[idx], 0));
+  const arrowColor = currentSigned >= 0 ? COLORS.bPos : COLORS.bNeg;
+  currentGroup.rotation.z = currentSigned >= 0 ? 0 : Math.PI;
+  currentShaft.material.color.setHex(arrowColor); currentShaft.material.emissive.setHex(arrowColor);
+  currentHead.material.color.setHex(arrowColor); currentHead.material.emissive.setHex(arrowColor);
 }
-
 function applyUI(){
   const eOpacity = (+ui.eAlpha.value) / 100;
   const bOpacity = (+ui.bAlpha.value) / 100;
@@ -322,7 +458,6 @@ function applyUI(){
   ePlaneLower.material.opacity = eOpacity;
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
-
   camera.position.z = +ui.zoom.value;
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
@@ -331,23 +466,22 @@ function applyUI(){
   particleGroup.visible = topCharge.visible = botCharge.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
 }
-
 for(const key of ['zoom','speed','count','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
   const el = ui[key];
-  const evt = (el.type === 'checkbox' || el.type === 'range') ? 'input' : 'change';
-  el.addEventListener(evt, applyUI);
+  el.addEventListener('input', applyUI);
 }
-ui.count.addEventListener('input', rebuildFields);
+ui.count.addEventListener('input', () => rebuildFields(loopPhase));
 
 let playing = true;
 let time = 0;
+let loopPhase = 0;
 ui.playBtn.addEventListener('click', () => {
   playing = !playing;
   ui.playBtn.textContent = playing ? 'Παύση' : 'Έναρξη';
 });
 ui.homeBtn.addEventListener('click', () => setHome());
 ui.lectureBtn.addEventListener('click', () => setLectureView());
-ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 58; applyUI(); });
+ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 64; applyUI(); });
 
 function bindHold(button, fn){
   let timer = null;
@@ -369,7 +503,6 @@ window.addEventListener('keydown', (ev) => {
   else if(ev.key === 'ArrowUp') root.rotation.x -= 0.03;
   else if(ev.key === 'ArrowDown') root.rotation.x += 0.03;
 });
-
 window.addEventListener('resize', () => {
   const w = Math.max(100, stage.clientWidth);
   const h = Math.max(100, stage.clientHeight);
@@ -379,12 +512,20 @@ window.addEventListener('resize', () => {
 });
 
 applyUI();
+rebuildFields(0);
 let last = performance.now();
+let lastPhaseBucket = -1;
 function animate(now){
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   if(playing) time += dt * (+ui.speed.value) * 0.12;
-  updateParticles(time % 1);
+  loopPhase = time % 1;
+  const bucket = Math.floor(loopPhase * 120);
+  if(bucket !== lastPhaseBucket){
+    rebuildFields(loopPhase);
+    lastPhaseBucket = bucket;
+  }
+  updateParticles(loopPhase);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
