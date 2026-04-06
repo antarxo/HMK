@@ -386,8 +386,7 @@ function addEFront3D(group, front, which){
   }
 }
 function addBFront3D(group, front, which){
-  const r = front.radius;
-  if(r < 0.16 * B_RADIUS_FINAL) return;
+  const r = Math.max(0.0001, front.radius);
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
   group.add(buildCurve(makeBCircleHalf(0, r, which, 68), color, lineRadius, 0.40, 64, opacity));
@@ -528,8 +527,9 @@ function animate(now){
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   if(playing){
-    phaseU = Math.min(1, phaseU + dt * ((+ui.speed.value) / 100));
-    if(phaseU >= 1){
+    const nextU = phaseU + dt * ((+ui.speed.value) / 100);
+    phaseU = Math.min(1, nextU);
+    if(nextU >= 1){
       phaseU = 1;
       playing = false;
       ui.playBtn.textContent = 'Έναρξη';
