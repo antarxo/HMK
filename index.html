@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v2 Projection Skeleton v4 responsive window</title>
+  <title>EMW v8 conductor at origin + symmetric E lobes</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
@@ -186,7 +186,7 @@
 <div class="app">
   <div class="top">
     <div class="title">EMW v2 – Projection Skeleton v4</div>
-    <div class="sub">Framing / centering pass: σωστό κάδρο, σωστή θέση πηγής και χώρος για δεξιά διάδοση + μελλοντική τοπική γέννηση γύρω από την πηγή.</div>
+    <div class="sub">Αγωγός στο (0,0,0). Μηλοειδείς του E anchored στα άκρα της ράβδου και άνοιγμα με τη λογική του μετώπου.</div>
   </div>
 
   <div class="main">
@@ -202,10 +202,13 @@
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show plane x–y</label><input id="showPlaneXY" type="checkbox" checked></div>
+        <div class="row"><label>Show plane x–z</label><input id="showPlaneXZ" type="checkbox" checked></div>
+        <div class="row"><label>Show x line</label><input id="showXAxisLine" type="checkbox" checked></div>
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
         <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox"></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
@@ -252,6 +255,9 @@ const ui = {
   speed: document.getElementById('speed'),
   count: document.getElementById('count'),
   axes: document.getElementById('axes'),
+  showPlaneXY: document.getElementById('showPlaneXY'),
+  showPlaneXZ: document.getElementById('showPlaneXZ'),
+  showXAxisLine: document.getElementById('showXAxisLine'),
   sourceZone: document.getElementById('sourceZone'),
   showE: document.getElementById('showE'),
   showEArrows: document.getElementById('showEArrows'),
@@ -270,7 +276,10 @@ const COLORS = {
   currentPos:'#38b66b', currentNeg:'#f2a31b',
   chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
   electron:'#7ee8ff',
-  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)'
+  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
+  planeXYFill:'rgba(232,90,90,0.08)', planeXYStroke:'rgba(232,90,90,0.22)',
+  planeXZFill:'rgba(56,182,107,0.08)', planeXZStroke:'rgba(56,182,107,0.22)',
+  xLine:'rgba(220,232,247,0.88)'
 };
 
 const state = { t:0, playing:true };
@@ -493,10 +502,63 @@ function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
   drawText2D('I', labelP.x, labelP.y, color, 0.3 + 0.7*imag, 16);
 }
 
+
+function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, width=1){
+  const pts = pts3.map(p => project(p, cam, vp));
+  if(pts.length < 3) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = fillColor;
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlaneXY(cam, vp){
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const y0 = -PLANE_Y_EXT, y1 = PLANE_Y_EXT;
+  drawProjectedPolygon(cam, vp, [
+    {x:x0,y:y0,z:0},
+    {x:x1,y:y0,z:0},
+    {x:x1,y:y1,z:0},
+    {x:x0,y:y1,z:0}
+  ], COLORS.planeXYFill, COLORS.planeXYStroke, 1, 1);
+}
+
+function drawPlaneXZ(cam, vp){
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const z0 = -PLANE_Z_EXT, z1 = PLANE_Z_EXT;
+  drawProjectedPolygon(cam, vp, [
+    {x:x0,y:0,z:z0},
+    {x:x1,y:0,z:z0},
+    {x:x1,y:0,z:z1},
+    {x:x0,y:0,z:z1}
+  ], COLORS.planeXZFill, COLORS.planeXZStroke, 1, 1);
+}
+
+function drawXAxisLine(cam, vp){
+  const A = project({x:PLANE_X_MIN,y:0,z:0}, cam, vp);
+  const B = project({x:PLANE_X_MAX,y:0,z:0}, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.xLine;
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y);
+  ctx.lineTo(B.x, B.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawAxesXY(cam, vp){
   const axes = [
-    {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
-    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'}
+    {a:{x:PLANE_X_MIN,y:0,z:0}, b:{x:PLANE_X_MAX,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-PLANE_Y_EXT,z:0}, b:{x:0,y:PLANE_Y_EXT,z:0}, c:COLORS.ePos, label:'y'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
@@ -518,15 +580,15 @@ function zAxisFrontIsPositive(cam){
 function drawZAxisHalf(cam, vp, which){
   const frontPositive = zAxisFrontIsPositive(cam);
   const usePositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
-  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-1.1};
-  const B3 = usePositive ? {x:0,y:0,z:1.1} : {x:0,y:0,z:0};
+  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-PLANE_Z_EXT};
+  const B3 = usePositive ? {x:0,y:0,z:PLANE_Z_EXT} : {x:0,y:0,z:0};
   const A = project(A3, cam, vp), B = project(B3, cam, vp);
   ctx.save();
   ctx.strokeStyle = COLORS.bPos;
   ctx.lineWidth = 1.6;
   ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
   if(which === 'front'){
-    const labelP = project({x:0,y:0,z:1.1}, cam, vp);
+    const labelP = project({x:0,y:0,z:PLANE_Z_EXT}, cam, vp);
     ctx.fillStyle = COLORS.bPos;
     ctx.fillText('z', labelP.x+6, labelP.y-4);
   }
@@ -557,14 +619,33 @@ const B_FULL = [
 const WORLD_PER_LOCAL = 0.8 / 142;
 const ROD_HALF_LENGTH = 0.8;
 const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
-const ROD_SHIFT_FIXED = -E_BIRTH_HALF_WIDTH;
-const E_SCALE_GROWTH = ((2 * (2 * ROD_HALF_LENGTH)) / (2 * E_BIRTH_HALF_WIDTH)) - 1; // makes final width about 2*rod length
+const ROD_SHIFT_FIXED = 0;
+const PLANE_X_MIN = -3.00;
+const PLANE_X_MAX = 3.00;
+const PLANE_Y_EXT = 2.10;
+const PLANE_Z_EXT = 2.10;
+const E_FINAL_HALF_WIDTH = 2 * ROD_HALF_LENGTH; // D = 2L from the origin to the right
+const E_X_SCALE_FINAL = E_FINAL_HALF_WIDTH / E_BIRTH_HALF_WIDTH;
 function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
 function getPulseScale(age){
-  return 1 + E_SCALE_GROWTH * age;
+  const s0 = 0.09; // very early narrow first lobe, not full-width
+  return s0 + (E_X_SCALE_FINAL - s0) * age;
 }
 function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal){
-  return { x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal, y: yLocal * WORLD_PER_LOCAL * scaleLocal, z: 0 };
+  return {
+    x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
+    y: yLocal * WORLD_PER_LOCAL * scaleLocal,
+    z: 0
+  };
+}
+
+function localToWorldAnchored(rodShiftIgnored, scaleLocal, xLocal, yLocal, anchorYLocal){
+  const anchorYWorld = anchorYLocal * WORLD_PER_LOCAL;
+  return {
+    x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
+    y: anchorYWorld + (yLocal - anchorYLocal) * WORLD_PER_LOCAL * scaleLocal,
+    z: 0
+  };
 }
 function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha){
   const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
@@ -581,6 +662,7 @@ function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, co
 function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alpha){
   const segments = [];
   const steps = 64;
+  const anchorYLocal = -142 * sy;
   for(let i=0;i<=steps;i++){
     const u = i/steps;
     const t = u;
@@ -601,12 +683,13 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
       x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
       y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
     }
-    segments.push(project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
+    segments.push(project(localToWorldAnchored(rodShift, scaleLocal, x, y, anchorYLocal), cam, vp));
   }
+  const safeScale = Math.max(0.08, scaleLocal);
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(0.6, 0.56 / scaleLocal);
+  ctx.lineWidth = Math.max(0.6, 0.56 / safeScale);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
@@ -618,35 +701,28 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
 function drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, x, y, angleDeg, reverse, color, alpha){
   const dir = reverse ? Math.PI : 0;
   const ang = angleDeg * Math.PI / 180 + dir;
-  const k = 1 / scaleLocal;
-  const pts = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
+  const safeScale = Math.max(0.08, scaleLocal);
+  const k = 1 / safeScale;
+  const anchorYLocal = y < 0 ? -142 : 142;
+  const ptsWorld = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
     const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
     const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
-    return [rx, ry];
+    return localToWorldAnchored(rodShift, scaleLocal, rx, ry, anchorYLocal);
   });
-  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha);
-}
-function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
-  if(arrowLen <= 0.25) return;
-  const k = 1 / scaleLocal;
-  const signY = sign >= 0 ? -1 : 1;
-  const xLocal = 159.0;
-  const baseY = 0;
-  const L = arrowLen * k;
-  const head = Math.min(5.1 * k, 0.34 * L);
-  const half = Math.min(2.9 * k, 0.22 * L);
-  const tipBaseY = signY * Math.max(0, L - head);
-  const tipY = signY * L;
-  const a = project(localToWorld(rodShift, scaleLocal, xLocal, baseY), cam, vp);
-  const b = project(localToWorld(rodShift, scaleLocal, xLocal, tipBaseY), cam, vp);
+  const pts = ptsWorld.map(p => project(p, cam, vp));
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(0.8, 1.18 * k);
-  ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  ctx.lineTo(pts[1].x, pts[1].y);
+  ctx.lineTo(pts[2].x, pts[2].y);
+  ctx.closePath();
+  ctx.fill();
   ctx.restore();
-  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, [[xLocal, tipY],[xLocal-half, tipBaseY],[xLocal+half, tipBaseY]], color, alpha*0.74);
+}
+function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
+  // intentionally disabled for now: these belong to another representation
 }
 function seededEFrontsAbsolute(u){
   const fronts = [];
@@ -743,7 +819,10 @@ function render(ts){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const { ys, r } = electronCenters(chargeSigned);
 
+  if(ui.showPlaneXZ.checked) back.push(() => drawPlaneXZ(cam, vp));
+  if(ui.showPlaneXY.checked) back.push(() => drawPlaneXY(cam, vp));
   if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
+  if(ui.showXAxisLine.checked) mid.push(() => drawXAxisLine(cam, vp));
   if(ui.axes.checked) mid.push(() => drawAxesXY(cam, vp));
   if(ui.sourceZone.checked) mid.push(() => drawSourceZone(cam, vp));
   if(ui.showRod.checked) mid.push(() => drawRodProjected(cam, vp, rodShift, chargeSigned));
