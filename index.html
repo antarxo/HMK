@@ -244,7 +244,7 @@
             </div>
           </div>
         </div>
-        <div class="row"><label>Ζουμ</label><input id="scale" type="range" min="40" max="220" value="110"></div>
+        <div class="row"><label>Ζουμ</label><input id="scale" type="range" min="40" max="420" value="110"></div>
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="1" max="20" value="20"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
@@ -1106,7 +1106,14 @@ function render(ts){
   if(ui.showElectrons.checked) core.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
   if(ui.showCurrent.checked) core.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
-  // 4) μπροστινό μισό του B/xz κάτω από το κάτω E
+  // 4) κάτω μισό του E/xy πριν από το τελικό μπροστινό B
+  if(ui.showPlaneXY.checked) eLower.push(() => drawPlaneXYHalf(cam, vp, 'lower', u));
+  if(ui.showE.checked){
+    eFronts.forEach(fr => eLower.push(() => drawSeededElectronFrontProjectedHalf(cam, vp, rodShift, fr, 'lower')));
+    eFronts.forEach(fr => eLower.push(() => drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, fr, 'lower')));
+  }
+
+  // 5) μπροστινό μισό του B/xz τελευταίο
   if(ui.showPlaneXZ.checked) bFront.push(() => drawPlaneXZHalf(cam, vp, 'front', u));
   if(ui.showB.checked){
     bFronts.forEach((fr) => {
@@ -1118,16 +1125,9 @@ function render(ts){
     });
   }
 
-  // 5) κάτω μισό του E/xy πάνω από το μπροστινό B
-  if(ui.showPlaneXY.checked) eLower.push(() => drawPlaneXYHalf(cam, vp, 'lower', u));
-  if(ui.showE.checked){
-    eFronts.forEach(fr => eLower.push(() => drawSeededElectronFrontProjectedHalf(cam, vp, rodShift, fr, 'lower')));
-    eFronts.forEach(fr => eLower.push(() => drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, fr, 'lower')));
-  }
-
   if(ui.axes.checked) top.push(() => drawZAxisHalf(cam, vp, 'front'));
 
-  [...back, ...eUpper, ...core, ...bFront, ...eLower, ...top].forEach(fn => fn());
+  [...back, ...eUpper, ...core, ...eLower, ...bFront, ...top].forEach(fn => fn());
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
