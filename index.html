@@ -38,8 +38,8 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v5 <span class="badge">zero-value fronts με alpha 0</span></div>
-    <div class="sub">3D βάση πατημένη στο baseline: μία περίοδος εκπομπής και freeze, ράβδος dead center, και στις μηδενικές τιμές των E/B το front μπαίνει κανονικά αλλά με πλήρη διαφάνεια.</div>
+    <div class="title">EMW true 3D v10 <span class="badge">centered rod / electrons / end glow</span></div>
+    <div class="sub">3D βάση: ράβδος ακριβώς στο κέντρο του κάδρου, zoom που ξεκινά από την τωρινή προεπιλογή και μόνο μεγαλώνει, βελάκια πάνω στα E/B fronts, ηλεκτρόνια στη ράβδο και αντάυγειες κόκκινη/μπλε στα άκρα όταν συσσωρεύονται.</div>
   </div>
   <div class="main">
     <div class="card sidebar">
@@ -53,7 +53,7 @@
             <div></div><button id="down">▼</button><div></div>
           </div>
         </div>
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="10" max="260" value="180"></div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="180" max="480" value="180"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
         <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Μέγιστο</div></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
@@ -79,7 +79,7 @@
     </div>
     <div class="card viewport"><div id="stage"></div></div>
   </div>
-  <div class="foot">3D βάση πατημένη στο baseline: μία περίοδος εκπομπής και μετά freeze, κεντραρισμένη ράβδος και fronts E/B που στις μηδενικές τιμές υπάρχουν αλλά μένουν αόρατα με alpha 0.</div>
+  <div class="foot">Μία περίοδος εκπομπής από t = 0 μέχρι και T, με κεντραρισμένη ράβδο, ηλεκτρόνια και χρωματική αντάυγεια στα άκρα όταν αυτά φορτίζονται αντίθετα.</div>
 </div>
 
 <script type="module">
@@ -98,6 +98,8 @@ stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, Math.max(1, stage.clientWidth / stage.clientHeight), 0.1, 250);
 camera.position.set(0, 0, 42);
+const focusPoint = new THREE.Vector3(0,0,0);
+camera.lookAt(focusPoint);
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.36));
 const key1 = new THREE.DirectionalLight(0xffffff, 0.84); key1.position.set(8, 10, 11); scene.add(key1);
@@ -183,6 +185,24 @@ function planeMaterial(color, opacity){
   });
 }
 
+function makeGlowTexture(){
+  const s = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = s;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(s*0.5, s*0.5, 0, s*0.5, s*0.5, s*0.5);
+  grad.addColorStop(0.00, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.18, 'rgba(255,255,255,0.95)');
+  grad.addColorStop(0.42, 'rgba(255,255,255,0.45)');
+  grad.addColorStop(0.72, 'rgba(255,255,255,0.12)');
+  grad.addColorStop(1.00, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0,0,s,s);
+  const tex = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+
 const planes = new THREE.Group();
 root.add(planes);
 const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, E_HALF_H), planeMaterial(COLORS.planeEPos, 0.07));
@@ -211,6 +231,25 @@ const rodGroup = new THREE.Group();
 root.add(rodGroup);
 const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 2 * ROD_HALF_LENGTH, 18), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.34, metalness:0.10 }));
 rodGroup.add(rod);
+
+const glowTexture = makeGlowTexture();
+function glowSprite(hex){
+  return new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glowTexture,
+    color: hex,
+    transparent:true,
+    opacity:0,
+    depthWrite:false,
+    blending:THREE.AdditiveBlending
+  }));
+}
+const topGlow = glowSprite(COLORS.chargeNeg);
+const botGlow = glowSprite(COLORS.chargePos);
+topGlow.position.set(0, -ROD_HALF_LENGTH, 0);
+botGlow.position.set(0,  ROD_HALF_LENGTH, 0);
+topGlow.scale.setScalar(0.01);
+botGlow.scale.setScalar(0.01);
+rodGroup.add(topGlow, botGlow);
 
 const particleGroup = new THREE.Group();
 root.add(particleGroup);
@@ -449,6 +488,20 @@ function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const ys = electronCenters(chargeSigned);
   electrons.forEach((e, idx) => e.position.set(0, ys[idx], 0));
+
+  const qmag = Math.abs(chargeSigned);
+  const topIsNegative = chargeSigned < 0;
+  const topHex = topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const botHex = topIsNegative ? COLORS.chargePos : COLORS.chargeNeg;
+  topGlow.material.color.setHex(topHex);
+  botGlow.material.color.setHex(botHex);
+  const glowOpacity = 0.72 * Math.pow(qmag, 1.25);
+  const glowScale = 0.16 + 0.92 * qmag;
+  topGlow.material.opacity = glowOpacity;
+  botGlow.material.opacity = glowOpacity;
+  topGlow.scale.setScalar(glowScale);
+  botGlow.scale.setScalar(glowScale);
+
   const arrowColor = currentSigned >= 0 ? COLORS.bPos : COLORS.bNeg;
   currentGroup.rotation.z = currentSigned >= 0 ? 0 : Math.PI;
   currentShaft.material.color.setHex(arrowColor); currentShaft.material.emissive.setHex(arrowColor);
@@ -462,12 +515,14 @@ function applyUI(){
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
   lineRadius = 28 / 3800;
-  camera.position.z = 270 - (+ui.zoom.value);
+  camera.position.z = 90 - ((+ui.zoom.value) - 180) * 0.25;
+  camera.lookAt(focusPoint);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
   particleGroup.visible = ui.showParticles.checked;
+  topGlow.visible = botGlow.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
 }
 for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
@@ -541,6 +596,7 @@ function animate(now){
     lastPhaseBucket = bucket;
   }
   updateParticles(phaseU);
+  camera.lookAt(focusPoint);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
