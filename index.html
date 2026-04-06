@@ -521,8 +521,8 @@ function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, wi
 }
 
 function drawPlaneXY(cam, vp){
-  const x0 = -0.10, x1 = 3.00;
-  const y0 = -1.05, y1 = 1.05;
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const y0 = -PLANE_Y_EXT, y1 = PLANE_Y_EXT;
   drawProjectedPolygon(cam, vp, [
     {x:x0,y:y0,z:0},
     {x:x1,y:y0,z:0},
@@ -532,8 +532,8 @@ function drawPlaneXY(cam, vp){
 }
 
 function drawPlaneXZ(cam, vp){
-  const x0 = -0.10, x1 = 3.00;
-  const z0 = -1.05, z1 = 1.05;
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const z0 = -PLANE_Z_EXT, z1 = PLANE_Z_EXT;
   drawProjectedPolygon(cam, vp, [
     {x:x0,y:0,z:z0},
     {x:x1,y:0,z:z0},
@@ -543,8 +543,8 @@ function drawPlaneXZ(cam, vp){
 }
 
 function drawXAxisLine(cam, vp){
-  const A = project({x:-0.10,y:0,z:0}, cam, vp);
-  const B = project({x:3.00,y:0,z:0}, cam, vp);
+  const A = project({x:PLANE_X_MIN,y:0,z:0}, cam, vp);
+  const B = project({x:PLANE_X_MAX,y:0,z:0}, cam, vp);
   ctx.save();
   ctx.strokeStyle = COLORS.xLine;
   ctx.lineWidth = 2.0;
@@ -557,8 +557,8 @@ function drawXAxisLine(cam, vp){
 
 function drawAxesXY(cam, vp){
   const axes = [
-    {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
-    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'}
+    {a:{x:PLANE_X_MIN,y:0,z:0}, b:{x:PLANE_X_MAX,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-PLANE_Y_EXT,z:0}, b:{x:0,y:PLANE_Y_EXT,z:0}, c:COLORS.ePos, label:'y'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
@@ -580,15 +580,15 @@ function zAxisFrontIsPositive(cam){
 function drawZAxisHalf(cam, vp, which){
   const frontPositive = zAxisFrontIsPositive(cam);
   const usePositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
-  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-1.1};
-  const B3 = usePositive ? {x:0,y:0,z:1.1} : {x:0,y:0,z:0};
+  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-PLANE_Z_EXT};
+  const B3 = usePositive ? {x:0,y:0,z:PLANE_Z_EXT} : {x:0,y:0,z:0};
   const A = project(A3, cam, vp), B = project(B3, cam, vp);
   ctx.save();
   ctx.strokeStyle = COLORS.bPos;
   ctx.lineWidth = 1.6;
   ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
   if(which === 'front'){
-    const labelP = project({x:0,y:0,z:1.1}, cam, vp);
+    const labelP = project({x:0,y:0,z:PLANE_Z_EXT}, cam, vp);
     ctx.fillStyle = COLORS.bPos;
     ctx.fillText('z', labelP.x+6, labelP.y-4);
   }
