@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v2 Projection Skeleton v4 responsive window</title>
+  <title>EMW v8 conductor at origin + symmetric E lobes</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
@@ -186,7 +186,7 @@
 <div class="app">
   <div class="top">
     <div class="title">EMW v2 – Projection Skeleton v4</div>
-    <div class="sub">Framing / centering pass: σωστό κάδρο, σωστή θέση πηγής και χώρος για δεξιά διάδοση + μελλοντική τοπική γέννηση γύρω από την πηγή.</div>
+    <div class="sub">Αγωγός στο (0,0,0). Μηλοειδείς του E anchored στα άκρα της ράβδου και άνοιγμα με τη λογική του μετώπου.</div>
   </div>
 
   <div class="main">
@@ -197,16 +197,18 @@
         <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
         <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
-        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
+        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="50"></div>
         <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
-        <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
         <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show plane x–y</label><input id="showPlaneXY" type="checkbox" checked></div>
+        <div class="row"><label>Show plane x–z</label><input id="showPlaneXZ" type="checkbox" checked></div>
+        <div class="row"><label>Show x line</label><input id="showXAxisLine" type="checkbox" checked></div>
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
         <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox"></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
@@ -235,7 +237,7 @@
   </div>
 
   <div class="foot">
-    Στόχος v4: να κάτσει σωστά η σκηνή μέσα στο viewport πριν φορτωθούν μεγάλα βέλη / περιβάλλουσες / τοπικές δομές γύρω από την πηγή.
+    Rod-centered E/B emission, μία περίοδος εκπομπής και μετά freeze όλου του συστήματος.
   </div>
 </div>
 
@@ -250,10 +252,12 @@ const ui = {
   scale: document.getElementById('scale'),
   shiftX: document.getElementById('shiftX'),
   shiftY: document.getElementById('shiftY'),
-  rodX: document.getElementById('rodX'),
   speed: document.getElementById('speed'),
   count: document.getElementById('count'),
   axes: document.getElementById('axes'),
+  showPlaneXY: document.getElementById('showPlaneXY'),
+  showPlaneXZ: document.getElementById('showPlaneXZ'),
+  showXAxisLine: document.getElementById('showXAxisLine'),
   sourceZone: document.getElementById('sourceZone'),
   showE: document.getElementById('showE'),
   showEArrows: document.getElementById('showEArrows'),
@@ -272,7 +276,10 @@ const COLORS = {
   currentPos:'#38b66b', currentNeg:'#f2a31b',
   chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
   electron:'#7ee8ff',
-  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)'
+  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
+  planeXYFill:'rgba(232,90,90,0.08)', planeXYStroke:'rgba(232,90,90,0.22)',
+  planeXZFill:'rgba(56,182,107,0.08)', planeXZStroke:'rgba(56,182,107,0.22)',
+  xLine:'rgba(220,232,247,0.88)'
 };
 
 const state = { t:0, playing:true };
@@ -281,7 +288,7 @@ ui.playBtn.addEventListener('click', () => {
   state.playing = !state.playing;
   ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
 });
-ui.resetBtn.addEventListener('click', () => { state.t = 0; });
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.playing = true; ui.playBtn.textContent = 'Παύση'; });
 
 function resizeCanvas(){
   const wrap = cv.parentElement.getBoundingClientRect();
@@ -391,8 +398,8 @@ function drawChargeGlyph(text, x, y, color, mag){
   ctx.fillText(text, x, y);
   ctx.restore();
 }
-function chargeAndCurrent(t, speedWU){
-  const phase = 2 * Math.PI * t * speedWU;
+function chargeAndCurrent(u){
+  const phase = 2 * Math.PI * u;
   const chargeSigned = -Math.sin(phase);
   const currentSigned = -Math.cos(phase);
   return { phase, chargeSigned, currentSigned };
@@ -473,9 +480,10 @@ function drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned){
   drawChargeGlyph(botNegative ? '−' : '+', botP.x, botP.y, botNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
 }
 function drawElectronsProjected(cam, vp, rodShift, ys, r){
+  const electronRadiusPx = 4.1 / 2; // diameter = rod core width
   ys.forEach(y => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, r * 100 * (+ui.scale.value/100) * 0.43, COLORS.electron, 0.92);
+    drawCircle2D(p, electronRadiusPx, COLORS.electron, 0.92);
   });
 }
 function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
@@ -494,11 +502,63 @@ function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
   drawText2D('I', labelP.x, labelP.y, color, 0.3 + 0.7*imag, 16);
 }
 
-function drawAxes(cam, vp){
+
+function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, width=1){
+  const pts = pts3.map(p => project(p, cam, vp));
+  if(pts.length < 3) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = fillColor;
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlaneXY(cam, vp){
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const y0 = -PLANE_Y_EXT, y1 = PLANE_Y_EXT;
+  drawProjectedPolygon(cam, vp, [
+    {x:x0,y:y0,z:0},
+    {x:x1,y:y0,z:0},
+    {x:x1,y:y1,z:0},
+    {x:x0,y:y1,z:0}
+  ], COLORS.planeXYFill, COLORS.planeXYStroke, 1, 1);
+}
+
+function drawPlaneXZ(cam, vp){
+  const x0 = PLANE_X_MIN, x1 = PLANE_X_MAX;
+  const z0 = -PLANE_Z_EXT, z1 = PLANE_Z_EXT;
+  drawProjectedPolygon(cam, vp, [
+    {x:x0,y:0,z:z0},
+    {x:x1,y:0,z:z0},
+    {x:x1,y:0,z:z1},
+    {x:x0,y:0,z:z1}
+  ], COLORS.planeXZFill, COLORS.planeXZStroke, 1, 1);
+}
+
+function drawXAxisLine(cam, vp){
+  const A = project({x:PLANE_X_MIN,y:0,z:0}, cam, vp);
+  const B = project({x:PLANE_X_MAX,y:0,z:0}, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.xLine;
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y);
+  ctx.lineTo(B.x, B.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAxesXY(cam, vp){
   const axes = [
-    {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
-    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
-    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
+    {a:{x:PLANE_X_MIN,y:0,z:0}, b:{x:PLANE_X_MAX,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-PLANE_Y_EXT,z:0}, b:{x:0,y:PLANE_Y_EXT,z:0}, c:COLORS.ePos, label:'y'}
   ];
   ctx.save();
   ctx.font = '12px system-ui';
@@ -512,12 +572,32 @@ function drawAxes(cam, vp){
   }
   ctx.restore();
 }
+function zAxisFrontIsPositive(cam){
+  const pPos = transformPoint({x:0,y:0,z:1}, cam);
+  const pNeg = transformPoint({x:0,y:0,z:-1}, cam);
+  return (pPos.z + cam.distance) < (pNeg.z + cam.distance);
+}
+function drawZAxisHalf(cam, vp, which){
+  const frontPositive = zAxisFrontIsPositive(cam);
+  const usePositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
+  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-PLANE_Z_EXT};
+  const B3 = usePositive ? {x:0,y:0,z:PLANE_Z_EXT} : {x:0,y:0,z:0};
+  const A = project(A3, cam, vp), B = project(B3, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.bPos;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+  if(which === 'front'){
+    const labelP = project({x:0,y:0,z:PLANE_Z_EXT}, cam, vp);
+    ctx.fillStyle = COLORS.bPos;
+    ctx.fillText('z', labelP.x+6, labelP.y-4);
+  }
+  ctx.restore();
+}
 
 function drawRod(cam, vp){
-  const rodShift = (+ui.rodX.value || 0) / 100;
-  const speedWU = (+ui.speed.value / 100);
-  const { chargeSigned } = chargeAndCurrent(state.t, speedWU);
-  drawRodProjected(cam, vp, rodShift, chargeSigned);
+  const { chargeSigned } = chargeAndCurrent(Math.min(1, state.t * (+ui.speed.value/100)));
+  drawRodProjected(cam, vp, ROD_SHIFT_FIXED, chargeSigned);
 }
 
 function drawSourceZone(cam, vp){
@@ -530,147 +610,169 @@ const E_FULL = [
   0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500,
   0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000
 ];
+const B_FULL = [
+  0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500,
+  0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000,
+  0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500,
+  0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
+];
+const WORLD_PER_LOCAL = 0.8 / 142;
+const ROD_HALF_LENGTH = 0.8;
+const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
+const ROD_SHIFT_FIXED = 0;
+const PLANE_X_MIN = -3.00;
+const PLANE_X_MAX = 3.00;
+const PLANE_Y_EXT = 2.10;
+const PLANE_Z_EXT = 2.10;
+const E_FINAL_HALF_WIDTH = 2 * ROD_HALF_LENGTH; // D = 2L
+const E_X_SCALE_FINAL = E_FINAL_HALF_WIDTH / E_BIRTH_HALF_WIDTH;
+function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
 
-function frontQuarterIndex(tEmit){
-  return tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
+function getDeltaX(age){
+  return E_FINAL_HALF_WIDTH * age; // front advance Δx over one-period emission window
 }
-
-function seededEFronts(tNorm){
+function getPulseScaleX(age){
+  const dx = getDeltaX(age);
+  return dx / E_BIRTH_HALF_WIDTH;  // initial width = 0
+}
+function getPulseScaleY(age){
+  const dx = getDeltaX(age);
+  return (ROD_HALF_LENGTH + dx) / ROD_HALF_LENGTH; // initial height = rod length, then +2Δx
+}
+function localToWorldXY(rodShiftIgnored, scaleX, scaleY, xLocal, yLocal){
+  return {
+    x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleX,
+    y: yLocal * WORLD_PER_LOCAL * scaleY,
+    z: 0
+  };
+}
+function drawProjectedFilledTriangle(cam, vp, rodShift, scaleX, scaleY, ptsLocal, color, alpha){
+  const pts = ptsLocal.map(([x,y]) => project(localToWorldXY(rodShift, scaleX, scaleY, x, y), cam, vp));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+function drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha){
+  const segments = [];
+  const steps = 64;
+  for(let i=0;i<=steps;i++){
+    const u = i/steps;
+    const t = u;
+    const p0 = [0 * sx, -142 * sy];
+    const c1 = [18 * sx, -158 * sy];
+    const c2 = [45 * sx, -178 * sy];
+    const p3 = [63 * sx, -178 * sy];
+    const d1 = [112 * sx, -178 * sy];
+    const d2 = [159 * sx, -122 * sy];
+    const p6 = [159 * sx, 0 * sy];
+    let x,y;
+    if(t <= 0.5){
+      const tt = t / 0.5; const mt = 1-tt;
+      x = mt*mt*mt*p0[0] + 3*mt*mt*tt*c1[0] + 3*mt*tt*tt*c2[0] + tt*tt*tt*p3[0];
+      y = mt*mt*mt*p0[1] + 3*mt*mt*tt*c1[1] + 3*mt*tt*tt*c2[1] + tt*tt*tt*p3[1];
+    } else {
+      const tt = (t-0.5)/0.5; const mt = 1-tt;
+      x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
+      y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
+    }
+    segments.push(project(localToWorldXY(rodShift, scaleX, scaleY, x, y), cam, vp));
+  }
+  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(0.6, 0.56 / safe);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(segments[0].x, segments[0].y);
+  for(let i=1;i<segments.length;i++) ctx.lineTo(segments[i].x, segments[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, x, y, angleDeg, reverse, color, alpha){
+  const dir = reverse ? Math.PI : 0;
+  const ang = angleDeg * Math.PI / 180 + dir;
+  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+  const k = 1 / safe;
+  const ptsLocal = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
+    const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
+    const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
+    return [rx, ry];
+  });
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleX, scaleY, ptsLocal, color, alpha);
+}
+function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
+  // intentionally disabled for now: these belong to another representation
+}
+function seededEFrontsAbsolute(u){
   const fronts = [];
   for(const tEmit of E_FULL){
-    let age = tNorm - tEmit;
-    if(age < 0) age += 1;
+    if(tEmit > 1 + 1e-9) continue;
+    const age = u - tEmit;
     if(age < 0 || age > 1) continue;
     const quarter = frontQuarterIndex(tEmit);
     const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
     const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
     const eAtBirth = -Math.sin(phaseEmit);
-    const arrowLen = 80 * Math.abs(eAtBirth);
     fronts.push({
-      t0: tEmit,
-      age,
-      sign,
-      reverseArrows: sign > 0,
+      t0: tEmit, age, sign, reverseArrows: sign > 0,
       color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
-      arrowLen
+      arrowLen: 80 * Math.abs(eAtBirth)
     });
   }
   return fronts;
 }
-
-function getPulseScale(age, rodLengthPx, lambdaPx){
-  const pulseLocalAnchor = 142;
-  const d0 = rodLengthPx * 0.5;
-  return (d0 + lambdaPx * age) / pulseLocalAnchor;
-}
-
-function drawSeededElectronFront(cam, vp, front, rodLengthPx){
+function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx){
   const age = front.age;
   if(age < 0 || age > 1) return;
-
-  const fadeK = 0.22;
-  const fade = Math.exp(-fadeK * age);
-  const alpha = 225 * fade;
-  const lambdaPx = 2 * rodLengthPx;
-  const scaleFactor = getPulseScale(age, rodLengthPx, lambdaPx);
-  const strokeW = 0.56 / scaleFactor;
-
-  const origin = project({x:0, y:0, z:0}, cam, vp);
-  const rgbHex = front.color;
-  const rgb = rgbHex === COLORS.eNeg ? [79,168,216] : [232,90,90];
-
-  ctx.save();
-  ctx.translate(origin.x, origin.y);
-  ctx.scale(scaleFactor, scaleFactor);
-
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha/255})`;
-  ctx.lineWidth = strokeW;
-  ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${(alpha*0.85)/255})`;
-
+  const fade = Math.exp(-0.22 * age);
+  const alpha = 225 * fade / 255;
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
   if(front.arrowLen > 1e-9){
     const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
-    for(const [sx, sy] of quads){
-      ctx.beginPath();
-      ctx.moveTo(0 * sx, -142 * sy);
-      ctx.bezierCurveTo(18 * sx, -158 * sy, 45 * sx, -178 * sy, 63 * sx, -178 * sy);
-      ctx.bezierCurveTo(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
-      ctx.stroke();
-    }
+    for(const [sx,sy] of quads) drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, alpha*0.85);
   }
-
-  const drawArrow = (x, y, angleDeg) => {
-    const dir = front.reverseArrows ? Math.PI : 0;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate((angleDeg * Math.PI / 180) + dir);
-    const k = 1 / scaleFactor;
-    ctx.beginPath();
-    ctx.moveTo(2.7 * k, 0);
-    ctx.lineTo(-1.45 * k, -1.8 * k);
-    ctx.lineTo(-1.45 * k,  1.8 * k);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  };
-
-  if(front.arrowLen > 1e-9){
-    const lenBase = 18 + 54 * (front.arrowLen / 80);
-    const arrowLayerIsActive = true;
-    if(arrowLayerIsActive){
-      if(age < 0.25){
-        drawArrow(159, -60, -47);
-        drawArrow(159,  60,  47);
-      } else if(age < 0.5){
-        drawArrow(159, -60,  47);
-        drawArrow(159,  60, -47);
-      } else if(age < 0.75){
-        drawArrow(159, -60, 133);
-        drawArrow(159,  60,-133);
-      } else {
-        drawArrow(159, -60,-133);
-        drawArrow(159,  60, 133);
-      }
-    }
-  }
-  ctx.restore();
+  drawTravelArrowProjected(cam, vp, rodShift, Math.max(scaleX, scaleY), front.sign, front.arrowLen, color, alpha*0.92);
 }
-
-
-function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, n=96){
+function seededBFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of B_FULL){
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const bAtBirth = -Math.cos(phaseEmit);
+    const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
+    fronts.push({ t0:tEmit, age, sign, color, travelX: age * 0.9, amp: Math.abs(bAtBirth) });
+  }
+  return fronts;
+}
+function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, amp=1, n=96){
   const pts = [];
-  const grow = Math.max(0, Math.min(1, travelX / (2*bx)));
+  const grow = Math.max(0, Math.min(1, travelX / (2*bx))) * Math.max(0.05, amp);
   const a = bx * grow;
   const cz = sign * bz * grow;
   const cx = originX + travelX + a;
   for(let i=0;i<n;i++){
     const t = (i/(n-1))*Math.PI*2;
-    pts.push({
-      x:cx + a*Math.cos(t),
-      y:0,
-      z:cz*Math.sin(t)
-    });
+    pts.push({ x:cx + a*Math.cos(t), y:0, z:cz*Math.sin(t) });
   }
   return pts;
 }
-
-function getBFronts(){
-  const count = +ui.count.value;
-  const speedWU = (+ui.speed.value/100);
-  const stepDistance = 0.34;
-  const emitPeriod = stepDistance / Math.max(0.05, speedWU);
-  const b = [];
-  for(let i=0;i<count;i++){
-    const age = state.t - i * emitPeriod;
-    if(age <= 0) continue;
-    const travelX = age * speedWU;
-    if(travelX > 2.8) continue;
-    b.push({travelX, sign:(i%2===0?1:-1), color:(i%2===0?COLORS.bPos:COLORS.bNeg)});
-  }
-  return b;
-}
-
 let lastTs = performance.now();
 function render(ts){
   const dt = Math.min(0.04, (ts - lastTs)/1000);
@@ -695,29 +797,35 @@ function render(ts){
   };
 
   const back = [], mid = [], front = [];
-  const rodShift = (+ui.rodX.value || 0) / 100;
+  const rodShift = ROD_SHIFT_FIXED;
   const speedWU = (+ui.speed.value / 100);
-  const { chargeSigned, currentSigned } = chargeAndCurrent(state.t, speedWU);
+  const u = Math.min(1, state.t * speedWU);
+  if(state.playing && u >= 1){
+    state.playing = false;
+    ui.playBtn.textContent = 'Έναρξη';
+  }
+  const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const { ys, r } = electronCenters(chargeSigned);
 
-  if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
+  if(ui.showPlaneXZ.checked) back.push(() => drawPlaneXZ(cam, vp));
+  if(ui.showPlaneXY.checked) back.push(() => drawPlaneXY(cam, vp));
+  if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
+  if(ui.showXAxisLine.checked) mid.push(() => drawXAxisLine(cam, vp));
+  if(ui.axes.checked) mid.push(() => drawAxesXY(cam, vp));
   if(ui.sourceZone.checked) mid.push(() => drawSourceZone(cam, vp));
   if(ui.showRod.checked) mid.push(() => drawRodProjected(cam, vp, rodShift, chargeSigned));
   if(ui.showCharges.checked) mid.push(() => drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned));
   if(ui.showElectrons.checked) mid.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
   if(ui.showCurrent.checked) mid.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
-  const tNorm = (state.t * speedWU) % 1;
-  const eFronts = seededEFronts(tNorm);
-  const bFronts = getBFronts();
+  const eFronts = seededEFrontsAbsolute(u);
+  const bFronts = seededBFrontsAbsolute(u);
 
-  const rodTopP = project({x:rodShift, y:-0.80, z:0}, cam, vp);
-  const rodBotP = project({x:rodShift, y: 0.80, z:0}, cam, vp);
-  const rodLengthPx = Math.hypot(rodBotP.x - rodTopP.x, rodBotP.y - rodTopP.y);
+  const rodLengthPx = 2 * ROD_HALF_LENGTH;
 
   if(ui.showE.checked){
     eFronts.forEach(fr => {
-      back.push(() => drawSeededElectronFront(cam, vp, fr, rodLengthPx));
+      back.push(() => drawSeededElectronFrontProjected(cam, vp, rodShift, fr, rodLengthPx));
     });
   }
 
@@ -725,11 +833,12 @@ function render(ts){
 
   if(ui.showB.checked){
     bFronts.forEach((fr, i) => {
-      const pts = pathProjected(makeBFront(0, fr.travelX, 0.20, 0.33, fr.sign), cam, vp);
+      const pts = pathProjected(makeBFront(rodShift, fr.travelX, 0.20, 0.33, fr.sign, fr.amp), cam, vp);
       front.push(() => drawPolyline(pts, fr.color, 2.3, Math.max(0.32, 0.90 - i*0.08)));
     });
   }
 
+  if(ui.axes.checked) front.unshift(() => drawZAxisHalf(cam, vp, 'front'));
   [...back, ...mid, ...eArrowPass, ...front].forEach(fn => fn());
   requestAnimationFrame(render);
 }
