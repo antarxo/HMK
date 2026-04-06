@@ -396,7 +396,7 @@ function makeBCircleHalf(centerX, radius, which='front', n=46){
   }
   return pts;
 }
-function addEFront3D(group, front, which){
+function addEFront3D(group, front, which, drawArrows=true){
   const age = front.age;
   const scaleX = getPulseScaleX(age);
   const scaleY = getPulseScaleY(age);
@@ -407,7 +407,7 @@ function addEFront3D(group, front, which){
   for(const [sx, sy] of lobes){
     group.add(buildCurve(makeLobePoints(scaleX, scaleY, sx, sy), color, lineRadius, 0.78, 72, opacity));
   }
-  if((front.arrowLen || 0) > 0.25){
+  if(drawArrows && (front.arrowLen || 0) > 0.25){
     const specs = [
       [ 139.320, -115.360,  66.762],
       [ 139.320,  115.360, 113.238],
@@ -420,24 +420,26 @@ function addEFront3D(group, front, which){
       const pos = localToWorldXY(scaleX, scaleY, x, y);
       const a = THREE.MathUtils.degToRad(aDeg) + (front.reverseArrows ? Math.PI : 0);
       const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
-      group.add(buildArrowHead(pos, tangent, color, 0.95, opacity));
+      group.add(buildArrowHead(pos, tangent, color, 0.58, opacity));
     }
   }
 }
-function addBFront3D(group, front, which){
+function addBFront3D(group, front, which, drawArrows=true){
   const r = Math.max(0.0001, front.radius);
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
   group.add(buildCurve(makeBCircleHalf(0, r, which, 68), color, lineRadius, 0.82, 64, opacity));
-  const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
-  const isGreen = (quarter === 0 || quarter === 3);
-  const ccw = isGreen;
-  const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
-  for(const th of thetas){
-    const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
-    let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
-    if(!ccw) tangent.multiplyScalar(-1);
-    group.add(buildArrowHead(p, tangent, color, 0.95, opacity));
+  if(drawArrows){
+    const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
+    const isGreen = (quarter === 0 || quarter === 3);
+    const ccw = isGreen;
+    const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
+    for(const th of thetas){
+      const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
+      let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
+      if(!ccw) tangent.multiplyScalar(-1);
+      group.add(buildArrowHead(p, tangent, color, 0.58, opacity));
+    }
   }
 }
 function rebuildFields(u){
@@ -447,10 +449,14 @@ function rebuildFields(u){
   disposeGroup(bFrontGroup);
   const eFronts = seededEFrontsAbsolute(u);
   const bFronts = seededBFrontsAbsolute(u);
-  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper'));
-  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower'));
-  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back'));
-  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front'));
+  const eArrowFront = [...eFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01 && (fr.arrowLen || 0) > 0.25)
+    .sort((a,b) => b.age - a.age)[0] || null;
+  const bArrowFront = [...bFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01)
+    .sort((a,b) => b.age - a.age)[0] || null;
+  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', fr === eArrowFront));
+  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', fr === eArrowFront));
+  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', fr === bArrowFront));
+  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', fr === bArrowFront));
 }
 function chargeAndCurrent(u){
   const phase = 2 * Math.PI * u;
