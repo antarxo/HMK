@@ -38,8 +38,8 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v3 <span class="badge">seeded μηχανή Ε/Β</span></div>
-    <div class="sub">3D βάση πιο πιστή στο βασικό αρχείο: μία περίοδος εκπομπής και freeze, ράβδος στο απόλυτο κέντρο, μήκη αξόνων/πεδίων σύμφωνα με το baseline.</div>
+    <div class="title">EMW true 3D v4 <span class="badge">baseline χωρίς active fronts</span></div>
+    <div class="sub">3D βάση πατημένη πιο αυστηρά στο baseline: μία περίοδος εκπομπής και freeze, ράβδος στο απόλυτο κέντρο, όλα τα fronts της μηχανής χωρίς τεχνητό limiter.</div>
   </div>
   <div class="main">
     <div class="card sidebar">
@@ -55,8 +55,7 @@
         </div>
         <div class="row"><label>Zoom</label><input id="zoom" type="range" min="10" max="260" value="180"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
-        <div class="row"><label>Ενεργά fronts ανά πεδίο</label><input id="count" type="range" min="2" max="10" value="5"></div>
-        <div class="row"><label>Πάχος γραμμών</label><input id="lineWidth" type="range" min="8" max="28" value="14"></div>
+        <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Μέγιστο</div></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
         <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="28" value="6"></div>
         <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
@@ -80,14 +79,14 @@
     </div>
     <div class="card viewport"><div id="stage"></div></div>
   </div>
-  <div class="foot">3D βάση προσαρμοσμένη στο baseline: μία περίοδος εκπομπής και μετά freeze, κεντραρισμένη ράβδος και μηχανή Ε/Β χωρίς αυθαίρετη αλλαγή μηκών.</div>
+  <div class="foot">3D βάση προσαρμοσμένη πιο αυστηρά στο baseline: μία περίοδος εκπομπής και μετά freeze, κεντραρισμένη ράβδος και μηχανή Ε/Β χωρίς active-fronts limiter.</div>
 </div>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['zoom','speed','count','lineWidth','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn'];
+const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
@@ -153,7 +152,7 @@ const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
-let lineRadius = 0.0038;
+let lineRadius = 28 / 3800;
 const PLANE_X_MIN = -3 * ROD_LENGTH;
 const PLANE_X_MAX =  3 * ROD_LENGTH;
 const PLANE_Y_EXT = 3 * ROD_LENGTH;
@@ -200,9 +199,10 @@ function axisCylinder(length, radius, color, axis){
   if(axis === 'z') m.rotation.x = -Math.PI / 2;
   return m;
 }
-const xAxis = axisCylinder(PLANE_LEN, 0.022, COLORS.axis, 'x'); axes.add(xAxis);
-axes.add(axisCylinder(2 * PLANE_Y_EXT, 0.022, COLORS.axis, 'y'));
-axes.add(axisCylinder(2 * PLANE_Z_EXT, 0.022, COLORS.axis, 'z'));
+const AXIS_RADIUS = 0.006;
+const xAxis = axisCylinder(PLANE_LEN, AXIS_RADIUS, COLORS.axis, 'x'); axes.add(xAxis);
+axes.add(axisCylinder(2 * PLANE_Y_EXT, AXIS_RADIUS, COLORS.axis, 'y'));
+axes.add(axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axis, 'z'));
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
@@ -352,10 +352,6 @@ function makeBCircleHalf(centerX, radius, which='front', n=46){
   }
   return pts;
 }
-function limitRecent(fronts, n){
-  if(fronts.length <= n) return fronts;
-  return fronts.slice(fronts.length - n);
-}
 function addEFront3D(group, front, which){
   const age = front.age;
   const scaleX = getPulseScaleX(age);
@@ -404,9 +400,8 @@ function rebuildFields(u){
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
   disposeGroup(bFrontGroup);
-  const activeCount = +ui.count.value;
-  const eFronts = limitRecent(seededEFrontsAbsolute(u), activeCount);
-  const bFronts = limitRecent(seededBFrontsAbsolute(u), activeCount);
+  const eFronts = seededEFrontsAbsolute(u);
+  const bFronts = seededBFrontsAbsolute(u);
   eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper'));
   eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower'));
   bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back'));
@@ -460,7 +455,7 @@ function applyUI(){
   ePlaneLower.material.opacity = eOpacity;
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
-  lineRadius = (+ui.lineWidth.value) / 3800;
+  lineRadius = 28 / 3800;
   camera.position.z = 270 - (+ui.zoom.value);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
@@ -469,12 +464,10 @@ function applyUI(){
   particleGroup.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
 }
-for(const key of ['zoom','speed','count','lineWidth','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
+for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
   const el = ui[key];
   el.addEventListener('input', applyUI);
 }
-ui.count.addEventListener('input', () => rebuildFields(phaseU));
-ui.lineWidth.addEventListener('input', () => rebuildFields(phaseU));
 
 let playing = true;
 let phaseU = 0;
