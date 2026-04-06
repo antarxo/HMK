@@ -53,7 +53,7 @@
             <div></div><button id="down">▼</button><div></div>
           </div>
         </div>
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="180" max="900" value="180"></div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="0"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
         <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
@@ -515,7 +515,7 @@ function applyUI(){
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
   lineRadius = 36 / 3800;
-  camera.position.z = 90 - ((+ui.zoom.value) - 180) * 0.060;
+  camera.position.z = Math.max(8, 42 - (+ui.zoom.value) * 0.028);
   camera.lookAt(focusPoint);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
@@ -544,7 +544,7 @@ ui.playBtn.addEventListener('click', () => {
 });
 ui.homeBtn.addEventListener('click', () => setHome());
 ui.lectureBtn.addEventListener('click', () => setLectureView());
-ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 180; applyUI(); });
+ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 0; applyUI(); });
 
 function bindHold(button, fn){
   let timer = null;
