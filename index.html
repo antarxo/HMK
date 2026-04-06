@@ -3,442 +3,1184 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW Three.js compare prototype</title>
+  <title>EMW v8 with B arrows and dark XZ plane</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
       --e1:#e85a5a; --e2:#4fa8d8; --b1:#38b66b; --b2:#f2a31b; --rod:#d8dee7; --accent:#b7c6db;
-      --gap:12px; --pad:12px;
+      --gap:12px;
+      --pad:12px;
+      --topH:72px;
+      --footH:42px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
-    .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
-    .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;
+      overflow:hidden;
+    }
+    .app{
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      height:100dvh;
+      min-height:100dvh;
+      overflow:hidden;
+    }
+    .top{
+      padding:12px 16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
     .title{font-size:18px;font-weight:700}
     .sub{color:var(--muted);margin-top:4px}
-    .main{display:grid;grid-template-columns:minmax(260px,30vw) minmax(0,1fr);gap:var(--gap);padding:var(--pad);min-height:0;overflow:hidden}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
-    .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
-    .card .body{padding:10px}
-    .sidebar{display:flex;flex-direction:column;min-height:0;overflow:auto}
-    .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
-    .row label{color:var(--muted);font-size:12px}
-    input[type="range"]{width:min(180px,34vw)}
-    .viewport{position:relative;min-height:0;height:100%}
-    #stage{position:absolute;inset:0}
-    .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-    button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
+    .main{
+      display:grid;
+      grid-template-columns:minmax(250px, 28vw) minmax(0,1fr);
+      gap:var(--gap);
+      padding:var(--pad);
+      min-height:0;
+      overflow:hidden;
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      overflow:hidden;
+      min-height:0;
+      min-width:0;
+    }
+    .card h3{
+      margin:0;
+      padding:9px 11px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:13px;
+    }
+    .card .body{
+      padding:10px;
+    }
+    .sidebar{
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      overflow:auto;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      margin:8px 0;
+    }
+    .row label{
+      color:var(--muted);
+      font-size:12px;
+    }
+    input[type="range"]{width:min(160px, 34vw)}
+    input[type="checkbox"]{transform:scale(.95)}
+    .viewport{
+      position:relative;
+      min-height:0;
+      height:100%;
+    }
+    .canvas-wrap{
+      position:absolute;
+      inset:0;
+    }
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      max-width:100%;
+      max-height:100%;
+    }
+    .controls{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:6px 9px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:12px;
+    }
     button:hover{background:rgba(255,255,255,.1)}
-    .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
-    .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
-    .dpadWrap{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:6px;justify-content:end;align-items:center}
-    .dpadWrap button{padding:0;border-radius:12px;font-size:18px;font-weight:700}
-    .centerDot{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);border-radius:12px}
-    .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
-    .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.15);border:1px solid rgba(79,168,216,.28);color:#cfeaff;font-size:11px;margin-left:8px}
+    .legend{
+      display:grid;
+      gap:6px;
+      margin-top:10px;
+      font-size:12px;
+    }
+    .dpad-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .dpad{
+      display:grid;
+      grid-template-columns:36px 36px 36px;
+      grid-template-rows:36px 36px 36px;
+      gap:6px;
+      align-items:center;
+      justify-items:center;
+    }
+    .dpad button{
+      width:36px;
+      height:36px;
+      padding:0;
+      border-radius:10px;
+      font-size:16px;
+      font-weight:700;
+      line-height:1;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:manipulation;
+    }
+    .dpad .ghost{
+      visibility:hidden;
+      pointer-events:none;
+    }
+    .sw{
+      display:inline-block;
+      width:12px;
+      height:12px;
+      border-radius:3px;
+      margin-right:7px;
+      vertical-align:-2px;
+    }
+    .foot{
+      padding:9px 14px;
+      color:var(--muted);
+      border-top:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+    }
+    code{
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+    }
+
+    @media (max-width: 1100px){
+      :root{ --gap:10px; --pad:10px; }
+      .main{ grid-template-columns:minmax(230px, 33vw) minmax(0,1fr); }
+      input[type="range"]{width:min(150px, 28vw)}
+      .title{font-size:17px}
+    }
+
     @media (max-width: 900px){
       html,body{overflow:auto}
       .app{height:auto;min-height:100dvh}
-      .main{grid-template-columns:1fr;overflow:visible}
-      .sidebar{max-height:none;overflow:visible}
-      .viewport{min-height:54vh;height:min(62vh,680px)}
+      .main{
+        grid-template-columns:1fr;
+        grid-auto-rows:auto auto;
+        overflow:visible;
+      }
+      .sidebar{
+        max-height:none;
+        overflow:visible;
+      }
+      .viewport{
+        min-height:54vh;
+        height:min(62vh, 680px);
+      }
+      input[type="range"]{width:min(180px, 48vw)}
+      .top{padding:10px 12px}
+      .title{font-size:16px}
+      .sub{font-size:12px}
+      .card .body{padding:9px}
+      .row{margin:6px 0}
+    }
+
+    @media (max-width: 560px){
+      .viewport{
+        min-height:48vh;
+        height:min(56vh, 540px);
+      }
+      .row{
+        grid-template-columns:1fr;
+        align-items:start;
+      }
+      input[type="range"]{width:100%}
     }
   </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW Three.js prototype <span class="badge">δοκιμή καθαρότητας / βάθους</span></div>
-    <div class="sub">Δεν είναι πλήρες port. Είναι δοκιμαστικό αντίγραφο της ίδιας λογικής σκηνής για να δεις διαφορά σε sharpness, zoom και spatial layering.</div>
+    <div class="title">EMW v14 – Hybrid Clean Compare</div>
+    <div class="sub">Αγωγός στο (0,0,0). Μηλοειδείς του E anchored στα άκρα της ράβδου και άνοιγμα με τη λογική του μετώπου.</div>
   </div>
+
   <div class="main">
     <div class="card sidebar">
-      <h3>Έλεγχοι</h3>
+      <h3>Κάδρο / σκηνή</h3>
       <div class="body">
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="28" max="220" value="80"></div>
-        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="10"></div>
-        <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="9" value="5"></div>
-        <div class="row"><label>Διαφάνεια πάνω/κάτω Ε</label><input id="eAlpha" type="range" min="0" max="40" value="10"></div>
-        <div class="row"><label>Διαφάνεια πίσω/μπροστά Β</label><input id="bAlpha" type="range" min="0" max="40" value="10"></div>
-        <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
-        <div class="row"><label>Show E half-planes</label><input id="showEPlanes" type="checkbox" checked></div>
-        <div class="row"><label>Show B half-planes</label><input id="showBPlanes" type="checkbox" checked></div>
-        <div class="row"><label>Show E fronts</label><input id="showEFronts" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showBFronts" type="checkbox" checked></div>
-        <div class="row"><label>Show electrons / charges</label><input id="showParticles" type="checkbox" checked></div>
+        <input id="yaw" type="hidden" min="-60" max="60" value="-24">
+        <input id="pitch" type="hidden" min="-45" max="45" value="16">
+        <input id="focal" type="hidden" min="300" max="1400" value="720">
+        <input id="shiftX" type="hidden" min="20" max="80" value="50">
+        <input id="shiftY" type="hidden" min="20" max="80" value="56">
+
         <div class="row">
           <label>Περιστροφή σκηνής</label>
-          <div class="dpadWrap">
-            <div></div><button id="btnUp">▲</button><div></div>
-            <button id="btnLeft">◀</button><div class="centerDot" id="btnReset">•</div><button id="btnRight">▶</button>
-            <div></div><button id="btnDown">▼</button><div></div>
+          <div class="dpad-wrap">
+            <div class="dpad">
+              <span class="ghost"></span>
+              <button id="camUpBtn" type="button" aria-label="Πάνω">▲</button>
+              <span class="ghost"></span>
+              <button id="camLeftBtn" type="button" aria-label="Αριστερά">◀</button>
+              <button id="resetViewBtn" type="button" aria-label="Επαναφορά όψης">•</button>
+              <button id="camRightBtn" type="button" aria-label="Δεξιά">▶</button>
+              <span class="ghost"></span>
+              <button id="camDownBtn" type="button" aria-label="Κάτω">▼</button>
+              <span class="ghost"></span>
+            </div>
           </div>
         </div>
+        <div class="row"><label>Ζουμ</label><input id="scale" type="range" min="20" max="1400" value="110"></div>
+        <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="1" max="20" value="20"></div>
+        <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
+        <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show plane x–y</label><input id="showPlaneXY" type="checkbox" checked></div>
+        <div class="row"><label>Διαφάνεια plane x–y</label><input id="planeXYAlpha" type="range" min="0" max="40" value="5"></div>
+        <div class="row"><label>Show plane x–z</label><input id="showPlaneXZ" type="checkbox" checked></div>
+        <div class="row"><label>Διαφάνεια plane x–z</label><input id="planeXZAlpha" type="range" min="0" max="40" value="4"></div>
+        <div class="row"><label>Show x line</label><input id="showXAxisLine" type="checkbox" checked></div>
+        <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
+        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
+        <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
+        <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
+        <div class="row"><label>Show end charges</label><input id="showCharges" type="checkbox" checked></div>
+
         <div class="controls">
           <button id="playBtn">Παύση</button>
-          <button id="homeBtn">Home view</button>
-          <button id="orthoBtn">Flat-ish</button>
+          <button id="resetBtn">Επαναφορά</button>
         </div>
+
         <div class="legend">
-          <div><span class="sw" style="background:#e85a5a"></span>E fronts / E ημιεπίπεδα</div>
-          <div><span class="sw" style="background:#38b66b"></span>B fronts / B ημιεπίπεδα</div>
-          <div><span class="sw" style="background:#7ee8ff"></span>electrons</div>
-          <div><span class="sw" style="background:#d8dee7"></span>ράβδος / άξονες</div>
+          <div><span class="sw" style="background:#7ee8ff"></span>electrons στη ράβδο</div>
+          <div><span class="sw" style="background:#38b66b"></span>current I (+)</div>
+          <div><span class="sw" style="background:#f2a31b"></span>current I (−)</div>
+          <div><span class="sw" style="background:#e85a5a"></span>E fronts / μεγάλα βέλη E</div>
+          <div><span class="sw" style="background:#38b66b"></span>B κύκλοι στο x–z</div>
         </div>
       </div>
     </div>
+
     <div class="card viewport">
-      <div id="stage"></div>
+      <div class="canvas-wrap">
+        <canvas id="cv" width="1400" height="900"></canvas>
+      </div>
     </div>
   </div>
-  <div class="foot">Στόχος του πρωτοτύπου: να δεις αν το Three.js αξίζει πριν κάνουμε πλήρες port της τωρινής έκδοσης.</div>
+
+  <div class="foot">
+    Hybrid-clean compare: πιο σκληρό separation μπρος/πίσω, λιγότερη διαφάνεια-σούπα, πιο καθαρά περιγράμματα.
+  </div>
 </div>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three/build/three.module.js';
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
 
-const stage = document.getElementById('stage');
 const ui = {
-  zoom: document.getElementById('zoom'),
+  yaw: document.getElementById('yaw'),
+  pitch: document.getElementById('pitch'),
+  focal: document.getElementById('focal'),
+  scale: document.getElementById('scale'),
+  shiftX: document.getElementById('shiftX'),
+  shiftY: document.getElementById('shiftY'),
   speed: document.getElementById('speed'),
   count: document.getElementById('count'),
-  eAlpha: document.getElementById('eAlpha'),
-  bAlpha: document.getElementById('bAlpha'),
-  showAxes: document.getElementById('showAxes'),
-  showEPlanes: document.getElementById('showEPlanes'),
-  showBPlanes: document.getElementById('showBPlanes'),
-  showEFronts: document.getElementById('showEFronts'),
-  showBFronts: document.getElementById('showBFronts'),
-  showParticles: document.getElementById('showParticles'),
-  btnUp: document.getElementById('btnUp'),
-  btnDown: document.getElementById('btnDown'),
-  btnLeft: document.getElementById('btnLeft'),
-  btnRight: document.getElementById('btnRight'),
-  btnReset: document.getElementById('btnReset'),
+  axes: document.getElementById('axes'),
+  showPlaneXY: document.getElementById('showPlaneXY'),
+  planeXYAlpha: document.getElementById('planeXYAlpha'),
+  showPlaneXZ: document.getElementById('showPlaneXZ'),
+  planeXZAlpha: document.getElementById('planeXZAlpha'),
+  showXAxisLine: document.getElementById('showXAxisLine'),
+  sourceZone: document.getElementById('sourceZone'),
+  showE: document.getElementById('showE'),
+  showEArrows: document.getElementById('showEArrows'),
+  showB: document.getElementById('showB'),
+  showRod: document.getElementById('showRod'),
+  showElectrons: document.getElementById('showElectrons'),
+  showCurrent: document.getElementById('showCurrent'),
+  showCharges: document.getElementById('showCharges'),
   playBtn: document.getElementById('playBtn'),
-  homeBtn: document.getElementById('homeBtn'),
-  orthoBtn: document.getElementById('orthoBtn')
+  resetBtn: document.getElementById('resetBtn'),
+  camUpBtn: document.getElementById('camUpBtn'),
+  camDownBtn: document.getElementById('camDownBtn'),
+  camLeftBtn: document.getElementById('camLeftBtn'),
+  camRightBtn: document.getElementById('camRightBtn'),
+  resetViewBtn: document.getElementById('resetViewBtn')
 };
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.setSize(stage.clientWidth, stage.clientHeight, false);
-renderer.setClearColor(0x0b0f14, 1);
-stage.appendChild(renderer.domElement);
+function withAlpha(rgbaString, alpha01){
+  const m = rgbaString.match(/rgba\((\d+),(\d+),(\d+),([0-9.]+)\)/);
+  if(!m) return rgbaString;
+  return `rgba(${m[1]},${m[2]},${m[3]},${alpha01})`;
+}
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  return { r:parseInt(h.slice(0,2),16), g:parseInt(h.slice(2,4),16), b:parseInt(h.slice(4,6),16) };
+}
+function rgbaFromHex(hex, a){
+  const {r,g,b}=hexToRgb(hex);
+  return `rgba(${r},${g},${b},${a})`;
+}
 
-const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x0b0f14, 26, 78);
-
-const camera = new THREE.PerspectiveCamera(38, Math.max(1, stage.clientWidth/stage.clientHeight), 0.1, 200);
-camera.position.set(0, 0, 38);
-
-const amb = new THREE.AmbientLight(0xffffff, 1.4);
-scene.add(amb);
-const dir1 = new THREE.DirectionalLight(0xffffff, 0.85); dir1.position.set(7, 10, 9); scene.add(dir1);
-const dir2 = new THREE.DirectionalLight(0x9ecbff, 0.45); dir2.position.set(-8, -3, 10); scene.add(dir2);
-
-const root = new THREE.Group();
-scene.add(root);
-root.rotation.y = THREE.MathUtils.degToRad(-24);
-root.rotation.x = THREE.MathUtils.degToRad(16);
-
-const colors = {
-  axis:0x6f7f95,
-  rod:0xd8dee7,
-  electron:0x7ee8ff,
-  ePos:0xe85a5a,
-  eNeg:0x4fa8d8,
-  bPos:0x38b66b,
-  bNeg:0xf2a31b,
-  chargeNeg:0xe85a5a,
-  chargePos:0x4fa8d8
+const COLORS = {
+  bg:'#0b0f14', axis:'#6f7f95', rod:'#d8dee7',
+  ePos:'#e85a5a', eNeg:'#4fa8d8', bPos:'#38b66b', bNeg:'#f2a31b',
+  currentPos:'#38b66b', currentNeg:'#f2a31b',
+  chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
+  electron:'#7ee8ff',
+  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
+  planeXYFill:'rgba(255,110,110,0.08)', planeXYStroke:'rgba(255,190,190,0.28)',
+  planeXZFill:'rgba(80,230,140,0.07)', planeXZStroke:'rgba(135,255,185,0.24)',
+  xLine:'rgba(220,232,247,0.88)'
 };
 
-function makePlaneMat(hex, opacity){
-  return new THREE.MeshBasicMaterial({
-    color:hex, transparent:true, opacity, depthWrite:false, side:THREE.DoubleSide
-  });
-}
+const state = { t:0, playing:true };
 
-const layer = {
-  bBack: 1,
-  eUpper: 2,
-  center: 3,
-  eLower: 4,
-  bFront: 5,
-};
-
-const planeW = 24, planeHalfH = 4.6, planeHalfZ = 4.8;
-
-const eUpper = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeHalfH), makePlaneMat(colors.ePos, 0.10));
-eUpper.position.set(6.5, planeHalfH/2, 0); eUpper.renderOrder = layer.eUpper; root.add(eUpper);
-const eLower = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeHalfH), makePlaneMat(colors.eNeg, 0.10));
-eLower.position.set(6.5, -planeHalfH/2, 0); eLower.renderOrder = layer.eLower; root.add(eLower);
-
-const bBack = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeHalfZ), makePlaneMat(colors.bPos, 0.10));
-bBack.rotation.x = -Math.PI/2; bBack.position.set(6.5, 0, -planeHalfZ/2); bBack.renderOrder = layer.bBack; root.add(bBack);
-const bFront = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeHalfZ), makePlaneMat(colors.bNeg, 0.10));
-bFront.rotation.x = -Math.PI/2; bFront.position.set(6.5, 0, planeHalfZ/2); bFront.renderOrder = layer.bFront; root.add(bFront);
-
-const axesGroup = new THREE.Group(); axesGroup.renderOrder = layer.center; root.add(axesGroup);
-function axisCylinder(length, radius, color, dir){
-  const geo = new THREE.CylinderGeometry(radius, radius, length, 16);
-  const mat = new THREE.MeshStandardMaterial({ color, metalness:0.08, roughness:0.42 });
-  const m = new THREE.Mesh(geo, mat);
-  if(dir==='x') m.rotation.z = -Math.PI/2;
-  if(dir==='z') m.rotation.x = -Math.PI/2;
-  return m;
-}
-const axX = axisCylinder(22, 0.03, colors.axis, 'x'); axX.position.x = 5.5; axesGroup.add(axX);
-const axY = axisCylinder(11, 0.03, colors.axis, 'y'); axesGroup.add(axY);
-const axZ = axisCylinder(11, 0.03, colors.axis, 'z'); axesGroup.add(axZ);
-
-const rodGroup = new THREE.Group(); rodGroup.renderOrder = layer.center; root.add(rodGroup);
-const rod = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.13, 0.13, 6.2, 24),
-  new THREE.MeshStandardMaterial({ color:colors.rod, metalness:0.28, roughness:0.28 })
-);
-rodGroup.add(rod);
-
-const capGeo = new THREE.SphereGeometry(0.22, 18, 18);
-const chargeTop = new THREE.Mesh(capGeo, new THREE.MeshStandardMaterial({ color:colors.chargeNeg, emissive:colors.chargeNeg, emissiveIntensity:0.18 }));
-const chargeBot = new THREE.Mesh(capGeo, new THREE.MeshStandardMaterial({ color:colors.chargePos, emissive:colors.chargePos, emissiveIntensity:0.18 }));
-chargeTop.position.y = 3.22; chargeBot.position.y = -3.22; rodGroup.add(chargeTop, chargeBot);
-
-const electrons = [];
-const electronGroup = new THREE.Group(); electronGroup.renderOrder = layer.center; root.add(electronGroup);
-for(let i=0;i<7;i++){
-  const e = new THREE.Mesh(
-    new THREE.SphereGeometry(0.14, 16, 16),
-    new THREE.MeshStandardMaterial({ color:colors.electron, emissive:colors.electron, emissiveIntensity:0.35, roughness:0.35, metalness:0.02 })
-  );
-  electrons.push(e); electronGroup.add(e);
-}
-
-const currentArrow = new THREE.Group(); currentArrow.renderOrder = layer.center; root.add(currentArrow);
-const curBody = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.2,14), new THREE.MeshStandardMaterial({ color:colors.bPos, emissive:colors.bPos, emissiveIntensity:0.25 }));
-const curHead = new THREE.Mesh(new THREE.ConeGeometry(0.15,0.4,16), new THREE.MeshStandardMaterial({ color:colors.bPos, emissive:colors.bPos, emissiveIntensity:0.35 }));
-curHead.position.y = 1.3; currentArrow.add(curBody, curHead); currentArrow.position.set(-2.6,0,0);
-
-function buildEFace(colorHex, sign){
-  const group = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color:colorHex, emissive:colorHex, emissiveIntensity:0.16, roughness:0.55, metalness:0.02 });
-  const tubeMat = new THREE.MeshStandardMaterial({ color:colorHex, emissive:colorHex, emissiveIntensity:0.18, roughness:0.58, metalness:0.02 });
-  const items = [];
-  for(let i=0;i<9;i++){
-    const x0 = 1.4 + i*2.25;
-    const a = 0.75 + i*0.28;
-    const h = 0.65 + i*0.22;
-    const pts = [];
-    for(let j=0;j<=42;j++){
-      const t = j/42;
-      const xx = x0 + a * (1 - Math.cos(Math.PI * t));
-      const yy = sign * h * Math.sin(Math.PI * t);
-      pts.push(new THREE.Vector3(xx, yy, 0));
-    }
-    const curve = new THREE.CatmullRomCurve3(pts);
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.035, 10, false), tubeMat);
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.12,0.32,16), mat);
-    group.add(tube, cone);
-    items.push({ tube, cone, pts, sign, x0, a, h });
-  }
-  return { group, items };
-}
-
-function buildBFace(colorHex, sign){
-  const group = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color:colorHex, emissive:colorHex, emissiveIntensity:0.12, roughness:0.55, metalness:0.02 });
-  const items = [];
-  for(let i=0;i<9;i++){
-    const x0 = 1.3 + i*2.25;
-    const a = 0.8 + i*0.24;
-    const zAmp = 0.65 + i*0.20;
-    const pts = [];
-    for(let j=0;j<=42;j++){
-      const t = j/42;
-      const xx = x0 + a * (1 - Math.cos(Math.PI * t));
-      const zz = sign * zAmp * Math.sin(Math.PI * t);
-      pts.push(new THREE.Vector3(xx, 0, zz));
-    }
-    const curve = new THREE.CatmullRomCurve3(pts);
-    const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.03, 10, false), mat);
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.11,0.28,14), mat);
-    cone.rotation.x = sign > 0 ? -Math.PI/2 : Math.PI/2;
-    group.add(tube, cone);
-    items.push({ tube, cone, pts, sign });
-  }
-  return { group, items };
-}
-
-const eUp = buildEFace(colors.ePos, +1); eUp.group.renderOrder = layer.eUpper; root.add(eUp.group);
-const eDown = buildEFace(colors.eNeg, -1); eDown.group.renderOrder = layer.eLower; root.add(eDown.group);
-const bBackFronts = buildBFace(colors.bPos, -1); bBackFronts.group.renderOrder = layer.bBack; root.add(bBackFronts.group);
-const bFrontFronts = buildBFace(colors.bNeg, +1); bFrontFronts.group.renderOrder = layer.bFront; root.add(bFrontFronts.group);
-
-const bloomDots = new THREE.Group(); bloomDots.renderOrder = layer.center; root.add(bloomDots);
-for(let i=0;i<18;i++){
-  const s = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ color:0xffffff }));
-  s.position.set((Math.random()-0.2)*22, (Math.random()-0.5)*8, (Math.random()-0.5)*8);
-  s.visible = false;
-  bloomDots.add(s);
-}
-
-function setHomeView(){
-  root.rotation.y = THREE.MathUtils.degToRad(-24);
-  root.rotation.x = THREE.MathUtils.degToRad(16);
-}
-function setFlatView(){
-  root.rotation.y = THREE.MathUtils.degToRad(-3);
-  root.rotation.x = THREE.MathUtils.degToRad(2);
-}
-
-ui.homeBtn.addEventListener('click', setHomeView);
-ui.orthoBtn.addEventListener('click', setFlatView);
-ui.btnReset.addEventListener('click', () => { setHomeView(); ui.zoom.value = 80; });
-
-let playing = true;
 ui.playBtn.addEventListener('click', () => {
-  playing = !playing;
-  ui.playBtn.textContent = playing ? 'Παύση' : 'Έναρξη';
+  state.playing = !state.playing;
+  ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
+});
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.playing = true; ui.playBtn.textContent = 'Παύση'; });
+
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+function setView(yaw, pitch){
+  ui.yaw.value = String(clamp(yaw, +ui.yaw.min, +ui.yaw.max));
+  ui.pitch.value = String(clamp(pitch, +ui.pitch.min, +ui.pitch.max));
+}
+function nudgeView(dir){
+  const yaw = +ui.yaw.value;
+  const pitch = +ui.pitch.value;
+  const step = 4;
+  if(dir === 'left') setView(yaw - step, pitch);
+  if(dir === 'right') setView(yaw + step, pitch);
+  if(dir === 'up') setView(yaw, pitch + step);
+  if(dir === 'down') setView(yaw, pitch - step);
+}
+function bindHoldButton(el, dir){
+  if(!el) return;
+  let timer = null;
+  const start = (ev) => {
+    if(ev) ev.preventDefault();
+    nudgeView(dir);
+    stop();
+    timer = setInterval(() => nudgeView(dir), 70);
+  };
+  const stop = () => {
+    if(timer){ clearInterval(timer); timer = null; }
+  };
+  el.addEventListener('mousedown', start);
+  el.addEventListener('touchstart', start, {passive:false});
+  el.addEventListener('mouseup', stop);
+  el.addEventListener('mouseleave', stop);
+  el.addEventListener('touchend', stop);
+  el.addEventListener('touchcancel', stop);
+}
+bindHoldButton(ui.camLeftBtn, 'left');
+bindHoldButton(ui.camRightBtn, 'right');
+bindHoldButton(ui.camUpBtn, 'up');
+bindHoldButton(ui.camDownBtn, 'down');
+ui.resetViewBtn.addEventListener('click', () => {
+  setView(-24, 16);
+  ui.scale.value = '110';
+});
+window.addEventListener('keydown', (ev) => {
+  if(ev.key === 'ArrowLeft'){ ev.preventDefault(); nudgeView('left'); }
+  else if(ev.key === 'ArrowRight'){ ev.preventDefault(); nudgeView('right'); }
+  else if(ev.key === 'ArrowUp'){ ev.preventDefault(); nudgeView('up'); }
+  else if(ev.key === 'ArrowDown'){ ev.preventDefault(); nudgeView('down'); }
 });
 
-function setupHold(btn, dx, dy){
-  let timer = null;
-  const step = () => {
-    root.rotation.y += dx;
-    root.rotation.x += dy;
-    root.rotation.x = THREE.MathUtils.clamp(root.rotation.x, THREE.MathUtils.degToRad(-70), THREE.MathUtils.degToRad(70));
-  };
-  const start = (e) => { e.preventDefault(); step(); timer = setInterval(step, 22); };
-  const stop = () => { if(timer){ clearInterval(timer); timer = null; } };
-  btn.addEventListener('mousedown', start);
-  btn.addEventListener('touchstart', start, { passive:false });
-  window.addEventListener('mouseup', stop);
-  window.addEventListener('mouseleave', stop);
-  window.addEventListener('touchend', stop);
-  window.addEventListener('touchcancel', stop);
+function resizeCanvas(){
+  const wrap = cv.parentElement.getBoundingClientRect();
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  cv.width = Math.max(400, Math.round(wrap.width * dpr));
+  cv.height = Math.max(260, Math.round(wrap.height * dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-setupHold(ui.btnLeft, +0.022, 0);
-setupHold(ui.btnRight, -0.022, 0);
-setupHold(ui.btnUp, 0, +0.018);
-setupHold(ui.btnDown, 0, -0.018);
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 0);
 
-function electronCenters(qSigned){
+function deg(a){ return a*Math.PI/180; }
+function rotateY(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:c*p.x+s*p.z,y:p.y,z:-s*p.x+c*p.z}; }
+function rotateX(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:p.x,y:c*p.y-s*p.z,z:s*p.y+c*p.z}; }
+function transformPoint(p, cam){ return rotateX(rotateY(p, cam.yaw), cam.pitch); }
+function project(p, cam, vp){
+  const q = transformPoint(p, cam);
+  const z = q.z + cam.distance;
+  const k = cam.focal / Math.max(40, z);
+  return { x: vp.cx + q.x * cam.scale * k, y: vp.cy - q.y * cam.scale * k, depth:z, k };
+}
+function pathProjected(points, cam, vp){ return points.map(p => project(p, cam, vp)); }
+
+function drawPolyline(pts2, color, width=2, alpha=1){
+  if(pts2.length < 2) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalAlpha = Math.min(1, alpha);
+  ctx.strokeStyle = 'rgba(8,12,18,0.88)';
+  ctx.lineWidth = width + 1.6;
+  ctx.beginPath();
+  ctx.moveTo(pts2[0].x, pts2[0].y);
+  for(let i=1;i<pts2.length;i++) ctx.lineTo(pts2[i].x, pts2[i].y);
+  ctx.stroke();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts2[0].x, pts2[0].y);
+  for(let i=1;i<pts2.length;i++) ctx.lineTo(pts2[i].x, pts2[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+
+function drawArrow2D(base, tip, color, width=2.2, alpha=1){
+  const dx = tip.x - base.x;
+  const dy = tip.y - base.y;
+  const L = Math.hypot(dx, dy);
+  if(L < 1e-6) return;
+
+  const ux = dx / L;
+  const uy = dy / L;
+  const head = Math.min(14, Math.max(8, L * 0.22));
+  const half = head * 0.42;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+
+  const shaftX = tip.x - ux * head;
+  const shaftY = tip.y - uy * head;
+
+  ctx.strokeStyle = 'rgba(8,12,18,0.90)';
+  ctx.lineWidth = width + 1.4;
+  ctx.beginPath();
+  ctx.moveTo(base.x, base.y);
+  ctx.lineTo(shaftX, shaftY);
+  ctx.stroke();
+
+  const px = -uy;
+  const py = ux;
+  ctx.fillStyle = 'rgba(8,12,18,0.90)';
+  ctx.beginPath();
+  ctx.moveTo(tip.x, tip.y);
+  ctx.lineTo(shaftX + px * (half + 1.0), shaftY + py * (half + 1.0));
+  ctx.lineTo(shaftX - px * (half + 1.0), shaftY - py * (half + 1.0));
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(base.x, base.y);
+  ctx.lineTo(shaftX, shaftY);
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(tip.x, tip.y);
+  ctx.lineTo(shaftX + px * half, shaftY + py * half);
+  ctx.lineTo(shaftX - px * half, shaftY - py * half);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+
+
+
+function drawCircle2D(p, r, color, alpha=1){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawArrowheadScreen(x, y, angleRad, scalePx, color, alpha=1){
+  const pts = [
+    [  2.7 * scalePx,  0 ],
+    [ -1.45 * scalePx, -1.8 * scalePx ],
+    [ -1.45 * scalePx,  1.8 * scalePx ]
+  ].map(([px,py]) => {
+    const rx = px * Math.cos(angleRad) - py * Math.sin(angleRad) + x;
+    const ry = px * Math.sin(angleRad) + py * Math.cos(angleRad) + y;
+    return [rx, ry];
+  });
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = 'rgba(8,12,18,0.90)';
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  ctx.lineTo(pts[1][0], pts[1][1]);
+  ctx.lineTo(pts[2][0], pts[2][1]);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo((pts[0][0]*0.90 + x*0.10), (pts[0][1]*0.90 + y*0.10));
+  ctx.lineTo((pts[1][0]*0.90 + x*0.10), (pts[1][1]*0.90 + y*0.10));
+  ctx.lineTo((pts[2][0]*0.90 + x*0.10), (pts[2][1]*0.90 + y*0.10));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+
+function screenAngleFromWorldTangent(cam, vp, pWorld, tangentWorld){
+  const p0 = project(pWorld, cam, vp);
+  const p1 = project({
+    x: pWorld.x + tangentWorld.x * 0.05,
+    y: pWorld.y + tangentWorld.y * 0.05,
+    z: pWorld.z + tangentWorld.z * 0.05
+  }, cam, vp);
+  return Math.atan2(p1.y - p0.y, p1.x - p0.x);
+}
+function drawText2D(text, x, y, color, alpha=1, size=14){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.font = `${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+function drawChargeGlyph(text, x, y, color, mag){
+  const size = 12 + 11 * mag;
+  const strokeW = 0.3 + 2.0 * mag;
+  ctx.save();
+  ctx.globalAlpha = 0.25 + 0.75 * mag;
+  ctx.font = `${600 + Math.round(250 * mag)} ${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = strokeW;
+  ctx.strokeStyle = 'rgba(12,16,22,0.88)';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+function chargeAndCurrent(u){
+  const phase = 2 * Math.PI * u;
+  const chargeSigned = -Math.sin(phase);
+  const currentSigned = -Math.cos(phase);
+  return { phase, chargeSigned, currentSigned };
+}
+function electronCenters(chargeSigned){
   const N = 7;
-  const r = 0.15;
-  const d = 2*r;
-  const top = -2.55;
-  const bot =  2.55;
-  const a = 0.10;
-  const tri = [0,1,3,6,10,15,21];
-  const targetOffsets = tri.map((t,i) => t*a + i*d);
+  const r = 0.036;
+  const d = 2 * r;
+  const top = -0.68;
+  const bot =  0.68;
+  const a = 0.020;
+
+  // approved center-position pattern:
+  // 0
+  // a + d
+  // 3a + 2d
+  // 6a + 3d
+  // 10a + 4d
+  // 15a + 5d
+  // 21a + 6d
+  const tri = [0, 1, 3, 6, 10, 15, 21];
+  const targetOffsets = tri.map((t, i) => t * a + i * d);
+
   const span = bot - top;
-  const gap = span / (N - 1);
-  const base = Array.from({length:N}, (_,i)=> top + i*gap);
-  const q = Math.abs(qSigned);
-  const moveUp = qSigned < 0;
+  const uniformGap = span / (N - 1);
+  const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
+
+  const q = Math.abs(chargeSigned);
+  const moveUp = chargeSigned < 0;
+
   const ys = new Array(N);
   if(moveUp){
     for(let i=0;i<N;i++){
       const target = top + targetOffsets[i];
       ys[i] = base[i] + q * (target - base[i]);
     }
-  }else{
+  } else {
     for(let i=0;i<N;i++){
-      const target = bot - targetOffsets[N-1-i];
+      const target = bot - targetOffsets[N - 1 - i];
       ys[i] = base[i] + q * (target - base[i]);
     }
   }
-  return ys;
+  return { ys, r, moveUp };
 }
-
-let t = 0;
-const clock = new THREE.Clock();
-
-function updateFrontVisibility(frontPack, visibleCount, phase){
-  frontPack.items.forEach((item, i) => {
-    const on = i < visibleCount;
-    item.tube.visible = on;
-    item.cone.visible = on;
-    if(!on) return;
-    const slide = phase * 1.2;
-    const pts = item.pts;
-    const tipIndex = Math.max(1, pts.length - 2);
-    const p = pts[tipIndex];
-    const p2 = pts[tipIndex+1];
-    item.tube.position.x = slide;
-    item.cone.position.set(p2.x + slide, p2.y, p2.z);
-    const dir = new THREE.Vector3().subVectors(p2,p).normalize();
-    const axis = new THREE.Vector3(0,1,0);
-    item.cone.quaternion.setFromUnitVectors(axis, dir.clone().normalize());
+function drawRodProjected(cam, vp, rodShift, chargeSigned){
+  const qmag = Math.abs(chargeSigned);
+  const topNegative = chargeSigned < 0;
+  const botNegative = !topNegative;
+  const topColor = topNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const botColor = botNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const pTop = project({x:rodShift, y:-0.80, z:0}, cam, vp);
+  const pBot = project({x:rodShift, y: 0.80, z:0}, cam, vp);
+  const rgba = (hex, a) => {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  };
+  const grad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
+  grad.addColorStop(0.00, rgba(topColor, 0.12 + 0.78*qmag));
+  grad.addColorStop(0.50, rgba(COLORS.rod, 0.10 + 0.06*qmag));
+  grad.addColorStop(1.00, rgba(botColor, 0.12 + 0.78*qmag));
+  ctx.save();
+  ctx.strokeStyle = 'rgba(12,16,22,0.92)';
+  ctx.lineWidth = 7.0; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(pTop.x,pTop.y); ctx.lineTo(pBot.x,pBot.y); ctx.stroke();
+  ctx.strokeStyle = grad; ctx.lineWidth = 4.1;
+  ctx.beginPath(); ctx.moveTo(pTop.x,pTop.y); ctx.lineTo(pBot.x,pBot.y); ctx.stroke();
+  ctx.restore();
+}
+function drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned){
+  const qmag = Math.abs(chargeSigned);
+  if(qmag < 0.01) return;
+  const topNegative = chargeSigned < 0;
+  const botNegative = !topNegative;
+  const topP = project({x:rodShift + 0.08, y:-0.86, z:0}, cam, vp);
+  const botP = project({x:rodShift + 0.08, y: 0.86, z:0}, cam, vp);
+  drawChargeGlyph(topNegative ? '−' : '+', topP.x, topP.y, topNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
+  drawChargeGlyph(botNegative ? '−' : '+', botP.x, botP.y, botNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
+}
+function drawElectronsProjected(cam, vp, rodShift, ys, r){
+  const electronRadiusPx = 4.1 / 2; // diameter = rod core width
+  ys.forEach(y => {
+    const p = project({x:rodShift, y, z:0}, cam, vp);
+    drawCircle2D(p, electronRadiusPx, COLORS.electron, 0.92);
   });
 }
-
-function update(){
-  const dt = Math.min(clock.getDelta(), 0.04);
-  if(playing) t += dt * (+ui.speed.value) * 0.18;
-  const phase = (t % 6);
-  const u = (t * 0.35) % 1;
-  const chargeSigned = -Math.sin(2*Math.PI*u);
-  const currentSigned = -Math.cos(2*Math.PI*u);
-
-  const qmag = Math.abs(chargeSigned);
-  chargeTop.material.color.setHex(chargeSigned < 0 ? colors.chargeNeg : colors.chargePos);
-  chargeBot.material.color.setHex(chargeSigned < 0 ? colors.chargePos : colors.chargeNeg);
-  chargeTop.material.emissive.setHex(chargeSigned < 0 ? colors.chargeNeg : colors.chargePos);
-  chargeBot.material.emissive.setHex(chargeSigned < 0 ? colors.chargePos : colors.chargeNeg);
-  chargeTop.scale.setScalar(0.8 + 0.75*qmag);
-  chargeBot.scale.setScalar(0.8 + 0.75*qmag);
-
-  const ys = electronCenters(chargeSigned);
-  electrons.forEach((e, i) => { e.position.set(0, ys[i], 0); });
-
-  currentArrow.visible = Math.abs(currentSigned) > 0.08;
-  currentArrow.scale.y = 0.35 + 0.95*Math.abs(currentSigned);
-  currentArrow.position.y = 0;
-  currentArrow.rotation.z = currentSigned >= 0 ? 0 : Math.PI;
-  curBody.material.color.setHex(currentSigned >= 0 ? colors.bPos : colors.bNeg);
-  curBody.material.emissive.setHex(currentSigned >= 0 ? colors.bPos : colors.bNeg);
-  curHead.material.color.setHex(currentSigned >= 0 ? colors.bPos : colors.bNeg);
-  curHead.material.emissive.setHex(currentSigned >= 0 ? colors.bPos : colors.bNeg);
-
-  const eOpacity = (+ui.eAlpha.value)/100;
-  const bOpacity = (+ui.bAlpha.value)/100;
-  eUpper.material.opacity = eOpacity;
-  eLower.material.opacity = eOpacity;
-  bBack.material.opacity = bOpacity;
-  bFront.material.opacity = bOpacity;
-
-  eUpper.visible = eLower.visible = ui.showEPlanes.checked;
-  bBack.visible = bFront.visible = ui.showBPlanes.checked;
-  axesGroup.visible = ui.showAxes.checked;
-  electronGroup.visible = rodGroup.visible = ui.showParticles.checked;
-  chargeTop.visible = chargeBot.visible = ui.showParticles.checked;
-
-  const visibleCount = +ui.count.value;
-  updateFrontVisibility(eUp, visibleCount, phase);
-  updateFrontVisibility(eDown, visibleCount, phase);
-  updateFrontVisibility(bBackFronts, visibleCount, phase*0.96);
-  updateFrontVisibility(bFrontFronts, visibleCount, phase*0.96);
-  eUp.group.visible = eDown.group.visible = ui.showEFronts.checked;
-  bBackFronts.group.visible = bFrontFronts.group.visible = ui.showBFronts.checked;
-
-  const zoom = +ui.zoom.value;
-  camera.position.set(0, 0, zoom * 0.48);
-  camera.lookAt(0,0,0);
-
-  renderer.render(scene, camera);
+function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
+  const imag = Math.abs(currentSigned);
+  if(imag < 0.02) return;
+  const len = (0.16 + 0.34 * imag);
+  const dir = currentSigned < 0 ? 1 : -1;
+  const x = rodShift - 0.12;
+  const y1 = -dir * len * 0.5;
+  const y2 =  dir * len * 0.5;
+  const base = project({x, y:y1, z:0}, cam, vp);
+  const tip  = project({x, y:y2, z:0}, cam, vp);
+  const color = currentSigned >= 0 ? COLORS.currentPos : COLORS.currentNeg;
+  drawArrow2D(base, tip, color, 2.6 + 1.8*imag, 0.25 + 0.75*imag);
+  const labelP = project({x:x - 0.06, y:0, z:0}, cam, vp);
+  drawText2D('I', labelP.x, labelP.y, color, 0.3 + 0.7*imag, 16);
 }
 
-function onResize(){
-  const w = Math.max(320, stage.clientWidth), h = Math.max(240, stage.clientHeight);
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
+
+function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, width=1){
+  const pts = pts3.map(p => project(p, cam, vp));
+  if(pts.length < 3) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = fillColor;
+  ctx.strokeStyle = 'rgba(8,12,18,0.72)';
+  ctx.lineWidth = width + 0.8;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = width;
+  ctx.stroke();
+  ctx.restore();
 }
-window.addEventListener('resize', onResize);
-onResize();
-renderer.setAnimationLoop(update);
+
+
+function currentEPlaneExtents(u){
+  const halfW = 0.5 * E_TARGET_TOTAL_WIDTH * u;
+  const halfHCore = 0.5 * (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * u);
+  const halfH = halfHCore + 0.55 * ROD_LENGTH * u;
+  return {
+    x0: -halfW,
+    x1:  halfW,
+    y0: -halfH,
+    y1:  halfH
+  };
+}
+function currentBPlaneExtents(u){
+  const r = B_RADIUS_FINAL * u;
+  return {
+    x0: -r,
+    x1:  r,
+    z0: -r,
+    z1:  r
+  };
+}
+
+function drawPlaneXYHalf(cam, vp, which, u){
+  const ext = currentEPlaneExtents(u);
+  const baseA = (+ui.planeXYAlpha.value || 0) / 100;
+  const a = which === 'upper' ? baseA * 0.95 : baseA * 0.55;
+  const y0 = which === 'upper' ? 0 : ext.y0;
+  const y1 = which === 'upper' ? ext.y1 : 0;
+  drawProjectedPolygon(cam, vp, [
+    {x:ext.x0,y:y0,z:0},
+    {x:ext.x1,y:y0,z:0},
+    {x:ext.x1,y:y1,z:0},
+    {x:ext.x0,y:y1,z:0}
+  ], withAlpha(COLORS.planeXYFill, a), withAlpha(COLORS.planeXYStroke, Math.min(1, a * 2.4)), 1, 1);
+}
+
+function drawPlaneXZHalf(cam, vp, which, u){
+  const ext = currentBPlaneExtents(u);
+  const frontPositive = zAxisFrontIsPositive(cam);
+  const zBack0 = frontPositive ? ext.z0 : 0;
+  const zBack1 = frontPositive ? 0 : ext.z1;
+  const zFront0 = frontPositive ? 0 : ext.z0;
+  const zFront1 = frontPositive ? ext.z1 : 0;
+
+  const x0 = ext.x0, x1 = ext.x1;
+  const z0 = which === 'back' ? zBack0 : zFront0;
+  const z1 = which === 'back' ? zBack1 : zFront1;
+  const baseA = (+ui.planeXZAlpha.value || 0) / 100;
+  const a = which === 'back' ? baseA * 0.55 : baseA * 0.95;
+
+  drawProjectedPolygon(cam, vp, [
+    {x:x0,y:0,z:z0},
+    {x:x1,y:0,z:z0},
+    {x:x1,y:0,z:z1},
+    {x:x0,y:0,z:z1}
+  ], withAlpha(COLORS.planeXZFill, a), withAlpha(COLORS.planeXZStroke, Math.min(1, a * 2.4)), 1, 1);
+}
+
+function drawXAxisLine(cam, vp){
+  const A = project({x:PLANE_X_MIN,y:0,z:0}, cam, vp);
+  const B = project({x:PLANE_X_MAX,y:0,z:0}, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.xLine;
+  ctx.lineWidth = 2.0;
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y);
+  ctx.lineTo(B.x, B.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAxesXY(cam, vp){
+  const axes = [
+    {a:{x:PLANE_X_MIN,y:0,z:0}, b:{x:PLANE_X_MAX,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-PLANE_Y_EXT,z:0}, b:{x:0,y:PLANE_Y_EXT,z:0}, c:COLORS.ePos, label:'y'}
+  ];
+  ctx.save();
+  ctx.font = '12px system-ui';
+  for(const ax of axes){
+    const A = project(ax.a, cam, vp), B = project(ax.b, cam, vp);
+    ctx.strokeStyle = ax.c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    ctx.fillStyle = ax.c;
+    ctx.fillText(ax.label, B.x+6, B.y-4);
+  }
+  ctx.restore();
+}
+function zAxisFrontIsPositive(cam){
+  const pPos = transformPoint({x:0,y:0,z:1}, cam);
+  const pNeg = transformPoint({x:0,y:0,z:-1}, cam);
+  return (pPos.z + cam.distance) < (pNeg.z + cam.distance);
+}
+function drawZAxisHalf(cam, vp, which){
+  const frontPositive = zAxisFrontIsPositive(cam);
+  const usePositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
+  const A3 = usePositive ? {x:0,y:0,z:0} : {x:0,y:0,z:-PLANE_Z_EXT};
+  const B3 = usePositive ? {x:0,y:0,z:PLANE_Z_EXT} : {x:0,y:0,z:0};
+  const A = project(A3, cam, vp), B = project(B3, cam, vp);
+  ctx.save();
+  ctx.strokeStyle = COLORS.bPos;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+  if(which === 'front'){
+    const labelP = project({x:0,y:0,z:PLANE_Z_EXT}, cam, vp);
+    ctx.fillStyle = COLORS.bPos;
+    ctx.fillText('z', labelP.x+6, labelP.y-4);
+  }
+  ctx.restore();
+}
+
+function drawRod(cam, vp){
+  const { chargeSigned } = chargeAndCurrent(Math.min(1, state.t * (+ui.speed.value/100)));
+  drawRodProjected(cam, vp, ROD_SHIFT_FIXED, chargeSigned);
+}
+
+function drawSourceZone(cam, vp){
+  // intentionally blank for now
+}
+
+const E_FULL = [
+  0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
+  0.2538, 0.2651, 0.2835, 0.3085, 0.3393, 0.3750, 0.4145, 0.4566, 0.5000,
+  0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500,
+  0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000
+];
+const B_FULL = [
+  0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500,
+  0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000,
+  0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500,
+  0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
+];
+const WORLD_PER_LOCAL = 0.8 / 142;
+const ROD_HALF_LENGTH = 0.8;
+const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
+const ROD_SHIFT_FIXED = 0;
+const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
+const PLANE_X_MIN = -3 * ROD_LENGTH;
+const PLANE_X_MAX =  3 * ROD_LENGTH;
+const PLANE_Y_EXT = 3 * ROD_LENGTH;
+const PLANE_Z_EXT = 3 * ROD_LENGTH;
+const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;   // τελικό συνολικό πλάτος = 4L = 2L προς κάθε κατεύθυνση
+const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;  // τελικό συνολικό ύψος = 5L = 2L πάνω + L ράβδος + 2L κάτω
+function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
+
+function getPulseScaleX(age){
+  const totalWidth = E_TARGET_TOTAL_WIDTH * age;   // από 0 μέχρι 4L
+  return totalWidth / (2 * E_BIRTH_HALF_WIDTH);
+}
+function getPulseScaleY(age){
+  const totalHeight = ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * age; // από rod length μέχρι 4L
+  return totalHeight / ROD_LENGTH;
+}
+function localToWorldXY(rodShiftIgnored, scaleX, scaleY, xLocal, yLocal){
+  return {
+    x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleX,
+    y: yLocal * WORLD_PER_LOCAL * scaleY,
+    z: 0
+  };
+}
+function drawProjectedFilledTriangle(cam, vp, rodShift, scaleX, scaleY, ptsLocal, color, alpha){
+  const pts = ptsLocal.map(([x,y]) => project(localToWorldXY(rodShift, scaleX, scaleY, x, y), cam, vp));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+function drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha){
+  const segments = [];
+  const steps = 64;
+  for(let i=0;i<=steps;i++){
+    const u = i/steps;
+    const t = u;
+    const p0 = [0 * sx, -142 * sy];
+    const c1 = [18 * sx, -158 * sy];
+    const c2 = [45 * sx, -178 * sy];
+    const p3 = [63 * sx, -178 * sy];
+    const d1 = [112 * sx, -178 * sy];
+    const d2 = [159 * sx, -122 * sy];
+    const p6 = [159 * sx, 0 * sy];
+    let x,y;
+    if(t <= 0.5){
+      const tt = t / 0.5; const mt = 1-tt;
+      x = mt*mt*mt*p0[0] + 3*mt*mt*tt*c1[0] + 3*mt*tt*tt*c2[0] + tt*tt*tt*p3[0];
+      y = mt*mt*mt*p0[1] + 3*mt*mt*tt*c1[1] + 3*mt*tt*tt*c2[1] + tt*tt*tt*p3[1];
+    } else {
+      const tt = (t-0.5)/0.5; const mt = 1-tt;
+      x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
+      y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
+    }
+    segments.push(project(localToWorldXY(rodShift, scaleX, scaleY, x, y), cam, vp));
+  }
+  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(0.8, 0.68 / safe);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(segments[0].x, segments[0].y);
+  for(let i=1;i<segments.length;i++) ctx.lineTo(segments[i].x, segments[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, x, y, angleDeg, reverse, color, alpha){
+  const dir = reverse ? Math.PI : 0;
+  const ang = angleDeg * Math.PI / 180 + dir;
+  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+  const k = 1 / safe;
+  const ptsLocal = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
+    const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
+    const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
+    return [rx, ry];
+  });
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleX, scaleY, ptsLocal, color, alpha);
+}
+function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
+  // intentionally disabled for now: these belong to another representation
+}
+function seededEFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of E_FULL){
+    if(tEmit > 1 + 1e-9) continue;
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const eAtBirth = -Math.sin(phaseEmit);
+    fronts.push({
+      t0: tEmit, age, sign, reverseArrows: sign > 0,
+      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+      arrowLen: 80 * Math.abs(eAtBirth)
+    });
+  }
+  return fronts;
+}
+function drawSeededElectronFrontProjectedHalf(cam, vp, rodShift, front, which){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  const fade = Math.exp(-0.22 * age);
+  const alpha = Math.min(1, (235 * fade / 255) * (which === 'upper' ? 1.00 : 0.78));
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+  if(front.arrowLen > 1e-9){
+    const quads = which === 'upper' ? [[1,-1],[-1,-1]] : [[1,1],[-1,1]];
+    for(const [sx,sy] of quads) drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha);
+  }
+  drawTravelArrowProjected(cam, vp, rodShift, Math.max(scaleX, scaleY), front.sign, front.arrowLen, color, alpha*0.92);
+}
+
+function drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, front, which){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  if((front.arrowLen || 0) <= 0.25) return;
+
+  const fade = Math.exp(-0.22 * age);
+  const alpha = Math.min(1, (225 * fade / 255) * 1.10);
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+
+  const specs = [
+    [ 139.320, -115.360,  66.762],
+    [ 139.320,  115.360, 113.238],
+    [-139.320, -115.360, 113.238],
+    [-139.320,  115.360,  66.762],
+  ];
+
+  for(const [x, y, aDeg] of specs){
+    const isUpper = y > 0;
+    if((which === 'upper' && !isUpper) || (which === 'lower' && isUpper)) continue;
+    const p = localToWorldXY(rodShift, scaleX, scaleY, x, y);
+    const dir = front.reverseArrows ? Math.PI : 0;
+    const a = aDeg * Math.PI / 180 + dir;
+    const tangent = {x: Math.cos(a), y: Math.sin(a), z: 0};
+    const ps = project(p, cam, vp);
+    const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, alpha);
+  }
+}
+const B_RADIUS_FINAL = 2 * ROD_LENGTH;
+
+function seededBFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of B_FULL){
+    if(tEmit > 1 + 1e-9) continue;
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const bAtBirth = -Math.cos(phaseEmit);
+    const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
+    fronts.push({
+      t0: tEmit,
+      age,
+      sign,
+      color,
+      amp: Math.abs(bAtBirth),
+      radius: B_RADIUS_FINAL * age
+    });
+  }
+  return fronts;
+}
+
+function makeBCircleHalf(centerX, radius, which='front', cam=null, n=96){
+  const r = Math.max(0.0001, radius);
+  const frontPositive = cam ? zAxisFrontIsPositive(cam) : true;
+  const wantPositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
+
+  const t0 = wantPositive ? 0 : Math.PI;
+  const t1 = wantPositive ? Math.PI : 2 * Math.PI;
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const t = t0 + (t1 - t0) * (i/(n-1));
+    pts.push({
+      x: centerX,
+      y: 0,
+      z: 0
+    });
+    pts[i].x = centerX + r * Math.cos(t);
+    pts[i].z = r * Math.sin(t);
+  }
+  return pts;
+}
+
+function drawProjectedTriangleWorld(cam, vp, pts3, color, alpha){
+  const pts = pts3.map(p => project(p, cam, vp));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  ctx.lineTo(pts[1].x, pts[1].y);
+  ctx.lineTo(pts[2].x, pts[2].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawMagneticArrowCircle(cam, vp, x, z, angleDeg, color, alpha, radius){
+  const k = 1 / Math.max(0.08, radius / B_RADIUS_FINAL);
+  const ang = angleDeg * Math.PI / 180;
+  const pts = [[2.25*k,0],[-1.28*k,-1.50*k],[-1.28*k,1.50*k]].map(([px,pz]) => {
+    const rx = px*Math.cos(ang) - pz*Math.sin(ang) + x;
+    const rz = px*Math.sin(ang) + pz*Math.cos(ang) + z;
+    return {x:rx, y:0, z:rz};
+  });
+  drawProjectedTriangleWorld(cam, vp, pts, color, alpha);
+}
+
+function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
+  const r = Math.max(0.0001, radius);
+  if(r < 0.16 * B_RADIUS_FINAL) return;
+
+  const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
+  const isGreen = (quarter === 0 || quarter === 3);
+  const ccw = isGreen;
+  const color = front.color;
+
+  const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
+  for(const th of thetas){
+    const p = { x: centerX + r * Math.cos(th), y: 0, z: r * Math.sin(th) };
+    let tangent = { x: -Math.sin(th), y: 0, z: Math.cos(th) };
+    if(!ccw){
+      tangent = { x: -tangent.x, y: 0, z: -tangent.z };
+    }
+    const ps = project(p, cam, vp);
+    const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, Math.min(1, alpha * 0.92));
+  }
+}
+let lastTs = performance.now();
+function render(ts){
+  const dt = Math.min(0.04, (ts - lastTs)/1000);
+  lastTs = ts;
+  if(state.playing) state.t += dt;
+
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0,0,w,h);
+
+  const cam = {
+    yaw: deg(+ui.yaw.value),
+    pitch: deg(+ui.pitch.value),
+    focal: +ui.focal.value,
+    scale: +ui.scale.value/100,
+    distance: 4.6
+  };
+  const vp = {
+    cx: w * (+ui.shiftX.value / 100),
+    cy: h * (+ui.shiftY.value / 100)
+  };
+
+  const back = [], eUpper = [], core = [], bFront = [], eLower = [], top = [];
+  const rodShift = ROD_SHIFT_FIXED;
+  const speedWU = (+ui.speed.value / 100);
+  const u = Math.min(1, state.t * speedWU);
+  if(state.playing && u >= 1){
+    state.playing = false;
+    ui.playBtn.textContent = 'Έναρξη';
+  }
+  const { chargeSigned, currentSigned } = chargeAndCurrent(u);
+  const { ys, r } = electronCenters(chargeSigned);
+
+  const eFronts = seededEFrontsAbsolute(u);
+  const bFronts = seededBFrontsAbsolute(u);
+
+  // 1) πίσω μισό του B/xz
+  if(ui.showPlaneXZ.checked) back.push(() => drawPlaneXZHalf(cam, vp, 'back', u));
+  if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
+  if(ui.showB.checked){
+    bFronts.forEach((fr) => {
+      const alpha = Math.max(0.12, (0.16 + 0.52 * fr.amp) * Math.exp(-0.16 * fr.age));
+      const safeScale = Math.max(0.08, fr.radius / B_RADIUS_FINAL);
+      const width = Math.max(0.6, 0.70 / safeScale);
+      back.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'back', cam), cam, vp), fr.color, width, alpha));
+      back.push(() => drawBCircleArrows(cam, vp, rodShift, fr.radius, fr, 'back', alpha));
+    });
+  }
+
+  // 2) πάνω μισό του E/xy πάνω από το πίσω B
+  if(ui.showPlaneXY.checked) eUpper.push(() => drawPlaneXYHalf(cam, vp, 'upper', u));
+  if(ui.showE.checked){
+    eFronts.forEach(fr => eUpper.push(() => drawSeededElectronFrontProjectedHalf(cam, vp, rodShift, fr, 'upper')));
+    eFronts.forEach(fr => eUpper.push(() => drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, fr, 'upper')));
+  }
+
+  // 3) κεντρικά στοιχεία της σκηνής
+  if(ui.showXAxisLine.checked) core.push(() => drawXAxisLine(cam, vp));
+  if(ui.axes.checked) core.push(() => drawAxesXY(cam, vp));
+  if(ui.sourceZone.checked) core.push(() => drawSourceZone(cam, vp));
+  if(ui.showRod.checked) core.push(() => drawRodProjected(cam, vp, rodShift, chargeSigned));
+  if(ui.showCharges.checked) core.push(() => drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned));
+  if(ui.showElectrons.checked) core.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
+  if(ui.showCurrent.checked) core.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
+
+  // 4) μπροστινό μισό του B/xz τελευταίο, πάνω από το κάτω E
+  if(ui.showPlaneXZ.checked) bFront.push(() => drawPlaneXZHalf(cam, vp, 'front', u));
+  if(ui.showB.checked){
+    bFronts.forEach((fr) => {
+      const alpha = Math.max(0.22, (0.28 + 0.84 * fr.amp) * Math.exp(-0.10 * fr.age));
+      const safeScale = Math.max(0.08, fr.radius / B_RADIUS_FINAL);
+      const width = Math.max(0.9, 0.98 / safeScale);
+      bFront.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'front', cam), cam, vp), fr.color, width, alpha));
+      bFront.push(() => drawBCircleArrows(cam, vp, rodShift, fr.radius, fr, 'front', alpha));
+    });
+  }
+
+  // 5) κάτω μισό του E/xy πριν από το μπροστινό B
+  if(ui.showPlaneXY.checked) eLower.push(() => drawPlaneXYHalf(cam, vp, 'lower', u));
+  if(ui.showE.checked){
+    eFronts.forEach(fr => eLower.push(() => drawSeededElectronFrontProjectedHalf(cam, vp, rodShift, fr, 'lower')));
+    eFronts.forEach(fr => eLower.push(() => drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, fr, 'lower')));
+  }
+
+  if(ui.axes.checked) top.push(() => drawZAxisHalf(cam, vp, 'front'));
+
+  [...back, ...eUpper, ...core, ...eLower, ...bFront, ...top].forEach(fn => fn());
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
 </script>
 </body>
 </html>
