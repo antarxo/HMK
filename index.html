@@ -1,2637 +1,516 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="el">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EM Wave Lab — Unified Graph Column Clean</title>
-<script src="https://cdn.jsdelivr.net/npm/p5@1.9.3/lib/p5.min.js"></script>
-<style>
-:root{
-  --bg:#09101a; --bg2:#122033; --bg3:#1b2d43;
-  --text:#e9eef7; --muted:#90a3be;
-  --green:#8df0b1; --red:#f57171; --blue:#67a8ff; --purple:#d85bf7; --cyan:#b8f4ff; --amber:#ffd56b;
-  --rodNeutral:#cad5e4;
-  --shellPad:8px; --gap:6px; --graphsW:338px; --topH:72px; --controlH:42px; --hintH:74px;
-  --glass2:rgba(14,22,34,.42);
-  --liftShadow:10px 12px 26px rgba(0,0,0,.26);
-
-  --bodyGlowA:rgba(67,168,255,.12);
-  --bodyGlowB:rgba(255,213,107,.10);
-  --shellBg:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), rgba(8,14,24,.78);
-  --topbarBg:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), rgba(11,18,30,.55);
-  --titleBoxBg:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), rgba(52,100,148,.24);
-  --logoBg:radial-gradient(circle at 35% 30%, rgba(255,255,255,.22), rgba(255,255,255,0) 42%), linear-gradient(135deg,#17304d 0%, #243d5f 100%);
-  --graphsPanelBg:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), rgba(52,100,148,.24);
-  --machineShellBg:radial-gradient(circle at 50% 42%, rgba(71,97,128,.50) 0%, rgba(17,24,36,.28) 36%, rgba(8,12,18,1) 76%), linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-  --machineHostBg:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0)), var(--glass2);
-  --machineAxis:rgba(176,188,204,.55);
-
-  --btnBorder:rgba(255,255,255,.10);
-  --btnBorderHover:rgba(255,255,255,.16);
-  --btnBorderOn:rgba(255,255,255,.18);
-  --btnBorderOff:rgba(255,255,255,.06);
-  --btnText:#e8f0fb;
-  --btnTextOff:#9fb0c7;
-  --btnTextActive:#ffffff;
-  --btnBg:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(24,39,61,.78);
-  --btnBgHover:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.88);
-  --btnBgActive:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05)), rgba(41,66,101,.92);
-  --btnBgOff:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)), rgba(18,28,43,.46);
-
-  --layerBtnBg:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(18,28,43,.68);
-  --layerBtnBgHover:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.84);
-  --layerBtnBgOn:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.90);
-  --layerBtnBgOff:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)), rgba(18,28,43,.40);
-  --layerBtnTextActive:#ffffff;
-
-  --hudPillBg:rgba(10,15,26,.46);
-  --hudPillText:#dce7f7;
-  --controlDockBg:rgba(20,27,40,.32);
-  --ctrlBg:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(22,36,56,.76);
-  --ctrlBgHover:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(28,45,70,.88);
-  --ctrlText:#e4edf9;
-  --ctrlPlayBg:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)), rgba(10,104,74,.32);
-  --ctrlPlayText:#9ce8c2;
-  --ctrlPlayBorder:rgba(110,230,180,.16);
-
-  --hintFrameBg:rgba(10,16,27,.44);
-  --hintPaneBg:rgba(16,25,40,.40);
-  --hintText:#d4deee;
-
-  --chargeTopBg:rgba(245,113,113,.24);
-  --chargeTopGlow:rgba(245,113,113,.32);
-  --chargeBottomBg:rgba(103,168,255,.24);
-  --chargeBottomGlow:rgba(103,168,255,.32);
-  --ringRedStrong:rgba(245,113,113,.56);
-  --ringRedSoft:rgba(245,113,113,.28);
-  --ringBlueSoft:rgba(103,168,255,.28);
-  --ellipseGreenStrong:rgba(141,240,177,.56);
-  --ellipseGreenSoft:rgba(141,240,177,.28);
-  --ellipsePurpleSoft:rgba(232,138,47,.28);
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{
-  font-family:Segoe UI,Arial,sans-serif;
-  background:
-    radial-gradient(circle at 18% 18%, var(--bodyGlowA) 0%, transparent 24%),
-    radial-gradient(circle at 82% 16%, var(--bodyGlowB) 0%, transparent 22%),
-    linear-gradient(180deg,var(--bg) 0%, var(--bg2) 58%, var(--bg3) 100%);
-  color:var(--text);
-  overflow:hidden;
-}
-button{font:inherit}
-.app{width:100vw;height:100dvh;padding:var(--shellPad)}
-.shell{
-  width:100%;height:calc(100dvh - 2*var(--shellPad));
-  border-radius:16px;overflow:hidden;
-  background:var(--shellBg);
-  box-shadow:0 14px 34px rgba(0,0,0,.24);
-  display:grid;grid-template-rows:var(--topH) minmax(0,1fr);
-}
-.topbar{
-  display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;
-  padding:6px 10px;min-height:0;
-  background:var(--topbarBg);
-  backdrop-filter:blur(8px);
-}
-.langs,.head-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.lang-btn,.chip{
-  border:1px solid var(--btnBorder);
-  background:var(--btnBg);
-  color:var(--btnText);
-  border-radius:999px;
-  padding:6px 10px;
-  font-size:11px;
-  line-height:1;
-  cursor:pointer;
-  backdrop-filter:blur(8px);
-  box-shadow:0 2px 8px rgba(0,0,0,.18);
-  transition:transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease, opacity .12s ease;
-}
-.lang-btn:hover,.chip:hover{
-  background:var(--btnBgHover);
-  border-color:var(--btnBorderHover);
-  box-shadow:0 4px 12px rgba(0,0,0,.22);
-}
-.lang-btn:active,.chip:active{ transform:translateY(1px); }
-.lang-btn.active{
-  background:var(--btnBgActive);
-  color:var(--btnTextActive);
-  border-color:var(--btnBorderOn);
-}
-.chip.is-on{
-  background:var(--btnBgActive);
-  color:var(--btnTextActive);
-  border-color:var(--btnBorderOn);
-}
-.chip.is-off{
-  background:var(--btnBgOff);
-  color:var(--btnTextOff);
-  border-color:var(--btnBorderOff);
-  opacity:.9;
-}
-.header-center{text-align:center;min-width:0}
-.title-box{
-  display:inline-grid;grid-template-columns:auto auto;gap:10px;align-items:center;justify-content:center;
-  padding:8px 16px 8px 10px;border-radius:18px;
-  background:var(--titleBoxBg);
-  backdrop-filter:blur(10px);box-shadow:var(--liftShadow);
-}
-.logo-box{
-  width:42px;height:42px;border-radius:13px;
-  background:var(--logoBg);
-  display:grid;place-items:center;box-shadow:6px 8px 16px rgba(0,0,0,.22);
-}
-.logo-glyph{color:#f1f6ff;font-weight:800;font-size:16px;letter-spacing:.02em;transform:translateY(-1px)}
-.title-stack{line-height:1}
-.header-title{margin:0;font-size:clamp(16px,1.7vw,24px);font-weight:800;line-height:1.02}
-.header-sub{margin-top:4px;font-size:clamp(10px,.88vw,13px);color:#d7e2f4;line-height:1.05}
-
-.main{
-  min-height:0;display:grid;grid-template-columns:var(--graphsW) minmax(0,1fr);
-  gap:var(--gap);padding:var(--gap);
-}
-.graphs-wrap{min-height:0}
-.graphs-panel{
-  height:100%;
-  border-radius:12px;
-  background:
-    var(--graphsPanelBg);
-  backdrop-filter:blur(8px);
-  padding:5px 4px;
-  display:grid;
-  grid-template-rows:repeat(5,minmax(0,1fr));
-  gap:3px;
-}
-.graph-row{min-height:0}
-.plot{
-  min-height:0;height:100%;
-  border-radius:8px;overflow:hidden;background:transparent;
-}
-.plot svg{width:100%;height:100%;display:block}
-.marker{fill:var(--green)}
-.tangent{stroke:var(--green);stroke-width:1.8;stroke-linecap:round}
-
-.stage-wrap{
-  min-height:0;
-  position:relative;
-  display:grid;
-  grid-template-rows:minmax(0,1fr) var(--hintH);
-  gap:6px;
-}
-.stage-wrap.no-comments{
-  grid-template-rows:minmax(0,1fr) 0px;
-}
-.machine-shell{
-  width:100%;height:100%;min-height:0;border-radius:14px;overflow:hidden;position:relative;
-  background:
-    var(--machineShellBg);
-}
-.machine-hud{position:absolute;top:8px;left:8px;z-index:7;display:flex;gap:5px}
-.machine-hud.right{left:auto;right:8px}
-.layer-dock{position:absolute;top:8px;right:4px;bottom:8px;left:auto;width:74px;z-index:9;display:flex;flex-direction:column;flex-wrap:nowrap;gap:4px;align-items:stretch;justify-content:flex-start;pointer-events:auto}
-.layer-chip{border:1px solid var(--btnBorder);background:var(--layerBtnBg);color:var(--btnText);border-radius:9px;padding:5px 4px;font-size:9.5px;line-height:1.05;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease, opacity .12s ease;text-align:center;min-height:26px;display:flex;align-items:center;justify-content:center}
-.layer-chip:hover{background:var(--layerBtnBgHover);border-color:var(--btnBorderHover);box-shadow:0 4px 12px rgba(0,0,0,.22)}
-.layer-chip:active{transform:translateY(1px)}
-.layer-chip.is-on{background:var(--layerBtnBgOn);color:var(--layerBtnTextActive);border-color:var(--btnBorderOn)}
-.layer-chip.is-off{background:var(--layerBtnBgOff);color:var(--btnTextOff);border-color:var(--btnBorderOff);opacity:.88}
-.layer-sep{width:100%;height:1px;background:rgba(255,255,255,.12);margin:2px 0}
-.hud-pill{
-  background:var(--hudPillBg);border:none;border-radius:999px;padding:5px 9px;font-size:11px;line-height:1;color:var(--hudPillText);backdrop-filter:blur(8px)
-}
-.machine-host{
-  position:absolute;inset:8px 8px 8px 8px;border-radius:12px;
-  background:
-    var(--machineHostBg);
-  backdrop-filter:blur(10px);
-  overflow:hidden;
-}
-#machineMount{position:absolute;left:8px;top:8px;right:86px;bottom:calc(var(--controlH) + 10px);}
-.machine-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10px}
-.machine-viewport{width:min(100%,1180px);height:100%;position:relative}
-.machine-axis{position:absolute;left:4%;right:4%;top:50%;height:1px;background:var(--machineAxis);transform:translateY(-50%)}
-.machine-rod{
-  position:absolute;left:50%;top:50%;width:5px;height:46%;transform:translate(-50%,-50%);
-  border-radius:999px;background:linear-gradient(180deg,var(--red) 0%, var(--rodNeutral) 48%, var(--blue) 100%);
-  box-shadow:0 0 12px rgba(148,163,184,.22);z-index:3
-}
-.charge{position:absolute;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;z-index:4}
-.charge.top{top:27%;background:var(--chargeTopBg);box-shadow:0 0 12px var(--chargeTopGlow)}
-.charge.bottom{top:68%;background:var(--chargeBottomBg);box-shadow:0 0 12px var(--chargeBottomGlow)}
-.ring,.ellipse{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%}
-.ring.r1{width:20%;aspect-ratio:1/1;border:1px solid var(--ringRedStrong)}
-.ring.r2{width:29%;aspect-ratio:1/1;border:1px solid var(--ringRedSoft)}
-.ring.r3{width:37%;aspect-ratio:1/1;border:1px solid var(--ringBlueSoft)}
-.ellipse.e1{width:29%;height:24%;border:1px solid var(--ellipseGreenStrong)}
-.ellipse.e2{width:41%;height:33%;border:1px solid var(--ellipseGreenSoft)}
-.ellipse.e3{width:54%;height:43%;border:1px solid var(--ellipsePurpleSoft)}
-
-.control-dock{
-  position:absolute;left:8px;right:86px;bottom:2px;transform:none;
-  width:auto;height:var(--controlH);z-index:9;
-  border-radius:11px;background:var(--controlDockBg);backdrop-filter:blur(10px);
-  display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;padding:4px;
-}
-.ctrl{
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:8px;
-  background:var(--ctrlBg);
-  color:var(--ctrlText);
-  font-size:10px;
-  line-height:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:0;
-  min-height:0;
-  white-space:nowrap;
-  box-shadow:0 2px 8px rgba(0,0,0,.16);
-  transition:transform .12s ease, background .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-.ctrl:hover{
-  background:var(--ctrlBgHover);
-  border-color:rgba(255,255,255,.14);
-  box-shadow:0 4px 12px rgba(0,0,0,.22);
-}
-.ctrl:active{ transform:translateY(1px); }
-.ctrl.play{
-  background:var(--ctrlPlayBg);
-  color:var(--ctrlPlayText);
-  border-color:var(--ctrlPlayBorder);
-}
-.ctrl.is-active{
-  background:var(--ctrlPlayBg);
-  color:var(--ctrlPlayText);
-  border-color:var(--ctrlPlayBorder);
-  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 4px 12px rgba(0,0,0,.22);
-}
-
-.hint-frame{
-  min-height:0;
-  height:100%;
-  border-radius:12px;background:var(--hintFrameBg);backdrop-filter:blur(12px);
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;
-  overflow:hidden;
-}
-.hint-pane{
-  border-radius:8px;background:var(--hintPaneBg);padding:7px 9px;min-width:0;overflow:hidden;
-}
-.hint-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
-.hint-text{font-size:11px;line-height:1.2;color:var(--hintText)}
-.hide{display:none !important}
-
-@media (max-width:1220px){ :root{ --graphsW:314px; } }
-@media (max-width:980px){
-  body{overflow:auto}
-  .app{height:auto;min-height:100dvh}
-  .shell{height:auto;min-height:calc(100dvh - 2*var(--shellPad))}
-  .main{grid-template-columns:1fr}
-  .machine-shell{min-height:740px}
-}
-@media (max-width:760px){
-  .topbar{grid-template-columns:1fr;justify-items:center;height:auto;padding:7px 8px}
-  .title-box{transform:none}
-  .machine-shell{min-height:820px}
-  .control-dock{left:8px;right:86px;grid-template-columns:repeat(4,minmax(0,1fr));height:auto}
-  .hint-frame{grid-template-columns:1fr;height:100%}
-}
-
-body.capture-view{
-  background:#f5f1e7 !important;
-  overflow:hidden;
-}
-body.capture-view .app{
-  padding:0;
-}
-body.capture-view .shell{
-  height:100dvh;
-  min-height:100dvh;
-  border-radius:0;
-  box-shadow:none;
-  background:#f5f1e7;
-}
-body.capture-view .topbar,
-body.capture-view .graphs-wrap,
-body.capture-view .layer-dock,
-body.capture-view .control-dock,
-body.capture-view .hint-frame,
-body.capture-view .machine-hud{
-  display:none !important;
-}
-body.capture-view .main{
-  display:block;
-  width:100vw;
-  height:100dvh;
-  padding:0;
-  margin:0;
-}
-body.capture-view .stage-wrap{
-  display:block;
-  width:100vw;
-  height:100dvh;
-  min-height:100dvh;
-  margin:0;
-  padding:0;
-}
-body.capture-view .machine-shell{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100dvh;
-  min-height:100dvh;
-  border-radius:0;
-  background:transparent;
-}
-body.capture-view .machine-host{
-  position:absolute;
-  inset:0;
-  border-radius:0;
-  background:#fbf8f1;
-  backdrop-filter:none;
-}
-body.capture-view #machineMount{
-  position:absolute;
-  inset:0;
-}
-.capture-fab{
-  position:fixed;
-  top:12px;
-  right:12px;
-  z-index:999;
-  display:none;
-  border:1px solid rgba(47,57,68,.24);
-  border-radius:999px;
-  padding:8px 12px;
-  background:rgba(255,255,255,.94);
-  color:#18222b;
-  font-size:12px;
-  line-height:1;
-  box-shadow:0 4px 16px rgba(0,0,0,.12);
-  cursor:pointer;
-}
-body.capture-view .capture-fab{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-}
-
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EMW v6 – Rod / Current Basis</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
+      --ePos:#e85a5a; --eNeg:#4fa8d8; --bPos:#38b66b; --bNeg:#f2a31b; --rod:#d8dee7;
+      --electron:#7ee8ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
+    .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
+    .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
+    .title{font-size:18px;font-weight:700}.sub{color:var(--muted);margin-top:4px}
+    .main{display:grid;grid-template-columns:minmax(250px,28vw) 1fr;gap:12px;padding:12px;min-height:0}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
+    .sidebar{display:flex;flex-direction:column;min-height:0;overflow:auto}
+    .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
+    .card .body{padding:10px}
+    .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
+    .row label{color:var(--muted);font-size:12px}
+    input[type="range"]{width:min(160px,34vw)}
+    input[type="checkbox"]{transform:scale(.95)}
+    .viewport{position:relative;min-height:0;height:100%}
+    .canvas-wrap{position:absolute;inset:0}
+    canvas{display:block;width:100%;height:100%}
+    .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
+    button:hover{background:rgba(255,255,255,.1)}
+    .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
+    .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
+    .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
+    @media (max-width:980px){
+      html,body{overflow:auto}
+      .app{height:auto;min-height:100dvh}
+      .main{grid-template-columns:1fr;gap:10px;padding:10px}
+      .viewport{min-height:58vh;height:min(62vh,680px)}
+      input[type="range"]{width:min(180px,48vw)}
+    }
+    @media (max-width:560px){
+      .row{grid-template-columns:1fr}
+      input[type="range"]{width:100%}
+      .viewport{min-height:50vh;height:min(58vh,540px)}
+    }
+  </style>
 </head>
 <body>
-<button class="capture-fab" id="captureExitBtn">Έξοδος λήψης</button>
 <div class="app">
-  <div class="shell">
-    <div class="topbar">
-      <div class="langs">
-        <button class="lang-btn active" data-lang="el">GR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </div>
+  <div class="top">
+    <div class="title">EMW v6 – Rod / Current Basis</div>
+    <div class="sub">Phase → charge separation → electron motion → current arrow. Αυτό είναι το θεμέλιο πριν ξαναβάλουμε τα βέλη του E/B στον χώρο.</div>
+  </div>
 
-      <div class="header-center">
-        <div class="title-box">
-          <div class="logo-box"><div class="logo-glyph">ΗΜ</div></div>
-          <div class="title-stack">
-            <div class="header-title" id="appTitle">Γένεση Ηλεκτρομαγνητικού Κύματος</div>
-            <div class="header-sub" id="appSub">Διαδραστικό εργαστήριο μελέτης</div>
-          </div>
+  <div class="main">
+    <div class="card sidebar">
+      <h3>Rod / current basis</h3>
+      <div class="body">
+        <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-24"></div>
+        <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
+        <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
+        <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
+        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
+        <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
+        <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
+        <div class="row"><label>Playback speed</label><input id="speed" type="range" min="3" max="180" value="28"></div>
+        <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
+        <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
+        <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
+        <div class="row"><label>Show end charges</label><input id="showCharges" type="checkbox" checked></div>
+
+        <div class="controls">
+          <button id="playBtn">Παύση</button>
+          <button id="resetBtn">Επαναφορά</button>
         </div>
-      </div>
 
-      <div class="head-actions">
-        <button class="chip" id="toggleE">E</button>
-        <button class="chip" id="toggleB">B</button>
-        <button class="chip" id="toggleHints">Οδηγίες</button>
-        <button class="chip" id="resetBtn">Επαναφορά</button>
-        <button class="chip theme-chip" id="themeDefault" data-theme="default">Βάση</button>
-        <button class="chip theme-chip" id="themeScreen" data-theme="screen">Οθόνη</button>
-        <button class="chip theme-chip" id="themeAcademic" data-theme="academic">Ήπια</button>
-        <button class="chip theme-chip" id="themePrint" data-theme="print">Print</button>
-        <button class="chip theme-chip" id="themePrintSharp" data-theme="printSharp">Print Sharp</button>
-        <button class="chip theme-chip" id="themePaperContrast" data-theme="paperContrast">Χαρτί+</button>
-        <button class="chip theme-chip" id="themeCapture" data-theme="capture">Χαρτί</button>
-        <button class="chip" id="toggleCaptureView">Capture</button>
+        <div class="legend">
+          <div><span class="sw" style="background:#4fa8d8"></span>αρνητικά φορτία / electrons</div>
+          <div><span class="sw" style="background:#38b66b"></span>current I (+)</div>
+          <div><span class="sw" style="background:#f2a31b"></span>current I (−)</div>
+          <div><span class="sw" style="background:#e85a5a"></span>θετικό άκρο</div>
+        </div>
       </div>
     </div>
 
-    <div class="main">
-      
-      <div class="graphs-wrap" id="graphsPanel">
-        <div class="graphs-panel">
-          <div class="graph-row"><div class="plot"><svg id="svgV" viewBox="0 0 280 90" preserveAspectRatio="none"></svg></div></div>
-          <div class="graph-row"><div class="plot"><svg id="svgQ" viewBox="0 0 280 90" preserveAspectRatio="none"></svg></div></div>
-          <div class="graph-row"><div class="plot"><svg id="svgI" viewBox="0 0 280 90" preserveAspectRatio="none"></svg></div></div>
-          <div class="graph-row graph-e"><div class="plot"><svg id="svgE" viewBox="0 0 280 90" preserveAspectRatio="none"></svg></div></div>
-          <div class="graph-row graph-b"><div class="plot"><svg id="svgB" viewBox="0 0 280 90" preserveAspectRatio="none"></svg></div></div>
-        </div>
-      </div>
-
-
-      <div class="stage-wrap" id="stageWrap">
-        <div class="machine-shell">
-<div class="machine-host">
-            <div class="layer-dock" id="layerDock">
-              <button class="layer-chip" id="toggleECurves">E καμπύλες</button>
-              <button class="layer-chip" id="toggleETravel">E βέλη</button>
-              <button class="layer-chip" id="toggleEEnv">E περίβλημα</button>
-              <span class="layer-sep" aria-hidden="true"></span>
-              <button class="layer-chip" id="toggleBCurves">B καμπύλες</button>
-              <button class="layer-chip" id="toggleBTravel">B βέλη</button>
-              <button class="layer-chip" id="toggleBEnv">B περίβλημα</button>
-            </div><div id="machineMount" style="width:100%;height:100%"></div>
-
-            <div class="control-dock">
-              <button class="ctrl" id="stepPrev">◀ Βήμα</button>
-              <button class="ctrl" id="stepNext">Βήμα ▶</button>
-              <button class="ctrl" id="qPrev">T/4 ◀</button>
-              <button class="ctrl" id="qNext">T/4 ▶</button>
-              <button class="ctrl play" id="playBtn">⏵ Έναρξη</button>
-              <button class="ctrl" id="speed025">0.25x</button>
-              <button class="ctrl" id="speed05">0.5x</button>
-              <button class="ctrl" id="speed1">1x</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="hint-frame" id="hintStrip">
-          <div class="hint-pane">
-            <div class="hint-kicker" id="hintK1">Τι βλέπω</div>
-            <div class="hint-text" id="hint1">Πρόσεξε την κλίση του q(t). Η πράσινη εφαπτομένη δείχνει γιατί εδώ το i είναι θετικό.</div>
-          </div>
-          <div class="hint-pane">
-            <div class="hint-kicker" id="hintK2">Τι κάνω</div>
-            <div class="hint-text" id="hint2">Κρύψε προσωρινά το B και δες αν η σχέση ανάμεσα σε V, q και i διαβάζεται πιο καθαρά.</div>
-          </div>
-          <div class="hint-pane">
-            <div class="hint-kicker" id="hintK3">Τι συγκρίνω</div>
-            <div class="hint-text" id="hint3">Πήγαινε βήμα-βήμα από 0 έως T/4 και σύγκρινε τη μεταβολή του q με την εμφάνιση των πρώτων γραμμών E.</div>
-          </div>
-        </div>
+    <div class="card viewport">
+      <div class="canvas-wrap">
+        <canvas id="cv" width="1400" height="900"></canvas>
       </div>
     </div>
   </div>
 
+  <div class="foot">
+    v6: πρώτα σταθεροποιούμε τη λογική μέσα στη ράβδο και μετά ξαναχτίζουμε τα μεγάλα βέλη / fronts στον χώρο.
+  </div>
+</div>
+
 <script>
-const THEME_PRESETS = {
-  default: {
-    key: 'default',
-    labels: { el: 'Βάση', en: 'Base' },
-    cssVars: {
-      '--bg':'#09101a','--bg2':'#122033','--bg3':'#1b2d43','--text':'#e9eef7','--muted':'#90a3be',
-      '--green':'#8df0b1','--red':'#f57171','--blue':'#67a8ff','--purple':'#e88a2f','--rodNeutral':'#cad5e4',
-      '--glass2':'rgba(14,22,34,.42)','--liftShadow':'10px 12px 26px rgba(0,0,0,.26)',
-      '--bodyGlowA':'rgba(67,168,255,.12)','--bodyGlowB':'rgba(255,213,107,.10)',
-      '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), rgba(8,14,24,.78)',
-      '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), rgba(11,18,30,.55)',
-      '--titleBoxBg':'linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), rgba(52,100,148,.24)',
-      '--logoBg':'radial-gradient(circle at 35% 30%, rgba(255,255,255,.22), rgba(255,255,255,0) 42%), linear-gradient(135deg,#17304d 0%, #243d5f 100%)',
-      '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), rgba(52,100,148,.24)',
-      '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(71,97,128,.50) 0%, rgba(17,24,36,.28) 36%, rgba(8,12,18,1) 76%), linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0))',
-      '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0)), rgba(14,22,34,.42)',
-      '--machineAxis':'rgba(176,188,204,.55)',
-      '--btnBorder':'rgba(255,255,255,.10)','--btnBorderHover':'rgba(255,255,255,.16)','--btnBorderOn':'rgba(255,255,255,.18)','--btnBorderOff':'rgba(255,255,255,.06)',
-      '--btnText':'#e8f0fb','--btnTextOff':'#9fb0c7','--btnTextActive':'#ffffff',
-      '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(24,39,61,.78)',
-      '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.88)',
-      '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05)), rgba(41,66,101,.92)',
-      '--btnBgOff':'linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)), rgba(18,28,43,.46)',
-      '--layerBtnBg':'linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(18,28,43,.68)',
-      '--layerBtnBgHover':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.84)',
-      '--layerBtnBgOn':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(31,49,76,.90)',
-      '--layerBtnBgOff':'linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01)), rgba(18,28,43,.40)','--layerBtnTextActive':'#ffffff',
-      '--hudPillBg':'rgba(10,15,26,.46)','--hudPillText':'#dce7f7',
-      '--controlDockBg':'rgba(20,27,40,.32)',
-      '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03)), rgba(22,36,56,.76)',
-      '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(28,45,70,.88)',
-      '--ctrlText':'#e4edf9',
-      '--ctrlPlayBg':'linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)), rgba(10,104,74,.32)',
-      '--ctrlPlayText':'#9ce8c2','--ctrlPlayBorder':'rgba(110,230,180,.16)',
-      '--hintFrameBg':'rgba(10,16,27,.44)','--hintPaneBg':'rgba(16,25,40,.40)','--hintText':'#d4deee',
-      '--chargeTopBg':'rgba(245,113,113,.24)','--chargeTopGlow':'rgba(245,113,113,.32)',
-      '--chargeBottomBg':'rgba(103,168,255,.24)','--chargeBottomGlow':'rgba(103,168,255,.32)',
-      '--ringRedStrong':'rgba(245,113,113,.56)','--ringRedSoft':'rgba(245,113,113,.28)','--ringBlueSoft':'rgba(103,168,255,.28)',
-      '--ellipseGreenStrong':'rgba(141,240,177,.56)','--ellipseGreenSoft':'rgba(141,240,177,.28)','--ellipsePurpleSoft':'rgba(232,138,47,.28)'
-    },
-    graphs: {
-      axis:'#6f87a6', text:'#d8e8fb', marker:'#8df0b1', time:'#ffffff',
-      V:{pos:'#ffd56b',neg:'#ffd56b'},
-      Q:{pos:'#67a8ff',neg:'#f57171'},
-      I:{pos:'#8df0b1',neg:'#ffba12'},
-      E:{pos:'#67a8ff',neg:'#f57171'},
-      B:{pos:'#8df0b1',neg:'#e88a2f'}
-    },
-    sim: {
-      viewportBg:'#0c0d10', axis:'#4d535d', electronDot:[255,82,82],
-      ePositive:[90,175,255], eNegative:[255,72,72],
-      bGreen:[68,214,112], bPurple:[255,208,24],
-      currentPositive:[74,215,110], currentNegative:[255,186,18],
-      rodPos:[90,175,255], rodNeg:[255,82,82], rodNeutral:[188,198,214],
-      rodOutline:'rgba(12, 16, 22, 0.92)', rodHighlight:'rgba(225, 232, 242, 0.30)',
-      chargePositive:'#00E7FF', chargeNegative:'#FF0000',
-      eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)',
-      eCurveStrokeMul:1.0, bCurveStrokeMul:1.0, travelStrokeMul:1.0, envelopeStrokeWeight:1.15
-    }
-  },
-  academic: {
-    key: 'academic',
-    labels: { el: 'Ήπια', en: 'Academic' },
-    cssVars: {
-      '--bg':'#20242a','--bg2':'#2d333b','--bg3':'#3a424c','--text':'#eef2f5','--muted':'#b0bac5',
-      '--green':'#86bfa0','--red':'#c88989','--blue':'#88a3c4','--purple':'#d08c52','--rodNeutral':'#d7dde5',
-      '--glass2':'rgba(255,255,255,.06)','--liftShadow':'8px 10px 20px rgba(0,0,0,.22)',
-      '--bodyGlowA':'rgba(255,255,255,.02)','--bodyGlowB':'rgba(255,255,255,.02)',
-      '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), rgba(35,40,47,.84)',
-      '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), rgba(44,50,58,.78)',
-      '--titleBoxBg':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)), rgba(93,105,120,.22)',
-      '--logoBg':'radial-gradient(circle at 35% 30%, rgba(255,255,255,.16), rgba(255,255,255,0) 42%), linear-gradient(135deg,#596675 0%, #707f90 100%)',
-      '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)), rgba(86,96,109,.22)',
-      '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(150,160,172,.30) 0%, rgba(55,61,70,.22) 38%, rgba(25,29,34,1) 78%), linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0))',
-      '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)), rgba(34,39,46,.44)',
-      '--machineAxis':'rgba(206,214,224,.52)',
-      '--btnBorder':'rgba(255,255,255,.11)','--btnBorderHover':'rgba(255,255,255,.17)','--btnBorderOn':'rgba(255,255,255,.18)','--btnBorderOff':'rgba(255,255,255,.06)',
-      '--btnText':'#eef2f6','--btnTextOff':'#bcc6d1','--btnTextActive':'#ffffff',
-      '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02)), rgba(73,82,94,.74)',
-      '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.03)), rgba(86,96,110,.82)',
-      '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(99,110,126,.88)',
-      '--btnBgOff':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)), rgba(54,61,70,.40)',
-      '--layerBtnBg':'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), rgba(66,75,86,.70)',
-      '--layerBtnBgHover':'linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03)), rgba(80,91,105,.80)',
-      '--layerBtnBgOn':'linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04)), rgba(92,103,118,.88)',
-      '--layerBtnBgOff':'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)), rgba(53,60,69,.36)','--layerBtnTextActive':'#ffffff',
-      '--hudPillBg':'rgba(31,36,43,.46)','--hudPillText':'#e4ecf4',
-      '--controlDockBg':'rgba(45,51,59,.34)',
-      '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), rgba(72,82,94,.76)',
-      '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03)), rgba(86,97,112,.84)',
-      '--ctrlText':'#eef3f8',
-      '--ctrlPlayBg':'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), rgba(82,108,94,.34)',
-      '--ctrlPlayText':'#d9f3e4','--ctrlPlayBorder':'rgba(166,213,187,.20)',
-      '--hintFrameBg':'rgba(34,40,48,.42)','--hintPaneBg':'rgba(46,54,64,.36)','--hintText':'#e1e7ee',
-      '--chargeTopBg':'rgba(200,137,137,.20)','--chargeTopGlow':'rgba(200,137,137,.24)',
-      '--chargeBottomBg':'rgba(136,163,196,.20)','--chargeBottomGlow':'rgba(136,163,196,.24)',
-      '--ringRedStrong':'rgba(200,137,137,.42)','--ringRedSoft':'rgba(200,137,137,.20)','--ringBlueSoft':'rgba(136,163,196,.20)',
-      '--ellipseGreenStrong':'rgba(134,191,160,.42)','--ellipseGreenSoft':'rgba(134,191,160,.20)','--ellipsePurpleSoft':'rgba(208,140,82,.22)'
-    },
-    graphs: {
-      axis:'#aab5c1', text:'#e7edf3', marker:'#8ac6a4', time:'#f0f4f8',
-      V:{pos:'#cdb676',neg:'#cdb676'},
-      Q:{pos:'#88a3c4',neg:'#c88989'},
-      I:{pos:'#86bfa0',neg:'#ecaa18'},
-      E:{pos:'#88a3c4',neg:'#c88989'},
-      B:{pos:'#86bfa0',neg:'#d08c52'}
-    },
-    sim: {
-      viewportBg:'#1b2026', axis:'#818b96', electronDot:[206,130,130],
-      ePositive:[125,152,191], eNegative:[200,122,122],
-      bGreen:[112,176,140], bPurple:[224,168,76],
-      currentPositive:[118,184,146], currentNegative:[236,170,24],
-      rodPos:[125,152,191], rodNeg:[200,122,122], rodNeutral:[211,218,227],
-      rodOutline:'rgba(23, 27, 32, 0.86)', rodHighlight:'rgba(238, 243, 248, 0.26)',
-      chargePositive:'#a9d8ea', chargeNegative:'#d27b7b',
-      eEnvelope:'rgba(236,242,247,0.30)', bEnvelope:'rgba(236,242,247,0.30)',
-      eCurveStrokeMul:0.96, bCurveStrokeMul:0.96, travelStrokeMul:0.94, envelopeStrokeWeight:1.00
-    }
-  },
-  capture: {
-    key: 'capture',
-    labels: { el: 'Χαρτί', en: 'Paper' },
-    cssVars: {
-      '--bg':'#f6efe2','--bg2':'#ede3d2','--bg3':'#dfd2be','--text':'#1f2b34','--muted':'#51606d',
-      '--green':'#159a52','--red':'#9f3b3b','--blue':'#2f5d91','--purple':'#ffb400','--rodNeutral':'#9ea8b3',
-      '--glass2':'rgba(255,255,255,.52)','--liftShadow':'6px 8px 16px rgba(45,39,30,.10)',
-      '--bodyGlowA':'rgba(255,255,255,0)','--bodyGlowB':'rgba(255,255,255,0)',
-      '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.34)), rgba(236,228,214,.94)',
-      '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.44)), rgba(228,218,202,.92)',
-      '--titleBoxBg':'linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.42)), rgba(215,203,185,.74)',
-      '--logoBg':'radial-gradient(circle at 35% 30%, rgba(255,255,255,.72), rgba(255,255,255,0) 42%), linear-gradient(135deg,#d8cbb5 0%, #c4b59d 100%)',
-      '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.28)), rgba(220,209,192,.72)',
-      '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(248,242,233,.96) 34%, rgba(237,228,214,1) 84%), linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0))',
-      '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.16)), rgba(255,255,255,.36)',
-      '--machineAxis':'rgba(78,87,96,.46)',
-      '--btnBorder':'rgba(58,69,80,.26)','--btnBorderHover':'rgba(58,69,80,.36)','--btnBorderOn':'rgba(58,69,80,.42)','--btnBorderOff':'rgba(58,69,80,.14)',
-      '--btnText':'#1d2831','--btnTextOff':'#61707e','--btnTextActive':'#101921',
-      '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.48)), rgba(220,209,191,.94)',
-      '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.56)), rgba(211,199,180,.98)',
-      '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.62)), rgba(197,184,164,1)',
-      '--btnBgOff':'linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.18)), rgba(225,217,205,.62)',
-      '--layerBtnBg':'linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.42)), rgba(220,209,191,.92)',
-      '--layerBtnBgHover':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.52)), rgba(211,199,180,.98)',
-      '--layerBtnBgOn':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.60)), rgba(196,183,163,1)',
-      '--layerBtnBgOff':'linear-gradient(180deg, rgba(255,255,255,.44), rgba(255,255,255,.16)), rgba(226,217,205,.56)','--layerBtnTextActive':'#101921',
-      '--hudPillBg':'rgba(255,255,255,.80)','--hudPillText':'#22303a',
-      '--controlDockBg':'rgba(237,229,216,.68)',
-      '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.40)), rgba(220,209,191,.92)',
-      '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.50)), rgba(209,197,178,.98)',
-      '--ctrlText':'#1d2831',
-      '--ctrlPlayBg':'linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.32)), rgba(184,219,196,.60)',
-      '--ctrlPlayText':'#1f5f3f','--ctrlPlayBorder':'rgba(48,112,78,.30)',
-      '--hintFrameBg':'rgba(239,233,223,.76)','--hintPaneBg':'rgba(255,255,255,.58)','--hintText':'#2b3945',
-      '--chargeTopBg':'rgba(159,59,59,.12)','--chargeTopGlow':'rgba(159,59,59,.12)',
-      '--chargeBottomBg':'rgba(47,93,145,.12)','--chargeBottomGlow':'rgba(47,93,145,.12)',
-      '--ringRedStrong':'rgba(159,59,59,.24)','--ringRedSoft':'rgba(159,59,59,.10)','--ringBlueSoft':'rgba(47,93,145,.10)',
-      '--ellipseGreenStrong':'rgba(21,154,82,.34)','--ellipseGreenSoft':'rgba(21,154,82,.16)','--ellipsePurpleSoft':'rgba(255,180,0,.18)'
-    },
-    graphs: {
-      axis:'#4d5964', text:'#1f2b34', marker:'#1f6f46', time:'#202b34',
-      V:{pos:'#8e6f1b',neg:'#8e6f1b'},
-      Q:{pos:'#2f5d91',neg:'#9f3b3b'},
-      I:{pos:'#159a52',neg:'#ffb400'},
-      E:{pos:'#2f5d91',neg:'#9f3b3b'},
-      B:{pos:'#159a52',neg:'#ffb400'}
-    },
-    sim: {
-      viewportBg:'#fffefb', axis:'#707774', electronDot:[159,59,59],
-      ePositive:[38,86,138], eNegative:[151,48,48],
-      bGreen:[21,154,82], bPurple:[255,180,0],
-      currentPositive:[21,154,82], currentNegative:[255,180,0],
-      rodPos:[47,93,145], rodNeg:[159,59,59], rodNeutral:[151,161,174],
-      rodOutline:'rgba(82, 89, 97, 0.28)', rodHighlight:'rgba(255,255,255, 0.74)',
-      chargePositive:'#1f6f88', chargeNegative:'#983b3b',
-      eEnvelope:'rgba(26,34,42,0.22)', bEnvelope:'rgba(26,34,42,0.22)',
-      eCurveStrokeMul:0.98, bCurveStrokeMul:0.98,
-      travelStrokeMul:0.98, envelopeStrokeWeight:1.02
-    }
-  }
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+const ui = {
+  yaw: document.getElementById('yaw'),
+  pitch: document.getElementById('pitch'),
+  focal: document.getElementById('focal'),
+  scale: document.getElementById('scale'),
+  shiftX: document.getElementById('shiftX'),
+  shiftY: document.getElementById('shiftY'),
+  rodX: document.getElementById('rodX'),
+  speed: document.getElementById('speed'),
+  axes: document.getElementById('axes'),
+  showRod: document.getElementById('showRod'),
+  showElectrons: document.getElementById('showElectrons'),
+  showCurrent: document.getElementById('showCurrent'),
+  showCharges: document.getElementById('showCharges'),
+  playBtn: document.getElementById('playBtn'),
+  resetBtn: document.getElementById('resetBtn')
 };
 
-function rgbToHex(rgb){
-  if (!Array.isArray(rgb) || rgb.length < 3) return '#ffffff';
-  const c = rgb.slice(0,3).map(v => {
-    const n = Math.max(0, Math.min(255, Math.round(v)));
-    return n.toString(16).padStart(2,'0');
-  });
-  return `#${c.join('')}`;
-}
-function applyPaletteFamily(theme, family){
-  if (!theme || !family) return;
-  const sim = theme.sim || (theme.sim = {});
-  const palette = sim.palette || (sim.palette = {});
-  const cssVars = theme.cssVars || (theme.cssVars = {});
-  const graphs = theme.graphs || (theme.graphs = {});
-  palette.ePositive = family.ePositive.slice();
-  palette.eNegative = family.eNegative.slice();
-  palette.bGreen = family.bGreen.slice();
-  palette.bPurple = family.bPurple.slice();
-  palette.currentPositive = family.bGreen.slice();
-  palette.currentNegative = family.bPurple.slice();
-  palette.rodPos = family.ePositive.slice();
-  palette.rodNeg = family.eNegative.slice();
-  palette.chargePositive = rgbToHex(family.ePositive);
-  palette.chargeNegative = rgbToHex(family.eNegative);
-  graphs.Q = graphs.Q || {};
-  graphs.I = graphs.I || {};
-  graphs.E = graphs.E || {};
-  graphs.B = graphs.B || {};
-  graphs.Q.pos = rgbToHex(family.ePositive);
-  graphs.Q.neg = rgbToHex(family.eNegative);
-  graphs.I.pos = rgbToHex(family.bGreen);
-  graphs.I.neg = rgbToHex(family.bPurple);
-  graphs.E.pos = rgbToHex(family.ePositive);
-  graphs.E.neg = rgbToHex(family.eNegative);
-  graphs.B.pos = rgbToHex(family.bPurple);
-  graphs.B.neg = rgbToHex(family.bGreen);
-  cssVars['--blue'] = rgbToHex(family.ePositive);
-  cssVars['--red'] = rgbToHex(family.eNegative);
-  cssVars['--green'] = rgbToHex(family.bGreen);
-  cssVars['--purple'] = rgbToHex(family.bPurple);
-  sim.stroke = sim.stroke || {};
-  if (family.eCurveAlphaMul != null) sim.stroke.eCurveAlphaMul = family.eCurveAlphaMul;
-  if (family.bCurveMul != null) sim.stroke.bCurveMul = family.bCurveMul;
-}
-const EMW_PALETTE_FAMILIES = {
-  default:      { ePositive:[78,156,202], eNegative:[226,106,94], bGreen:[34,198,100], bPurple:[255,186,18], eCurveAlphaMul:0.78, bCurveMul:1.10 },
-  screen:       { ePositive:[84,166,214], eNegative:[232,110,96], bGreen:[40,208,108], bPurple:[255,194,22], eCurveAlphaMul:0.80, bCurveMul:1.12 },
-  academic:     { ePositive:[74,144,182], eNegative:[198,98,86], bGreen:[48,174,96], bPurple:[236,170,24], eCurveAlphaMul:0.76, bCurveMul:1.08 },
-  print:        { ePositive:[76,148,190], eNegative:[202,96,84], bGreen:[52,178,98], bPurple:[238,172,22], eCurveAlphaMul:0.74, bCurveMul:1.10 },
-  printSharp:   { ePositive:[72,160,208], eNegative:[220,94,82], bGreen:[46,188,100], bPurple:[255,184,18], eCurveAlphaMul:0.72, bCurveMul:1.14 },
-  paperContrast:{ ePositive:[74,146,188], eNegative:[206,98,86], bGreen:[52,182,100], bPurple:[244,176,20], eCurveAlphaMul:0.70, bCurveMul:1.14 },
-  capture:      { ePositive:[76,152,194], eNegative:[210,100,88], bGreen:[24,198,100], bPurple:[255,184,0], eCurveAlphaMul:0.72, bCurveMul:1.14 }
-};
-Object.entries(EMW_PALETTE_FAMILIES).forEach(([key, family]) => {
-  if (THEME_PRESETS[key]) applyPaletteFamily(THEME_PRESETS[key], family);
-});
-
-function normalizeSimThemeCompat(theme){
-  const t = theme || {};
-  const sim = t.sim || (t.sim = {});
-  const palette = sim.palette || (sim.palette = {});
-  const stroke = sim.stroke || (sim.stroke = {});
-
-  palette.axis = palette.axis ?? sim.axis ?? '#4d535d';
-  palette.electronDot = palette.electronDot ?? sim.electronDot ?? [255,82,82];
-  palette.ePositive = palette.ePositive ?? sim.ePositive ?? [90,175,255];
-  palette.eNegative = palette.eNegative ?? sim.eNegative ?? [255,72,72];
-  palette.bGreen = palette.bGreen ?? sim.bGreen ?? [60,220,120];
-  palette.bPurple = palette.bPurple ?? sim.bPurple ?? [255,208,24];
-  palette.currentPositive = palette.currentPositive ?? sim.currentPositive ?? palette.bGreen ?? [74,215,110];
-  palette.currentNegative = palette.currentNegative ?? sim.currentNegative ?? palette.bPurple ?? [255,186,18];
-  palette.rodPos = palette.rodPos ?? sim.rodPos ?? palette.ePositive ?? [79,168,216];
-  palette.rodNeg = palette.rodNeg ?? sim.rodNeg ?? palette.eNegative ?? [232,90,90];
-  palette.rodNeutral = palette.rodNeutral ?? sim.rodNeutral ?? [188,198,214];
-  palette.rodOutline = palette.rodOutline ?? sim.rodOutline ?? 'rgba(12, 16, 22, 0.92)';
-  palette.rodHighlight = palette.rodHighlight ?? sim.rodHighlight ?? 'rgba(225, 232, 242, 0.30)';
-  palette.chargePositive = palette.chargePositive ?? sim.chargePositive ?? '#00E7FF';
-  palette.chargeNegative = palette.chargeNegative ?? sim.chargeNegative ?? '#FF0000';
-  palette.eEnvelope = palette.eEnvelope ?? sim.eEnvelope ?? 'rgba(255,255,255,0.43)';
-  palette.bEnvelope = palette.bEnvelope ?? sim.bEnvelope ?? 'rgba(255,255,255,0.43)';
-
-  stroke.eCurveMul = stroke.eCurveMul ?? sim.eCurveStrokeMul ?? 1.0;
-  stroke.bCurveMul = stroke.bCurveMul ?? sim.bCurveStrokeMul ?? 1.0;
-  stroke.eTravelMul = stroke.eTravelMul ?? sim.eTravelStrokeMul ?? sim.travelStrokeMul ?? 1.0;
-  stroke.bTravelMul = stroke.bTravelMul ?? sim.bTravelStrokeMul ?? sim.travelStrokeMul ?? 1.0;
-  stroke.envelopeWeight = stroke.envelopeWeight ?? sim.envelopeStrokeWeight ?? 1.15;
-  stroke.currentArrowMul = stroke.currentArrowMul ?? sim.currentArrowStrokeMul ?? 1.0;
-  stroke.axisWeight = stroke.axisWeight ?? sim.axisStrokeWeight ?? 0.83;
-
-  sim.axis = palette.axis;
-  sim.electronDot = palette.electronDot;
-  sim.ePositive = palette.ePositive;
-  sim.eNegative = palette.eNegative;
-  sim.bGreen = palette.bGreen;
-  sim.bPurple = palette.bPurple;
-  sim.currentPositive = palette.currentPositive;
-  sim.currentNegative = palette.currentNegative;
-  sim.rodPos = palette.rodPos;
-  sim.rodNeg = palette.rodNeg;
-  sim.rodNeutral = palette.rodNeutral;
-  sim.rodOutline = palette.rodOutline;
-  sim.rodHighlight = palette.rodHighlight;
-  sim.chargePositive = palette.chargePositive;
-  sim.chargeNegative = palette.chargeNegative;
-  sim.eEnvelope = palette.eEnvelope;
-  sim.bEnvelope = palette.bEnvelope;
-  sim.eCurveStrokeMul = stroke.eCurveMul;
-  sim.bCurveStrokeMul = stroke.bCurveMul;
-  sim.eTravelStrokeMul = stroke.eTravelMul;
-  sim.bTravelStrokeMul = stroke.bTravelMul;
-  sim.travelStrokeMul = stroke.eTravelMul;
-  sim.envelopeStrokeWeight = stroke.envelopeWeight;
-  sim.currentArrowStrokeMul = stroke.currentArrowMul;
-  sim.axisStrokeWeight = stroke.axisWeight;
-
-  return t;
-}
-
-function clonePlain(obj){
-  return JSON.parse(JSON.stringify(obj));
-}
-function mergeThemePreset(base, patch){
-  const out = clonePlain(base || {});
-  if (!patch || typeof patch !== 'object') return out;
-  Object.entries(patch).forEach(([k, v]) => {
-    if (v && typeof v === 'object' && !Array.isArray(v)) {
-      out[k] = mergeThemePreset(out[k] || {}, v);
-    } else {
-      out[k] = v;
-    }
-  });
-  return out;
-}
-THEME_PRESETS.screen = mergeThemePreset(THEME_PRESETS.default, {
-  key: 'screen',
-  labels: { el: 'Οθόνη', en: 'Screen' },
-  cssVars: {
-    '--bg':'#02060c','--bg2':'#07111d','--bg3':'#0f2134','--text':'#f4f9ff','--muted':'#b8d0ee',
-    '--green':'#54ffac','--red':'#ff6868','--blue':'#64c0ff','--purple':'#d76dff',
-    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0)), rgba(3,8,15,.92)',
-    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0)), rgba(5,10,18,.82)',
-    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0)), rgba(21,59,101,.34)',
-    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(54,126,212,.78) 0%, rgba(8,24,44,.42) 32%, rgba(2,5,10,1) 80%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0))',
-    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)), rgba(4,12,24,.68)',
-    '--machineAxis':'rgba(220,236,255,.88)',
-    '--btnBg':'linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.06)), rgba(12,52,96,.92)',
-    '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.08)), rgba(20,74,131,.96)',
-    '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.10)), rgba(33,97,165,1)',
-    '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05)), rgba(10,45,86,.92)',
-    '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,.07)), rgba(18,68,120,.98)',
-    '--ctrlText':'#f6fbff'
-  },
-  graphs: {
-    axis:'#9dc3f0', text:'#f1f8ff', marker:'#5dffb0', time:'#ffffff',
-    V:{pos:'#ffd65d',neg:'#ffd65d'},
-    Q:{pos:'#64c0ff',neg:'#ff6868'},
-    I:{pos:'#54ffac',neg:'#ffbe18'},
-    E:{pos:'#64c0ff',neg:'#ff6868'},
-    B:{pos:'#54ffac',neg:'#ff9a36'}
-  },
-  sim: {
-    viewportBg:'#03070e', axis:'#88a0be',
-    palette: {
-      ePositive:[112,208,255], eNegative:[255,104,104],
-      bGreen:[84,255,172], bPurple:[255,196,46],
-      eEnvelope:'rgba(255,255,255,0.48)', bEnvelope:'rgba(255,255,255,0.42)'
-    },
-    stroke: {
-      eCurveMul:1.22, bCurveMul:1.16, eTravelMul:1.18, bTravelMul:1.12, envelopeWeight:1.14
-    }
-  }
-});
-THEME_PRESETS.print = mergeThemePreset(THEME_PRESETS.capture, {
-  key: 'print',
-  labels: { el: 'Print', en: 'Print' },
-  cssVars: {
-    '--bg':'#ffffff','--bg2':'#f4f1eb','--bg3':'#e7e0d4','--text':'#18232c','--muted':'#4f5c69',
-    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.54)), rgba(238,232,222,.92)',
-    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.58)), rgba(230,223,211,.92)',
-    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.42)), rgba(233,225,213,.88)',
-    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(249,247,242,.98) 34%, rgba(237,231,221,1) 86%), linear-gradient(180deg, rgba(255,255,255,.56), rgba(255,255,255,0))',
-    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.18)), rgba(255,255,255,.42)',
-    '--machineAxis':'rgba(74,84,92,.54)',
-    '--btnText':'#18232c','--btnTextOff':'#576573','--btnTextActive':'#0d161d',
-    '--btnBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.58)), rgba(222,214,201,.96)',
-    '--btnBgHover':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.66)), rgba(211,201,186,1)',
-    '--btnBgActive':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.74)), rgba(196,184,166,1)',
-    '--layerBtnTextActive':'#0d161d',
-    '--ctrlBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.54)), rgba(223,213,198,.96)',
-    '--ctrlBgHover':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.62)), rgba(209,198,182,1)',
-    '--ctrlText':'#18232c'
-  },
-  graphs: {
-    axis:'#43505b', text:'#16212a', marker:'#176d42', time:'#16212a',
-    V:{pos:'#876814',neg:'#876814'},
-    Q:{pos:'#224f80',neg:'#8e3030'},
-    I:{pos:'#176d42',neg:'#e6a71a'},
-    E:{pos:'#224f80',neg:'#8e3030'},
-    B:{pos:'#176d42',neg:'#b06414'}
-  },
-  sim: {
-    viewportBg:'#ffffff', axis:'#7f8682',
-    palette: {
-      ePositive:[31,79,128], eNegative:[142,48,48],
-      bGreen:[23,109,66], bPurple:[218,150,18],
-      eEnvelope:'rgba(20,28,36,0.18)', bEnvelope:'rgba(20,28,36,0.18)', axis:'#7f8682'
-    },
-    stroke: {
-      eCurveMul:1.08, bCurveMul:1.06, eTravelMul:1.02, bTravelMul:1.00, envelopeWeight:1.00, axisWeight:0.96
-    }
-  }
-});
-
-THEME_PRESETS.printSharp = mergeThemePreset(THEME_PRESETS.print, {
-  key: 'printSharp',
-  labels: { el: 'Print Sharp', en: 'Print Sharp' },
-  cssVars: {
-    '--bg':'#ffffff','--bg2':'#fbfaf7','--bg3':'#eee7dc','--text':'#0f1820','--muted':'#42505c',
-    '--green':'#008749','--red':'#bb2424','--blue':'#005bb4','--purple':'#d26f00',
-    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.72)), rgba(245,240,232,.96)',
-    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.76)), rgba(238,231,220,.94)',
-    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.56)), rgba(238,231,220,.92)',
-    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(252,250,246,1) 34%, rgba(240,234,224,1) 88%), linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0))',
-    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.22)), rgba(255,255,255,.52)',
-    '--machineAxis':'rgba(46,58,68,.66)',
-    '--btnBorder':'rgba(24,34,44,.30)','--btnBorderHover':'rgba(24,34,44,.38)','--btnBorderOn':'rgba(24,34,44,.44)','--btnBorderOff':'rgba(24,34,44,.14)',
-    '--btnText':'#0f1820','--btnTextOff':'#52606d','--btnTextActive':'#000000',
-    '--layerBtnTextActive':'#000000',
-    '--ctrlText':'#0f1820',
-    '--hintText':'#17222b'
-  },
-  graphs: {
-    axis:'#2f3a44', text:'#0f1820', marker:'#00723d', time:'#0f1820',
-    V:{pos:'#775400',neg:'#775400'},
-    Q:{pos:'#0058ad',neg:'#ad1e1e'},
-    I:{pos:'#00723d',neg:'#f4b012'},
-    E:{pos:'#0058ad',neg:'#ad1e1e'},
-    B:{pos:'#00723d',neg:'#d26f00'}
-  },
-  sim: {
-    viewportBg:'#ffffff', axis:'#37424a',
-    palette: {
-      ePositive:[0,118,238], eNegative:[230,28,28],
-      bGreen:[0,170,86], bPurple:[255,170,0],
-      currentPositive:[0,150,76], currentNegative:[244,176,20],
-      rodPos:[0,118,238], rodNeg:[230,28,28], rodNeutral:[122,132,144],
-      rodOutline:'rgba(34, 40, 46, 0.34)', rodHighlight:'rgba(255,255,255,0.96)',
-      chargePositive:'#0069d9', chargeNegative:'#d81f1f',
-      eEnvelope:'rgba(20,26,32,0.08)', bEnvelope:'rgba(20,26,32,0.08)', axis:'#37424a'
-    },
-    stroke: {
-      eCurveMul:1.46, bCurveMul:1.42, eTravelMul:1.28, bTravelMul:1.24, envelopeWeight:0.84, axisWeight:1.10, eCurveAlphaMul:0.72
-    }
-  }
-});
-
-THEME_PRESETS.paperContrast = mergeThemePreset(THEME_PRESETS.print, {
-  key: 'paperContrast',
-  labels: { el: 'Χαρτί+', en: 'Paper Contrast' },
-  cssVars: {
-    '--bg':'#ffffff','--bg2':'#f7f5ef','--bg3':'#ece7db','--text':'#101820','--muted':'#4b5762',
-    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.62)), rgba(244,239,230,.94)',
-    '--topbarBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.70)), rgba(236,229,217,.94)',
-    '--graphsPanelBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.52)), rgba(238,230,218,.92)',
-    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(252,249,244,.98) 34%, rgba(240,234,224,1) 88%), linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0))',
-    '--machineHostBg':'linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.22)), rgba(255,255,255,.48)',
-    '--machineAxis':'rgba(56,66,74,.60)',
-    '--btnBorder':'rgba(31,44,56,.28)','--btnBorderHover':'rgba(31,44,56,.36)','--btnBorderOn':'rgba(31,44,56,.34)',
-    '--btnText':'#101820','--btnTextOff':'#55616b','--btnTextActive':'#000000',
-    '--layerBtnTextActive':'#000000',
-    '--ctrlText':'#101820'
-  },
-  graphs: {
-    axis:'#34414b', text:'#0d161d', marker:'#0f6f3f', time:'#0d161d',
-    V:{pos:'#7a5b0a',neg:'#7a5b0a'},
-    Q:{pos:'#153f71',neg:'#7f2222'},
-    I:{pos:'#0f6f3f',neg:'#f0aa16'},
-    E:{pos:'#153f71',neg:'#7f2222'},
-    B:{pos:'#0f6f3f',neg:'#a85c12'}
-  },
-  sim: {
-    viewportBg:'#ffffff', axis:'#6a706c',
-    palette: {
-      ePositive:[21,63,113], eNegative:[127,34,34],
-      bGreen:[15,111,63], bPurple:[212,142,18],
-      eEnvelope:'rgba(10,16,22,0.24)', bEnvelope:'rgba(10,16,22,0.24)', axis:'#6a706c'
-    },
-    stroke: {
-      eCurveMul:1.20, bCurveMul:1.18, eTravelMul:1.10, bTravelMul:1.06, envelopeWeight:1.08, axisWeight:1.02
-    }
-  }
-});
-
-THEME_PRESETS.captureView = mergeThemePreset(THEME_PRESETS.capture, {
-  key: 'captureView',
-  labels: { el: 'Λήψη', en: 'Capture' },
-  cssVars: {
-    '--bg':'#f7f3ea','--bg2':'#f3ede1','--bg3':'#ebe2d2','--text':'#14202a','--muted':'#45525c',
-    '--shellBg':'linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92)), #f6f1e6',
-    '--machineShellBg':'radial-gradient(circle at 50% 42%, rgba(255,255,255,1) 0%, rgba(252,249,243,1) 42%, rgba(242,235,223,1) 100%), #faf7f0',
-    '--machineHostBg':'transparent',
-    '--machineAxis':'rgba(56,66,74,.42)',
-    '--btnText':'#17232c','--btnTextActive':'#101820','--btnTextOff':'#52616c',
-    '--ctrlText':'#17232c',
-    '--hintText':'#1f2b34'
-  },
-  graphs: {
-    axis:'#3d4c56', text:'#18242d', marker:'#16643e', time:'#18242d',
-    V:{pos:'#7e6110',neg:'#7e6110'},
-    Q:{pos:'#184f8a',neg:'#a13434'},
-    I:{pos:'#17643f',neg:'#f8b416'},
-    E:{pos:'#184f8a',neg:'#a13434'},
-    B:{pos:'#17643f',neg:'#b86416'}
-  },
-  sim: {
-    viewportBg:'#fffdf8', axis:'#59636b',
-    ePositive:[24,79,138], eNegative:[165,48,48],
-    bGreen:[22,108,63], bPurple:[224,154,22],
-    currentPositive:[22,108,63], currentNegative:[248,180,22],
-    rodPos:[24,79,138], rodNeg:[165,48,48], rodNeutral:[144,153,165],
-    rodOutline:'rgba(75, 81, 89, 0.22)', rodHighlight:'rgba(255,255,255,0.82)',
-    chargePositive:'#155d78', chargeNegative:'#a43c3c',
-    eEnvelope:'rgba(25,32,38,0.12)', bEnvelope:'rgba(25,32,38,0.12)',
-    eCurveStrokeMul:1.22, bCurveStrokeMul:1.22, eTravelStrokeMul:1.18, bTravelStrokeMul:1.18, envelopeStrokeWeight:0.85
-  }
-});
-
-THEME_PRESETS.paper = THEME_PRESETS.capture;
-
-Object.keys(THEME_PRESETS).forEach((key) => {
-  THEME_PRESETS[key] = normalizeSimThemeCompat({ ...THEME_PRESETS[key], key });
-});
-
-window.EMW_THEME_PRESETS = THEME_PRESETS;
-window.EMW_ACTIVE_THEME = normalizeSimThemeCompat(JSON.parse(JSON.stringify(THEME_PRESETS.default)));
-
-function getActiveTheme(){
-  return window.EMW_ACTIVE_THEME || THEME_PRESETS.default;
-}
-function cloneTheme(theme){
-  return normalizeSimThemeCompat(JSON.parse(JSON.stringify(theme)));
-}
-function applyThemeVars(theme){
-  const root = document.documentElement;
-  Object.entries(theme.cssVars || {}).forEach(([key, value]) => root.style.setProperty(key, value));
-}
-function syncThemeButtons(){
-  document.querySelectorAll('.theme-chip').forEach(btn => {
-    const on = btn.dataset.theme === getActiveTheme().key;
-    btn.classList.toggle('is-on', on);
-    btn.classList.toggle('is-off', !on);
-    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
-}
-function registerThemePreset(key, themeObj){
-  THEME_PRESETS[key] = normalizeSimThemeCompat({ ...themeObj, key });
-}
-function applyTheme(themeKeyOrObj, options = {}){
-  const theme = typeof themeKeyOrObj === 'string'
-    ? (THEME_PRESETS[themeKeyOrObj] || THEME_PRESETS.default)
-    : themeKeyOrObj;
-  window.EMW_ACTIVE_THEME = cloneTheme(theme);
-  applyThemeVars(window.EMW_ACTIVE_THEME);
-  if (window.sim && typeof window.sim.setTheme === 'function') {
-    window.sim.setTheme(window.EMW_ACTIVE_THEME);
-    if (options.refreshSim !== false && typeof window.sim.refreshThemeColors === 'function') {
-      window.sim.refreshThemeColors();
-    }
-  }
-  if (options.refreshGraphs !== false && typeof window.initGraphs === 'function') {
-    window.initGraphs();
-  }
-  if (typeof window.updateGraphs === 'function') window.updateGraphs();
-  syncThemeButtons();
-}
-window.applyEMWTheme = applyTheme;
-window.registerEMWThemePreset = registerThemePreset;
-window.EMW_THEME_SCHEMA_HINT = {
-  sim: {
-    palette: { ePositive:[90,175,255], eNegative:[255,72,72], bGreen:[68,214,112], bPurple:[255,208,24], eEnvelope:'rgba(255,255,255,0.43)', bEnvelope:'rgba(255,255,255,0.43)', axis:'#4d535d' },
-    stroke: { eCurveMul:1.0, bCurveMul:1.0, eTravelMul:1.0, bTravelMul:1.0, envelopeWeight:1.15, currentArrowMul:1.0, axisWeight:0.83 }
-  }
+const COLORS = {
+  bg:'#0b0f14', axis:'#6f7f95', rod:'#d8dee7',
+  ePos:'#e85a5a', eNeg:'#4fa8d8',
+  currentPos:'#38b66b', currentNeg:'#f2a31b',
+  chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
+  electron:'#7ee8ff'
 };
 
-(function(global){
-  class EMWaveSimulation {
-    constructor(options = {}) {
-      this.options = {
-        width: 1400,
-        height: 620,
-        periodSeconds: 7.0,
-        host: null,
-        title: '',
-        description: '',
-        ...options
-      };
-      this.host = typeof this.options.host === 'string'
-        ? document.querySelector(this.options.host)
-        : this.options.host;
-      if (!this.host) throw new Error('EMWaveSimulation: host not found');
-      this.rootMount = null;
-      this.rootEl = null;
-      this.canvasHost = null;
-      this.ui = null;
-      this.p5Instance = null;
-      this._listeners = [];
-      this._initialized = false;
-
-      this.state = {
-        playing: true,
-        showE: true,
-        showB: true,
-        showECurves: true,
-        showETravelArrows: true,
-        showEEnvelope: true,
-        showBCurves: true,
-        showBTravelArrows: true,
-        showBEnvelope: true,
-        t: 0,
-        periodSeconds: this.options.periodSeconds,
-        playbackRate: 1,
-
-        canvasW: this.options.width,
-        canvasH: this.options.height,
-        leftFrac: 0.0,
-        leftW: 0,
-        rightW: 0,
-        x0: 0,
-        yTop: 180,
-        yBot: 300,
-        centerY: 0,
-        titleBandH: 56,
-
-        N: 11,
-        margin: 6,
-        minSep: 6.2,
-        naturalSpacing: 0,
-
-        yTarget: [],
-        yDisplay: [],
-        compTopSmooth: 0,
-        compBotSmooth: 0,
-        signedChargeView: 0,
-
-        rodLengthPx: 0,
-        lambdaPx: 0,
-
-        shiftAmp: 135,
-        beta: 0.88,
-        ell: 4,
-
-        fronts: [],
-        bFronts: [],
-        eTipTable: [],
-        bTipTable: [],
-        fadeK: 0.36,
-        eSlotIndex: 0,
-        bSlotIndex: 0,
-        lastSpawnT: 0,
-        lastBSpawnT: 0,
-        nextFrontId: 1
-      };
-
-      this.tables = this._buildTables();
-    }
-
-    _buildTables(){
-      const E_Q1 = [0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500];
-      const E_Q2 = [0.2500, 0.2538, 0.2651, 0.2835, 0.3085, 0.3393, 0.3750, 0.4145, 0.4566, 0.5000];
-      const E_Q3 = [0.5000, 0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500];
-      const E_Q4 = [0.7500, 0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000];
-      const B_Q1 = [0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500];
-      const B_Q2 = [0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000];
-      const B_Q3 = [0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500];
-      const B_Q4 = [0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000];
-      return {
-        E_Q1, E_Q2, E_Q3, E_Q4,
-        B_Q1, B_Q2, B_Q3, B_Q4,
-        E_FULL: [...E_Q1, ...E_Q2.slice(1), ...E_Q3.slice(1), ...E_Q4.slice(1)],
-        B_FULL: [...B_Q1, ...B_Q2.slice(1), ...B_Q3.slice(1), ...B_Q4.slice(1)]
-      };
-    }
-
-    _template(){
-      return `
-        <style>
-          .emws-root{all:initial;display:block;width:100%;height:100%}
-          .emws-root .wrap{width:100%;height:100%;margin:0;padding:0;background:transparent;border-radius:0;box-shadow:none;font-family:Arial,Helvetica,sans-serif;color:#eee}
-          .emws-root .canvas-host{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-          .emws-root .canvas-host canvas{display:block;border:none;border-radius:0;background:transparent;margin:0 auto}
-        </style>
-        <div class="wrap">
-          <div class="canvas-host"></div>
-        </div>
-      `;
-    }
-
-    init(){
-      if (this._initialized) return this;
-      if (typeof global.p5 === 'undefined') {
-        throw new Error('EMWaveSimulation: p5.js is required before init()');
-      }
-      this.rootMount = document.createElement('div');
-      this.rootMount.className = 'emws-root';
-      this.rootMount.innerHTML = this._template();
-      this.host.innerHTML = '';
-      this.host.appendChild(this.rootMount);
-      this.rootEl = this.rootMount.querySelector('.wrap');
-      this.canvasHost = this.rootMount.querySelector('.canvas-host');
-      this.ui = {
-        playBtn: this.rootMount.querySelector('[data-role="play"]'),
-        resetBtn: this.rootMount.querySelector('[data-role="reset"]')
-      };
-      if (this.ui.playBtn && this.ui.resetBtn) this._bindUI();
-      this._mountP5();
-      this._initialized = true;
-      return this;
-    }
-
-    _bindUI(){
-      const playHandler = () => this.toggle();
-      const resetHandler = () => this.reset();
-      this.ui.playBtn.addEventListener('click', playHandler);
-      this.ui.resetBtn.addEventListener('click', resetHandler);
-      this._listeners.push([this.ui.playBtn, 'click', playHandler], [this.ui.resetBtn, 'click', resetHandler]);
-    }
-
-    _syncButtons(){
-      if (this.ui?.playBtn) this.ui.playBtn.textContent = this.state.playing ? 'Pause' : 'Play';
-    }
-
-    _theme(){
-      return global.EMW_ACTIVE_THEME || global.EMW_THEME_PRESETS?.default || {};
-    }
-
-    _simTheme(){
-      return normalizeSimThemeCompat(this._theme()).sim || {};
-    }
-
-    _simPalette(){
-      return this._simTheme().palette || {};
-    }
-
-    _simStroke(){
-      return this._simTheme().stroke || {};
-    }
-
-    setTheme(theme){
-      global.EMW_ACTIVE_THEME = cloneTheme(theme);
-      return this;
-    }
-
-    refreshThemeColors(){
-      const simPalette = this._simPalette();
-      this.state.fronts.forEach(front => {
-        front.color = front.sign < 0 ? (simPalette.eNegative || [255,72,72]) : (simPalette.ePositive || [90,175,255]);
-      });
-      this.state.bFronts.forEach(front => {
-        const q = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
-        front.rgb = (q === 0 || q === 3) ? (simPalette.bPurple || [255,208,24]) : (simPalette.bGreen || [60,220,120]);
-      });
-      return this;
-    }
-
-    setFieldVisibility(kind, visible){
-      if (kind === 'E') this.state.showE = !!visible;
-      if (kind === 'B') this.state.showB = !!visible;
-      return this;
-    }
-
-    toggleField(kind){
-      if (kind === 'E') this.state.showE = !this.state.showE;
-      if (kind === 'B') this.state.showB = !this.state.showB;
-      return this;
-    }
-
-    setLayerVisibility(kind, visible){
-      if (Object.prototype.hasOwnProperty.call(this.state, kind)) this.state[kind] = !!visible;
-      return this;
-    }
-
-    toggleLayer(kind){
-      if (Object.prototype.hasOwnProperty.call(this.state, kind)) this.state[kind] = !this.state[kind];
-      return this;
-    }
-
-    start(){ this.state.playing = true; this._syncButtons(); return this; }
-    stop(){ this.state.playing = false; this._syncButtons(); return this; }
-    toggle(){ this.state.playing = !this.state.playing; this._syncButtons(); return this; }
-
-    setPlaybackRate(rate){
-      const next = Number(rate);
-      if (!Number.isFinite(next) || next <= 0) return this;
-      this.state.playbackRate = next;
-      return this;
-    }
-
-    _seekTo(tNorm, { keepPlaying = false } = {}){
-      const state = this.state;
-      state.t = this._clamp(tNorm, 0, 1);
-      state.playing = !!keepPlaying;
-      this._resetFronts();
-      this._emitContinuousFronts();
-      this._emitContinuousBFronts();
-      const { s } = this._computeTargets();
-      for(let k=0; k<state.N; k++) state.yDisplay[k] = state.yTarget[k];
-      const { compTop, compBot } = this._edgeAccumulation(state.yDisplay);
-      state.compTopSmooth = compTop;
-      state.compBotSmooth = compBot;
-      state.signedChargeView = s;
-      this._syncButtons();
-      if (typeof window.updateGraphs === 'function') window.updateGraphs();
-      return this;
-    }
-
-    stepBy(delta){
-      return this._seekTo(this.state.t + delta, { keepPlaying: false });
-    }
-
-    stepQuarter(dir){
-      const t = this.state.t;
-      const eps = 1e-9;
-      let target;
-      if (dir > 0){
-        target = (Math.floor((t + eps) * 4) + 1) / 4;
-      }else{
-        target = (Math.ceil((t - eps) * 4) - 1) / 4;
-      }
-      return this._seekTo(target, { keepPlaying: false });
-    }
-
-    reset(){
-      this._seekTo(0, { keepPlaying: false });
-      return this;
-    }
-
-    destroy(){
-      this.stop();
-      this._listeners.forEach(([el, ev, fn]) => el.removeEventListener(ev, fn));
-      this._listeners = [];
-      if (this.p5Instance) {
-        this.p5Instance.remove();
-        this.p5Instance = null;
-      }
-      if (this.rootMount) this.rootMount.remove();
-      this.rootMount = null;
-      this._initialized = false;
-    }
-
-    _resetFronts(){
-      this.state.fronts = [];
-      this.state.bFronts = [];
-      this.state.eTipTable = [];
-      this.state.bTipTable = [];
-      this.state.eTipSlots = this.tables.E_FULL
-        .map((tEmit, idx) => ({
-          slotIndex: idx,
-          tEmit,
-          frontRef: null,
-          xLocal: null,
-          tipY: null,
-          screenX: null,
-          screenY: null,
-          visible: false,
-          alive: false
-        }));
-      this.state.eSlotIndex = 0;
-      this.state.bSlotIndex = 0;
-      this.state.nextFrontId = 1;
-    }
-
-    _clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-    _phaseTextFromT(t){
-      const wrapped = ((t % 1) + 1) % 1;
-      const k = Math.round(wrapped * 8);
-      return ['0','T/8','T/4','3T/8','T/2','5T/8','3T/4','7T/8','T'][k] ?? (wrapped.toFixed(2)+'T');
-    }
-
-    _seedFront(tNorm, sign){
-      const phaseEmit = Math.PI + 2 * Math.PI * tNorm;
-      const eAtBirth = -Math.sin(phaseEmit);
-      const arrowLen = 80 * Math.abs(eAtBirth);
-      const front = {
-        id: this.state.nextFrontId++,
-        t0: tNorm,
-        sign,
-        reverseArrows: sign > 0,
-        color: sign < 0 ? (this._simPalette().eNegative || [255,72,72]) : (this._simPalette().ePositive || [90,175,255]),
-        arrowLen
-      };
-      this.state.fronts.push(front);
-      const slot = (this.state.eTipSlots || []).find(s => s.frontRef === null && Math.abs(s.tEmit - tNorm) < 1e-12);
-      if(slot) slot.frontRef = front.id;
-      this.state.lastSpawnT = tNorm;
-    }
-
-    _seedBFront(tNorm, sign, rgb, travelAngle, arrowLen, opts = {}){
-      this.state.bFronts.push({
-        t0: tNorm,
-        sign,
-        rgb,
-        travelAngle,
-        arrowLen,
-        anchorOnly: !!opts.anchorOnly
-      });
-      this.state.lastBSpawnT = tNorm;
-    }
-
-    _computeTargets(){
-      const state = this.state;
-      const usableTop = state.yTop + state.margin;
-      const usableBot = state.yBot - state.margin;
-      const usableL = usableBot - usableTop;
-      const d0 = usableL / (state.N - 1);
-      const phase = Math.PI + 2 * Math.PI * state.t;
-      const sField = -Math.sin(phase);
-      const s = -sField;
-      const sign = Math.sign(s) || -1;
-      const absS = Math.abs(s);
-      const A0 = (state.shiftAmp / 1000) * (state.yBot - state.yTop);
-      const S = A0 * s;
-      const maxGapCompression = Math.max(0, d0 - state.minSep);
-      const gapScale = state.beta * 0.98 * maxGapCompression * absS;
-      const gaps = new Array(state.N - 1).fill(d0);
-
-      if(sign <= 0){
-        for(let i=0; i<state.N-1; i++){
-          const profile = Math.exp(-i / state.ell);
-          gaps[i] = d0 - gapScale * profile;
-        }
-      } else {
-        for(let i=0; i<state.N-1; i++){
-          const profile = Math.exp(-(state.N - 2 - i) / state.ell);
-          gaps[i] = d0 - gapScale * profile;
-        }
-      }
-
-      const compressed = new Array(state.N);
-      compressed[0] = usableTop;
-      for(let i=1; i<state.N; i++) compressed[i] = compressed[i - 1] + gaps[i - 1];
-      const centerCompressed = 0.5 * (compressed[0] + compressed[state.N - 1]);
-      const centerBase = 0.5 * (usableTop + usableBot);
-      const centerOffset = centerBase - centerCompressed;
-      for(let i=0; i<state.N; i++) state.yTarget[i] = compressed[i] + centerOffset + S;
-
-      const lowBound = usableTop;
-      const highBound = usableBot;
-      if(state.yTarget[0] < lowBound){
-        const shift = lowBound - state.yTarget[0];
-        for(let i=0; i<state.N; i++) state.yTarget[i] += shift;
-      }
-      if(state.yTarget[state.N - 1] > highBound){
-        const shift = state.yTarget[state.N - 1] - highBound;
-        for(let i=0; i<state.N; i++) state.yTarget[i] -= shift;
-      }
-      return { s, phase, sField };
-    }
-
-    _edgeAccumulation(displayArray){
-      const state = this.state;
-      const d0 = state.naturalSpacing;
-      const topGaps = [];
-      const botGaps = [];
-      for(let k=0; k<Math.min(3, state.N - 1); k++){
-        topGaps.push(displayArray[k+1] - displayArray[k]);
-        botGaps.push(displayArray[state.N-1-k] - displayArray[state.N-2-k]);
-      }
-      const avgTop = topGaps.reduce((a,b)=>a+b,0) / topGaps.length;
-      const avgBot = botGaps.reduce((a,b)=>a+b,0) / botGaps.length;
-      const compTop = this._clamp((d0 - avgTop) / (d0 - state.minSep + 1e-6), 0, 1);
-      const compBot = this._clamp((d0 - avgBot) / (d0 - state.minSep + 1e-6), 0, 1);
-      return { compTop, compBot };
-    }
-
-    _drawChargeSymbol(p, symbol, x, y, strength, isPositive, alignMode='center'){
-      if(strength <= 0.01) return;
-      const alpha = 90 + 165 * strength;
-      const halfLen = 7.2 + 2.0 * strength;
-      const horizHalf = isPositive ? halfLen : halfLen * 1.12;
-      const lwBase = 1.05 + 2.60 * strength;
-      const lw = isPositive ? lwBase * 1.18 : lwBase;
-      let cy = y;
-      if(alignMode === 'top') cy = y + halfLen;
-      if(alignMode === 'bottom') cy = y - halfLen;
-      p.push();
-      p.strokeCap(p.ROUND);
-      const simPalette = this._simPalette();
-      const col = isPositive ? p.color(simPalette.chargePositive || '#00E7FF') : p.color(simPalette.chargeNegative || '#FF0000');
-      col.setAlpha(alpha);
-      p.stroke(col);
-      p.strokeWeight(lw);
-      p.line(x - horizHalf, cy, x + horizHalf, cy);
-      if(symbol === '+' || symbol === '＋') p.line(x, cy - halfLen*1.06, x, cy + halfLen*1.06);
-      p.pop();
-    }
-
-    _drawCurrentArrow(p, phase, x, yTop, yBot){
-      const iSigned = -Math.cos(phase);
-      const mag = Math.abs(iSigned);
-      if(mag < 0.025) return;
-      const alpha = 30 + 225 * mag;
-      const lineW = 0.65 + 4.0 * mag;
-      const arrowLen = (yBot - yTop) * (0.07 + 0.30 * mag);
-      const xArrow = x - 14;
-      const yCenter = 0.5 * (yTop + yBot);
-      const dir = iSigned >= 0 ? 1 : -1;
-      const y1 = yCenter - dir * arrowLen * 0.5;
-      const y2 = yCenter + dir * arrowLen * 0.5;
-      const head = 5.2 + 3.2 * mag;
-      p.push();
-      p.strokeCap(p.ROUND);
-      p.strokeJoin(p.ROUND);
-      const simPalette = this._simPalette();
-      const simStroke = this._simStroke();
-      const arrowRGB = iSigned >= 0 ? (simPalette.currentPositive || [74, 215, 110]) : (simPalette.currentNegative || [255, 186, 18]);
-      p.stroke(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
-      p.fill(arrowRGB[0], arrowRGB[1], arrowRGB[2], alpha);
-      p.strokeWeight(lineW * (simStroke.currentArrowMul || 1));
-      const yBase = y2 - dir * head;
-      p.line(xArrow, y1, xArrow, yBase);
-      p.noStroke();
-      p.triangle(xArrow, y2, xArrow - head * 0.55, yBase, xArrow + head * 0.55, yBase);
-      p.fill(arrowRGB[0], arrowRGB[1], arrowRGB[2], 45 + 190 * mag);
-      p.noStroke();
-      p.textAlign(p.CENTER, p.CENTER);
-      p.textSize(17);
-      p.text(mag > 0.92 ? 'I' : 'i', xArrow - 10, yCenter);
-      p.pop();
-    }
-
-    _drawRod(p, chargeTop, chargeBot, topIsNegative, botIsNegative){
-      const state = this.state;
-      const ctx = p.drawingContext;
-      const rodGrad = ctx.createLinearGradient(state.x0, state.yTop, state.x0, state.yBot);
-      const simPalette = this._simPalette();
-      const negColor = simPalette.rodNeg || [255, 82, 82];
-      const posColor = simPalette.rodPos || [90, 175, 255];
-      const neutralColor = simPalette.rodNeutral || [188, 198, 214];
-      const topColor = topIsNegative ? negColor : posColor;
-      const botColor = botIsNegative ? negColor : posColor;
-      const topA = 0.10 + 0.82 * chargeTop;
-      const botA = 0.10 + 0.82 * chargeBot;
-      const midA = 0.07 + 0.10 * Math.max(chargeTop, chargeBot);
-      rodGrad.addColorStop(0.00, `rgba(${topColor[0]}, ${topColor[1]}, ${topColor[2]}, ${topA})`);
-      rodGrad.addColorStop(0.16, `rgba(${topColor[0]}, ${topColor[1]}, ${topColor[2]}, ${0.32 * topA + 0.04})`);
-      rodGrad.addColorStop(0.50, `rgba(${neutralColor[0]}, ${neutralColor[1]}, ${neutralColor[2]}, ${midA})`);
-      rodGrad.addColorStop(0.84, `rgba(${botColor[0]}, ${botColor[1]}, ${botColor[2]}, ${0.32 * botA + 0.04})`);
-      rodGrad.addColorStop(1.00, `rgba(${botColor[0]}, ${botColor[1]}, ${botColor[2]}, ${botA})`);
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = simPalette.rodOutline || 'rgba(12, 16, 22, 0.92)';
-      ctx.lineWidth = 5.55;
-      ctx.beginPath();
-      ctx.moveTo(state.x0, state.yTop);
-      ctx.lineTo(state.x0, state.yBot);
-      ctx.stroke();
-      ctx.strokeStyle = rodGrad;
-      ctx.lineWidth = 3.75;
-      ctx.beginPath();
-      ctx.moveTo(state.x0, state.yTop);
-      ctx.lineTo(state.x0, state.yBot);
-      ctx.stroke();
-      ctx.strokeStyle = simPalette.rodHighlight || 'rgba(225, 232, 242, 0.30)';
-      ctx.lineWidth = 0.72;
-      ctx.beginPath();
-      ctx.moveTo(state.x0, state.yTop);
-      ctx.lineTo(state.x0, state.yBot);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    _getPulseScale(progress){
-      const pulseLocalAnchor = 142;
-      const d0 = this.state.rodLengthPx * 0.5;
-      return (d0 + this.state.lambdaPx * progress) / pulseLocalAnchor;
-    }
-
-    _drawElectronFront(p, front, nowT, travelLayer = 'all'){
-      const state = this.state;
-      const age = nowT - front.t0;
-      if(age < 0 || age > 1) return;
-      const scaleFactor = this._getPulseScale(age);
-      const fade = Math.exp(-state.fadeK * age);
-      const alpha = 225 * fade;
-      const simTheme = this._simTheme();
-      const simStroke = this._simStroke();
-      const curveAlpha = alpha * ((simStroke.eCurveAlphaMul || 1));
-      const strokeW = (simStroke.eCurveMul || 1) * 0.56 / scaleFactor;
-      const rgb = front.color;
-      p.push();
-      p.translate(state.x0, state.centerY);
-      p.scale(scaleFactor);
-      p.noFill();
-      p.stroke(rgb[0], rgb[1], rgb[2], curveAlpha);
-      p.strokeWeight(strokeW);
-      p.strokeCap(p.ROUND);
-      p.strokeJoin(p.ROUND);
-      const hasENonZeroLobe = state.showECurves && (front.arrowLen || 0) > 1e-9;
-      if(hasENonZeroLobe){
-        const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
-        for(const [sx, sy] of quads){
-          p.beginShape();
-          p.vertex(0 * sx, -142 * sy);
-          p.bezierVertex(18 * sx, -158 * sy, 45 * sx, -178 * sy, 63 * sx, -178 * sy);
-          p.bezierVertex(112 * sx, -178 * sy, 159 * sx, -122 * sy, 159 * sx, 0 * sy);
-          p.endShape();
-        }
-      }
-      const drawArrow = (x, y, angleDeg) => {
-        const dir = front.reverseArrows ? 180 : 0;
-        p.push();
-        p.translate(x, y);
-        p.rotate(p.radians(angleDeg + dir));
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.85);
-        const k = 1 / scaleFactor;
-        p.beginShape();
-        p.vertex(2.7 * k, 0);
-        p.vertex(-1.45 * k, -1.8 * k);
-        p.vertex(-1.45 * k, 1.8 * k);
-        p.endShape(p.CLOSE);
-        p.pop();
-      };
-      const hasEArrowMagnitude = state.showECurves && (front.arrowLen || 0) > 0.25;
-      if(hasEArrowMagnitude){
-        drawArrow(139.320, -115.360, 66.762);
-        drawArrow(139.320, 115.360, 113.238);
-        drawArrow(-139.320, -115.360, 113.238);
-        drawArrow(-139.320, 115.360, 66.762);
-      }
-      const drawTravelArrow = (xLocal) => {
-        if(!state.showETravelArrows || (front.arrowLen || 0) <= 0.25) return;
-        const dirLayer = front.sign >= 0 ? 'up' : 'down';
-        if(!(travelLayer === 'all' || travelLayer === dirLayer)) return;
-        const k = 1 / scaleFactor;
-        const signY = front.sign >= 0 ? -1 : 1; // positive E up, negative E down
-        const baseY = 0;
-        const L = (front.arrowLen || 18) * k;
-        const head = Math.min(5.1 * k, 0.34 * L);
-        const half = Math.min(2.9 * k, 0.22 * L);
-        const tipBaseY = signY * Math.max(0, L - head);
-        const tipY = signY * L;
-
-        p.push();
-        p.stroke(rgb[0], rgb[1], rgb[2], alpha * 0.92);
-        p.strokeWeight((simStroke.eTravelMul || 1) * 1.18 * k);
-        p.strokeCap(p.ROUND);
-        p.line(xLocal, baseY, xLocal, tipBaseY);
-        p.noStroke();
-        p.fill(rgb[0], rgb[1], rgb[2], alpha * 0.68);
-        p.triangle(xLocal, tipY, xLocal - half, tipBaseY, xLocal + half, tipBaseY);
-        p.pop();
-      };
-      if(travelLayer !== 'none') drawTravelArrow(159.000);
-      p.pop();
-    }
-
-    _ellipsePoint(a, b, theta){ return { x: a * Math.cos(theta), y: b * Math.sin(theta) }; }
-    _ellipseTangent(a, b, theta, ccw=true){
-      const tx = -a * Math.sin(theta);
-      const ty =  b * Math.cos(theta);
-      return ccw ? {x: tx, y: ty} : {x: -tx, y: -ty};
-    }
-
-    _drawMagneticArrow(p, x, y, angleDeg, rgb, alpha, scaleFactor){
-      p.push();
-      p.translate(x, y);
-      p.rotate(p.radians(angleDeg));
-      const k = 1 / scaleFactor;
-      p.noStroke();
-      p.fill(rgb[0], rgb[1], rgb[2], alpha);
-      p.beginShape();
-      p.vertex(2.25 * k, 0);
-      p.vertex(-1.28 * k, -1.50 * k);
-      p.vertex(-1.28 * k,  1.50 * k);
-      p.endShape(p.CLOSE);
-      p.pop();
-    }
-
-    _drawEllipseArcBySampling(ctx, a, b, t1, t2, steps=64){
-      for(let i=0; i<=steps; i++){
-        const u = i / steps;
-        const t = t1 + (t2 - t1) * u;
-        const x = a * Math.cos(t);
-        const y = b * Math.sin(t);
-        if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-    }
-
-    _drawMagneticEllipseSegment(p, front, nowT, mode, options = {}){
-      const state = this.state;
-      const drawCurves = options.drawCurves !== false;
-      const drawEllipseArrows = options.drawEllipseArrows !== false;
-      const drawTravelArrows = options.drawTravelArrows !== false;
-      const ageFromSpawn = nowT - front.t0;
-      if(ageFromSpawn < 0 || ageFromSpawn > 1) return;
-      const isZeroBFront = Math.abs(front.t0 * 4 - Math.round(front.t0 * 4)) < 1e-12;
-      if(isZeroBFront) return;
-      const age = ageFromSpawn;
-      const scaleFactor = this._getPulseScale(age);
-      const fade = Math.exp(-state.fadeK * age) * 0.78;
-      const alphaBase = 200 * fade;
-      const alpha = mode === 'back' ? alphaBase * 0.42 : alphaBase * 0.95;
-      const simTheme = this._simTheme();
-      const simPalette = this._simPalette();
-      const simStroke = this._simStroke();
-      const strokeW = (simStroke.bCurveMul || 1) * 0.82 / scaleFactor;
-      const frontQuarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
-      const isGreen = (frontQuarter === 0 || frontQuarter === 3);
-      const rgb = Array.isArray(front.rgb)
-        ? front.rgb
-        : (isGreen ? (simPalette.bPurple || [255, 208, 24]) : (simPalette.bGreen || [60, 220, 120]));
-      const curveRgb = mode === 'back'
-        ? rgb.map(v => Math.min(255, Math.round(v * 1.08 + 10)))
-        : rgb;
-      const a = 159;
-      const b = 39.5;
-      const ctx = p.drawingContext;
-      p.push();
-      p.translate(state.x0, state.centerY);
-      p.scale(scaleFactor);
-      ctx.save();
-      ctx.strokeStyle = `rgba(${curveRgb[0]},${curveRgb[1]},${curveRgb[2]},${alpha/255})`;
-      ctx.lineWidth = strokeW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      if(state.showBCurves && drawCurves){
-        ctx.beginPath();
-        if(mode === 'back') this._drawEllipseArcBySampling(ctx, a, b, Math.PI, 2 * Math.PI, 72);
-        else this._drawEllipseArcBySampling(ctx, a, b, 0, Math.PI, 72);
-        ctx.stroke();
-      }
-      ctx.restore();
-      const ccw = isGreen; // ίδια φορά για ίδιο χρώμα: reference η πρώτη πράσινη
-      const nominalTravelAngle = (typeof front.travelAngle === 'number') ? front.travelAngle : (front.sign > 0 ? -60 : 120);
-      const isBackwardTravel = nominalTravelAngle < 0;
-      const arrowLayerIsActive = isBackwardTravel ? (mode === 'back') : (mode === 'front');
-      const arrowRgb = rgb.map(v => Math.min(255, Math.round(v * 1.16 + 8)));
-      const arrowAlphaBase = alpha * (mode === 'back' ? 0.96 : 1.0);
-      const arrowAlpha = Math.max(
-        (!isGreen && isBackwardTravel) ? arrowAlphaBase * 0.92 : arrowAlphaBase,
-        mode === 'back' ? 150 : 176
-      );
-      if(state.showBCurves && drawEllipseArrows && arrowAlpha > 8){
-        const thetas = mode === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
-        for(const th of thetas){
-          const pt = this._ellipsePoint(a, b, th);
-          const tg = this._ellipseTangent(a, b, th, ccw);
-          const ang = Math.atan2(tg.y, tg.x) * 180 / Math.PI;
-          this._drawMagneticArrow(p, pt.x, pt.y, ang, arrowRgb, arrowAlpha, scaleFactor);
-        }
-      }
-      if(state.showBTravelArrows && drawTravelArrows && arrowAlpha > 8 && arrowLayerIsActive){
-        const anchorX = a;
-        const anchorY = 0;
-        this._drawMagneticArrow(p, anchorX, anchorY, nominalTravelAngle, arrowRgb, arrowAlpha, scaleFactor);
-      }
-      const hasBTravelMagnitude = (front.arrowLen || 0) > 0.25;
-      const drawBTravelArrow = () => {
-        if(!state.showBTravelArrows || !drawTravelArrows || !arrowLayerIsActive || !hasBTravelMagnitude) return;
-        const k = 1 / scaleFactor;
-        const baseX = a;
-        const baseY = 0;
-        const L = (front.arrowLen || 18) * k;
-        const angDeg = nominalTravelAngle;
-        const angRad = p.radians(angDeg);
-        const ux = Math.cos(angRad);
-        const uy = Math.sin(angRad);
-        const head = Math.min(5.1 * k, 0.34 * L);
-        const half = Math.min(2.9 * k, 0.22 * L);
-        const tipX = baseX + ux * L;
-        const tipY = baseY + uy * L;
-        const tipBaseX = tipX - ux * head;
-        const tipBaseY = tipY - uy * head;
-        const px = -uy;
-        const py = ux;
-        const travelRgb = arrowRgb;
-        const travelAlpha = Math.max((!isGreen && isBackwardTravel) ? 176 : alpha * 0.96, 184);
-
-        p.push();
-        p.stroke(12, 14, 18, Math.min(190, travelAlpha * 0.78));
-        p.strokeWeight((simStroke.bTravelMul || 1) * 2.18 * k);
-        p.strokeCap(p.ROUND);
-        p.line(baseX, baseY, tipBaseX, tipBaseY);
-        p.stroke(travelRgb[0], travelRgb[1], travelRgb[2], travelAlpha);
-        p.strokeWeight((simStroke.bTravelMul || 1) * 1.42 * k);
-        p.line(baseX, baseY, tipBaseX, tipBaseY);
-        p.noStroke();
-        p.fill(12, 14, 18, Math.min(190, travelAlpha * 0.78));
-        p.triangle(
-          tipX, tipY,
-          tipBaseX + px * (half * 1.08), tipBaseY + py * (half * 1.08),
-          tipBaseX - px * (half * 1.08), tipBaseY - py * (half * 1.08)
-        );
-        p.fill(travelRgb[0], travelRgb[1], travelRgb[2], travelAlpha);
-        p.triangle(
-          tipX, tipY,
-          tipBaseX + px * half, tipBaseY + py * half,
-          tipBaseX - px * half, tipBaseY - py * half
-        );
-        p.pop();
-      };
-      drawBTravelArrow();
-      p.pop();
-    }
-
-    _buildBLayerItems(nowT){
-      const visible = this.state.bFronts.filter(f => !f.anchorOnly && (nowT - f.t0) >= 0 && (nowT - f.t0) <= 1.0);
-      const items = [];
-      visible.forEach((front, idx) => {
-        items.push({ kind: 'ellipseTop', front, z: 1 + idx });
-        items.push({ kind: 'ellipseBottom', front, z: 200 - idx });
-      });
-      items.sort((a,b) => a.z - b.z);
-      return items;
-    }
-
-    _frontQuarterIndex(tEmit){
-      return tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
-    }
-
-    _isBFrontRelative(frontOrQuarter){
-      const q = typeof frontOrQuarter === 'number' ? frontOrQuarter : this._frontQuarterIndex(frontOrQuarter.t0);
-      return q === 0 || q === 3;
-    }
-
-    _emitContinuousFronts(){
-      const { E_FULL } = this.tables;
-      while(this.state.eSlotIndex < E_FULL.length && E_FULL[this.state.eSlotIndex] <= this.state.t + 1e-9){
-        const tEmit = E_FULL[this.state.eSlotIndex];
-        const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
-        const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
-        this._seedFront(tEmit, sign);
-        this.state.eSlotIndex++;
-      }
-    }
-
-    _emitContinuousBFronts(){
-      const { B_FULL } = this.tables;
-      while(this.state.bSlotIndex < B_FULL.length && B_FULL[this.state.bSlotIndex] <= this.state.t + 1e-9){
-        const tEmit = B_FULL[this.state.bSlotIndex];
-        const quarterFloat = tEmit >= 1 ? 3 : Math.floor(tEmit * 4);
-        const sign = (quarterFloat === 0 || quarterFloat === 1) ? 1 : -1;
-        const rgb = (quarterFloat === 0 || quarterFloat === 3)
-          ? ((this._simPalette().bPurple) || [255, 208, 24])
-          : ((this._simPalette().bGreen) || [60, 220, 120]);
-        // screen-angle test by T/4: 115, 55, 55, 115
-        // with canvas y-axis downward, the visible 55° orientation maps to -55 here
-        const travelAngle = (quarterFloat === 0) ? 75 : ((quarterFloat === 3) ? 115 : -55);
-        const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
-        const bAtBirth = -Math.cos(phaseEmit);
-        const arrowLen = 26 * Math.abs(bAtBirth);
-        const onQuarterBoundary = Math.abs(tEmit * 4 - Math.round(tEmit * 4)) < 1e-12;
-        const isZeroCrossing = onQuarterBoundary && Math.abs(bAtBirth) < 1e-9;
-        if(isZeroCrossing){
-          // Keep an invisible boundary anchor only at true zero crossings of B.
-          // At maxima/minima (e.g. T/2) we must still emit a normal visible front.
-          this._seedBFront(tEmit, sign, rgb, travelAngle, 0, { anchorOnly: true });
-        } else {
-          this._seedBFront(tEmit, sign, rgb, travelAngle, arrowLen);
-        }
-        this.state.bSlotIndex++;
-      }
-    }
-
-    _updateEArrowTipTable(nowT){
-      const state = this.state;
-      const slots = state.eTipSlots || [];
-      const liveFrontMap = new Map();
-
-      for(const front of state.fronts){
-        const age = nowT - front.t0;
-        if(age < 0 || age > 1) continue;
-        liveFrontMap.set(front.id, front);
-      }
-
-      for(const slot of slots){
-        slot.xLocal = null;
-        slot.tipY = null;
-        slot.screenX = null;
-        slot.screenY = null;
-        slot.visible = false;
-        slot.alive = false;
-
-        const front = liveFrontMap.get(slot.frontRef);
-        if(!front) continue;
-
-        const age = nowT - front.t0;
-        if(age < 0 || age > 1) continue;
-
-        const scaleFactor = this._getPulseScale(age);
-        if(scaleFactor <= 0) continue;
-
-        const xLocal = 159 * scaleFactor;
-        const signY = front.sign >= 0 ? -1 : 1;
-        const tipY = signY * (front.arrowLen || 0); // σε local coords του envelope, χωρίς extra scaling
-        const screenX = state.x0 + xLocal;
-        const screenY = state.centerY + tipY;
-        const baseScreenX = screenX;
-        const baseScreenY = state.centerY;
-
-        const visible = (
-          screenX >= state.x0 &&
-          screenX <= state.canvasW - 1 &&
-          screenY >= 0 &&
-          screenY <= state.canvasH
-        );
-
-        slot.xLocal = xLocal;
-        slot.tipY = tipY;
-        slot.screenX = screenX;
-        slot.screenY = screenY;
-        slot.baseScreenX = baseScreenX;
-        slot.baseScreenY = baseScreenY;
-        slot.visible = visible;
-        slot.alive = true;
-      }
-
-      state.eTipTable = slots.map(s => ({
-        slotIndex: s.slotIndex,
-        tEmit: s.tEmit,
-        frontRef: s.frontRef,
-        xLocal: s.xLocal,
-        tipY: s.tipY,
-        screenX: s.screenX,
-        screenY: s.screenY,
-        baseScreenX: s.baseScreenX,
-        baseScreenY: s.baseScreenY,
-        visible: s.visible,
-        alive: s.alive
-      }));
-      return state.eTipTable;
-    }
-
-    _drawEArrowTipsEnvelope(p, nowT){
-      const state = this.state;
-      const tipRows = this._updateEArrowTipTable(nowT);
-      if(!tipRows.length) return;
-
-      const visibleRows = tipRows.filter(row => row.alive && row.visible && row.xLocal != null && row.tipY != null);
-      if(visibleRows.length < 2) return;
-
-      p.push();
-      p.noStroke();
-      for(let i = 0; i < visibleRows.length - 1; i++){
-        const a = visibleRows[i];
-        const b = visibleRows[i + 1];
-        const fillAlpha = 118;
-        p.fill(196, 208, 220, fillAlpha);
-        p.quad(
-          a.baseScreenX, a.baseScreenY,
-          a.screenX, a.screenY,
-          b.screenX, b.screenY,
-          b.baseScreenX, b.baseScreenY
-        );
-      }
-      p.translate(state.x0, state.centerY);
-      p.noFill();
-      p.stroke((this._simPalette()).eEnvelope || 'rgba(255,255,255,0.43)');
-      p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
-      p.strokeCap(p.ROUND);
-      p.drawingContext.setLineDash([]);
-
-      // ΩΜΗ ΤΕΘΛΑΣΜΕΝΗ ΔΟΚΙΜΗΣ: ένωση κάθε δύο διαδοχικών ορατών tips με ευθύγραμμο τμήμα
-      for(let i = 0; i < visibleRows.length - 1; i++){
-        const a = visibleRows[i];
-        const b = visibleRows[i + 1];
-        p.line(a.xLocal, a.tipY, b.xLocal, b.tipY);
-      }
-
-      p.drawingContext.setLineDash([]);
-
-
-      p.pop();
-    }
-
-
-    _updateBArrowTipTable(nowT){
-      const state = this.state;
-      const rows = [];
-      for(const front of state.bFronts){
-        const age = nowT - front.t0;
-        if(age < 0 || age > 1) continue;
-        const scaleFactor = this._getPulseScale(age);
-        if(scaleFactor <= 0) continue;
-        const rawL = front.arrowLen || 0;
-        const hasVisibleArrow = rawL > 0.25;
-        const L = hasVisibleArrow ? rawL : 0;
-        const angDeg = (typeof front.travelAngle === 'number') ? front.travelAngle : -60;
-        const angRad = angDeg * Math.PI / 180;
-        const baseX = 159 * scaleFactor;
-        const baseScreenX = state.x0 + baseX;
-        const baseScreenY = state.centerY;
-        const tipX = baseScreenX + Math.cos(angRad) * L;
-        const tipY = baseScreenY + Math.sin(angRad) * L;
-        const visible = hasVisibleArrow ? (
-          tipX >= state.x0 &&
-          tipX <= state.canvasW - 1 &&
-          tipY >= 0 &&
-          tipY <= state.canvasH
-        ) : (
-          baseScreenX >= state.x0 &&
-          baseScreenX <= state.canvasW - 1 &&
-          baseScreenY >= 0 &&
-          baseScreenY <= state.canvasH
-        );
-        rows.push({
-          tEmit: front.t0,
-          screenX: tipX,
-          screenY: tipY,
-          baseScreenX,
-          baseScreenY,
-          visible,
-          alive: true,
-          isZeroAnchor: !hasVisibleArrow
-        });
-      }
-      rows.sort((a, b) => (a.screenX - b.screenX) || (a.tEmit - b.tEmit));
-      state.bTipTable = rows.map(row => {
-        const q = row.tEmit >= 1 ? 3 : Math.floor(row.tEmit * 4);
-        return {
-          ...row,
-          quarter: q,
-          isContinuous: (q === 0 || q === 3)
-        };
-      });
-      return state.bTipTable;
-    }
-
-    _resolveBEnvelopeSegmentQuarter(a, b){
-      const aZero = !!a.isZeroAnchor;
-      const bZero = !!b.isZeroAnchor;
-      if(aZero && !bZero) return b.quarter;
-      if(!aZero && bZero) return a.quarter;
-      if(a.quarter === b.quarter) return b.quarter;
-      // Fallback for awkward boundary cases: prefer the non-front side so the segment
-      // does not jump ahead visually before the zero crossing closes it on-axis.
-      const aFront = this._isBFrontRelative(a.quarter);
-      const bFront = this._isBFrontRelative(b.quarter);
-      if(aFront !== bFront) return aFront ? b.quarter : a.quarter;
-      return b.quarter;
-    }
-
-    _drawBArrowTipsEnvelope(p, nowT, layer = 'all', part = 'all'){
-      const state = this.state;
-      const tipRows = this._updateBArrowTipTable(nowT);
-      const visibleRows = tipRows.filter(row => row.alive && row.visible);
-      if(visibleRows.length < 2) return;
-
-      p.push();
-      if(part === 'all' || part === 'fill'){
-        // Keep the smoked-glass fill below the B arrows so the arrows stay crisp.
-        p.noStroke();
-        for(let i = 0; i < visibleRows.length - 1; i++){
-          const a = visibleRows[i];
-          const b = visibleRows[i + 1];
-          const segQuarter = this._resolveBEnvelopeSegmentQuarter(a, b);
-          const segFront = this._isBFrontRelative(segQuarter);
-          if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-          const isGreen = (segQuarter === 0 || segQuarter === 3);
-          const fillAlpha = isGreen ? 132 : 140;
-          const r = isGreen ? 18 : 14;
-          const g = isGreen ? 24 : 16;
-          const bl = isGreen ? 22 : 10;
-          p.fill(r, g, bl, fillAlpha);
-          p.quad(
-            a.baseScreenX, a.baseScreenY,
-            a.screenX, a.screenY,
-            b.screenX, b.screenY,
-            b.baseScreenX, b.baseScreenY
-          );
-        }
-      }
-      if(part === 'all' || part === 'line'){
-        p.noFill();
-        p.stroke((this._simPalette()).bEnvelope || 'rgba(255,255,255,0.43)');
-        p.strokeWeight(((this._simStroke()).envelopeWeight || 1.15));
-        p.strokeCap(p.ROUND);
-        for(let i = 0; i < visibleRows.length - 1; i++){
-          const a = visibleRows[i];
-          const b = visibleRows[i + 1];
-          const segQuarter = this._resolveBEnvelopeSegmentQuarter(a, b);
-          const segFront = this._isBFrontRelative(segQuarter);
-          if(layer !== 'all' && layer !== (segFront ? 'front' : 'back')) continue;
-          const useContinuous = !!(a.isContinuous && b.isContinuous && a.quarter === b.quarter);
-          p.drawingContext.setLineDash(useContinuous ? [] : [0.8,3.0]);
-          p.line(a.screenX, a.screenY, b.screenX, b.screenY);
-        }
-        p.drawingContext.setLineDash([]);
-      }
-      p.pop();
-    }
-
-    _mountP5(){
-      const self = this;
-      this.p5Instance = new global.p5((p) => {
-        p.setup = () => {
-          const state = self.state;
-          state.leftW = 0;
-          state.rightW = state.canvasW;
-          state.x0 = state.canvasW * 0.50;
-          state.centerY = state.canvasH * 0.50;
-          state.rodLengthPx = 120;
-          state.yTop = state.centerY - state.rodLengthPx * 0.50;
-          state.yBot = state.centerY + state.rodLengthPx * 0.50;
-          state.lambdaPx = 2 * state.rodLengthPx;
-          state.naturalSpacing = (state.rodLengthPx - 2 * state.margin) / (state.N - 1);
-          for(let i=0; i<state.N; i++){
-            state.yTarget[i] = state.yTop + state.margin + i * state.naturalSpacing;
-            state.yDisplay[i] = state.yTarget[i];
-          }
-          const cnv = p.createCanvas(state.canvasW, state.canvasH);
-          cnv.parent(self.canvasHost);
-          p.pixelDensity(1);
-          self._syncButtons();
-          self._resetFronts();
-        };
-
-        p.draw = () => {
-          const state = self.state;
-          const dt = Math.min(1/120, p.deltaTime / 1000);
-          if(state.playing){
-            state.t += (dt * (state.playbackRate || 1)) / state.periodSeconds;
-            if(state.t >= 1){
-              state.t = 1;
-              state.playing = false;
-              self._syncButtons();
-            }
-          }
-          const { s, phase } = self._computeTargets();
-          if(state.playing) {
-            self._emitContinuousFronts();
-            self._emitContinuousBFronts();
-          }
-          const alphaFollow = 1 - Math.exp(-22 * dt);
-          for(let k=0; k<state.N; k++) state.yDisplay[k] += (state.yTarget[k] - state.yDisplay[k]) * alphaFollow;
-          const { compTop, compBot } = self._edgeAccumulation(state.yDisplay);
-          state.compTopSmooth += (compTop - state.compTopSmooth) * (1 - Math.exp(-14 * dt));
-          state.compBotSmooth += (compBot - state.compBotSmooth) * (1 - Math.exp(-14 * dt));
-          state.signedChargeView += (s - state.signedChargeView) * (1 - Math.exp(-10 * dt));
-
-          const simTheme = self._theme().sim || {};
-          p.background(simTheme.viewportBg || '#0c0d10');
-          p.stroke((this._simPalette()).axis || '#4d535d');
-          p.strokeWeight((this._simStroke()).axisWeight || 0.83);
-          p.drawingContext.setLineDash([0.8,3.0]);
-          p.line(30, state.centerY, state.canvasW - 30, state.centerY);
-          p.drawingContext.setLineDash([]);
-
-          state.fronts = state.fronts.filter(front => (state.t - front.t0) <= 1.02);
-          state.bFronts = state.bFronts.filter(front => (state.t - front.t0) <= 1.02);
-          const bItems = state.showB ? self._buildBLayerItems(state.t) : [];
-          const bBackOfE = bItems.filter(item => !self._isBFrontRelative(item.front));
-          const bFrontOfE = bItems.filter(item => self._isBFrontRelative(item.front));
-          for(const item of bBackOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back', { drawTravelArrows: false });
-          for(const item of bFrontOfE) if(item.kind === 'ellipseTop') self._drawMagneticEllipseSegment(p, item.front, state.t, 'back', { drawTravelArrows: false });
-
-          const topComp = state.compTopSmooth;
-          const botComp = state.compBotSmooth;
-          const signed = state.signedChargeView;
-          const negTop = self._clamp(-signed, 0, 1);
-          const posTop = self._clamp( signed, 0, 1);
-          const negBot = self._clamp( signed, 0, 1);
-          const posBot = self._clamp(-signed, 0, 1);
-          const chargeTop = Math.max(negTop, posTop) * topComp;
-          const chargeBot = Math.max(negBot, posBot) * botComp;
-          const topIsNegative = negTop > posTop;
-          const botIsNegative = negBot > posBot;
-          self._drawRod(p, chargeTop, chargeBot, topIsNegative, botIsNegative);
-          self._drawCurrentArrow(p, phase, state.x0, state.yTop, state.yBot);
-          const chargeX = state.x0 + 24;
-          if(chargeTop > 0.01) self._drawChargeSymbol(p, topIsNegative ? '−' : '+', chargeX, state.yTop, chargeTop, !topIsNegative, 'top');
-          if(chargeBot > 0.01) self._drawChargeSymbol(p, botIsNegative ? '−' : '+', chargeX, state.yBot, chargeBot, !botIsNegative, 'bottom');
-
-          // E lobes stay behind; B-back travel arrows must stay behind the top E arrows.
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'none');
-          if(state.showE && state.showEEnvelope) self._drawEArrowTipsEnvelope(p, state.t);
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'down');
-
-          // Back-side B fill/line/arrows stay behind the top E arrows.
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'fill');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'back', 'line');
-          for(const item of bBackOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
-
-          // Top E arrows must cover the green/back B arrows.
-          if(state.showE) for(const front of state.fronts) self._drawElectronFront(p, front, state.t, 'up');
-
-          // Lower B ellipses sit above the E arrows, but still below B travel arrows.
-          for(const item of bBackOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
-          for(const item of bFrontOfE) if(item.kind === 'ellipseBottom') self._drawMagneticEllipseSegment(p, item.front, state.t, 'front', { drawTravelArrows: false });
-
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'fill');
-          if(state.showB && state.showBEnvelope) self._drawBArrowTipsEnvelope(p, state.t, 'front', 'line');
-          for(const item of bFrontOfE) self._drawMagneticEllipseSegment(p, item.front, state.t, item.kind === 'ellipseTop' ? 'back' : 'front', { drawCurves: false, drawEllipseArrows: false, drawTravelArrows: true });
-
-          const dotColor = (self._theme().sim || {}).electronDot || [255, 82, 82];
-          p.noStroke(); p.fill(dotColor[0], dotColor[1], dotColor[2]);
-          for(let k=0; k<state.N; k++) p.circle(state.x0, state.yDisplay[k], 2.5);
-
-        };
-      });
-    }
-  }
-
-  global.EMWaveSimulation = EMWaveSimulation;
-})(window);
-
-let uiTexts = null;
-let commentsTexts = null;
-let graphsTexts = null;
-let uiConfig = null;
-let currentLang = 'el';
-let sim = null;
-
-
-async function loadJSON(path){
-  const res = await fetch(path, {cache:'no-store'});
-  if(!res.ok) throw new Error(`Failed to load ${path}`);
-  return await res.json();
+const state = { t:0, playing:true, electronDisplayYs:null, compTopSmooth:0, compBotSmooth:0 };
+
+ui.playBtn.addEventListener('click', () => {
+  state.playing = !state.playing;
+  ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
+});
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.electronDisplayYs = null; state.compTopSmooth = 0; state.compBotSmooth = 0; });
+
+function resizeCanvas(){
+  const wrap = cv.parentElement.getBoundingClientRect();
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  cv.width = Math.max(400, Math.round(wrap.width * dpr));
+  cv.height = Math.max(260, Math.round(wrap.height * dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 }
-async function loadResources(){
-  uiTexts = await loadJSON('em_wave_ui_texts.json');
-  commentsTexts = await loadJSON('em_wave_comments_texts.json');
-  graphsTexts = await loadJSON('em_wave_graphs_texts.json');
-  uiConfig = await loadJSON('em_wave_config_ui.json');
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 0);
+
+function deg(a){ return a*Math.PI/180; }
+function rotateY(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:c*p.x+s*p.z,y:p.y,z:-s*p.x+c*p.z}; }
+function rotateX(p, a){ const c=Math.cos(a), s=Math.sin(a); return {x:p.x,y:c*p.y-s*p.z,z:s*p.y+c*p.z}; }
+function transformPoint(p, cam){ return rotateX(rotateY(p, cam.yaw), cam.pitch); }
+function project(p, cam, vp){
+  const q = transformPoint(p, cam);
+  const z = q.z + cam.distance;
+  const k = cam.focal / Math.max(40, z);
+  return { x: vp.cx + q.x * cam.scale * k, y: vp.cy - q.y * cam.scale * k, depth:z, k };
 }
 
-
-window.getActiveTheme = getActiveTheme;
-
-const captureModeState = {
-  enabled: false,
-  previousThemeKey: 'default'
-};
-
-function syncCaptureButtons(){
-  const mainBtn = document.getElementById('toggleCaptureView');
-  const exitBtn = document.getElementById('captureExitBtn');
-  [mainBtn, exitBtn].forEach(btn => {
-    if(!btn) return;
-    btn.classList.toggle('is-on', captureModeState.enabled);
-    btn.classList.toggle('is-off', !captureModeState.enabled);
-    btn.setAttribute('aria-pressed', captureModeState.enabled ? 'true' : 'false');
-  });
+function drawLine2D(a, b, color, width=2, alpha=1){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+  ctx.restore();
 }
 
-function setCaptureMode(enabled){
-  const next = !!enabled;
-  if(next === captureModeState.enabled) return;
-  if(next){
-    captureModeState.previousThemeKey = (getActiveTheme() && getActiveTheme().key) || 'default';
-    applyTheme('captureView', { refreshGraphs:true, refreshSim:true });
-    document.body.classList.add('capture-view');
-  }else{
-    document.body.classList.remove('capture-view');
-    applyTheme(captureModeState.previousThemeKey || 'default', { refreshGraphs:true, refreshSim:true });
-  }
-  captureModeState.enabled = next;
-  syncCaptureButtons();
+function drawCircle2D(p, r, color, alpha=1){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
 }
 
-function toggleCaptureMode(){
-  setCaptureMode(!captureModeState.enabled);
+function drawText2D(text, x, y, color, alpha=1, size=14){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.font = `${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+  ctx.restore();
 }
 
-function updatePlayButton(){
-  const btn = document.getElementById('playBtn');
-  if(!btn || !uiTexts || !currentLang) return;
-  const ui = uiTexts[currentLang];
-  btn.textContent = sim && sim.state && sim.state.playing ? ui.controls.pause : ui.controls.play;
+function drawChargeGlyph(text, x, y, color, mag){
+  const size = 12 + 11 * mag;
+  const strokeW = 0.3 + 2.1 * mag;
+  ctx.save();
+  ctx.globalAlpha = 0.28 + 0.72 * mag;
+  ctx.font = `${600 + Math.round(250 * mag)} ${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = strokeW;
+  ctx.strokeStyle = 'rgba(12,16,22,0.88)';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
 }
 
-function syncSpeedButtons(){
-  if(!sim) return;
-  const speedMap = [
-    ['speed025', 0.25],
-    ['speed05', 0.5],
-    ['speed1', 1]
+function drawArrow2D(base, tip, color, width=2.2, alpha=1){
+  const dx = tip.x - base.x;
+  const dy = tip.y - base.y;
+  const L = Math.hypot(dx, dy);
+  if(L < 1e-6) return;
+  const ux = dx / L, uy = dy / L;
+  const head = Math.min(14, Math.max(8, L * 0.22));
+  const half = head * 0.42;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+
+  const shaftX = tip.x - ux * head;
+  const shaftY = tip.y - uy * head;
+
+  ctx.beginPath();
+  ctx.moveTo(base.x, base.y);
+  ctx.lineTo(shaftX, shaftY);
+  ctx.stroke();
+
+  const px = -uy, py = ux;
+  ctx.beginPath();
+  ctx.moveTo(tip.x, tip.y);
+  ctx.lineTo(shaftX + px * half, shaftY + py * half);
+  ctx.lineTo(shaftX - px * half, shaftY - py * half);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawAxes(cam, vp){
+  const axes = [
+    {a:{x:-0.3,y:0,z:0}, b:{x:1.6,y:0,z:0}, c:COLORS.axis, label:'x'},
+    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
+    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.currentPos, label:'z'}
   ];
-  speedMap.forEach(([id, rate]) => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const on = Math.abs((sim.state.playbackRate || 1) - rate) < 1e-9;
-    el.classList.toggle('is-active', on);
-    el.setAttribute('aria-pressed', on ? 'true' : 'false');
+  ctx.save();
+  ctx.font = '12px system-ui';
+  axes.forEach(ax => {
+    const A = project(ax.a, cam, vp);
+    const B = project(ax.b, cam, vp);
+    drawLine2D(A, B, ax.c, 1.6, 1);
+    drawText2D(ax.label, B.x + 8, B.y - 5, ax.c, 1, 12);
   });
+  ctx.restore();
 }
 
-function syncFieldButtons(){
-  const eBtn = document.getElementById("toggleE");
-  const bBtn = document.getElementById("toggleB");
-  if (!eBtn || !bBtn || !sim) return;
-  eBtn.classList.toggle("is-on", !!sim.state.showE);
-  eBtn.classList.toggle("is-off", !sim.state.showE);
-  bBtn.classList.toggle("is-on", !!sim.state.showB);
-  bBtn.classList.toggle("is-off", !sim.state.showB);
-  eBtn.setAttribute("aria-pressed", sim.state.showE ? "true" : "false");
-  bBtn.setAttribute("aria-pressed", sim.state.showB ? "true" : "false");
+function getPhase(){
+  // ίδια λογική φάσης με το καλό 2D: μία πλήρης περίοδος στο [0,1)
+  return Math.PI + 2 * Math.PI * state.t;
 }
 
-function syncLayerButtons(){
-  if(!sim) return;
-  const ids = [
-    ['toggleECurves', 'showECurves'],
-    ['toggleETravel', 'showETravelArrows'],
-    ['toggleEEnv', 'showEEnvelope'],
-    ['toggleBCurves', 'showBCurves'],
-    ['toggleBTravel', 'showBTravelArrows'],
-    ['toggleBEnv', 'showBEnvelope']
-  ];
-  ids.forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const on = !!sim.state[key];
-    el.classList.toggle('is-on', on);
-    el.classList.toggle('is-off', !on);
-    el.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
+function getRodState(){
+  const phase = getPhase();
+  const chargeSigned = Math.sin(phase);
+  const currentSigned = -Math.cos(phase);
+  const chargeMag = Math.abs(chargeSigned);
+  const currentMag = Math.abs(currentSigned);
+  return { phase, chargeSigned, currentSigned, chargeMag, currentMag };
 }
 
-function setLang(lang){
-  currentLang = lang;
-  const ui = uiTexts[lang];
-  const cm = commentsTexts[lang];
-  const btnEl = document.querySelector('.lang-btn[data-lang="el"]');
-  const btnEn = document.querySelector('.lang-btn[data-lang="en"]');
-  if (btnEl) btnEl.textContent = ui.controls.langGR;
-  if (btnEn) btnEn.textContent = ui.controls.langEN;
+function drawRodProjected(cam, vp, rodShift, rodVisual){
+  const yTop = 0.80, yBot = -0.80;
+  const topColor = rodVisual.topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const botColor = rodVisual.botIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
 
-  const ids = {
-    appTitle: ui.header.appTitle,
-    appSub: ui.header.appSub,
-    toggleE: ui.controls.toggleE,
-    toggleB: ui.controls.toggleB,
-    toggleHints: ui.controls.toggleHints,
-    resetBtn: ui.controls.reset,
-    stepPrev: ui.controls.stepPrev,
-    stepNext: ui.controls.stepNext,
-    qPrev: ui.controls.qPrev,
-    qNext: ui.controls.qNext,
-    speed025: ui.controls.speed025,
-    speed05: ui.controls.speed05,
-    speed1: ui.controls.speed1,
-    toggleCaptureView: (lang === 'en' ? 'Capture view' : 'Λήψη'),
-    captureExitBtn: (lang === 'en' ? 'Exit capture' : 'Έξοδος λήψης'),
-    hintK1: cm.seeTitle,
-    hintK2: cm.compareTitle,
-    hintK3: cm.nextTitle,
-    hint1: cm.seeText,
-    hint2: cm.compareText,
-    hint3: cm.nextText
+  const pTop = project({x:rodShift, y:yTop, z:0}, cam, vp);
+  const pBot = project({x:rodShift, y:yBot, z:0}, cam, vp);
+
+  const topA = 0.10 + 0.82 * rodVisual.chargeTop;
+  const botA = 0.10 + 0.82 * rodVisual.chargeBot;
+  const midA = 0.07 + 0.10 * Math.max(rodVisual.chargeTop, rodVisual.chargeBot);
+
+  const rgba = (hex, a) => {
+    const h = hex.replace('#','');
+    const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
   };
-  Object.entries(ids).forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  });
 
-  const layerLabels = (lang === 'en')
-    ? { toggleECurves:'E curves', toggleETravel:'E arrows', toggleEEnv:'E envelope', toggleBCurves:'B curves', toggleBTravel:'B arrows', toggleBEnv:'B envelope' }
-    : { toggleECurves:'E καμπύλες', toggleETravel:'E βέλη', toggleEEnv:'E περίβλημα', toggleBCurves:'B καμπύλες', toggleBTravel:'B βέλη', toggleBEnv:'B περίβλημα' };
-  Object.entries(layerLabels).forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  });
+  const rodGrad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
+  rodGrad.addColorStop(0.00, rgba(topColor, topA));
+  rodGrad.addColorStop(0.16, rgba(topColor, 0.32 * topA + 0.04));
+  rodGrad.addColorStop(0.50, rgba(COLORS.rod, midA));
+  rodGrad.addColorStop(0.84, rgba(botColor, 0.32 * botA + 0.04));
+  rodGrad.addColorStop(1.00, rgba(botColor, botA));
 
-  const themeLabels = (lang === 'en')
-    ? {
-        themeDefault: THEME_PRESETS.default.labels.en,
-        themeScreen: THEME_PRESETS.screen.labels.en,
-        themeAcademic: THEME_PRESETS.academic.labels.en,
-        themePrint: THEME_PRESETS.print.labels.en,
-        themePrintSharp: THEME_PRESETS.printSharp.labels.en,
-        themePaperContrast: THEME_PRESETS.paperContrast.labels.en,
-        themeCapture: THEME_PRESETS.capture.labels.en
-      }
-    : {
-        themeDefault: THEME_PRESETS.default.labels.el,
-        themeScreen: THEME_PRESETS.screen.labels.el,
-        themeAcademic: THEME_PRESETS.academic.labels.el,
-        themePrint: THEME_PRESETS.print.labels.el,
-        themePrintSharp: THEME_PRESETS.printSharp.labels.el,
-        themePaperContrast: THEME_PRESETS.paperContrast.labels.el,
-        themeCapture: THEME_PRESETS.capture.labels.el
-      };
-  Object.entries(themeLabels).forEach(([id, value]) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  });
+  ctx.save();
+  ctx.strokeStyle = 'rgba(12,16,22,0.92)';
+  ctx.lineWidth = 7.0;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(pTop.x, pTop.y);
+  ctx.lineTo(pBot.x, pBot.y);
+  ctx.stroke();
 
-  document.querySelectorAll(".lang-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.lang === lang));
-  syncThemeButtons();
-  initGraphs();
-  updatePlayButton();
-  syncFieldButtons();
-  syncLayerButtons();
-  syncCaptureButtons();
+  ctx.strokeStyle = rodGrad;
+  ctx.lineWidth = 4.1;
+  ctx.beginPath();
+  ctx.moveTo(pTop.x, pTop.y);
+  ctx.lineTo(pBot.x, pBot.y);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(225,232,242,0.28)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(pTop.x, pTop.y);
+  ctx.lineTo(pBot.x, pBot.y);
+  ctx.stroke();
+  ctx.restore();
+
+  return { pTop, pBot };
 }
 
-
-
-function buildPath(fn, samples=160){
-  const x0 = 24, x1 = 256, yMid = 44, amp = 24;
-  let d = '';
-  for(let i=0;i<=samples;i++){
-    const u = i / samples;
-    const x = x0 + (x1 - x0) * u;
-    const y = yMid - amp * fn(u);
-    d += (i===0 ? 'M' : ' L') + x.toFixed(2) + ' ' + y.toFixed(2);
+function drawChargeSymbols(cam, vp, rodShift, rodVisual){
+  if(rodVisual.chargeTop > 0.01){
+    const topP = project({x:rodShift + 0.08, y:0.86, z:0}, cam, vp);
+    const topSymbol = rodVisual.topIsNegative ? '−' : '+';
+    const topColor = rodVisual.topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+    drawChargeGlyph(topSymbol, topP.x, topP.y, topColor, rodVisual.chargeTop);
   }
-  return d;
-}
-const graphFns = {
-  V: u => Math.sin(2*Math.PI*u),
-  q: u => Math.sin(2*Math.PI*u),
-  i: u => Math.cos(2*Math.PI*u),
-  E: u => Math.sin(2*Math.PI*u),
-  B: u => Math.cos(2*Math.PI*u)
-};
-function graphAxisMarkup(label){
-  const axisText = graphsTexts[currentLang].axis;
-  const theme = getActiveTheme();
-  const gTheme = theme.graphs || {};
-  const ticks = [
-    {u:0.125, txt:axisText.ticks[0]},
-    {u:0.25, txt:axisText.ticks[1]},
-    {u:0.375, txt:axisText.ticks[2]},
-    {u:0.5, txt:axisText.ticks[3]},
-    {u:0.625, txt:axisText.ticks[4]},
-    {u:0.75, txt:axisText.ticks[5]},
-    {u:0.875, txt:axisText.ticks[6]},
-    {u:1.0, txt:axisText.ticks[7]}
-  ];
-  const x0=24, x1=256, y0=44, yAxis=24;
-  let s = '';
-  s += `<text x="6" y="16" fill="${gTheme.text || '#d8e8fb'}" font-size="10" font-weight="600">${label}</text>`;
-  s += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="${gTheme.axis || '#6f87a6'}" stroke-width="1.0"/>`;
-  s += `<line x1="${yAxis}" y1="10" x2="${yAxis}" y2="78" stroke="${gTheme.axis || '#6f87a6'}" stroke-width="1.0"/>`;
-  s += `<circle cx="${yAxis}" cy="${y0}" r="1.6" fill="${gTheme.axis || '#6f87a6'}"/>`;
-  s += `<text x="${yAxis-5}" y="${y0+14}" fill="${gTheme.text || '#d8e8fb'}" font-size="9">${axisText.zero}</text>`;
-  for(const t of ticks){
-    const x = x0 + (x1-x0)*t.u;
-    s += `<line x1="${x}" y1="${y0-3.5}" x2="${x}" y2="${y0+3.5}" stroke="${gTheme.axis || '#6f87a6'}" stroke-width="0.9"/>`;
-    s += `<text x="${x-8}" y="${y0+14}" fill="${gTheme.text || '#d8e8fb'}" font-size="8">${t.txt}</text>`;
+  if(rodVisual.chargeBot > 0.01){
+    const botP = project({x:rodShift + 0.08, y:-0.86, z:0}, cam, vp);
+    const botSymbol = rodVisual.botIsNegative ? '−' : '+';
+    const botColor = rodVisual.botIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+    drawChargeGlyph(botSymbol, botP.x, botP.y, botColor, rodVisual.chargeBot);
   }
-  s += `<text x="${x1+6}" y="${y0+4}" fill="${gTheme.text || '#d8e8fb'}" font-size="10">${axisText.time}</text>`;
-  s += `<polygon points="${x1+2},${y0-3} ${x1+8},${y0} ${x1+2},${y0+3}" fill="${gTheme.text || '#d8e8fb'}"/>`;
-  s += `<polygon points="${yAxis-3},12 ${yAxis},6 ${yAxis+3},12" fill="${gTheme.text || '#d8e8fb'}"/>`;
-  return s;
 }
-function key(id){ return id.replace('svg','').toLowerCase(); }
-function initGraphs(){
-  const g = graphsTexts[currentLang].labels;
-  const theme = getActiveTheme();
-  const gt = theme.graphs || {};
-  const specs = [
-    {id:'svgV', kind:'V', label:g.V, ghost:'vGhost', active:'vActive', marker:'vMarker', time:'vTime', split:false},
-    {id:'svgQ', kind:'Q', label:g.q, ghost:'qGhost', active:'qActive', marker:'qMarker', time:'qTime', split:true},
-    {id:'svgI', kind:'I', label:g.i, ghost:'iGhost', active:'iActive', marker:'iMarker', time:'iTime', split:false},
-    {id:'svgE', kind:'E', label:g.E, ghost:'eGhost', active:'eActive', marker:'eMarker', time:'eTime', split:false},
-    {id:'svgB', kind:'B', label:g.B, ghost:'bGhost', active:'bActive', marker:'bMarker', time:'bTime', split:false}
-  ];
-  specs.forEach(spec => {
-    const svg = document.getElementById(spec.id);
-    if(!svg) return;
-    const x0=24, x1=256;
-    let inner = graphAxisMarkup(spec.label);
-    if(spec.split){
-      inner += `<defs>
-        <clipPath id="clipQPos"><rect x="${x0}" y="0" width="${x1-x0}" height="44"/></clipPath>
-        <clipPath id="clipQNeg"><rect x="${x0}" y="44" width="${x1-x0}" height="46"/></clipPath>
-      </defs>
-      <path id="qGhostPos" fill="none" stroke="${(gt.Q?.pos || '#67a8ff')}55" stroke-width="1.3" stroke-linecap="round" clip-path="url(#clipQPos)"/>
-      <path id="qGhostNeg" fill="none" stroke="${(gt.Q?.neg || '#f57171')}55" stroke-width="1.3" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
-      <path id="qActivePos" fill="none" stroke="${gt.Q?.pos || '#67a8ff'}" stroke-width="2.2" stroke-linecap="round" clip-path="url(#clipQPos)"/>
-      <path id="qActiveNeg" fill="none" stroke="${gt.Q?.neg || '#f57171'}" stroke-width="2.2" stroke-linecap="round" clip-path="url(#clipQNeg)"/>
-      <line id="qTangent" class="tangent" x1="0" y1="0" x2="0" y2="0" />`;
-    } else {
-      const posColor = (gt[spec.kind]?.pos) || '#67a8ff';
-      const negColor = (gt[spec.kind]?.neg) || '#f57171';
-      inner += `<defs>
-        <clipPath id="${spec.id}Pos"><rect x="${x0}" y="0" width="${x1-x0}" height="44"/></clipPath>
-        <clipPath id="${spec.id}Neg"><rect x="${x0}" y="44" width="${x1-x0}" height="46"/></clipPath>
-      </defs>
-      <path id="${key(spec.id)}GhostPos" fill="none" stroke="${posColor}55" stroke-width="1.3" stroke-linecap="round" clip-path="url(#${spec.id}Pos)"/>
-      <path id="${key(spec.id)}GhostNeg" fill="none" stroke="${negColor}55" stroke-width="1.3" stroke-linecap="round" clip-path="url(#${spec.id}Neg)"/>
-      <path id="${key(spec.id)}ActivePos" fill="none" stroke="${posColor}" stroke-width="2.2" stroke-linecap="round" clip-path="url(#${spec.id}Pos)"/>
-      <path id="${key(spec.id)}ActiveNeg" fill="none" stroke="${negColor}" stroke-width="2.2" stroke-linecap="round" clip-path="url(#${spec.id}Neg)"/>`;
-    }
-    inner += `<line id="${spec.time}" x1="24" y1="8" x2="24" y2="76" stroke="${gt.time || '#ffffff'}" stroke-width="1.0" stroke-linecap="round" stroke-dasharray="1.2 4.2"/>
-              <circle id="${spec.marker}" cx="24" cy="44" r="3.2" fill="${gt.marker || '#8df0b1'}"/>`;
-    svg.innerHTML = inner;
-  });
-}
-function setReveal(pathEl, frac){
-  if(!pathEl) return;
-  const total = pathEl.getTotalLength();
-  pathEl.style.strokeDasharray = `${total}`;
-  pathEl.style.strokeDashoffset = `${Math.max(0, total * (1-frac))}`;
-}
-function updateSingleGraph(kind, frac){
-  const fn = graphFns[kind];
-  const key = kind.toLowerCase();
-  const marker = document.getElementById(key + 'Marker');
-  const time = document.getElementById(key + 'Time');
-  const x0 = 24, x1 = 256, yMid = 44, amp = 24;
-  const x = x0 + (x1 - x0) * frac;
-  const y = yMid - amp * fn(frac);
-  const d = buildPath(fn);
 
-  if (kind === 'q'){
-    ['qGhostPos','qGhostNeg','qActivePos','qActiveNeg'].forEach(id => {
-      const el = document.getElementById(id);
-      if(el && !el.getAttribute('d')) el.setAttribute('d', d);
-      if(el && id.startsWith('qActive')) setReveal(el, frac);
-    });
-    const tangent = document.getElementById('qTangent');
-    if (tangent){
-      const deriv = 2*Math.PI*Math.cos(2*Math.PI*frac);
-      const slope = -amp * deriv / (x1-x0);
-      const dx = 28;
-      tangent.setAttribute('x1', (x-dx).toFixed(2));
-      tangent.setAttribute('x2', (x+dx).toFixed(2));
-      tangent.setAttribute('y1', (y - slope*dx).toFixed(2));
-      tangent.setAttribute('y2', (y + slope*dx).toFixed(2));
+function computeElectronTargets(rodState){
+  const N = 7;
+  const usableTop = -0.68;
+  const usableBot = 0.68;
+  const L = usableBot - usableTop;
+
+  // αρχική ομοιόμορφη κατανομή
+  const base = new Array(N);
+  for(let i=0;i<N;i++) base[i] = usableTop + (L * i / (N - 1));
+
+  const q = Math.abs(rodState.chargeSigned);
+  const moveUp = rodState.chargeSigned < 0;
+
+  // Ζητούμενο:
+  // τελικά κενά = a, 2a, 3a, 4a, 5a, 6a
+  // με a μικρότερο από το αρχικό ομοιόμορφο κενό.
+  // Επειδή 1+2+...+6 = 21, παίρνουμε a = L/21.
+  const a = L / 21;
+  const targetGaps = new Array(N - 1);
+  for(let i=0;i<N-1;i++){
+    targetGaps[i] = (i + 1) * a;
+  }
+
+  const d0 = L / (N - 1);  // αρχικό ομοιόμορφο κενό
+  const gaps = new Array(N - 1);
+  for(let i=0;i<N-1;i++){
+    gaps[i] = d0 + q * (targetGaps[i] - d0);
+  }
+
+  const ys = new Array(N);
+
+  if(moveUp){
+    // όταν κινούνται προς τα πάνω, το πάνω πάνω μένει σταθερό
+    ys[0] = usableTop;
+    for(let i=1;i<N;i++){
+      ys[i] = ys[i-1] + gaps[i-1];
     }
   } else {
-    const ghostPos = document.getElementById(key + 'GhostPos');
-    const ghostNeg = document.getElementById(key + 'GhostNeg');
-    const activePos = document.getElementById(key + 'ActivePos');
-    const activeNeg = document.getElementById(key + 'ActiveNeg');
-    [ghostPos, ghostNeg, activePos, activeNeg].forEach(el => { if(el && !el.getAttribute('d')) el.setAttribute('d', d); });
-    [activePos, activeNeg].forEach(el => { if(el) setReveal(el, frac); });
-  }
-  if (marker){ marker.setAttribute('cx', x.toFixed(2)); marker.setAttribute('cy', y.toFixed(2)); }
-  if (time){ time.setAttribute('x1', x.toFixed(2)); time.setAttribute('x2', x.toFixed(2)); }
-}
-function updateGraphs(){
-  if(!sim || !sim.state) return;
-  const frac = Math.max(0, Math.min(1, sim.state.t));
-  updateSingleGraph('V', frac);
-  updateSingleGraph('q', frac);
-  updateSingleGraph('i', frac);
-  if (sim.state.showE) updateSingleGraph('E', frac);
-  if (sim.state.showB) updateSingleGraph('B', frac);
-}
-function graphLoop(){
-  updateGraphs();
-  requestAnimationFrame(graphLoop);
-}
-
-
-async function boot(){
-  await loadResources();
-  currentLang = uiConfig.defaultLang || 'el';
-  applyTheme('default', { refreshGraphs:false, refreshSim:false });
-  sim = new EMWaveSimulation({
-    host: '#machineMount',
-    width: 1180,
-    height: 620,
-    title: '',
-    description: ''
-  });
-  sim.init();
-  sim.setTheme(getActiveTheme());
-  sim.refreshThemeColors();
-  sim.stop();
-  initGraphs();
-  updatePlayButton();
-  syncSpeedButtons();
-  syncFieldButtons();
-  syncLayerButtons();
-  updateGraphs();
-  requestAnimationFrame(graphLoop);
-
-  document.querySelectorAll(".lang-btn").forEach(btn => btn.addEventListener("click", () => setLang(btn.dataset.lang)));
-  document.querySelectorAll(".theme-chip").forEach(btn => btn.addEventListener("click", () => {
-    if(captureModeState.enabled){
-      captureModeState.previousThemeKey = btn.dataset.theme;
-      return;
+    // στην αντίστροφη κίνηση, το κάτω κάτω μένει σταθερό
+    ys[N-1] = usableBot;
+    for(let i=N-2;i>=0;i--){
+      ys[i] = ys[i+1] - gaps[i];
     }
-    applyTheme(btn.dataset.theme);
-  }));
-  document.getElementById("toggleCaptureView").addEventListener("click", toggleCaptureMode);
-  document.getElementById("captureExitBtn").addEventListener("click", toggleCaptureMode);
-  document.getElementById("toggleHints").addEventListener("click", () => {
-    const hintStrip = document.getElementById("hintStrip");
-    const stageWrap = document.getElementById("stageWrap");
-    hintStrip.classList.toggle("hide");
-    stageWrap.classList.toggle("no-comments");
-  });
-  document.getElementById("toggleE").addEventListener("click", () => {
-    sim.toggleField('E');
-    document.querySelectorAll(".graph-e").forEach(el => el.classList.toggle("hide", !sim.state.showE));
-    syncFieldButtons();
-    updateGraphs();
-  });
-  document.getElementById("toggleB").addEventListener("click", () => {
-    sim.toggleField('B');
-    document.querySelectorAll(".graph-b").forEach(el => el.classList.toggle("hide", !sim.state.showB));
-    syncFieldButtons();
-  });
-  document.getElementById("toggleECurves").addEventListener("click", () => { sim.toggleLayer('showECurves'); syncLayerButtons(); });
-  document.getElementById("toggleETravel").addEventListener("click", () => { sim.toggleLayer('showETravelArrows'); syncLayerButtons(); });
-  document.getElementById("toggleEEnv").addEventListener("click", () => { sim.toggleLayer('showEEnvelope'); syncLayerButtons(); });
-  document.getElementById("toggleBCurves").addEventListener("click", () => { sim.toggleLayer('showBCurves'); syncLayerButtons(); });
-  document.getElementById("toggleBTravel").addEventListener("click", () => { sim.toggleLayer('showBTravelArrows'); syncLayerButtons(); });
-  document.getElementById("toggleBEnv").addEventListener("click", () => { sim.toggleLayer('showBEnvelope'); syncLayerButtons(); });
-  document.getElementById("playBtn").addEventListener("click", () => {
-    sim.toggle();
-    updatePlayButton();
-  });
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    sim.reset();
-    sim.stop();
-    updatePlayButton();
-    syncSpeedButtons();
-    syncFieldButtons();
-    syncLayerButtons();
-  });
-  document.getElementById("stepPrev").addEventListener("click", () => {
-    sim.stepBy(-1/32);
-    updatePlayButton();
-    syncSpeedButtons();
-  });
-  document.getElementById("stepNext").addEventListener("click", () => {
-    sim.stepBy(1/32);
-    updatePlayButton();
-    syncSpeedButtons();
-  });
-  document.getElementById("qPrev").addEventListener("click", () => {
-    sim.stepQuarter(-1);
-    updatePlayButton();
-    syncSpeedButtons();
-  });
-  document.getElementById("qNext").addEventListener("click", () => {
-    sim.stepQuarter(1);
-    updatePlayButton();
-    syncSpeedButtons();
-  });
-  document.getElementById("speed025").addEventListener("click", () => {
-    sim.setPlaybackRate(0.25);
-    syncSpeedButtons();
-  });
-  document.getElementById("speed05").addEventListener("click", () => {
-    sim.setPlaybackRate(0.5);
-    syncSpeedButtons();
-  });
-  document.getElementById("speed1").addEventListener("click", () => {
-    sim.setPlaybackRate(1);
-    syncSpeedButtons();
-  });
-  setLang(currentLang);
-  syncThemeButtons();
-  syncCaptureButtons();
-  syncSpeedButtons();
+  }
+
+  return ys;
 }
 
-window.initGraphs = initGraphs;
-window.updateGraphs = updateGraphs;
-window.setLang = setLang;
-window.sim = sim;
-boot().then(() => { window.sim = sim; });
+function edgeAccumulation(displayArray){
+  const N = displayArray.length;
+  const usableTop = -0.68;
+  const usableBot = 0.68;
+  const d0 = (usableBot - usableTop) / (N - 1);
+  const minSep = 0.11;
+  const topGaps = [];
+  const botGaps = [];
+  for(let k=0; k<Math.min(3, N - 1); k++){
+    topGaps.push(displayArray[k+1] - displayArray[k]);
+    botGaps.push(displayArray[N-1-k] - displayArray[N-2-k]);
+  }
+  const avgTop = topGaps.reduce((a,b)=>a+b,0) / topGaps.length;
+  const avgBot = botGaps.reduce((a,b)=>a+b,0) / botGaps.length;
+  const compTop = Math.max(0, Math.min(1, (d0 - avgTop) / (d0 - minSep + 1e-6)));
+  const compBot = Math.max(0, Math.min(1, (d0 - avgBot) / (d0 - minSep + 1e-6)));
+  return { compTop, compBot };
+}
+
+function getRodVisualState(rodState){
+  const topComp = state.compTopSmooth || 0;
+  const botComp = state.compBotSmooth || 0;
+  const bias = topComp - botComp;
+
+  let topIsNegative, botIsNegative;
+  if(Math.abs(bias) < 0.02){
+    topIsNegative = rodState.chargeSigned < 0;
+    botIsNegative = !topIsNegative;
+  } else {
+    topIsNegative = topComp > botComp;
+    botIsNegative = !topIsNegative;
+  }
+
+  return {
+    currentSigned: rodState.currentSigned,
+    currentMag: rodState.currentMag,
+    chargeTop: topComp,
+    chargeBot: botComp,
+    topIsNegative,
+    botIsNegative
+  };
+}
+
+function drawCurrentArrowProjected(cam, vp, rodShift, rodState){
+  const iSigned = rodState.currentSigned;
+  const mag = rodState.currentMag;
+  if(mag < 0.025) return;
+
+  const totalLen = 1.60 * (0.07 + 0.30 * mag);
+  const dir = iSigned >= 0 ? 1 : -1;
+  const xArrow = rodShift - 0.12;
+  const yCenter = 0;
+  const y1 = yCenter - dir * totalLen * 0.5;
+  const y2 = yCenter + dir * totalLen * 0.5;
+
+  const base = project({x:xArrow, y:y1, z:0}, cam, vp);
+  const tip  = project({x:xArrow, y:y2, z:0}, cam, vp);
+
+  const color = iSigned >= 0 ? COLORS.currentPos : COLORS.currentNeg;
+  drawArrow2D(base, tip, color, 2.4 + 1.8*mag, 0.25 + 0.75*mag);
+
+  const labelP = project({x:xArrow - 0.06, y:0, z:0}, cam, vp);
+  drawText2D(mag > 0.92 ? 'I' : 'i', labelP.x, labelP.y, color, 0.35 + 0.65*mag, 17);
+}
+
+function drawElectronsProjected(cam, vp, rodShift){
+  const ys = state.electronDisplayYs || [];
+  ys.forEach(y => {
+    const p = project({x:rodShift, y, z:0}, cam, vp);
+    drawCircle2D(p, 1.8, COLORS.electron, 0.90);
+  });
+}
+
+let lastTs = performance.now();
+function render(ts){
+  const dt = Math.min(0.04, (ts - lastTs)/1000);
+  lastTs = ts;
+  if(state.playing) state.t += dt * (+ui.speed.value/100);
+
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0, 0, w, h);
+
+  const cam = {
+    yaw: deg(+ui.yaw.value),
+    pitch: deg(+ui.pitch.value),
+    focal: +ui.focal.value,
+    scale: +ui.scale.value/100,
+    distance: 4.6
+  };
+  const vp = {
+    cx: w * (+ui.shiftX.value / 100),
+    cy: h * (+ui.shiftY.value / 100)
+  };
+  const rodShift = (+ui.rodX.value || 0) / 100;
+  const rodState = getRodState();
+
+  const electronTargets = computeElectronTargets(rodState);
+  if(!state.electronDisplayYs || state.electronDisplayYs.length !== electronTargets.length){
+    state.electronDisplayYs = electronTargets.slice();
+    const comps0 = edgeAccumulation(state.electronDisplayYs);
+    state.compTopSmooth = comps0.compTop;
+    state.compBotSmooth = comps0.compBot;
+  } else {
+    const k = 1 - Math.exp(-11 * dt);
+    for(let i=0; i<electronTargets.length; i++){
+      state.electronDisplayYs[i] += (electronTargets[i] - state.electronDisplayYs[i]) * k;
+    }
+    const comps = edgeAccumulation(state.electronDisplayYs);
+    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-11 * dt));
+    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-11 * dt));
+  }
+  const rodVisual = getRodVisualState(rodState);
+
+  if(ui.axes.checked) drawAxes(cam, vp);
+  if(ui.showRod.checked) drawRodProjected(cam, vp, rodShift, rodVisual);
+  if(ui.showCharges.checked) drawChargeSymbols(cam, vp, rodShift, rodVisual);
+  if(ui.showElectrons.checked) drawElectronsProjected(cam, vp, rodShift);
+  if(ui.showCurrent.checked) drawCurrentArrowProjected(cam, vp, rodShift, rodVisual);
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
 </script>
 </body>
 </html>
-
-<script>
-(() => {
-  const style = document.createElement('style');
-  style.textContent = `
-    .stage-wrap.no-comments .hint-frame {
-      display: none !important;
-      height: 0 !important;
-      min-height: 0 !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      overflow: hidden !important;
-    }
-  `;
-  document.head.appendChild(style);
-})();
-</script>
