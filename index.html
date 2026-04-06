@@ -624,20 +624,20 @@ const PLANE_X_MIN = -3.00;
 const PLANE_X_MAX = 3.00;
 const PLANE_Y_EXT = 2.10;
 const PLANE_Z_EXT = 2.10;
-const E_FINAL_HALF_WIDTH = 2 * ROD_HALF_LENGTH; // D = 2L
-const E_X_SCALE_FINAL = E_FINAL_HALF_WIDTH / E_BIRTH_HALF_WIDTH;
+const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
+const E_TARGET_TOTAL_WIDTH = 2 * ROD_LENGTH; // τελικό συνολικό πλάτος = 2 × μήκος ράβδου
 function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
 
-function getDeltaX(age){
-  return E_FINAL_HALF_WIDTH * age; // front advance Δx over one-period emission window
+function getWidthDelta(age){
+  return E_TARGET_TOTAL_WIDTH * age; // μεταβολή πλάτους από 0 μέχρι 2 × rod length
 }
 function getPulseScaleX(age){
-  const dx = getDeltaX(age);
-  return dx / E_BIRTH_HALF_WIDTH;  // initial width = 0
+  const dW = getWidthDelta(age);
+  return dW / (2 * E_BIRTH_HALF_WIDTH); // επειδή το local total width είναι 2*E_BIRTH_HALF_WIDTH
 }
 function getPulseScaleY(age){
-  const dx = getDeltaX(age);
-  return (ROD_HALF_LENGTH + dx) / ROD_HALF_LENGTH; // initial height = rod length, then +2Δx
+  const dH = getWidthDelta(age); // Δύψους = Δπλάτους
+  return (ROD_LENGTH + dH) / ROD_LENGTH; // αρχικό ύψος = μήκος ράβδου
 }
 function localToWorldXY(rodShiftIgnored, scaleX, scaleY, xLocal, yLocal){
   return {
