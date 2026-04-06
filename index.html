@@ -277,8 +277,8 @@ const COLORS = {
   chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
   electron:'#7ee8ff',
   source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
-  planeXYFill:'rgba(232,90,90,0.08)', planeXYStroke:'rgba(232,90,90,0.22)',
-  planeXZFill:'rgba(0,0,0,0.16)', planeXZStroke:'rgba(0,0,0,0.34)',
+  planeXYFill:'rgba(255,255,255,0.10)', planeXYStroke:'rgba(255,255,255,0.24)',
+  planeXZFill:'rgba(0,0,0,0.08)', planeXZStroke:'rgba(0,0,0,0.18)',
   xLine:'rgba(220,232,247,0.88)'
 };
 
@@ -657,11 +657,14 @@ function drawProjectedFilledTriangle(cam, vp, rodShift, scaleX, scaleY, ptsLocal
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
+  ctx.strokeStyle = 'rgba(10,10,10,0.75)';
+  ctx.lineWidth = 0.8;
   ctx.beginPath();
   ctx.moveTo(pts[0].x, pts[0].y);
   for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
   ctx.closePath();
   ctx.fill();
+  ctx.stroke();
   ctx.restore();
 }
 function drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha){
@@ -707,7 +710,7 @@ function drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, x, y, angleD
   const ang = angleDeg * Math.PI / 180 + dir;
   const safe = Math.max(0.08, Math.max(scaleX, scaleY));
   const k = 1 / safe;
-  const ptsLocal = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
+  const ptsLocal = [[4.0*k,0],[-2.2*k,-2.7*k],[-2.2*k,2.7*k]].map(([px,py]) => {
     const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
     const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
     return [rx, ry];
@@ -746,10 +749,10 @@ function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx)
   if(front.arrowLen > 1e-9){
     const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
     for(const [sx,sy] of quads) drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha);
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, alpha*0.95);
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, alpha*0.95);
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, alpha*0.95);
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, alpha*0.95);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, Math.min(1, alpha*1.15));
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, Math.min(1, alpha*1.15));
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, Math.min(1, alpha*1.15));
+    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, Math.min(1, alpha*1.15));
   }
   drawTravelArrowProjected(cam, vp, rodShift, Math.max(scaleX, scaleY), front.sign, front.arrowLen, color, alpha*0.92);
 }
@@ -819,21 +822,19 @@ function drawBCircleArrows(cam, vp, centerX, radius, sign, which, color, alpha){
   const wantPositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
 
   const anglesDeg = wantPositive ? [35, 145] : [215, 325];
-  const dirSign = sign >= 0 ? 1 : -1; // controls CW/CCW
+  const dirSign = sign >= 0 ? 1 : -1;
 
   for(const deg0 of anglesDeg){
     const t = deg0 * Math.PI / 180;
     const px = centerX + r * Math.cos(t);
     const pz = r * Math.sin(t);
-
-    // tangent direction on xz circle
     const tx = -Math.sin(t) * dirSign;
     const tz =  Math.cos(t) * dirSign;
     const L = Math.hypot(tx, tz) || 1;
     const ux = tx / L, uz = tz / L;
 
-    const head = Math.max(0.035, 0.09 * r);
-    const half = 0.45 * head;
+    const head = Math.max(0.018, 0.045 * r);
+    const half = 0.42 * head;
     const bx = px - ux * head;
     const bz = pz - uz * head;
     const nx = -uz;
@@ -844,7 +845,7 @@ function drawBCircleArrows(cam, vp, centerX, radius, sign, which, color, alpha){
       {x:bx + nx * half, y:0, z:bz + nz * half},
       {x:bx - nx * half, y:0, z:bz - nz * half},
     ];
-    drawProjectedTriangleWorld(cam, vp, tri, color, alpha);
+    drawProjectedTriangleWorld(cam, vp, tri, color, alpha * 0.65);
   }
 }
 let lastTs = performance.now();
