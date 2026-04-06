@@ -999,6 +999,14 @@ function drawSeededElectronPerimeterArrowsProjectedHalf(cam, vp, rodShift, front
   }
 }
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
+function bRadiusVisibility(radius){
+  const q = radius / B_RADIUS_FINAL;
+  return Math.max(0, Math.min(1, (q - 0.22) / 0.42));
+}
+function bStrokeWidth(radius){
+  const safeScale = Math.max(0.08, radius / B_RADIUS_FINAL);
+  return Math.max(0.8, 0.68 / safeScale);
+}
 
 function seededBFrontsAbsolute(u){
   const fronts = [];
@@ -1071,7 +1079,8 @@ function drawMagneticArrowCircle(cam, vp, x, z, angleDeg, color, alpha, radius){
 
 function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
   const r = Math.max(0.0001, radius);
-  if(r < 0.16 * B_RADIUS_FINAL) return;
+  const vis = bRadiusVisibility(r);
+  if(vis < 0.22) return;
 
   const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
   const isGreen = (quarter === 0 || quarter === 3);
@@ -1087,7 +1096,7 @@ function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
     }
     const ps = project(p, cam, vp);
     const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
-    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, Math.min(1, alpha * 0.92));
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, Math.min(1, alpha * 0.92 * vis));
   }
 }
 let lastTs = performance.now();
@@ -1132,9 +1141,10 @@ function render(ts){
   if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
   if(ui.showB.checked){
     bFronts.forEach((fr) => {
-      const alpha = Math.max(0.12, (0.16 + 0.52 * fr.amp) * Math.exp(-0.16 * fr.age));
-      const safeScale = Math.max(0.08, fr.radius / B_RADIUS_FINAL);
-      const width = Math.max(0.6, 0.70 / safeScale);
+      const vis = bRadiusVisibility(fr.radius);
+      if(vis <= 0.05) return;
+      const alpha = Math.max(0.08, (0.12 + 0.40 * fr.amp) * Math.exp(-0.16 * fr.age) * vis);
+      const width = bStrokeWidth(fr.radius);
       back.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'back', cam), cam, vp), fr.color, width, alpha));
       back.push(() => drawBCircleArrows(cam, vp, rodShift, fr.radius, fr, 'back', alpha));
     });
@@ -1160,9 +1170,10 @@ function render(ts){
   if(ui.showPlaneXZ.checked) bFront.push(() => drawPlaneXZHalf(cam, vp, 'front', u));
   if(ui.showB.checked){
     bFronts.forEach((fr) => {
-      const alpha = Math.max(0.22, (0.28 + 0.84 * fr.amp) * Math.exp(-0.10 * fr.age));
-      const safeScale = Math.max(0.08, fr.radius / B_RADIUS_FINAL);
-      const width = Math.max(0.9, 0.98 / safeScale);
+      const vis = bRadiusVisibility(fr.radius);
+      if(vis <= 0.05) return;
+      const alpha = Math.max(0.10, (0.16 + 0.52 * fr.amp) * Math.exp(-0.10 * fr.age) * vis);
+      const width = bStrokeWidth(fr.radius);
       bFront.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'front', cam), cam, vp), fr.color, width, alpha));
       bFront.push(() => drawBCircleArrows(cam, vp, rodShift, fr.radius, fr, 'front', alpha));
     });
