@@ -278,7 +278,7 @@ const COLORS = {
   electron:'#7ee8ff',
   source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
   planeXYFill:'rgba(255,255,255,0.09)', planeXYStroke:'rgba(255,255,255,0.22)',
-  planeXZFill:'rgba(88,106,132,0.10)', planeXZStroke:'rgba(88,106,132,0.24)',
+  planeXZFill:'rgba(255,255,255,0.09)', planeXZStroke:'rgba(255,255,255,0.22)',
   xLine:'rgba(220,232,247,0.88)'
 };
 
@@ -828,7 +828,7 @@ function drawSeededElectronPerimeterArrowsProjected(cam, vp, rodShift, front){
     const tangent = {x: Math.cos(a), y: Math.sin(a), z: 0};
     const ps = project(p, cam, vp);
     const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
-    drawArrowheadScreen(ps.x, ps.y, angScreen, 7.0, color, alpha);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 5.0, color, alpha);
   }
 }
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
@@ -920,7 +920,7 @@ function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
     }
     const ps = project(p, cam, vp);
     const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
-    drawArrowheadScreen(ps.x, ps.y, angScreen, 5.8, color, Math.min(1, alpha * 0.92));
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 4.5, color, Math.min(1, alpha * 0.92));
   }
 }
 let lastTs = performance.now();
