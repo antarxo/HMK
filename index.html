@@ -628,11 +628,11 @@ const WORLD_PER_LOCAL = 0.8 / 142;
 const ROD_HALF_LENGTH = 0.8;
 const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const ROD_SHIFT_FIXED = 0;
+const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
 const PLANE_X_MIN = -3 * ROD_LENGTH;
 const PLANE_X_MAX =  3 * ROD_LENGTH;
 const PLANE_Y_EXT = 3 * ROD_LENGTH;
 const PLANE_Z_EXT = 3 * ROD_LENGTH;
-const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;   // τελικό συνολικό πλάτος = 4L = 2L προς κάθε κατεύθυνση
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;  // τελικό συνολικό ύψος = 5L = 2L πάνω + L ράβδος + 2L κάτω
 function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
