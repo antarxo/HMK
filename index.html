@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v8 conductor origin symmetric E lobes anchored tips</title>
+  <title>EMW v8 with XY/XZ planes</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
@@ -186,7 +186,7 @@
 <div class="app">
   <div class="top">
     <div class="title">EMW v2 – Projection Skeleton v4</div>
-    <div class="sub">Αγωγός στο (0,0,0) και συμμετρικές μηλοειδείς του E στο x–y με πλάτος από 0 έως D = 2L.</div>
+    <div class="sub">Framing / centering pass: σωστό κάδρο, σωστή θέση πηγής και χώρος για δεξιά διάδοση + μελλοντική τοπική γέννηση γύρω από την πηγή.</div>
   </div>
 
   <div class="main">
@@ -208,7 +208,7 @@
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
         <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox"></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
@@ -619,33 +619,21 @@ const B_FULL = [
 const WORLD_PER_LOCAL = 0.8 / 142;
 const ROD_HALF_LENGTH = 0.8;
 const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
-const ROD_SHIFT_FIXED = 0;
-const PLANE_X_MIN = -3.00;
+const ROD_SHIFT_FIXED = -E_BIRTH_HALF_WIDTH;
+const PLANE_X_MIN = -1.20;
 const PLANE_X_MAX = 3.00;
-const PLANE_Y_EXT = 2.10;
-const PLANE_Z_EXT = 2.10;
-const E_FINAL_HALF_WIDTH = 2 * ROD_HALF_LENGTH; // D = 2L from the origin to the right
-const E_X_SCALE_FINAL = E_FINAL_HALF_WIDTH / E_BIRTH_HALF_WIDTH;
+const PLANE_Y_EXT = 1.05;
+const PLANE_Z_EXT = 1.05;
+const E_SCALE_GROWTH = ((2 * (2 * ROD_HALF_LENGTH)) / (2 * E_BIRTH_HALF_WIDTH)) - 1; // makes final width about 2*rod length
 function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
 function getPulseScale(age){
-  return E_X_SCALE_FINAL * age; // starts from 0 and reaches D = 2L at age = 1
+  return 1 + E_SCALE_GROWTH * age;
 }
-function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal, cuspYLocal = null){
-  if(cuspYLocal === null){
-    return {
-      x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
-      y: yLocal * WORLD_PER_LOCAL * scaleLocal,
-      z: 0
-    };
-  }
-  return {
-    x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
-    y: (cuspYLocal + (yLocal - cuspYLocal) * scaleLocal) * WORLD_PER_LOCAL,
-    z: 0
-  };
+function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal){
+  return { x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal, y: yLocal * WORLD_PER_LOCAL * scaleLocal, z: 0 };
 }
-function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha, cuspYLocal = null){
-  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y, cuspYLocal), cam, vp));
+function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha){
+  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
@@ -658,7 +646,6 @@ function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, co
 }
 function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alpha){
   const segments = [];
-  const cuspYLocal = -142 * sy;
   const steps = 64;
   for(let i=0;i<=steps;i++){
     const u = i/steps;
@@ -680,13 +667,12 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
       x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
       y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
     }
-    segments.push(project(localToWorld(rodShift, scaleLocal, x, y, cuspYLocal), cam, vp));
+    segments.push(project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
   }
-  const safeScale = Math.max(0.08, scaleLocal);
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(0.6, 0.56 / safeScale);
+  ctx.lineWidth = Math.max(0.6, 0.56 / scaleLocal);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
@@ -698,20 +684,17 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
 function drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, x, y, angleDeg, reverse, color, alpha){
   const dir = reverse ? Math.PI : 0;
   const ang = angleDeg * Math.PI / 180 + dir;
-  const safeScale = Math.max(0.08, scaleLocal);
-  const cuspYLocal = y < 0 ? -142 : 142;
-  const k = 1 / safeScale;
+  const k = 1 / scaleLocal;
   const pts = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
     const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
     const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
     return [rx, ry];
   });
-  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha, cuspYLocal);
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha);
 }
 function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
   if(arrowLen <= 0.25) return;
-  const safeScale = Math.max(0.08, scaleLocal);
-  const k = 1 / safeScale;
+  const k = 1 / scaleLocal;
   const signY = sign >= 0 ? -1 : 1;
   const xLocal = 159.0;
   const baseY = 0;
