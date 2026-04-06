@@ -224,7 +224,7 @@
           <div><span class="sw" style="background:#38b66b"></span>current I (+)</div>
           <div><span class="sw" style="background:#f2a31b"></span>current I (−)</div>
           <div><span class="sw" style="background:#e85a5a"></span>E fronts / μεγάλα βέλη E</div>
-          <div><span class="sw" style="background:#38b66b"></span>B fronts στο x–z</div>
+          <div><span class="sw" style="background:#38b66b"></span>B κύκλοι στο x–z</div>
         </div>
       </div>
     </div>
@@ -628,10 +628,10 @@ const WORLD_PER_LOCAL = 0.8 / 142;
 const ROD_HALF_LENGTH = 0.8;
 const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const ROD_SHIFT_FIXED = 0;
-const PLANE_X_MIN = -3.00;
-const PLANE_X_MAX = 3.00;
-const PLANE_Y_EXT = 2.10;
-const PLANE_Z_EXT = 2.10;
+const PLANE_X_MIN = -3 * ROD_LENGTH;
+const PLANE_X_MAX =  3 * ROD_LENGTH;
+const PLANE_Y_EXT = 3 * ROD_LENGTH;
+const PLANE_Z_EXT = 3 * ROD_LENGTH;
 const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;   // τελικό συνολικό πλάτος = 4L = 2L προς κάθε κατεύθυνση
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;  // τελικό συνολικό ύψος = 5L = 2L πάνω + L ράβδος + 2L κάτω
@@ -753,9 +753,12 @@ function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx)
   }
   drawTravelArrowProjected(cam, vp, rodShift, Math.max(scaleX, scaleY), front.sign, front.arrowLen, color, alpha*0.92);
 }
+const B_RADIUS_FINAL = 2 * ROD_LENGTH;
+
 function seededBFrontsAbsolute(u){
   const fronts = [];
   for(const tEmit of B_FULL){
+    if(tEmit > 1 + 1e-9) continue;
     const age = u - tEmit;
     if(age < 0 || age > 1) continue;
     const quarter = frontQuarterIndex(tEmit);
@@ -763,28 +766,20 @@ function seededBFrontsAbsolute(u){
     const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
     const bAtBirth = -Math.cos(phaseEmit);
     const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
-    fronts.push({ t0:tEmit, age, sign, color, travelX: age * 0.9, amp: Math.abs(bAtBirth) });
+    fronts.push({
+      t0: tEmit,
+      age,
+      sign,
+      color,
+      amp: Math.abs(bAtBirth),
+      radius: B_RADIUS_FINAL * age
+    });
   }
   return fronts;
 }
-function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, amp=1, n=96){
-  const pts = [];
-  const grow = Math.max(0, Math.min(1, travelX / (2*bx))) * Math.max(0.05, amp);
-  const a = bx * grow;
-  const cz = sign * bz * grow;
-  const cx = originX + travelX + a;
-  for(let i=0;i<n;i++){
-    const t = (i/(n-1))*Math.PI*2;
-    pts.push({ x:cx + a*Math.cos(t), y:0, z:cz*Math.sin(t) });
-  }
-  return pts;
-}
 
-function makeBFrontHalf(originX, travelX, bx=0.20, bz=0.33, sign=1, amp=1, which='front', cam=null, n=72){
-  const grow = Math.max(0, Math.min(1, travelX / (2*bx))) * Math.max(0.05, amp);
-  const a = bx * grow;
-  const cz = sign * bz * grow;
-  const cx = originX + travelX + a;
+function makeBCircleHalf(centerX, radius, which='front', cam=null, n=96){
+  const r = Math.max(0.0001, radius);
   const frontPositive = cam ? zAxisFrontIsPositive(cam) : true;
   const wantPositive = (which === 'front' && frontPositive) || (which === 'back' && !frontPositive);
 
@@ -793,7 +788,13 @@ function makeBFrontHalf(originX, travelX, bx=0.20, bz=0.33, sign=1, amp=1, which
   const pts = [];
   for(let i=0;i<n;i++){
     const t = t0 + (t1 - t0) * (i/(n-1));
-    pts.push({ x:cx + a*Math.cos(t), y:0, z:cz*Math.sin(t) });
+    pts.push({
+      x: centerX,
+      y: 0,
+      z: 0
+    });
+    pts[i].x = centerX + r * Math.cos(t);
+    pts[i].z = r * Math.sin(t);
   }
   return pts;
 }
@@ -858,9 +859,11 @@ function render(ts){
 
   if(ui.showB.checked){
     bFronts.forEach((fr, i) => {
-      const alpha = Math.max(0.32, 0.90 - i*0.08);
-      back.push(() => drawPolyline(pathProjected(makeBFrontHalf(rodShift, fr.travelX, 0.20, 0.33, fr.sign, fr.amp, 'back', cam), cam, vp), fr.color, 2.3, alpha));
-      front.push(() => drawPolyline(pathProjected(makeBFrontHalf(rodShift, fr.travelX, 0.20, 0.33, fr.sign, fr.amp, 'front', cam), cam, vp), fr.color, 2.3, alpha));
+      const alpha = Math.max(0.22, (0.22 + 0.78 * fr.amp) * Math.exp(-0.12 * fr.age));
+      const safeScale = Math.max(0.08, fr.radius / B_RADIUS_FINAL);
+      const width = Math.max(0.6, 0.56 / safeScale);
+      back.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'back', cam), cam, vp), fr.color, width, alpha));
+      front.push(() => drawPolyline(pathProjected(makeBCircleHalf(rodShift, fr.radius, 'front', cam), cam, vp), fr.color, width, alpha));
     });
   }
 
