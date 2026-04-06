@@ -3,70 +3,209 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v6 – Rod / Current Basis</title>
+  <title>EMW v2 Projection Skeleton v4 responsive window</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
-      --ePos:#e85a5a; --eNeg:#4fa8d8; --bPos:#38b66b; --bNeg:#f2a31b; --rod:#d8dee7;
-      --electron:#7ee8ff;
+      --e1:#e85a5a; --e2:#4fa8d8; --b1:#38b66b; --b2:#f2a31b; --rod:#d8dee7; --accent:#b7c6db;
+      --gap:12px;
+      --pad:12px;
+      --topH:72px;
+      --footH:42px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
-    .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
-    .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
-    .title{font-size:18px;font-weight:700}.sub{color:var(--muted);margin-top:4px}
-    .main{display:grid;grid-template-columns:minmax(250px,28vw) 1fr;gap:12px;padding:12px;min-height:0}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
-    .sidebar{display:flex;flex-direction:column;min-height:0;overflow:auto}
-    .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
-    .card .body{padding:10px}
-    .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
-    .row label{color:var(--muted);font-size:12px}
-    input[type="range"]{width:min(160px,34vw)}
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;
+      overflow:hidden;
+    }
+    .app{
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      height:100dvh;
+      min-height:100dvh;
+      overflow:hidden;
+    }
+    .top{
+      padding:12px 16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .title{font-size:18px;font-weight:700}
+    .sub{color:var(--muted);margin-top:4px}
+    .main{
+      display:grid;
+      grid-template-columns:minmax(250px, 28vw) minmax(0,1fr);
+      gap:var(--gap);
+      padding:var(--pad);
+      min-height:0;
+      overflow:hidden;
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      overflow:hidden;
+      min-height:0;
+      min-width:0;
+    }
+    .card h3{
+      margin:0;
+      padding:9px 11px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:13px;
+    }
+    .card .body{
+      padding:10px;
+    }
+    .sidebar{
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      overflow:auto;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      margin:8px 0;
+    }
+    .row label{
+      color:var(--muted);
+      font-size:12px;
+    }
+    input[type="range"]{width:min(160px, 34vw)}
     input[type="checkbox"]{transform:scale(.95)}
-    .viewport{position:relative;min-height:0;height:100%}
-    .canvas-wrap{position:absolute;inset:0}
-    canvas{display:block;width:100%;height:100%}
-    .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-    button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
+    .viewport{
+      position:relative;
+      min-height:0;
+      height:100%;
+    }
+    .canvas-wrap{
+      position:absolute;
+      inset:0;
+    }
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      max-width:100%;
+      max-height:100%;
+    }
+    .controls{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    button{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:6px 9px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:12px;
+    }
     button:hover{background:rgba(255,255,255,.1)}
-    .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
-    .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
-    .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
-    @media (max-width:980px){
+    .legend{
+      display:grid;
+      gap:6px;
+      margin-top:10px;
+      font-size:12px;
+    }
+    .sw{
+      display:inline-block;
+      width:12px;
+      height:12px;
+      border-radius:3px;
+      margin-right:7px;
+      vertical-align:-2px;
+    }
+    .foot{
+      padding:9px 14px;
+      color:var(--muted);
+      border-top:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+    }
+    code{
+      background:rgba(255,255,255,.06);
+      padding:2px 6px;
+      border-radius:6px;
+    }
+
+    @media (max-width: 1100px){
+      :root{ --gap:10px; --pad:10px; }
+      .main{ grid-template-columns:minmax(230px, 33vw) minmax(0,1fr); }
+      input[type="range"]{width:min(150px, 28vw)}
+      .title{font-size:17px}
+    }
+
+    @media (max-width: 900px){
       html,body{overflow:auto}
       .app{height:auto;min-height:100dvh}
-      .main{grid-template-columns:1fr;gap:10px;padding:10px}
-      .viewport{min-height:58vh;height:min(62vh,680px)}
-      input[type="range"]{width:min(180px,48vw)}
+      .main{
+        grid-template-columns:1fr;
+        grid-auto-rows:auto auto;
+        overflow:visible;
+      }
+      .sidebar{
+        max-height:none;
+        overflow:visible;
+      }
+      .viewport{
+        min-height:54vh;
+        height:min(62vh, 680px);
+      }
+      input[type="range"]{width:min(180px, 48vw)}
+      .top{padding:10px 12px}
+      .title{font-size:16px}
+      .sub{font-size:12px}
+      .card .body{padding:9px}
+      .row{margin:6px 0}
     }
-    @media (max-width:560px){
-      .row{grid-template-columns:1fr}
+
+    @media (max-width: 560px){
+      .viewport{
+        min-height:48vh;
+        height:min(56vh, 540px);
+      }
+      .row{
+        grid-template-columns:1fr;
+        align-items:start;
+      }
       input[type="range"]{width:100%}
-      .viewport{min-height:50vh;height:min(58vh,540px)}
     }
   </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW v6 – Rod / Current Basis</div>
-    <div class="sub">Phase → charge separation → electron motion → current arrow. Αυτό είναι το θεμέλιο πριν ξαναβάλουμε τα βέλη του E/B στον χώρο.</div>
+    <div class="title">EMW v2 – Projection Skeleton v4</div>
+    <div class="sub">Framing / centering pass: σωστό κάδρο, σωστή θέση πηγής και χώρος για δεξιά διάδοση + μελλοντική τοπική γέννηση γύρω από την πηγή.</div>
   </div>
 
   <div class="main">
     <div class="card sidebar">
-      <h3>Rod / current basis</h3>
+      <h3>Κάδρο / σκηνή</h3>
       <div class="body">
         <div class="row"><label>Yaw κάμερας</label><input id="yaw" type="range" min="-60" max="60" value="-24"></div>
         <div class="row"><label>Pitch κάμερας</label><input id="pitch" type="range" min="-45" max="45" value="16"></div>
         <div class="row"><label>Focal</label><input id="focal" type="range" min="300" max="1400" value="720"></div>
         <div class="row"><label>Scale σκηνής</label><input id="scale" type="range" min="40" max="220" value="110"></div>
-        <div class="row"><label>Shift X κάδρου</label><input id="shiftX" type="range" min="20" max="80" value="48"></div>
-        <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
+                <div class="row"><label>Shift Y κάδρου</label><input id="shiftY" type="range" min="20" max="80" value="56"></div>
         <div class="row"><label>Shift ράβδου στο x</label><input id="rodX" type="range" min="-160" max="160" value="-10"></div>
-        <div class="row"><label>Playback speed</label><input id="speed" type="range" min="3" max="180" value="28"></div>
+        <div class="row"><label>Ταχύτητα διάδοσης</label><input id="speed" type="range" min="20" max="180" value="80"></div>
+        <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
+        <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
+        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show seeded E logic</label><input id="showEArrows" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
         <div class="row"><label>Show rod</label><input id="showRod" type="checkbox" checked></div>
         <div class="row"><label>Show electrons</label><input id="showElectrons" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
@@ -78,10 +217,11 @@
         </div>
 
         <div class="legend">
-          <div><span class="sw" style="background:#4fa8d8"></span>αρνητικά φορτία / electrons</div>
+          <div><span class="sw" style="background:#7ee8ff"></span>electrons στη ράβδο</div>
           <div><span class="sw" style="background:#38b66b"></span>current I (+)</div>
           <div><span class="sw" style="background:#f2a31b"></span>current I (−)</div>
-          <div><span class="sw" style="background:#e85a5a"></span>θετικό άκρο</div>
+          <div><span class="sw" style="background:#e85a5a"></span>E fronts / μεγάλα βέλη E</div>
+          <div><span class="sw" style="background:#38b66b"></span>B fronts στο x–z</div>
         </div>
       </div>
     </div>
@@ -94,7 +234,7 @@
   </div>
 
   <div class="foot">
-    v6: πρώτα σταθεροποιούμε τη λογική μέσα στη ράβδο και μετά ξαναχτίζουμε τα μεγάλα βέλη / fronts στον χώρο.
+    Rod-centered E/B emission, μία περίοδος εκπομπής και μετά freeze όλου του συστήματος.
   </div>
 </div>
 
@@ -107,11 +247,15 @@ const ui = {
   pitch: document.getElementById('pitch'),
   focal: document.getElementById('focal'),
   scale: document.getElementById('scale'),
-  shiftX: document.getElementById('shiftX'),
   shiftY: document.getElementById('shiftY'),
   rodX: document.getElementById('rodX'),
   speed: document.getElementById('speed'),
+  count: document.getElementById('count'),
   axes: document.getElementById('axes'),
+  sourceZone: document.getElementById('sourceZone'),
+  showE: document.getElementById('showE'),
+  showEArrows: document.getElementById('showEArrows'),
+  showB: document.getElementById('showB'),
   showRod: document.getElementById('showRod'),
   showElectrons: document.getElementById('showElectrons'),
   showCurrent: document.getElementById('showCurrent'),
@@ -122,19 +266,20 @@ const ui = {
 
 const COLORS = {
   bg:'#0b0f14', axis:'#6f7f95', rod:'#d8dee7',
-  ePos:'#e85a5a', eNeg:'#4fa8d8',
+  ePos:'#e85a5a', eNeg:'#4fa8d8', bPos:'#38b66b', bNeg:'#f2a31b',
   currentPos:'#38b66b', currentNeg:'#f2a31b',
   chargeNeg:'#e85a5a', chargePos:'#4fa8d8',
-  electron:'#7ee8ff'
+  electron:'#7ee8ff',
+  source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)'
 };
 
-const state = { t:0, playing:true, electronDisplayYs:null, compTopSmooth:0, compBotSmooth:0 };
+const state = { t:0, playing:true };
 
 ui.playBtn.addEventListener('click', () => {
   state.playing = !state.playing;
   ui.playBtn.textContent = state.playing ? 'Παύση' : 'Έναρξη';
 });
-ui.resetBtn.addEventListener('click', () => { state.t = 0; state.electronDisplayYs = null; state.compTopSmooth = 0; state.compBotSmooth = 0; });
+ui.resetBtn.addEventListener('click', () => { state.t = 0; state.playing = true; ui.playBtn.textContent = 'Παύση'; });
 
 function resizeCanvas(){
   const wrap = cv.parentElement.getBoundingClientRect();
@@ -156,54 +301,18 @@ function project(p, cam, vp){
   const k = cam.focal / Math.max(40, z);
   return { x: vp.cx + q.x * cam.scale * k, y: vp.cy - q.y * cam.scale * k, depth:z, k };
 }
+function pathProjected(points, cam, vp){ return points.map(p => project(p, cam, vp)); }
 
-function drawLine2D(a, b, color, width=2, alpha=1){
+function drawPolyline(pts2, color, width=2, alpha=1){
+  if(pts2.length < 2) return;
   ctx.save();
   ctx.strokeStyle = color;
   ctx.globalAlpha = alpha;
   ctx.lineWidth = width;
-  ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
+  ctx.moveTo(pts2[0].x, pts2[0].y);
+  for(let i=1;i<pts2.length;i++) ctx.lineTo(pts2[i].x, pts2[i].y);
   ctx.stroke();
-  ctx.restore();
-}
-
-function drawCircle2D(p, r, color, alpha=1){
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.globalAlpha = alpha;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawText2D(text, x, y, color, alpha=1, size=14){
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.globalAlpha = alpha;
-  ctx.font = `${size}px system-ui`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text, x, y);
-  ctx.restore();
-}
-
-function drawChargeGlyph(text, x, y, color, mag){
-  const size = 12 + 11 * mag;
-  const strokeW = 0.3 + 2.1 * mag;
-  ctx.save();
-  ctx.globalAlpha = 0.28 + 0.72 * mag;
-  ctx.font = `${600 + Math.round(250 * mag)} ${size}px system-ui`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.lineWidth = strokeW;
-  ctx.strokeStyle = 'rgba(12,16,22,0.88)';
-  ctx.strokeText(text, x, y);
-  ctx.fillStyle = color;
-  ctx.fillText(text, x, y);
   ctx.restore();
 }
 
@@ -212,7 +321,9 @@ function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   const dy = tip.y - base.y;
   const L = Math.hypot(dx, dy);
   if(L < 1e-6) return;
-  const ux = dx / L, uy = dy / L;
+
+  const ux = dx / L;
+  const uy = dy / L;
   const head = Math.min(14, Math.max(8, L * 0.22));
   const half = head * 0.42;
 
@@ -231,7 +342,8 @@ function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   ctx.lineTo(shaftX, shaftY);
   ctx.stroke();
 
-  const px = -uy, py = ux;
+  const px = -uy;
+  const py = ux;
   ctx.beginPath();
   ctx.moveTo(tip.x, tip.y);
   ctx.lineTo(shaftX + px * half, shaftY + py * half);
@@ -241,235 +353,352 @@ function drawArrow2D(base, tip, color, width=2.2, alpha=1){
   ctx.restore();
 }
 
-function drawAxes(cam, vp){
-  const axes = [
-    {a:{x:-0.3,y:0,z:0}, b:{x:1.6,y:0,z:0}, c:COLORS.axis, label:'x'},
-    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
-    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.currentPos, label:'z'}
-  ];
+
+
+function drawCircle2D(p, r, color, alpha=1){
   ctx.save();
-  ctx.font = '12px system-ui';
-  axes.forEach(ax => {
-    const A = project(ax.a, cam, vp);
-    const B = project(ax.b, cam, vp);
-    drawLine2D(A, B, ax.c, 1.6, 1);
-    drawText2D(ax.label, B.x + 8, B.y - 5, ax.c, 1, 12);
-  });
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fill();
   ctx.restore();
 }
-
-function getPhase(){
-  // ίδια λογική φάσης με το καλό 2D: μία πλήρης περίοδος στο [0,1)
-  return Math.PI + 2 * Math.PI * state.t;
+function drawText2D(text, x, y, color, alpha=1, size=14){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
+  ctx.font = `${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+  ctx.restore();
 }
-
-function getRodState(){
-  const phase = getPhase();
-  const chargeSigned = Math.sin(phase);
+function drawChargeGlyph(text, x, y, color, mag){
+  const size = 12 + 11 * mag;
+  const strokeW = 0.3 + 2.0 * mag;
+  ctx.save();
+  ctx.globalAlpha = 0.25 + 0.75 * mag;
+  ctx.font = `${600 + Math.round(250 * mag)} ${size}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = strokeW;
+  ctx.strokeStyle = 'rgba(12,16,22,0.88)';
+  ctx.strokeText(text, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+function chargeAndCurrent(u){
+  const phase = 2 * Math.PI * u;
+  const chargeSigned = -Math.sin(phase);
   const currentSigned = -Math.cos(phase);
-  const chargeMag = Math.abs(chargeSigned);
-  const currentMag = Math.abs(currentSigned);
-  return { phase, chargeSigned, currentSigned, chargeMag, currentMag };
+  return { phase, chargeSigned, currentSigned };
 }
+function electronCenters(chargeSigned){
+  const N = 7;
+  const r = 0.036;
+  const d = 2 * r;
+  const top = -0.68;
+  const bot =  0.68;
+  const a = 0.020;
 
-function drawRodProjected(cam, vp, rodShift, rodVisual){
-  const yTop = 0.80, yBot = -0.80;
-  const topColor = rodVisual.topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-  const botColor = rodVisual.botIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  // approved center-position pattern:
+  // 0
+  // a + d
+  // 3a + 2d
+  // 6a + 3d
+  // 10a + 4d
+  // 15a + 5d
+  // 21a + 6d
+  const tri = [0, 1, 3, 6, 10, 15, 21];
+  const targetOffsets = tri.map((t, i) => t * a + i * d);
 
-  const pTop = project({x:rodShift, y:yTop, z:0}, cam, vp);
-  const pBot = project({x:rodShift, y:yBot, z:0}, cam, vp);
+  const span = bot - top;
+  const uniformGap = span / (N - 1);
+  const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
 
-  const topA = 0.10 + 0.82 * rodVisual.chargeTop;
-  const botA = 0.10 + 0.82 * rodVisual.chargeBot;
-  const midA = 0.07 + 0.10 * Math.max(rodVisual.chargeTop, rodVisual.chargeBot);
+  const q = Math.abs(chargeSigned);
+  const moveUp = chargeSigned < 0;
 
+  const ys = new Array(N);
+  if(moveUp){
+    for(let i=0;i<N;i++){
+      const target = top + targetOffsets[i];
+      ys[i] = base[i] + q * (target - base[i]);
+    }
+  } else {
+    for(let i=0;i<N;i++){
+      const target = bot - targetOffsets[N - 1 - i];
+      ys[i] = base[i] + q * (target - base[i]);
+    }
+  }
+  return { ys, r, moveUp };
+}
+function drawRodProjected(cam, vp, rodShift, chargeSigned){
+  const qmag = Math.abs(chargeSigned);
+  const topNegative = chargeSigned < 0;
+  const botNegative = !topNegative;
+  const topColor = topNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const botColor = botNegative ? COLORS.chargeNeg : COLORS.chargePos;
+  const pTop = project({x:rodShift, y:-0.80, z:0}, cam, vp);
+  const pBot = project({x:rodShift, y: 0.80, z:0}, cam, vp);
   const rgba = (hex, a) => {
     const h = hex.replace('#','');
     const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   };
-
-  const rodGrad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
-  rodGrad.addColorStop(0.00, rgba(topColor, topA));
-  rodGrad.addColorStop(0.16, rgba(topColor, 0.32 * topA + 0.04));
-  rodGrad.addColorStop(0.50, rgba(COLORS.rod, midA));
-  rodGrad.addColorStop(0.84, rgba(botColor, 0.32 * botA + 0.04));
-  rodGrad.addColorStop(1.00, rgba(botColor, botA));
-
+  const grad = ctx.createLinearGradient(pTop.x, pTop.y, pBot.x, pBot.y);
+  grad.addColorStop(0.00, rgba(topColor, 0.12 + 0.78*qmag));
+  grad.addColorStop(0.50, rgba(COLORS.rod, 0.10 + 0.06*qmag));
+  grad.addColorStop(1.00, rgba(botColor, 0.12 + 0.78*qmag));
   ctx.save();
   ctx.strokeStyle = 'rgba(12,16,22,0.92)';
-  ctx.lineWidth = 7.0;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(pTop.x, pTop.y);
-  ctx.lineTo(pBot.x, pBot.y);
-  ctx.stroke();
-
-  ctx.strokeStyle = rodGrad;
-  ctx.lineWidth = 4.1;
-  ctx.beginPath();
-  ctx.moveTo(pTop.x, pTop.y);
-  ctx.lineTo(pBot.x, pBot.y);
-  ctx.stroke();
-
-  ctx.strokeStyle = 'rgba(225,232,242,0.28)';
-  ctx.lineWidth = 0.8;
-  ctx.beginPath();
-  ctx.moveTo(pTop.x, pTop.y);
-  ctx.lineTo(pBot.x, pBot.y);
-  ctx.stroke();
+  ctx.lineWidth = 7.0; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(pTop.x,pTop.y); ctx.lineTo(pBot.x,pBot.y); ctx.stroke();
+  ctx.strokeStyle = grad; ctx.lineWidth = 4.1;
+  ctx.beginPath(); ctx.moveTo(pTop.x,pTop.y); ctx.lineTo(pBot.x,pBot.y); ctx.stroke();
   ctx.restore();
-
-  return { pTop, pBot };
 }
-
-function drawChargeSymbols(cam, vp, rodShift, rodVisual){
-  if(rodVisual.chargeTop > 0.01){
-    const topP = project({x:rodShift + 0.08, y:0.86, z:0}, cam, vp);
-    const topSymbol = rodVisual.topIsNegative ? '−' : '+';
-    const topColor = rodVisual.topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-    drawChargeGlyph(topSymbol, topP.x, topP.y, topColor, rodVisual.chargeTop);
-  }
-  if(rodVisual.chargeBot > 0.01){
-    const botP = project({x:rodShift + 0.08, y:-0.86, z:0}, cam, vp);
-    const botSymbol = rodVisual.botIsNegative ? '−' : '+';
-    const botColor = rodVisual.botIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-    drawChargeGlyph(botSymbol, botP.x, botP.y, botColor, rodVisual.chargeBot);
-  }
+function drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned){
+  const qmag = Math.abs(chargeSigned);
+  if(qmag < 0.01) return;
+  const topNegative = chargeSigned < 0;
+  const botNegative = !topNegative;
+  const topP = project({x:rodShift + 0.08, y:-0.86, z:0}, cam, vp);
+  const botP = project({x:rodShift + 0.08, y: 0.86, z:0}, cam, vp);
+  drawChargeGlyph(topNegative ? '−' : '+', topP.x, topP.y, topNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
+  drawChargeGlyph(botNegative ? '−' : '+', botP.x, botP.y, botNegative ? COLORS.chargeNeg : COLORS.chargePos, qmag);
 }
-
-function computeElectronTargets(rodState){
-  const N = 7;
-  const usableTop = -0.68;
-  const usableBot = 0.68;
-  const L = usableBot - usableTop;
-
-  // αρχική ομοιόμορφη κατανομή
-  const base = new Array(N);
-  for(let i=0;i<N;i++) base[i] = usableTop + (L * i / (N - 1));
-
-  const q = Math.abs(rodState.chargeSigned);
-  const moveUp = rodState.chargeSigned < 0;
-
-  // Ζητούμενο:
-  // τελικά κενά = a, 2a, 3a, 4a, 5a, 6a
-  // με a μικρότερο από το αρχικό ομοιόμορφο κενό.
-  // Επειδή 1+2+...+6 = 21, παίρνουμε a = L/21.
-  const a = L / 21;
-  const targetGaps = new Array(N - 1);
-  for(let i=0;i<N-1;i++){
-    targetGaps[i] = (i + 1) * a;
-  }
-
-  const d0 = L / (N - 1);  // αρχικό ομοιόμορφο κενό
-  const gaps = new Array(N - 1);
-  for(let i=0;i<N-1;i++){
-    gaps[i] = d0 + q * (targetGaps[i] - d0);
-  }
-
-  const ys = new Array(N);
-
-  if(moveUp){
-    // όταν κινούνται προς τα πάνω, το πάνω πάνω μένει σταθερό
-    ys[0] = usableTop;
-    for(let i=1;i<N;i++){
-      ys[i] = ys[i-1] + gaps[i-1];
-    }
-  } else {
-    // στην αντίστροφη κίνηση, το κάτω κάτω μένει σταθερό
-    ys[N-1] = usableBot;
-    for(let i=N-2;i>=0;i--){
-      ys[i] = ys[i+1] - gaps[i];
-    }
-  }
-
-  return ys;
-}
-
-function edgeAccumulation(displayArray){
-  const N = displayArray.length;
-  const usableTop = -0.68;
-  const usableBot = 0.68;
-  const d0 = (usableBot - usableTop) / (N - 1);
-  const minSep = 0.11;
-  const topGaps = [];
-  const botGaps = [];
-  for(let k=0; k<Math.min(3, N - 1); k++){
-    topGaps.push(displayArray[k+1] - displayArray[k]);
-    botGaps.push(displayArray[N-1-k] - displayArray[N-2-k]);
-  }
-  const avgTop = topGaps.reduce((a,b)=>a+b,0) / topGaps.length;
-  const avgBot = botGaps.reduce((a,b)=>a+b,0) / botGaps.length;
-  const compTop = Math.max(0, Math.min(1, (d0 - avgTop) / (d0 - minSep + 1e-6)));
-  const compBot = Math.max(0, Math.min(1, (d0 - avgBot) / (d0 - minSep + 1e-6)));
-  return { compTop, compBot };
-}
-
-function getRodVisualState(rodState){
-  const topComp = state.compTopSmooth || 0;
-  const botComp = state.compBotSmooth || 0;
-  const bias = topComp - botComp;
-
-  let topIsNegative, botIsNegative;
-  if(Math.abs(bias) < 0.02){
-    topIsNegative = rodState.chargeSigned < 0;
-    botIsNegative = !topIsNegative;
-  } else {
-    topIsNegative = topComp > botComp;
-    botIsNegative = !topIsNegative;
-  }
-
-  return {
-    currentSigned: rodState.currentSigned,
-    currentMag: rodState.currentMag,
-    chargeTop: topComp,
-    chargeBot: botComp,
-    topIsNegative,
-    botIsNegative
-  };
-}
-
-function drawCurrentArrowProjected(cam, vp, rodShift, rodState){
-  const iSigned = rodState.currentSigned;
-  const mag = rodState.currentMag;
-  if(mag < 0.025) return;
-
-  const totalLen = 1.60 * (0.07 + 0.30 * mag);
-  const dir = iSigned >= 0 ? 1 : -1;
-  const xArrow = rodShift - 0.12;
-  const yCenter = 0;
-  const y1 = yCenter - dir * totalLen * 0.5;
-  const y2 = yCenter + dir * totalLen * 0.5;
-
-  const base = project({x:xArrow, y:y1, z:0}, cam, vp);
-  const tip  = project({x:xArrow, y:y2, z:0}, cam, vp);
-
-  const color = iSigned >= 0 ? COLORS.currentPos : COLORS.currentNeg;
-  drawArrow2D(base, tip, color, 2.4 + 1.8*mag, 0.25 + 0.75*mag);
-
-  const labelP = project({x:xArrow - 0.06, y:0, z:0}, cam, vp);
-  drawText2D(mag > 0.92 ? 'I' : 'i', labelP.x, labelP.y, color, 0.35 + 0.65*mag, 17);
-}
-
-function drawElectronsProjected(cam, vp, rodShift){
-  const ys = state.electronDisplayYs || [];
+function drawElectronsProjected(cam, vp, rodShift, ys, r){
+  const electronRadiusPx = 4.1 / 2; // diameter = rod core width
   ys.forEach(y => {
     const p = project({x:rodShift, y, z:0}, cam, vp);
-    drawCircle2D(p, 1.8, COLORS.electron, 0.90);
+    drawCircle2D(p, electronRadiusPx, COLORS.electron, 0.92);
   });
 }
+function drawCurrentArrowRod(cam, vp, rodShift, currentSigned){
+  const imag = Math.abs(currentSigned);
+  if(imag < 0.02) return;
+  const len = (0.16 + 0.34 * imag);
+  const dir = currentSigned < 0 ? 1 : -1;
+  const x = rodShift - 0.12;
+  const y1 = -dir * len * 0.5;
+  const y2 =  dir * len * 0.5;
+  const base = project({x, y:y1, z:0}, cam, vp);
+  const tip  = project({x, y:y2, z:0}, cam, vp);
+  const color = currentSigned >= 0 ? COLORS.currentPos : COLORS.currentNeg;
+  drawArrow2D(base, tip, color, 2.6 + 1.8*imag, 0.25 + 0.75*imag);
+  const labelP = project({x:x - 0.06, y:0, z:0}, cam, vp);
+  drawText2D('I', labelP.x, labelP.y, color, 0.3 + 0.7*imag, 16);
+}
 
+function drawAxes(cam, vp){
+  const axes = [
+    {a:{x:-1.0,y:0,z:0}, b:{x:2.9,y:0,z:0}, c:'#8ca0b8', label:'x'},
+    {a:{x:0,y:-1.1,z:0}, b:{x:0,y:1.1,z:0}, c:COLORS.ePos, label:'y'},
+    {a:{x:0,y:0,z:-1.1}, b:{x:0,y:0,z:1.1}, c:COLORS.bPos, label:'z'}
+  ];
+  ctx.save();
+  ctx.font = '12px system-ui';
+  for(const ax of axes){
+    const A = project(ax.a, cam, vp), B = project(ax.b, cam, vp);
+    ctx.strokeStyle = ax.c;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    ctx.fillStyle = ax.c;
+    ctx.fillText(ax.label, B.x+6, B.y-4);
+  }
+  ctx.restore();
+}
+
+function drawRod(cam, vp){
+  const rodShift = (+ui.rodX.value || 0) / 100;
+  const speedWU = (+ui.speed.value / 100);
+  const { chargeSigned } = chargeAndCurrent(state.t, speedWU);
+  drawRodProjected(cam, vp, rodShift, chargeSigned);
+}
+
+function drawSourceZone(cam, vp){
+  // intentionally blank for now
+}
+
+const E_FULL = [
+  0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
+  0.2538, 0.2651, 0.2835, 0.3085, 0.3393, 0.3750, 0.4145, 0.4566, 0.5000,
+  0.5434, 0.5855, 0.6250, 0.6607, 0.6915, 0.7165, 0.7349, 0.7462, 0.7500,
+  0.7538, 0.7651, 0.7835, 0.8085, 0.8393, 0.8750, 0.9145, 0.9566, 1.0000
+];
+const B_FULL = [
+  0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500,
+  0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000,
+  0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500,
+  0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
+];
+const WORLD_PER_LOCAL = 0.8 / 142;
+function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
+function getPulseScale(age, rodLengthPx, lambdaPx){
+  const pulseLocalAnchor = 142;
+  const d0 = rodLengthPx * 0.5;
+  return (d0 + lambdaPx * age) / pulseLocalAnchor;
+}
+function localToWorld(rodShift, scaleLocal, xLocal, yLocal){
+  return { x: rodShift + xLocal * WORLD_PER_LOCAL * scaleLocal, y: yLocal * WORLD_PER_LOCAL * scaleLocal, z: 0 };
+}
+function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha){
+  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alpha){
+  const segments = [];
+  const steps = 64;
+  for(let i=0;i<=steps;i++){
+    const u = i/steps;
+    const t = u;
+    const p0 = [0 * sx, -142 * sy];
+    const c1 = [18 * sx, -158 * sy];
+    const c2 = [45 * sx, -178 * sy];
+    const p3 = [63 * sx, -178 * sy];
+    const d1 = [112 * sx, -178 * sy];
+    const d2 = [159 * sx, -122 * sy];
+    const p6 = [159 * sx, 0 * sy];
+    let x,y;
+    if(t <= 0.5){
+      const tt = t / 0.5; const mt = 1-tt;
+      x = mt*mt*mt*p0[0] + 3*mt*mt*tt*c1[0] + 3*mt*tt*tt*c2[0] + tt*tt*tt*p3[0];
+      y = mt*mt*mt*p0[1] + 3*mt*mt*tt*c1[1] + 3*mt*tt*tt*c2[1] + tt*tt*tt*p3[1];
+    } else {
+      const tt = (t-0.5)/0.5; const mt = 1-tt;
+      x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
+      y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
+    }
+    segments.push(project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
+  }
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(0.6, 0.56 / scaleLocal);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(segments[0].x, segments[0].y);
+  for(let i=1;i<segments.length;i++) ctx.lineTo(segments[i].x, segments[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+function drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, x, y, angleDeg, reverse, color, alpha){
+  const dir = reverse ? Math.PI : 0;
+  const ang = angleDeg * Math.PI / 180 + dir;
+  const k = 1 / scaleLocal;
+  const pts = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
+    const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
+    const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
+    return [rx, ry];
+  });
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha);
+}
+function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
+  if(arrowLen <= 0.25) return;
+  const k = 1 / scaleLocal;
+  const signY = sign >= 0 ? -1 : 1;
+  const xLocal = 159.0;
+  const baseY = 0;
+  const L = arrowLen * k;
+  const head = Math.min(5.1 * k, 0.34 * L);
+  const half = Math.min(2.9 * k, 0.22 * L);
+  const tipBaseY = signY * Math.max(0, L - head);
+  const tipY = signY * L;
+  const a = project(localToWorld(rodShift, scaleLocal, xLocal, baseY), cam, vp);
+  const b = project(localToWorld(rodShift, scaleLocal, xLocal, tipBaseY), cam, vp);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(0.8, 1.18 * k);
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.restore();
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, [[xLocal, tipY],[xLocal-half, tipBaseY],[xLocal+half, tipBaseY]], color, alpha*0.74);
+}
+function seededEFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of E_FULL){
+    if(tEmit > 1 + 1e-9) continue;
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const eAtBirth = -Math.sin(phaseEmit);
+    fronts.push({
+      t0: tEmit, age, sign, reverseArrows: sign > 0,
+      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+      arrowLen: 80 * Math.abs(eAtBirth)
+    });
+  }
+  return fronts;
+}
+function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  const fade = Math.exp(-0.22 * age);
+  const alpha = 225 * fade / 255;
+  const lambdaPx = 2 * rodLengthPx;
+  const scaleLocal = getPulseScale(age, rodLengthPx, lambdaPx);
+  const color = front.color;
+  if(front.arrowLen > 1e-9){
+    const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
+    for(const [sx,sy] of quads) drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alpha);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, 139.320, -115.360, 66.762, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, 139.320, 115.360, 113.238, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, -139.320, -115.360, 113.238, front.reverseArrows, color, alpha*0.85);
+    drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, -139.320, 115.360, 66.762, front.reverseArrows, color, alpha*0.85);
+  }
+  drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, front.sign, front.arrowLen, color, alpha*0.92);
+}
+function seededBFrontsAbsolute(u){
+  const fronts = [];
+  for(const tEmit of B_FULL){
+    const age = u - tEmit;
+    if(age < 0 || age > 1) continue;
+    const quarter = frontQuarterIndex(tEmit);
+    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
+    const bAtBirth = -Math.cos(phaseEmit);
+    const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
+    fronts.push({ t0:tEmit, age, sign, color, travelX: age * 0.9, amp: Math.abs(bAtBirth) });
+  }
+  return fronts;
+}
+function makeBFront(originX, travelX, bx=0.20, bz=0.33, sign=1, amp=1, n=96){
+  const pts = [];
+  const grow = Math.max(0, Math.min(1, travelX / (2*bx))) * Math.max(0.05, amp);
+  const a = bx * grow;
+  const cz = sign * bz * grow;
+  const cx = originX + travelX + a;
+  for(let i=0;i<n;i++){
+    const t = (i/(n-1))*Math.PI*2;
+    pts.push({ x:cx + a*Math.cos(t), y:0, z:cz*Math.sin(t) });
+  }
+  return pts;
+}
 let lastTs = performance.now();
 function render(ts){
   const dt = Math.min(0.04, (ts - lastTs)/1000);
   lastTs = ts;
-  if(state.playing) state.t += dt * (+ui.speed.value/100);
+  if(state.playing) state.t += dt;
 
   const w = cv.clientWidth, h = cv.clientHeight;
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0,0,w,h);
   ctx.fillStyle = COLORS.bg;
-  ctx.fillRect(0, 0, w, h);
+  ctx.fillRect(0,0,w,h);
 
   const cam = {
     yaw: deg(+ui.yaw.value),
@@ -479,35 +708,51 @@ function render(ts){
     distance: 4.6
   };
   const vp = {
-    cx: w * (+ui.shiftX.value / 100),
+    cx: w * 0.50,
     cy: h * (+ui.shiftY.value / 100)
   };
+
+  const back = [], mid = [], front = [];
   const rodShift = (+ui.rodX.value || 0) / 100;
-  const rodState = getRodState();
-
-  const electronTargets = computeElectronTargets(rodState);
-  if(!state.electronDisplayYs || state.electronDisplayYs.length !== electronTargets.length){
-    state.electronDisplayYs = electronTargets.slice();
-    const comps0 = edgeAccumulation(state.electronDisplayYs);
-    state.compTopSmooth = comps0.compTop;
-    state.compBotSmooth = comps0.compBot;
-  } else {
-    const k = 1 - Math.exp(-11 * dt);
-    for(let i=0; i<electronTargets.length; i++){
-      state.electronDisplayYs[i] += (electronTargets[i] - state.electronDisplayYs[i]) * k;
-    }
-    const comps = edgeAccumulation(state.electronDisplayYs);
-    state.compTopSmooth += (comps.compTop - state.compTopSmooth) * (1 - Math.exp(-11 * dt));
-    state.compBotSmooth += (comps.compBot - state.compBotSmooth) * (1 - Math.exp(-11 * dt));
+  const speedWU = (+ui.speed.value / 100);
+  const u = Math.min(1, state.t * speedWU);
+  if(state.playing && u >= 1){
+    state.playing = false;
+    ui.playBtn.textContent = 'Έναρξη';
   }
-  const rodVisual = getRodVisualState(rodState);
+  const { chargeSigned, currentSigned } = chargeAndCurrent(u);
+  const { ys, r } = electronCenters(chargeSigned);
 
-  if(ui.axes.checked) drawAxes(cam, vp);
-  if(ui.showRod.checked) drawRodProjected(cam, vp, rodShift, rodVisual);
-  if(ui.showCharges.checked) drawChargeSymbols(cam, vp, rodShift, rodVisual);
-  if(ui.showElectrons.checked) drawElectronsProjected(cam, vp, rodShift);
-  if(ui.showCurrent.checked) drawCurrentArrowProjected(cam, vp, rodShift, rodVisual);
+  if(ui.axes.checked) mid.push(() => drawAxes(cam, vp));
+  if(ui.sourceZone.checked) mid.push(() => drawSourceZone(cam, vp));
+  if(ui.showRod.checked) mid.push(() => drawRodProjected(cam, vp, rodShift, chargeSigned));
+  if(ui.showCharges.checked) mid.push(() => drawChargeSymbolsProjected(cam, vp, rodShift, chargeSigned));
+  if(ui.showElectrons.checked) mid.push(() => drawElectronsProjected(cam, vp, rodShift, ys, r));
+  if(ui.showCurrent.checked) mid.push(() => drawCurrentArrowRod(cam, vp, rodShift, currentSigned));
 
+  const eFronts = seededEFrontsAbsolute(u);
+  const bFronts = seededBFrontsAbsolute(u);
+
+  const rodTopP = project({x:rodShift, y:-0.80, z:0}, cam, vp);
+  const rodBotP = project({x:rodShift, y: 0.80, z:0}, cam, vp);
+  const rodLengthPx = Math.hypot(rodBotP.x - rodTopP.x, rodBotP.y - rodTopP.y);
+
+  if(ui.showE.checked){
+    eFronts.forEach(fr => {
+      back.push(() => drawSeededElectronFrontProjected(cam, vp, rodShift, fr, rodLengthPx));
+    });
+  }
+
+  const eArrowPass = [];
+
+  if(ui.showB.checked){
+    bFronts.forEach((fr, i) => {
+      const pts = pathProjected(makeBFront(rodShift, fr.travelX, 0.20, 0.33, fr.sign, fr.amp), cam, vp);
+      front.push(() => drawPolyline(pts, fr.color, 2.3, Math.max(0.32, 0.90 - i*0.08)));
+    });
+  }
+
+  [...back, ...mid, ...eArrowPass, ...front].forEach(fn => fn());
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
