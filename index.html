@@ -278,7 +278,7 @@ const COLORS = {
   electron:'#7ee8ff',
   source:'#b7c6db', sourceSoft:'rgba(183,198,219,0.18)', sourceLine:'rgba(183,198,219,0.65)',
   planeXYFill:'rgba(255,255,255,0.09)', planeXYStroke:'rgba(255,255,255,0.22)',
-  planeXZFill:'rgba(20,20,20,0.10)', planeXZStroke:'rgba(20,20,20,0.20)',
+  planeXZFill:'rgba(0,0,0,0.16)', planeXZStroke:'rgba(0,0,0,0.34)',
   xLine:'rgba(220,232,247,0.88)'
 };
 
@@ -522,7 +522,8 @@ function drawProjectedPolygon(cam, vp, pts3, fillColor, strokeColor, alpha=1, wi
 
 function currentEPlaneExtents(u){
   const halfW = 0.5 * E_TARGET_TOTAL_WIDTH * u;
-  const halfH = 0.5 * (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * u);
+  const halfHCore = 0.5 * (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * u);
+  const halfH = halfHCore + 0.25 * ROD_LENGTH * u;
   return {
     x0: -halfW,
     x1:  halfW,
@@ -766,12 +767,23 @@ function drawSeededElectronFrontProjected(cam, vp, rodShift, front, rodLengthPx)
   if(front.arrowLen > 1e-9){
     const quads = [[1,1],[1,-1],[-1,1],[-1,-1]];
     for(const [sx,sy] of quads) drawProjectedLobePath(cam, vp, rodShift, scaleX, scaleY, sx, sy, color, alpha);
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, Math.min(1, alpha*1.15));
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, Math.min(1, alpha*1.15));
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, Math.min(1, alpha*1.15));
-    drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, Math.min(1, alpha*1.15));
   }
   drawTravelArrowProjected(cam, vp, rodShift, Math.max(scaleX, scaleY), front.sign, front.arrowLen, color, alpha*0.92);
+}
+
+function drawSeededElectronPerimeterArrowsProjected(cam, vp, rodShift, front){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  if((front.arrowLen || 0) <= 0.25) return;
+  const fade = Math.exp(-0.22 * age);
+  const alpha = Math.min(1, (225 * fade / 255) * 1.25);
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, -115.360, 66.762, front.reverseArrows, color, alpha);
+  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, 139.320, 115.360, 113.238, front.reverseArrows, color, alpha);
+  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, -115.360, 113.238, front.reverseArrows, color, alpha);
+  drawLocalArrowProjected(cam, vp, rodShift, scaleX, scaleY, -139.320, 115.360, 66.762, front.reverseArrows, color, alpha);
 }
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
 
@@ -846,12 +858,14 @@ function drawMagneticArrowCircle(cam, vp, x, z, angleDeg, color, alpha, radius){
 
 function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
   const r = Math.max(0.0001, radius);
+  if(r < 0.10 * B_RADIUS_FINAL) return;
   const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
   const isGreen = (quarter === 0 || quarter === 3);
   const ccw = isGreen;
   const color = front.color;
 
   const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
+  const arrowAlpha = Math.min(1, alpha);
   for(const th of thetas){
     const x = centerX + r * Math.cos(th);
     const z = r * Math.sin(th);
@@ -859,7 +873,7 @@ function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
     let tz =  r * Math.cos(th);
     if(!ccw){ tx = -tx; tz = -tz; }
     const ang = Math.atan2(tz, tx) * 180 / Math.PI;
-    drawMagneticArrowCircle(cam, vp, x, z, ang, color, alpha, radius);
+    drawMagneticArrowCircle(cam, vp, x, z, ang, color, arrowAlpha, radius);
   }
 }
 let lastTs = performance.now();
@@ -920,6 +934,11 @@ function render(ts){
   }
 
   const eArrowPass = [];
+  if(ui.showE.checked){
+    eFronts.forEach(fr => {
+      eArrowPass.push(() => drawSeededElectronPerimeterArrowsProjected(cam, vp, rodShift, fr));
+    });
+  }
 
   if(ui.showB.checked){
     bFronts.forEach((fr, i) => {
