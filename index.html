@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EMW v8 conductor at origin + symmetric E lobes</title>
+  <title>EMW v8 conductor origin symmetric E lobes anchored tips</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#111822; --axis:#6f7f95; --text:#e8eef7; --muted:#9aa8bc;
@@ -630,15 +630,22 @@ function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4)
 function getPulseScale(age){
   return E_X_SCALE_FINAL * age; // starts from 0 and reaches D = 2L at age = 1
 }
-function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal){
+function localToWorld(rodShiftIgnored, scaleLocal, xLocal, yLocal, cuspYLocal = null){
+  if(cuspYLocal === null){
+    return {
+      x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
+      y: yLocal * WORLD_PER_LOCAL * scaleLocal,
+      z: 0
+    };
+  }
   return {
     x: ROD_SHIFT_FIXED + xLocal * WORLD_PER_LOCAL * scaleLocal,
-    y: yLocal * WORLD_PER_LOCAL * scaleLocal,
+    y: (cuspYLocal + (yLocal - cuspYLocal) * scaleLocal) * WORLD_PER_LOCAL,
     z: 0
   };
 }
-function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha){
-  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
+function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, color, alpha, cuspYLocal = null){
+  const pts = ptsLocal.map(([x,y]) => project(localToWorld(rodShift, scaleLocal, x, y, cuspYLocal), cam, vp));
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.fillStyle = color;
@@ -651,6 +658,7 @@ function drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, ptsLocal, co
 }
 function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alpha){
   const segments = [];
+  const cuspYLocal = -142 * sy;
   const steps = 64;
   for(let i=0;i<=steps;i++){
     const u = i/steps;
@@ -672,7 +680,7 @@ function drawProjectedLobePath(cam, vp, rodShift, scaleLocal, sx, sy, color, alp
       x = mt*mt*mt*p3[0] + 3*mt*mt*tt*d1[0] + 3*mt*tt*tt*d2[0] + tt*tt*tt*p6[0];
       y = mt*mt*mt*p3[1] + 3*mt*mt*tt*d1[1] + 3*mt*tt*tt*d2[1] + tt*tt*tt*p6[1];
     }
-    segments.push(project(localToWorld(rodShift, scaleLocal, x, y), cam, vp));
+    segments.push(project(localToWorld(rodShift, scaleLocal, x, y, cuspYLocal), cam, vp));
   }
   const safeScale = Math.max(0.08, scaleLocal);
   ctx.save();
@@ -691,13 +699,14 @@ function drawLocalArrowProjected(cam, vp, rodShift, scaleLocal, x, y, angleDeg, 
   const dir = reverse ? Math.PI : 0;
   const ang = angleDeg * Math.PI / 180 + dir;
   const safeScale = Math.max(0.08, scaleLocal);
+  const cuspYLocal = y < 0 ? -142 : 142;
   const k = 1 / safeScale;
   const pts = [[2.7*k,0],[-1.45*k,-1.8*k],[-1.45*k,1.8*k]].map(([px,py]) => {
     const rx = px*Math.cos(ang) - py*Math.sin(ang) + x;
     const ry = px*Math.sin(ang) + py*Math.cos(ang) + y;
     return [rx, ry];
   });
-  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha);
+  drawProjectedFilledTriangle(cam, vp, rodShift, scaleLocal, pts, color, alpha, cuspYLocal);
 }
 function drawTravelArrowProjected(cam, vp, rodShift, scaleLocal, sign, arrowLen, color, alpha){
   if(arrowLen <= 0.25) return;
