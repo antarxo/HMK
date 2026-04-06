@@ -53,9 +53,9 @@
             <div></div><button id="down">▼</button><div></div>
           </div>
         </div>
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="180" max="480" value="180"></div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="180" max="900" value="180"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
-        <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Μέγιστο</div></div>
+        <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
         <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="28" value="6"></div>
         <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
@@ -154,7 +154,7 @@ const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
-let lineRadius = 28 / 3800;
+let lineRadius = 36 / 3800;
 const PLANE_X_MIN = -3 * ROD_LENGTH;
 const PLANE_X_MAX =  3 * ROD_LENGTH;
 const PLANE_Y_EXT = 3 * ROD_LENGTH;
@@ -229,7 +229,7 @@ axes.add(axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axis, 'z'));
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
-const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 2 * ROD_HALF_LENGTH, 18), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.34, metalness:0.10 }));
+const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 2 * ROD_HALF_LENGTH, 18), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.34, metalness:0.10 }));
 rodGroup.add(rod);
 
 const glowTexture = makeGlowTexture();
@@ -255,17 +255,17 @@ const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 for(let i=0;i<7;i++){
-  const e = new THREE.Mesh(new THREE.SphereGeometry(0.034, 14, 14), solidMat(COLORS.electron, 0.22));
+  const e = new THREE.Mesh(new THREE.SphereGeometry(0.050, 18, 18), solidMat(COLORS.electron, 0.38));
   electrons.push(e);
   particleGroup.add(e);
 }
 
 const currentGroup = new THREE.Group();
-currentGroup.position.set(-0.12, 0, 0);
+currentGroup.position.set(-0.16, 0, 0.05);
 root.add(currentGroup);
-const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.82, 10), solidMat(COLORS.bPos, 0.18));
+const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.82, 10), solidMat(COLORS.bPos, 0.18));
 currentGroup.add(currentShaft);
-const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.12, 12), solidMat(COLORS.bPos, 0.22));
+const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.050, 0.14, 12), solidMat(COLORS.bPos, 0.22));
 currentHead.position.y = 0.47; currentGroup.add(currentHead);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
@@ -325,8 +325,8 @@ function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56, o
   const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 10, false), solidMat(color, 0.17, opacity));
   const pos = curve.getPoint(0.995);
   const tan = curve.getTangent(0.98).normalize();
-  const coneR = Math.max(radius * 4.2, 0.010) * headScale;
-  const coneL = Math.max(radius * 10.2, 0.028) * headScale;
+  const coneR = Math.max(radius * 5.8, 0.016) * headScale;
+  const coneL = Math.max(radius * 13.0, 0.050) * headScale;
   const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12, opacity));
   cone.position.copy(pos);
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tan);
@@ -335,8 +335,8 @@ function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56, o
   return g;
 }
 function buildArrowHead(position, tangent, color, headScale=1, opacity=1){
-  const coneR = Math.max(lineRadius * 3.8, 0.009) * headScale;
-  const coneL = Math.max(lineRadius * 9.0, 0.024) * headScale;
+  const coneR = Math.max(lineRadius * 5.4, 0.016) * headScale;
+  const coneL = Math.max(lineRadius * 13.5, 0.050) * headScale;
   const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12, opacity));
   cone.position.copy(position);
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tangent.clone().normalize());
@@ -405,7 +405,7 @@ function addEFront3D(group, front, which){
   const signY = which === 'upper' ? -1 : 1;
   const lobes = [[1, signY], [-1, signY]];
   for(const [sx, sy] of lobes){
-    group.add(buildCurve(makeLobePoints(scaleX, scaleY, sx, sy), color, lineRadius, 0.42, 72, opacity));
+    group.add(buildCurve(makeLobePoints(scaleX, scaleY, sx, sy), color, lineRadius, 0.78, 72, opacity));
   }
   if((front.arrowLen || 0) > 0.25){
     const specs = [
@@ -420,7 +420,7 @@ function addEFront3D(group, front, which){
       const pos = localToWorldXY(scaleX, scaleY, x, y);
       const a = THREE.MathUtils.degToRad(aDeg) + (front.reverseArrows ? Math.PI : 0);
       const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
-      group.add(buildArrowHead(pos, tangent, color, 0.40, opacity));
+      group.add(buildArrowHead(pos, tangent, color, 0.95, opacity));
     }
   }
 }
@@ -428,7 +428,7 @@ function addBFront3D(group, front, which){
   const r = Math.max(0.0001, front.radius);
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
-  group.add(buildCurve(makeBCircleHalf(0, r, which, 68), color, lineRadius, 0.40, 64, opacity));
+  group.add(buildCurve(makeBCircleHalf(0, r, which, 68), color, lineRadius, 0.82, 64, opacity));
   const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
   const isGreen = (quarter === 0 || quarter === 3);
   const ccw = isGreen;
@@ -437,7 +437,7 @@ function addBFront3D(group, front, which){
     const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
     let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
     if(!ccw) tangent.multiplyScalar(-1);
-    group.add(buildArrowHead(p, tangent, color, 0.38, opacity));
+    group.add(buildArrowHead(p, tangent, color, 0.95, opacity));
   }
 }
 function rebuildFields(u){
@@ -487,7 +487,7 @@ function electronCenters(chargeSigned){
 function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const ys = electronCenters(chargeSigned);
-  electrons.forEach((e, idx) => e.position.set(0, ys[idx], 0));
+  electrons.forEach((e, idx) => e.position.set(0.065, ys[idx], 0.075));
 
   const qmag = Math.abs(chargeSigned);
   const topIsNegative = chargeSigned < 0;
@@ -496,7 +496,7 @@ function updateParticles(u){
   topGlow.material.color.setHex(topHex);
   botGlow.material.color.setHex(botHex);
   const glowOpacity = 0.72 * Math.pow(qmag, 1.25);
-  const glowScale = 0.16 + 0.92 * qmag;
+  const glowScale = 0.24 + 1.10 * qmag;
   topGlow.material.opacity = glowOpacity;
   botGlow.material.opacity = glowOpacity;
   topGlow.scale.setScalar(glowScale);
@@ -514,8 +514,8 @@ function applyUI(){
   ePlaneLower.material.opacity = eOpacity;
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
-  lineRadius = 28 / 3800;
-  camera.position.z = 90 - ((+ui.zoom.value) - 180) * 0.25;
+  lineRadius = 36 / 3800;
+  camera.position.z = 90 - ((+ui.zoom.value) - 180) * 0.060;
   camera.lookAt(focusPoint);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
