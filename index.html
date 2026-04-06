@@ -203,7 +203,9 @@
         <div class="row"><label>Πλήθος fronts</label><input id="count" type="range" min="2" max="10" value="5"></div>
         <div class="row"><label>Show axes</label><input id="axes" type="checkbox" checked></div>
         <div class="row"><label>Show plane x–y</label><input id="showPlaneXY" type="checkbox" checked></div>
+        <div class="row"><label>Διαφάνεια plane x–y</label><input id="planeXYAlpha" type="range" min="0" max="40" value="9"></div>
         <div class="row"><label>Show plane x–z</label><input id="showPlaneXZ" type="checkbox" checked></div>
+        <div class="row"><label>Διαφάνεια plane x–z</label><input id="planeXZAlpha" type="range" min="0" max="40" value="9"></div>
         <div class="row"><label>Show x line</label><input id="showXAxisLine" type="checkbox" checked></div>
         <div class="row"><label>Show source zone</label><input id="sourceZone" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
@@ -256,7 +258,9 @@ const ui = {
   count: document.getElementById('count'),
   axes: document.getElementById('axes'),
   showPlaneXY: document.getElementById('showPlaneXY'),
+  planeXYAlpha: document.getElementById('planeXYAlpha'),
   showPlaneXZ: document.getElementById('showPlaneXZ'),
+  planeXZAlpha: document.getElementById('planeXZAlpha'),
   showXAxisLine: document.getElementById('showXAxisLine'),
   sourceZone: document.getElementById('sourceZone'),
   showE: document.getElementById('showE'),
@@ -269,6 +273,12 @@ const ui = {
   playBtn: document.getElementById('playBtn'),
   resetBtn: document.getElementById('resetBtn')
 };
+
+function withAlpha(rgbaString, alpha01){
+  const m = rgbaString.match(/rgba\((\d+),(\d+),(\d+),([0-9.]+)\)/);
+  if(!m) return rgbaString;
+  return `rgba(${m[1]},${m[2]},${m[3]},${alpha01})`;
+}
 
 const COLORS = {
   bg:'#0b0f14', axis:'#6f7f95', rod:'#d8dee7',
@@ -575,12 +585,13 @@ function currentBPlaneExtents(u){
 
 function drawPlaneXY(cam, vp, u){
   const ext = currentEPlaneExtents(u);
+  const a = (+ui.planeXYAlpha.value || 0) / 100;
   drawProjectedPolygon(cam, vp, [
     {x:ext.x0,y:ext.y0,z:0},
     {x:ext.x1,y:ext.y0,z:0},
     {x:ext.x1,y:ext.y1,z:0},
     {x:ext.x0,y:ext.y1,z:0}
-  ], COLORS.planeXYFill, COLORS.planeXYStroke, 1, 1);
+  ], withAlpha(COLORS.planeXYFill, a), withAlpha(COLORS.planeXYStroke, Math.min(1, a * 2.4)), 1, 1);
 }
 
 function drawPlaneXZHalf(cam, vp, which, u){
@@ -594,13 +605,14 @@ function drawPlaneXZHalf(cam, vp, which, u){
   const x0 = ext.x0, x1 = ext.x1;
   const z0 = which === 'back' ? zBack0 : zFront0;
   const z1 = which === 'back' ? zBack1 : zFront1;
+  const a = (+ui.planeXZAlpha.value || 0) / 100;
 
   drawProjectedPolygon(cam, vp, [
     {x:x0,y:0,z:z0},
     {x:x1,y:0,z:z0},
     {x:x1,y:0,z:z1},
     {x:x0,y:0,z:z1}
-  ], COLORS.planeXZFill, COLORS.planeXZStroke, 1, 1);
+  ], withAlpha(COLORS.planeXZFill, a), withAlpha(COLORS.planeXZStroke, Math.min(1, a * 2.4)), 1, 1);
 }
 
 function drawXAxisLine(cam, vp){
