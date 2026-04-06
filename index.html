@@ -39,23 +39,12 @@
 <div class="app">
   <div class="top">
     <div class="title">EMW true 3D v3 <span class="badge">seeded μηχανή Ε/Β</span></div>
-    <div class="sub">Πρώτη 3D βάση που πατάει στην παλιά μηχανή: μηλοειδείς Ε, ημικύκλια Β και ο μηχανισμός γέννησής τους πάνω στη ράβδο.</div>
+    <div class="sub">3D βάση πιο πιστή στο βασικό αρχείο: μία περίοδος εκπομπής και freeze, ράβδος στο απόλυτο κέντρο, μήκη αξόνων/πεδίων σύμφωνα με το baseline.</div>
   </div>
   <div class="main">
     <div class="card sidebar">
       <h3>Έλεγχοι</h3>
       <div class="body">
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="14" max="240" value="64"></div>
-        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
-        <div class="row"><label>Ενεργά fronts ανά πεδίο</label><input id="count" type="range" min="2" max="40" value="40"></div>
-        <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
-        <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="28" value="6"></div>
-        <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
-        <div class="row"><label>Show planes</label><input id="showPlanes" type="checkbox" checked></div>
-        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
-        <div class="row"><label>Show particles</label><input id="showParticles" type="checkbox" checked></div>
-        <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
         <div class="row">
           <label>Περιστροφή</label>
           <div class="dpad">
@@ -64,6 +53,18 @@
             <div></div><button id="down">▼</button><div></div>
           </div>
         </div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="10" max="260" value="180"></div>
+        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
+        <div class="row"><label>Ενεργά fronts ανά πεδίο</label><input id="count" type="range" min="2" max="10" value="5"></div>
+        <div class="row"><label>Πάχος γραμμών</label><input id="lineWidth" type="range" min="8" max="28" value="14"></div>
+        <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="28" value="7"></div>
+        <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="28" value="6"></div>
+        <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
+        <div class="row"><label>Show planes</label><input id="showPlanes" type="checkbox" checked></div>
+        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
+        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
+        <div class="row"><label>Show particles</label><input id="showParticles" type="checkbox" checked></div>
+        <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
         <div class="controls">
           <button id="playBtn">Παύση</button>
           <button id="homeBtn">Home view</button>
@@ -79,14 +80,14 @@
     </div>
     <div class="card viewport"><div id="stage"></div></div>
   </div>
-  <div class="foot">Πρωτότυπο 3D μεταφοράς της μηχανής. Δεν είναι ακόμα πλήρες port όλων των λεπτομερειών του canvas, αλλά πλέον δεν είναι άδειο scaffold.</div>
+  <div class="foot">3D βάση προσαρμοσμένη στο baseline: μία περίοδος εκπομπής και μετά freeze, κεντραρισμένη ράβδος και μηχανή Ε/Β χωρίς αυθαίρετη αλλαγή μηκών.</div>
 </div>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['zoom','speed','count','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn'];
+const ids = ['zoom','speed','count','lineWidth','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
@@ -152,9 +153,14 @@ const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
-const lineRadius = 0.0062;
-const PLANE_LEN = 6.0 * ROD_LENGTH;
-const PLANE_HALF_H = 1.6 * ROD_LENGTH;
+let lineRadius = 0.0038;
+const PLANE_X_MIN = -3 * ROD_LENGTH;
+const PLANE_X_MAX =  3 * ROD_LENGTH;
+const PLANE_Y_EXT = 3 * ROD_LENGTH;
+const PLANE_Z_EXT = 3 * ROD_LENGTH;
+const PLANE_LEN = PLANE_X_MAX - PLANE_X_MIN;
+const E_HALF_H = PLANE_Y_EXT;
+const B_HALF_W = PLANE_Z_EXT;
 
 function solidMat(color, emissiveIntensity=0.14){
   return new THREE.MeshStandardMaterial({
@@ -177,14 +183,14 @@ function planeMaterial(color, opacity){
 
 const planes = new THREE.Group();
 root.add(planes);
-const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeEPos, 0.07));
-ePlaneUpper.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0.5 * PLANE_HALF_H, 0); ePlaneUpper.renderOrder = 1; planes.add(ePlaneUpper);
-const ePlaneLower = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeENeg, 0.07));
-ePlaneLower.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, -0.5 * PLANE_HALF_H, 0); ePlaneLower.renderOrder = 4; planes.add(ePlaneLower);
-const bPlaneBack = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeBPos, 0.06));
-bPlaneBack.rotation.x = -Math.PI / 2; bPlaneBack.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0, -0.5 * PLANE_HALF_H); bPlaneBack.renderOrder = 0; planes.add(bPlaneBack);
-const bPlaneFront = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, PLANE_HALF_H), planeMaterial(COLORS.planeBNeg, 0.06));
-bPlaneFront.rotation.x = -Math.PI / 2; bPlaneFront.position.set(PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH, 0, 0.5 * PLANE_HALF_H); bPlaneFront.renderOrder = 5; planes.add(bPlaneFront);
+const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, E_HALF_H), planeMaterial(COLORS.planeEPos, 0.07));
+ePlaneUpper.position.set(0, 0.5 * E_HALF_H, 0); ePlaneUpper.renderOrder = 1; planes.add(ePlaneUpper);
+const ePlaneLower = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, E_HALF_H), planeMaterial(COLORS.planeENeg, 0.07));
+ePlaneLower.position.set(0, -0.5 * E_HALF_H, 0); ePlaneLower.renderOrder = 4; planes.add(ePlaneLower);
+const bPlaneBack = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, B_HALF_W), planeMaterial(COLORS.planeBPos, 0.06));
+bPlaneBack.rotation.x = -Math.PI / 2; bPlaneBack.position.set(0, 0, -0.5 * B_HALF_W); bPlaneBack.renderOrder = 0; planes.add(bPlaneBack);
+const bPlaneFront = new THREE.Mesh(new THREE.PlaneGeometry(PLANE_LEN, B_HALF_W), planeMaterial(COLORS.planeBNeg, 0.06));
+bPlaneFront.rotation.x = -Math.PI / 2; bPlaneFront.position.set(0, 0, 0.5 * B_HALF_W); bPlaneFront.renderOrder = 5; planes.add(bPlaneFront);
 
 const axes = new THREE.Group();
 root.add(axes);
@@ -194,31 +200,31 @@ function axisCylinder(length, radius, color, axis){
   if(axis === 'z') m.rotation.x = -Math.PI / 2;
   return m;
 }
-const xAxis = axisCylinder(PLANE_LEN, 0.022, COLORS.axis, 'x'); xAxis.position.x = PLANE_LEN * 0.5 - 0.2 * ROD_LENGTH; axes.add(xAxis);
-axes.add(axisCylinder(2 * PLANE_HALF_H, 0.022, COLORS.axis, 'y'));
-axes.add(axisCylinder(2 * PLANE_HALF_H, 0.022, COLORS.axis, 'z'));
+const xAxis = axisCylinder(PLANE_LEN, 0.022, COLORS.axis, 'x'); axes.add(xAxis);
+axes.add(axisCylinder(2 * PLANE_Y_EXT, 0.022, COLORS.axis, 'y'));
+axes.add(axisCylinder(2 * PLANE_Z_EXT, 0.022, COLORS.axis, 'z'));
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
-const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 2 * ROD_HALF_LENGTH, 22), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.34, metalness:0.10 }));
+const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 2 * ROD_HALF_LENGTH, 18), new THREE.MeshStandardMaterial({ color:COLORS.rod, roughness:0.34, metalness:0.10 }));
 rodGroup.add(rod);
 
 const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 for(let i=0;i<7;i++){
-  const e = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 16), solidMat(COLORS.electron, 0.22));
+  const e = new THREE.Mesh(new THREE.SphereGeometry(0.034, 14, 14), solidMat(COLORS.electron, 0.22));
   electrons.push(e);
   particleGroup.add(e);
 }
 
 const currentGroup = new THREE.Group();
-currentGroup.position.set(-1.2, 0, 0);
+currentGroup.position.set(-0.12, 0, 0);
 root.add(currentGroup);
-const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.0, 12), solidMat(COLORS.bPos, 0.18));
+const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.82, 10), solidMat(COLORS.bPos, 0.18));
 currentGroup.add(currentShaft);
-const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.16, 14), solidMat(COLORS.bPos, 0.22));
-currentHead.position.y = 0.62; currentGroup.add(currentHead);
+const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.12, 12), solidMat(COLORS.bPos, 0.22));
+currentHead.position.y = 0.47; currentGroup.add(currentHead);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
 const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
@@ -274,10 +280,12 @@ function makeLobePoints(scaleX, scaleY, sx, sy){
 }
 function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56){
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
-  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 12, false), solidMat(color, 0.17));
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 10, false), solidMat(color, 0.17));
   const pos = curve.getPoint(0.995);
   const tan = curve.getTangent(0.98).normalize();
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.022 * headScale, 0.060 * headScale, 12), solidMat(color, 0.12));
+  const coneR = Math.max(radius * 4.2, 0.010) * headScale;
+  const coneL = Math.max(radius * 10.2, 0.028) * headScale;
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12));
   cone.position.copy(pos);
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tan);
   const g = new THREE.Group();
@@ -285,7 +293,9 @@ function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56){
   return g;
 }
 function buildArrowHead(position, tangent, color, headScale=1){
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.018 * headScale, 0.050 * headScale, 12), solidMat(color, 0.12));
+  const coneR = Math.max(lineRadius * 3.8, 0.009) * headScale;
+  const coneL = Math.max(lineRadius * 9.0, 0.024) * headScale;
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12));
   cone.position.copy(position);
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tangent.clone().normalize());
   return cone;
@@ -450,7 +460,8 @@ function applyUI(){
   ePlaneLower.material.opacity = eOpacity;
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
-  camera.position.z = +ui.zoom.value;
+  lineRadius = (+ui.lineWidth.value) / 3800;
+  camera.position.z = 270 - (+ui.zoom.value);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
@@ -458,22 +469,28 @@ function applyUI(){
   particleGroup.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
 }
-for(const key of ['zoom','speed','count','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
+for(const key of ['zoom','speed','count','lineWidth','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
   const el = ui[key];
   el.addEventListener('input', applyUI);
 }
-ui.count.addEventListener('input', () => rebuildFields(loopPhase));
+ui.count.addEventListener('input', () => rebuildFields(phaseU));
+ui.lineWidth.addEventListener('input', () => rebuildFields(phaseU));
 
 let playing = true;
-let time = 0;
-let loopPhase = 0;
+let phaseU = 0;
 ui.playBtn.addEventListener('click', () => {
+  if(!playing && phaseU >= 1){
+    phaseU = 0;
+    lastPhaseBucket = -1;
+    rebuildFields(phaseU);
+    updateParticles(phaseU);
+  }
   playing = !playing;
   ui.playBtn.textContent = playing ? 'Παύση' : 'Έναρξη';
 });
 ui.homeBtn.addEventListener('click', () => setHome());
 ui.lectureBtn.addEventListener('click', () => setLectureView());
-ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 64; applyUI(); });
+ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 180; applyUI(); });
 
 function bindHold(button, fn){
   let timer = null;
@@ -510,14 +527,20 @@ let lastPhaseBucket = -1;
 function animate(now){
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  if(playing) time += dt * (+ui.speed.value) * 0.12;
-  loopPhase = time % 1;
-  const bucket = Math.floor(loopPhase * 120);
+  if(playing){
+    phaseU = Math.min(1, phaseU + dt * ((+ui.speed.value) / 100));
+    if(phaseU >= 1){
+      phaseU = 1;
+      playing = false;
+      ui.playBtn.textContent = 'Έναρξη';
+    }
+  }
+  const bucket = Math.floor(phaseU * 120);
   if(bucket !== lastPhaseBucket){
-    rebuildFields(loopPhase);
+    rebuildFields(phaseU);
     lastPhaseBucket = bucket;
   }
-  updateParticles(loopPhase);
+  updateParticles(phaseU);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
