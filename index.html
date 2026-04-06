@@ -384,11 +384,13 @@ function drawCircle2D(p, r, color, alpha=1){
   ctx.restore();
 }
 
-function drawArrowheadScreen(x, y, angleRad, sizePx, color, alpha=1){
+function drawArrowheadScreen(x, y, angleRad, scalePx, color, alpha=1){
+  // ίδια γεωμετρία κεφαλής με το 2D:
+  // [2.7,0], [-1.45,-1.8], [-1.45,1.8]
   const pts = [
-    [ sizePx, 0 ],
-    [ -0.55 * sizePx, -0.72 * sizePx ],
-    [ -0.55 * sizePx,  0.72 * sizePx ]
+    [  2.7 * scalePx,  0 ],
+    [ -1.45 * scalePx, -1.8 * scalePx ],
+    [ -1.45 * scalePx,  1.8 * scalePx ]
   ].map(([px,py]) => {
     const rx = px * Math.cos(angleRad) - py * Math.sin(angleRad) + x;
     const ry = px * Math.sin(angleRad) + py * Math.cos(angleRad) + y;
@@ -840,7 +842,7 @@ function drawSeededElectronPerimeterArrowsProjected(cam, vp, rodShift, front){
     const tangent = {x: Math.cos(a), y: Math.sin(a), z: 0};
     const ps = project(p, cam, vp);
     const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
-    drawArrowheadScreen(ps.x, ps.y, angScreen, 5.0, color, alpha);
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, alpha);
   }
 }
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
@@ -932,7 +934,7 @@ function drawBCircleArrows(cam, vp, centerX, radius, front, which, alpha){
     }
     const ps = project(p, cam, vp);
     const angScreen = screenAngleFromWorldTangent(cam, vp, p, tangent);
-    drawArrowheadScreen(ps.x, ps.y, angScreen, 4.5, color, Math.min(1, alpha * 0.92));
+    drawArrowheadScreen(ps.x, ps.y, angScreen, 1.0, color, Math.min(1, alpha * 0.92));
   }
 }
 let lastTs = performance.now();
@@ -969,9 +971,11 @@ function render(ts){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
   const { ys, r } = electronCenters(chargeSigned);
 
+  // Πίσω ημιεπίπεδο xz και πίσω ημιάξονας z
   if(ui.showPlaneXZ.checked) back.push(() => drawPlaneXZHalf(cam, vp, 'back', u));
   if(ui.axes.checked) back.push(() => drawZAxisHalf(cam, vp, 'back'));
 
+  // Ενδιάμεσο επίπεδο xy
   if(ui.showPlaneXY.checked) mid.push(() => drawPlaneXY(cam, vp, u));
   if(ui.showXAxisLine.checked) mid.push(() => drawXAxisLine(cam, vp));
   if(ui.axes.checked) mid.push(() => drawAxesXY(cam, vp));
@@ -1011,6 +1015,7 @@ function render(ts){
     });
   }
 
+  // Μπροστινός ημιάξονας z και μπροστινό ημιεπίπεδο xz
   if(ui.axes.checked) front.unshift(() => drawZAxisHalf(cam, vp, 'front'));
   if(ui.showPlaneXZ.checked) front.unshift(() => drawPlaneXZHalf(cam, vp, 'front', u));
   [...back, ...mid, ...eArrowPass, ...front].forEach(fn => fn());
