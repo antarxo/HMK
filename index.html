@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v11g transparent rod red electrons limited planes exact baseline arrows</title>
+<title>EMW true 3D v11i flat exact baseline arrows no hidden cones</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
@@ -351,25 +351,32 @@ function makeLobePoints(scaleX, scaleY, sx, sy){
 }
 function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56, opacity=1){
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
-  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 10, false), solidMat(color, 0.17, opacity));
-  const pos = curve.getPoint(0.995);
-  const tan = curve.getTangent(0.98).normalize();
-  const coneR = Math.max(radius * 5.8, 0.016) * headScale;
-  const coneL = Math.max(radius * 13.0, 0.050) * headScale;
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12, opacity));
-  cone.position.copy(pos);
-  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tan);
-  const g = new THREE.Group();
-  g.add(tube, cone);
-  return g;
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 10, false), solidMat(color, 0.17, opacity));
 }
-function buildArrowHead(position, tangent, color, headScale=1, opacity=1){
-  const coneR = Math.max(lineRadius * 5.4, 0.016) * headScale;
-  const coneL = Math.max(lineRadius * 13.5, 0.050) * headScale;
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneL, 10), solidMat(color, 0.12, opacity));
-  cone.position.copy(position);
-  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tangent.clone().normalize());
-  return cone;
+function flatArrowGeometry(scale=1){
+  const k = scale;
+  const geom = new THREE.BufferGeometry();
+  const verts = new Float32Array([
+     2.7 * k,  0.0,      0.0,
+    -1.45 * k, -1.8 * k, 0.0,
+    -1.45 * k,  1.8 * k, 0.0,
+  ]);
+  geom.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+  geom.computeVertexNormals();
+  return geom;
+}
+function buildArrowHeadXY(position, angleRad, color, scale=0.030, opacity=1){
+  const m = new THREE.Mesh(flatArrowGeometry(scale), solidMat(color, 0.10, opacity));
+  m.position.copy(position);
+  m.rotation.z = angleRad;
+  return m;
+}
+function buildArrowHeadXZ(position, angleRad, color, scale=0.030, opacity=1){
+  const m = new THREE.Mesh(flatArrowGeometry(scale), solidMat(color, 0.10, opacity));
+  m.position.copy(position);
+  m.rotation.x = -Math.PI / 2;
+  m.rotation.z = angleRad;
+  return m;
 }
 function seededEFrontsAbsolute(u){
   const fronts = [];
@@ -446,6 +453,8 @@ function addEArrowSpecs3D(group, front){
   const scaleY = getPulseScaleY(age);
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
+  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+  const arrowScale = 0.030 / safe;
   const specs = [
     [ 139.320, -115.360,  66.762],
     [ 139.320,  115.360, 113.238],
@@ -456,8 +465,7 @@ function addEArrowSpecs3D(group, front){
     const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
     const dir = front.reverseArrows ? Math.PI : 0;
     const a = aDeg * Math.PI / 180 + dir;
-    const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
-    group.add(buildArrowHead(pos, tangent, color, 0.58, opacity));
+    group.add(buildArrowHeadXY(pos, a, color, arrowScale, opacity));
   }
 }
 function addBFront3D(group, front, which, drawArrows=true){
@@ -469,12 +477,15 @@ function addBFront3D(group, front, which, drawArrows=true){
     const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
     const isGreen = (quarter === 0 || quarter === 3);
     const ccw = isGreen;
+    const arrowScale = 0.030;
     const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
     for(const th of thetas){
       const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
       let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
       if(!ccw) tangent.multiplyScalar(-1);
-      group.add(buildArrowHead(p, tangent, color, 0.58, opacity));
+      const ang = Math.atan2(tangent.y, tangent.x);
+      const angXZ = Math.atan2(tangent.z, tangent.x);
+      group.add(buildArrowHeadXZ(p, angXZ, color, arrowScale, opacity));
     }
   }
 }
