@@ -789,13 +789,13 @@ function rebuildFieldVectorMode(u, eFronts, bFronts){
       tips.push(tip);
     }
     if(tips.length > 1){
-      eFieldModeGroup.add(makePolyline(tips, 0xffffff, 0.28, 0.40));
+      eFieldModeGroup.add(makePolyline(tips, 0x5b616a, 0.34, 0.58));
       for(let i=0;i<tips.length-1;i++){
         const p1 = tips[i], p2 = tips[i+1];
         const base1 = new THREE.Vector3(p1.x, 0, eZ);
         const base2 = new THREE.Vector3(p2.x, 0, eZ);
         const fillColor = ((p1.y + p2.y) * 0.5) >= 0 ? COLORS.ePos : COLORS.eNeg;
-        eFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], fillColor, 0.11));
+        eFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x2a2f36, 0.32));
       }
     }
   }
@@ -811,18 +811,18 @@ function rebuildFieldVectorMode(u, eFronts, bFronts){
       tips.push(tip);
     }
     if(tips.length > 1){
-      bFieldModeGroup.add(makePolyline(tips, 0xffffff, 0.28, 0.36));
+      bFieldModeGroup.add(makePolyline(tips, 0x4d535c, 0.34, 0.56));
       for(let i=0;i<tips.length-1;i++){
         const p1 = tips[i], p2 = tips[i+1];
         const base1 = new THREE.Vector3(p1.x, bY, 0);
         const base2 = new THREE.Vector3(p2.x, bY, 0);
         const fillColor = ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bPos : COLORS.bNeg;
-        bFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], fillColor, 0.11));
+        bFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x1f242b, 0.34));
       }
     }
   }
-  buildSideE(+1); buildSideE(-1);
-  buildSideB(+1); buildSideB(-1);
+  buildSideE(+1);
+  buildSideB(+1);
 }
 
 function seededEFrontsAbsolute(u){
@@ -1085,12 +1085,12 @@ function drawGraphs(){
   function familyColors(family, value){
     if(family === 'E') return value >= 0 ? ['#e85a5a', '#4fa8d8'] : ['#4fa8d8', '#e85a5a'];
     // i / B simple alternation only
-    return value >= 0 ? ['#38b66b', '#f2a31b'] : ['#f2a31b', '#38b66b'];
+    return value >= 0 ? ['#f2a31b', '#38b66b'] : ['#38b66b', '#f2a31b'];
   }
   function signColor(family, value){
     if(family === 'E') return value >= 0 ? '#e85a5a' : '#4fa8d8';
     // i and B: simple color alternation only
-    return value >= 0 ? '#38b66b' : '#f2a31b';
+    return value >= 0 ? '#f2a31b' : '#38b66b';
   }
   function drawSignedCurve(row, midY){
     let started = false;
@@ -1165,7 +1165,7 @@ function drawGraphs(){
       const m = -(ampPix * deriv) / gw;
       const dx = 60 / Math.sqrt(1 + m*m);
       const dy = m * dx;
-      g.strokeStyle = iNow >= 0 ? '#38b66b' : '#f2a31b';
+      g.strokeStyle = iNow >= 0 ? '#f2a31b' : '#38b66b';
       g.lineWidth = 1.8;
       g.beginPath();
       g.moveTo(xNow - dx, yNow - dy);
