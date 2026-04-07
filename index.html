@@ -108,8 +108,11 @@ const key2 = new THREE.DirectionalLight(0xa7d0ff, 0.26); key2.position.set(-8, -
 const root = new THREE.Group();
 scene.add(root);
 
+const DSTEP = 0.004;
+const HOME_Y_OFFSET = 18 * DSTEP;
+
 function setHome(){
-  root.rotation.y = THREE.MathUtils.degToRad(-21);
+  root.rotation.y = THREE.MathUtils.degToRad(-21) + HOME_Y_OFFSET;
   root.rotation.x = THREE.MathUtils.degToRad(15);
 }
 function setLectureView(){
@@ -647,7 +650,7 @@ function chargeAndCurrent(u){
   const phase = 2 * Math.PI * u;
   return { chargeSigned: -Math.sin(phase), currentSigned: -Math.cos(phase) };
 }
-function electronCenters(chargeSigned){
+function electronCenters(chargeSigned, currentSigned){
   const N = 7;
   const r = 0.036;
   const d = 2 * r;
@@ -673,11 +676,14 @@ function electronCenters(chargeSigned){
       ys[i] = base[i] + q * (target - base[i]);
     }
   }
-  return ys.map(v => v * (ROD_LENGTH / 1.6));
+  const drift = 0.11 * currentSigned;
+  const minY = top + r;
+  const maxY = bot - r;
+  return ys.map(v => Math.min(maxY, Math.max(minY, v + drift)) * (ROD_LENGTH / 1.6));
 }
 function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
-  const ys = electronCenters(chargeSigned);
+  const ys = electronCenters(chargeSigned, currentSigned);
   electrons.forEach((e, idx) => {
     const wobble = 0.010 * Math.sin(2 * Math.PI * u + idx * 0.85);
     const sway = 0.012 * Math.cos(4 * Math.PI * u + idx * 0.55);
@@ -766,7 +772,6 @@ function bindHold(button, fn){
   button.addEventListener('pointerleave', stop);
   button.addEventListener('pointercancel', stop);
 }
-const DSTEP = 0.004;
 bindHold(ui.left,  () => { root.rotation.y -= DSTEP; });
 bindHold(ui.right, () => { root.rotation.y += DSTEP; });
 bindHold(ui.up,    () => { root.rotation.x -= DSTEP; });
