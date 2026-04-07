@@ -555,17 +555,43 @@ function addEArrowCones(front){
   const scaleX = getPulseScaleX(age);
   const scaleY = getPulseScaleY(age);
   const color = front.color;
-  const baseX = 139.320;
-  const baseY = 115.360;
-  const baseA = 113.238 * Math.PI / 180;
-  const tx0 = Math.cos(baseA), ty0 = Math.sin(baseA);
-  for(const sx of [1,-1]){
-    for(const sy of [1,-1]){
-      const pos = localToWorldXY(scaleX, scaleY, sx * baseX, sy * baseY);
-      const tangent = new THREE.Vector3(sx * tx0, sy * ty0, 0);
-      if(front.reverseArrows) tangent.multiplyScalar(-1);
-      eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.19, 0.010, opacity, 'xy'));
-    }
+
+  // Build one arrow in the upper-right quarter and obtain the other three
+  // ONLY through symmetries, as in the 2D construction.
+  // Coordinates come from the 2D baseline anchor.
+  const x0 = 139.320;
+  const y0 = 115.360;
+
+  // Screen-space anchor angle from the 2D baseline for the upper-right quarter.
+  // In screen coords (+y downward) this points downward-right on the red lobe.
+  // Convert to world tangent (+y upward) by flipping the y component.
+  const aScreen = 66.762 * Math.PI / 180;
+  const tUR = new THREE.Vector3(Math.cos(aScreen), -Math.sin(aScreen), 0);
+
+  const reflectX = (v) => new THREE.Vector3(v.x, -v.y, v.z);
+  const reflectY = (v) => new THREE.Vector3(-v.x, v.y, v.z);
+
+  // Right half: lower-right is the mirror of upper-right w.r.t. x-axis,
+  // with reversed direction, so that all red arrows point downward and
+  // all blue arrows upward after a global reversal.
+  const tLR = reflectX(tUR).multiplyScalar(-1);
+
+  // Left half obtained from the right half by symmetry w.r.t. y-axis.
+  const tUL = reflectY(tUR);
+  const tLL = reflectY(tLR);
+
+  const entries = [
+    { x: +x0, y: -y0, tangent: tUR }, // upper-right
+    { x: +x0, y: +y0, tangent: tLR }, // lower-right
+    { x: -x0, y: -y0, tangent: tUL }, // upper-left
+    { x: -x0, y: +y0, tangent: tLL }, // lower-left
+  ];
+
+  for(const ent of entries){
+    const pos = localToWorldXY(scaleX, scaleY, ent.x, ent.y);
+    const tangent = ent.tangent.clone();
+    if(front.reverseArrows) tangent.multiplyScalar(-1);
+    eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.19, 0.010, opacity, 'xy'));
   }
 }
 function addBArrowCones(front){
