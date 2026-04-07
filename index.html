@@ -12,10 +12,10 @@
   .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
   .title{font-size:18px;font-weight:700}
   .sub{color:var(--muted);margin-top:4px}
-  .main{display:grid;grid-template-columns:minmax(290px,31vw) minmax(0,1fr);gap:var(--gap);padding:var(--pad);min-height:0;overflow:hidden}
+  .main{display:grid;grid-template-columns:minmax(250px,27vw) minmax(0,1fr);gap:8px;padding:8px;min-height:0;overflow:hidden}
   .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
   .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
-  .card .body{padding:10px}
+  .card .body{padding:4px}
   .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
   .row label{color:var(--muted);font-size:12px}
   input[type="range"]{width:min(190px,34vw)}
@@ -31,9 +31,9 @@
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
   .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
-  .graphs{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:8px;height:100%}
-  .gcard{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02);overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-height:0}
-  .ghead{padding:6px 10px;color:var(--muted);font-size:12px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .graphs{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:4px;height:100%}
+  .gcard{border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.018);overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-height:0}
+  .ghead{padding:2px 6px;color:var(--muted);font-size:11px;line-height:1.1;border-bottom:1px solid rgba(255,255,255,.05)}
   .gwrap{position:relative;min-height:0}
   .gwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   .drawerShell{position:fixed;left:0;top:88px;bottom:52px;z-index:30;display:flex;align-items:stretch;pointer-events:none}
@@ -43,6 +43,8 @@
   .drawerBody{padding:12px 12px 14px;overflow:auto}
   .drawerTitle{font-size:13px;font-weight:700;margin:0 0 10px;color:var(--text)}
   .drawerHint{color:var(--muted);font-size:12px;margin:0 0 10px}
+  .graphsCol .body{padding:4px!important;height:100%}
+  .graphsCol{min-width:0}
   @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} .graphsCol{min-height:48vh} .drawerShell{top:74px;bottom:44px} }
 </style>
 </head>
@@ -54,7 +56,6 @@
   </div>
   <div class="main">
     <div class="card graphsCol">
-      <h3>Γραφήματα</h3>
       <div class="body" style="height:100%">
         <div class="graphs">
           <div class="gcard"><div class="ghead">V(t)</div><div class="gwrap"><canvas id="gV"></canvas></div></div>
@@ -142,10 +143,11 @@ scene.add(root);
 
 const DSTEP = 0.004;
 const DEFAULT_RIGHT_CLICKS = 18;
-const HOME_Y_OFFSET = DEFAULT_RIGHT_CLICKS * DSTEP;
+// Η ζητούμενη προεπιλογή προσεγγίζεται ως σαφής δεξιά στροφή ~90° από το αρχικό κάδρο.
+const HOME_Y = THREE.MathUtils.degToRad(-21 + 90);
 
 function setHome(){
-  root.rotation.y = THREE.MathUtils.degToRad(-21) + HOME_Y_OFFSET;
+  root.rotation.y = HOME_Y;
   root.rotation.x = THREE.MathUtils.degToRad(15);
 }
 function setLectureView(){
