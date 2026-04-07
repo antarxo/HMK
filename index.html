@@ -21,6 +21,9 @@
   input[type="range"]{width:min(190px,34vw)}
   .viewport{position:relative;min-height:0;height:100%}
   #stage{position:absolute;inset:0}
+  .machineHud{position:absolute;left:10px;top:10px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none}
+  .machineHud .dpad,.machineHud button{pointer-events:auto}
+  .machineHud .playDock{display:flex;gap:6px;align-items:center}
   .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
   button:hover{background:rgba(255,255,255,.1)}
@@ -57,22 +60,24 @@
         <div class="paperWrap"><canvas id="graphsPaper"></canvas></div>
       </div>
     </div>
-    <div class="card viewport"><div id="stage"></div></div>
+    <div class="card viewport">
+      <div id="stage"></div>
+      <div class="machineHud">
+        <div class="dpad">
+          <div></div><button id="up">▲</button><div></div>
+          <button id="left">◀</button><div class="centerDot" id="resetView">•</div><button id="right">▶</button>
+          <div></div><button id="down">▼</button><div></div>
+        </div>
+        <div class="playDock"><button id="playBtn">Παύση</button></div>
+      </div>
+    </div>
   </div>
   <div class="drawerShell">
     <div class="drawerPanel" id="drawerPanel">
       <button class="drawerHandle" id="drawerToggle" aria-label="Άνοιγμα/κλείσιμο ελέγχων">❯</button>
       <div class="drawerBody">
         <div class="drawerTitle">Έλεγχοι σκηνής</div>
-        <div class="drawerHint">Το panel μαζεύτηκε σε συρτάρι στο αριστερό περιθώριο. Στη θέση του μπήκαν τα γραφήματα.</div>
-        <div class="row">
-          <label>Περιστροφή</label>
-          <div class="dpad">
-            <div></div><button id="up">▲</button><div></div>
-            <button id="left">◀</button><div class="centerDot" id="resetView">•</div><button id="right">▶</button>
-            <div></div><button id="down">▼</button><div></div>
-          </div>
-        </div>
+        <div class="drawerHint">Το panel μαζεύτηκε σε συρτάρι στο αριστερό περιθώριο. Το d-pad και η έναρξη/παύση μεταφέρθηκαν μέσα στο παράθυρο της μηχανής.</div>
         <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="960"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
         <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
@@ -85,7 +90,6 @@
         <div class="row"><label>Show particles</label><input id="showParticles" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
         <div class="controls">
-          <button id="playBtn">Παύση</button>
           <button id="homeBtn">Home view</button>
           <button id="lectureBtn">Lecture view</button>
         </div>
@@ -885,7 +889,7 @@ function drawGraphs(){
     [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu],j) => {
       const x = axisX + gw * uu;
       g.beginPath(); g.moveTo(x, midY-2.5); g.lineTo(x, midY+2.5); g.stroke();
-      g.fillText(lab, x, midY + ampPix + 10);
+      g.textBaseline = 'top'; g.fillText(lab, x, midY + 4);
     });
 
     const valNow = row.fn(phaseU);
