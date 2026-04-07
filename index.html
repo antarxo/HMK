@@ -361,7 +361,7 @@ const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 const ELECTRON_COUNT = 7; // odd count so one electron sits on y = 0
-const ELECTRON_RADIUS = 0.060;
+const ELECTRON_RADIUS = 0.050;
 for(let i=0;i<ELECTRON_COUNT;i++){
   const e = new THREE.Mesh(
     new THREE.SphereGeometry(ELECTRON_RADIUS, 21, 21),
@@ -376,8 +376,8 @@ for(let i=0;i<ELECTRON_COUNT;i++){
     })
   );
   e.renderOrder = 70;
-  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.20); glow.material.opacity = 0.95; e.add(glow);
-  const coreGlow = glowSprite(0xffffff); coreGlow.scale.setScalar(0.10); coreGlow.material.opacity = 0.26; e.add(coreGlow);
+  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.17); glow.material.opacity = 0.90; e.add(glow);
+  const coreGlow = glowSprite(0xffffff); coreGlow.scale.setScalar(0.085); coreGlow.material.opacity = 0.22; e.add(coreGlow);
   electrons.push(e);
   particleGroup.add(e);
 }
@@ -796,12 +796,12 @@ function drawGraphs(){
   const axisX = 42;
   const right = 10;
   const top = 8;
-  const bottom = 24;
+  const bottom = 10;
   const rowGap = 1;
   const gw = w - axisX - right;
   const rowH = (h - top - bottom - rowGap * (rows.length - 1)) / rows.length;
   const ampPix = rowH * 0.39;
-  const xAxisColor = 'rgba(255,255,255,0.34)';
+  const xAxisColor = 'rgba(255,255,255,0.44)';
   const yAxisColor = 'rgba(255,255,255,0.18)';
   const minorText = '10px system-ui';
 
@@ -868,17 +868,10 @@ function drawGraphs(){
     g.lineWidth = 1.45;
     g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
 
-    // y-axis values
-    g.fillStyle = 'rgba(232,238,247,0.72)';
-    g.font = minorText;
-    g.textAlign = 'right';
-    g.textBaseline = 'middle';
-    g.fillText('+1', axisX - 4, midY - ampPix);
-    g.fillText('0', axisX - 4, midY);
-    g.fillText('−1', axisX - 4, midY + ampPix);
-
     g.fillStyle = 'rgba(232,238,247,0.90)';
     g.font = '12px system-ui';
+    g.textAlign = 'right';
+    g.textBaseline = 'middle';
     g.fillText(row.label, leftLabel, midY);
 
     drawSignedCurve(row, midY);
@@ -892,9 +885,7 @@ function drawGraphs(){
     [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu],j) => {
       const x = axisX + gw * uu;
       g.beginPath(); g.moveTo(x, midY-2.5); g.lineTo(x, midY+2.5); g.stroke();
-      if(idx === rows.length - 1 || uu === 0 || uu === 1){
-        g.fillText(lab, x, midY + ampPix + 10);
-      }
+      g.fillText(lab, x, midY + ampPix + 10);
     });
 
     const valNow = row.fn(phaseU);
@@ -925,21 +916,6 @@ function drawGraphs(){
   g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
   g.setLineDash([]);
 
-  // bottom shared time axis
-  const tAxisY = h - bottom + 6;
-  g.strokeStyle = 'rgba(255,255,255,0.18)';
-  g.lineWidth = 1.0;
-  g.beginPath(); g.moveTo(axisX, tAxisY); g.lineTo(axisX + gw, tAxisY); g.stroke();
-  g.fillStyle = 'rgba(232,238,247,0.72)';
-  g.font = minorText;
-  g.textAlign = 'center';
-  [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu]) => {
-    const x = axisX + gw * uu;
-    g.beginPath(); g.moveTo(x, tAxisY-3); g.lineTo(x, tAxisY+3); g.stroke();
-    g.fillText(lab, x, h - 4);
-  });
-  g.textAlign = 'right';
-  g.fillText('t', axisX + gw - 2, tAxisY - 6);
 }
 
 function applyUI(){
