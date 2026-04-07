@@ -370,11 +370,23 @@ const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 const ELECTRON_COUNT = 7; // odd count so one electron sits on y = 0
-const ELECTRON_RADIUS = 0.052;
+const ELECTRON_RADIUS = 0.060;
 for(let i=0;i<ELECTRON_COUNT;i++){
-  const e = new THREE.Mesh(new THREE.SphereGeometry(ELECTRON_RADIUS, 22, 22), new THREE.MeshBasicMaterial({ color:COLORS.electron, transparent:true, opacity:0.98, depthWrite:false }));
+  const e = new THREE.Mesh(
+    new THREE.SphereGeometry(ELECTRON_RADIUS, 21, 21),
+    new THREE.MeshPhongMaterial({
+      color:0xff8c8c,
+      emissive:0xff3f3f,
+      emissiveIntensity:1.10,
+      shininess:150,
+      transparent:true,
+      opacity:0.98,
+      depthWrite:false
+    })
+  );
   e.renderOrder = 70;
-  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.14); glow.material.opacity = 0.70; e.add(glow);
+  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.20); glow.material.opacity = 0.95; e.add(glow);
+  const coreGlow = glowSprite(0xffffff); coreGlow.scale.setScalar(0.10); coreGlow.material.opacity = 0.26; e.add(coreGlow);
   electrons.push(e);
   particleGroup.add(e);
 }
@@ -725,6 +737,12 @@ function updateParticles(u){
   electrons.forEach((e, idx) => {
     // keep centers on the y axis so the axis 'skewers' the spheres
     e.position.set(0, ys[idx], 0);
+    const pulse = 0.82 + 0.28 * Math.abs(currentSigned);
+    e.material.opacity = 0.90 + 0.08 * Math.abs(currentSigned);
+    e.material.emissiveIntensity = 0.90 + 0.45 * Math.abs(currentSigned);
+    if(e.children[0]) e.children[0].material.opacity = 0.72 + 0.26 * Math.abs(currentSigned);
+    if(e.children[0]) e.children[0].scale.setScalar(0.16 * pulse + 0.04);
+    if(e.children[1]) e.children[1].material.opacity = 0.18 + 0.12 * Math.abs(currentSigned);
   });
 
   const qmag = Math.abs(chargeSigned);
