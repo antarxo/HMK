@@ -534,6 +534,64 @@ function buildArrowHeadXZ(position, angleRad, color, scale=0.052, opacity=1){
 function buildBranchTube(points, color, radiusMul=1, opacity=1){
   return buildCurve(points, color, lineRadius * radiusMul, 0.82, 34, opacity);
 }
+function buildConeArrow(position, tangentVec, color, length=0.22, radius=0.014, opacity=1, plane='xy'){
+  const dir = tangentVec.clone().normalize();
+  const offset = plane === 'xy' ? new THREE.Vector3(0,0,0.030) : new THREE.Vector3(0,0.030,0);
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(radius, length, 22, 1, false),
+    new THREE.MeshBasicMaterial({ color, transparent:true, opacity, depthWrite:false })
+  );
+  cone.position.copy(position.clone().add(offset).add(dir.clone().multiplyScalar(-length * 0.5)));
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
+  cone.renderOrder = 62;
+  return cone;
+}
+function addEArrowCones(front){
+  if((front.arrowLen || 0) <= 0.25) return;
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  const fade = Math.exp(-0.22 * age);
+  const opacity = Math.min(1, (front.birthOpacity ?? 1) * fade * 1.12);
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+  const baseX = 139.320;
+  const baseY = 115.360;
+  const baseA = 113.238 * Math.PI / 180;
+  const tx0 = Math.cos(baseA), ty0 = Math.sin(baseA);
+  for(const sx of [1,-1]){
+    for(const sy of [1,-1]){
+      const pos = localToWorldXY(scaleX, scaleY, sx * baseX, sy * baseY);
+      const tangent = new THREE.Vector3(sx * tx0, sy * ty0, 0);
+      if(front.reverseArrows) tangent.multiplyScalar(-1);
+      eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.19, 0.010, opacity, 'xy'));
+    }
+  }
+}
+function addBArrowCones(front){
+  const age = front.age;
+  if(age < 0 || age > 1) return;
+  const r = Math.max(0.0001, front.radius);
+  if(r < 0.16 * B_RADIUS_FINAL) return;
+  const fade = Math.exp(-0.22 * age);
+  const opacity = Math.min(1, (front.birthOpacity ?? 1) * fade * 1.08);
+  const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
+  const isGreen = (quarter === 0 || quarter === 3);
+  const ccw = isGreen;
+  const color = front.color;
+  const packs = [
+    ['back', [Math.PI * 1.18, Math.PI * 1.82]],
+    ['front', [Math.PI * 0.18, Math.PI * 0.82]],
+  ];
+  for(const [which, thetas] of packs){
+    for(const th of thetas){
+      const pos = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
+      let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
+      if(!ccw) tangent.multiplyScalar(-1);
+      eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.18, 0.010, opacity, 'xz'));
+    }
+  }
+}
 function buildEmbeddedArrowXY(position, angleRad, color, scale=0.17, opacity=1){
   const g = new THREE.Group();
   const tip = position.clone();
@@ -690,6 +748,8 @@ function rebuildFields(u){
   eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', false));
   bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', false));
   bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', false));
+  if(eArrowFront) addEArrowCones(eArrowFront);
+  if(bArrowFront) addBArrowCones(bArrowFront);
 }
 
 function chargeAndCurrent(u){
@@ -939,7 +999,7 @@ function applyUI(){
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
-  eArrowGroup.visible = false;
+  eArrowGroup.visible = ui.showE.checked || ui.showB.checked;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
   particleGroup.visible = ui.showParticles.checked;
   topGlow.visible = botGlow.visible = ui.showParticles.checked;
