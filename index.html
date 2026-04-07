@@ -297,10 +297,11 @@ const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.050, 0.14, 12), soli
 currentHead.position.y = 0.47; currentGroup.add(currentHead);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
+const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 3;
 const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
 const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
 const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
-root.add(eUpperGroup, eLowerGroup, bBackGroup, bFrontGroup);
+root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bFrontGroup);
 
 function disposeGroup(group){
   while(group.children.length){
@@ -424,7 +425,7 @@ function makeBCircleHalf(centerX, radius, which='front', n=46){
   }
   return pts;
 }
-function addEFront3D(group, front, which, drawArrows=true){
+function addEFront3D(group, front, which){
   const age = front.age;
   const scaleX = getPulseScaleX(age);
   const scaleY = getPulseScaleY(age);
@@ -436,23 +437,27 @@ function addEFront3D(group, front, which, drawArrows=true){
     const pts = makeLobePoints(scaleX, scaleY, sx, sy);
     group.add(buildCurve(pts, color, lineRadius, 0.78, 72, opacity));
   }
-  if(drawArrows && (front.arrowLen || 0) > 0.25){
-    const allSpecs = [
-      [ 139.320, -115.360,  66.762],
-      [ 139.320,  115.360, 113.238],
-      [-139.320, -115.360, 113.238],
-      [-139.320,  115.360,  66.762],
-    ];
-    const specs = which === 'upper'
-      ? allSpecs.filter(([,yLocal]) => yLocal < 0)
-      : allSpecs.filter(([,yLocal]) => yLocal > 0);
-    for(const [xLocal, yLocal, aDeg] of specs){
-      const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
-      const dir = front.reverseArrows ? Math.PI : 0;
-      const a = aDeg * Math.PI / 180 + dir;
-      const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
-      group.add(buildArrowHead(pos, tangent, color, 0.58, opacity));
-    }
+}
+
+function addEArrowSpecs3D(group, front){
+  if((front.arrowLen || 0) <= 0.25) return;
+  const age = front.age;
+  const scaleX = getPulseScaleX(age);
+  const scaleY = getPulseScaleY(age);
+  const color = front.color;
+  const opacity = front.birthOpacity ?? 1;
+  const specs = [
+    [ 139.320, -115.360,  66.762],
+    [ 139.320,  115.360, 113.238],
+    [-139.320, -115.360, 113.238],
+    [-139.320,  115.360,  66.762],
+  ];
+  for(const [xLocal, yLocal, aDeg] of specs){
+    const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
+    const dir = front.reverseArrows ? Math.PI : 0;
+    const a = aDeg * Math.PI / 180 + dir;
+    const tangent = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
+    group.add(buildArrowHead(pos, tangent, color, 0.58, opacity));
   }
 }
 function addBFront3D(group, front, which, drawArrows=true){
@@ -475,6 +480,7 @@ function addBFront3D(group, front, which, drawArrows=true){
 }
 function rebuildFields(u){
   disposeGroup(eUpperGroup);
+  disposeGroup(eArrowGroup);
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
   disposeGroup(bFrontGroup);
@@ -484,8 +490,9 @@ function rebuildFields(u){
     .sort((a,b) => b.age - a.age)[0] || null;
   const bArrowFront = [...bFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01)
     .sort((a,b) => b.age - a.age)[0] || null;
-  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', fr === eArrowFront));
-  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', fr === eArrowFront));
+  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper'));
+  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower'));
+  if(eArrowFront) addEArrowSpecs3D(eArrowGroup, eArrowFront);
   bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', fr === bArrowFront));
   bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', fr === bArrowFront));
 }
@@ -556,7 +563,7 @@ function applyUI(){
   camera.lookAt(focusPoint);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
-  eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
+  eUpperGroup.visible = eArrowGroup.visible = eLowerGroup.visible = ui.showE.checked;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
   particleGroup.visible = ui.showParticles.checked;
   topGlow.visible = botGlow.visible = ui.showParticles.checked;
