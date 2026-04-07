@@ -31,11 +31,8 @@
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
   .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
-  .graphs{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:4px;height:100%}
-  .gcard{border:1px solid rgba(255,255,255,.06);border-radius:8px;background:rgba(255,255,255,.018);overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-height:0}
-  .ghead{padding:2px 6px;color:var(--muted);font-size:11px;line-height:1.1;border-bottom:1px solid rgba(255,255,255,.05)}
-  .gwrap{position:relative;min-height:0}
-  .gwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .paperWrap{position:relative;height:100%;min-height:0;border-radius:10px;overflow:hidden}
+  .paperWrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   .drawerShell{position:fixed;left:0;top:88px;bottom:52px;z-index:30;display:flex;align-items:stretch;pointer-events:none}
   .drawerPanel{width:320px;max-width:min(84vw,320px);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.10);border-left:none;border-radius:0 14px 14px 0;box-shadow:0 10px 28px rgba(0,0,0,.35);transform:translateX(calc(-100% + 22px));transition:transform .22s ease;pointer-events:auto;display:flex;flex-direction:column;min-height:0}
   .drawerPanel.open{transform:translateX(0)}
@@ -57,13 +54,7 @@
   <div class="main">
     <div class="card graphsCol">
       <div class="body" style="height:100%">
-        <div class="graphs">
-          <div class="gcard"><div class="ghead">V(t)</div><div class="gwrap"><canvas id="gV"></canvas></div></div>
-          <div class="gcard"><div class="ghead">q(t)</div><div class="gwrap"><canvas id="gQ"></canvas></div></div>
-          <div class="gcard"><div class="ghead">i(t)</div><div class="gwrap"><canvas id="gI"></canvas></div></div>
-          <div class="gcard"><div class="ghead">E(t)</div><div class="gwrap"><canvas id="gE"></canvas></div></div>
-          <div class="gcard"><div class="ghead">B(t)</div><div class="gwrap"><canvas id="gB"></canvas></div></div>
-        </div>
+        <div class="paperWrap"><canvas id="graphsPaper"></canvas></div>
       </div>
     </div>
     <div class="card viewport"><div id="stage"></div></div>
@@ -116,7 +107,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.m
 const stage = document.getElementById('stage');
 const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn','drawerToggle','drawerPanel'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
-const graphEls = { V:document.getElementById('gV'), Q:document.getElementById('gQ'), I:document.getElementById('gI'), E:document.getElementById('gE'), B:document.getElementById('gB') };
+const graphPaper = document.getElementById('graphsPaper');
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -780,61 +771,115 @@ function updateParticles(u){
 function resizeGraphCanvas(c){
   const box = c.parentElement.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  c.width = Math.max(160, Math.round(box.width * dpr));
-  c.height = Math.max(80, Math.round(box.height * dpr));
+  c.width = Math.max(220, Math.round(box.width * dpr));
+  c.height = Math.max(220, Math.round(box.height * dpr));
   const g = c.getContext('2d');
   g.setTransform(dpr,0,0,dpr,0,0);
   return { g, w: box.width, h: box.height };
 }
-function drawGraphCanvas(canvas, label, fn, color){
-  const { g, w, h } = resizeGraphCanvas(canvas);
+function drawGraphs(){
+  const { g, w, h } = resizeGraphCanvas(graphPaper);
   g.clearRect(0,0,w,h);
-  g.fillStyle = '#0b0f14'; g.fillRect(0,0,w,h);
-  const left = 26, right = 10, top = 10, bottom = 16;
-  const gw = w - left - right, gh = h - top - bottom;
-  const midY = top + gh/2;
-  g.strokeStyle = 'rgba(255,255,255,0.12)'; g.lineWidth = 1;
-  g.beginPath(); g.moveTo(left, midY); g.lineTo(left+gw, midY); g.stroke();
-  g.beginPath(); g.moveTo(left, top); g.lineTo(left, top+gh); g.stroke();
-  g.strokeStyle = 'rgba(255,255,255,0.09)';
-  g.setLineDash([3,4]);
+  g.fillStyle = '#0b0f14';
+  g.fillRect(0,0,w,h);
+
+  const rows = [
+    { label:'V', fn:u => -Math.sin(2*Math.PI*u), color:'#f2d35a' },
+    { label:'q', fn:u => -Math.sin(2*Math.PI*u), color:'#7ad7ff', tangent:true },
+    { label:'i', fn:u => -Math.cos(2*Math.PI*u), color:'#71db86' },
+    { label:'E', fn:u => -Math.sin(2*Math.PI*u), color:'#e85a5a' },
+    { label:'B', fn:u => -Math.cos(2*Math.PI*u), color:'#38b66b' },
+  ];
+  const leftLabel = 20;
+  const axisX = 32;
+  const right = 10;
+  const top = 10;
+  const bottom = 24;
+  const rowGap = 1;
+  const gw = w - axisX - right;
+  const rowH = (h - top - bottom - rowGap * (rows.length - 1)) / rows.length;
+  const ampPix = rowH * 0.38;
+
+  // one shared paper/grid
+  g.strokeStyle = 'rgba(255,255,255,0.08)';
+  g.lineWidth = 1;
   for(let k=1;k<4;k++){
-    const x = left + gw * (k/4);
-    g.beginPath(); g.moveTo(x, top); g.lineTo(x, top+gh); g.stroke();
+    const x = axisX + gw * (k/4);
+    g.beginPath(); g.moveTo(x, top); g.lineTo(x, h-bottom); g.stroke();
   }
-  g.setLineDash([]);
-  g.strokeStyle = color; g.lineWidth = 2.1;
-  g.beginPath();
-  for(let i=0;i<=220;i++){
-    const uu = i/220;
-    const x = left + gw*uu;
-    const y = midY - fn(uu) * gh*0.40;
-    if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+  g.strokeStyle = 'rgba(255,255,255,0.05)';
+  for(let r=1;r<rows.length;r++){
+    const y = top + r * rowH + (r-1) * rowGap;
+    g.beginPath(); g.moveTo(6, y-0.5); g.lineTo(w-6, y-0.5); g.stroke();
   }
-  g.stroke();
-  const xNow = left + gw * phaseU;
-  g.strokeStyle = 'rgba(255,255,255,0.72)';
+
+  rows.forEach((row, idx) => {
+    const y0 = top + idx * (rowH + rowGap);
+    const midY = y0 + rowH / 2;
+
+    // local axes close to label
+    g.strokeStyle = 'rgba(255,255,255,0.16)';
+    g.lineWidth = 1;
+    g.beginPath(); g.moveTo(axisX, y0 + 3); g.lineTo(axisX, y0 + rowH - 3); g.stroke();
+    g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
+
+    g.fillStyle = 'rgba(232,238,247,0.88)';
+    g.font = '12px system-ui';
+    g.textAlign = 'right';
+    g.textBaseline = 'middle';
+    g.fillText(row.label, leftLabel, midY);
+
+    g.strokeStyle = row.color;
+    g.lineWidth = 2.2;
+    g.beginPath();
+    for(let i=0;i<=260;i++){
+      const uu = i/260;
+      const x = axisX + gw*uu;
+      const y = midY - row.fn(uu) * ampPix;
+      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.stroke();
+
+    const xNow = axisX + gw * phaseU;
+    const yNow = midY - row.fn(phaseU) * ampPix;
+    g.fillStyle = row.color;
+    g.beginPath(); g.arc(xNow, yNow, 3.3, 0, Math.PI*2); g.fill();
+
+    if(row.tangent){
+      const deriv = -2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
+      const m = -(ampPix * deriv) / gw;
+      const dx = 24 / Math.sqrt(1 + m*m);
+      const dy = m * dx;
+      g.strokeStyle = '#71db86';
+      g.lineWidth = 1.8;
+      g.beginPath();
+      g.moveTo(xNow - dx, yNow - dy);
+      g.lineTo(xNow + dx, yNow + dy);
+      g.stroke();
+    }
+  });
+
+  // one shared time cursor
+  const xNow = axisX + gw * phaseU;
+  g.strokeStyle = 'rgba(255,255,255,0.68)';
   g.setLineDash([2,3]);
-  g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, top+gh); g.stroke();
+  g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
   g.setLineDash([]);
-  const yNow = midY - fn(phaseU) * gh*0.40;
-  g.fillStyle = color;
-  g.beginPath(); g.arc(xNow, yNow, 3.2, 0, Math.PI*2); g.fill();
+
+  // bottom time axis
+  const tAxisY = h - bottom + 6;
+  g.strokeStyle = 'rgba(255,255,255,0.16)';
+  g.beginPath(); g.moveTo(axisX, tAxisY); g.lineTo(axisX + gw, tAxisY); g.stroke();
   g.fillStyle = 'rgba(232,238,247,0.86)';
   g.font = '11px system-ui';
-  g.textAlign = 'right'; g.textBaseline = 'alphabetic';
-  g.fillText('T', left+gw, h-4);
   g.textAlign = 'center';
-  g.fillText('T/4', left+gw*0.25, h-4);
-  g.fillText('T/2', left+gw*0.50, h-4);
-  g.fillText('3T/4', left+gw*0.75, h-4);
-}
-function drawGraphs(){
-  drawGraphCanvas(graphEls.V, 'V', u => Math.cos(2*Math.PI*u), '#f2d35a');
-  drawGraphCanvas(graphEls.Q, 'q', u => -Math.sin(2*Math.PI*u), '#7ad7ff');
-  drawGraphCanvas(graphEls.I, 'i', u => -Math.cos(2*Math.PI*u), '#71db86');
-  drawGraphCanvas(graphEls.E, 'E', u => -Math.sin(2*Math.PI*u), '#e85a5a');
-  drawGraphCanvas(graphEls.B, 'B', u => -Math.cos(2*Math.PI*u), '#38b66b');
+  [['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu]) => {
+    const x = axisX + gw * uu;
+    g.beginPath(); g.moveTo(x, tAxisY-3); g.lineTo(x, tAxisY+3); g.stroke();
+    g.fillText(lab, x, h - 4);
+  });
+  g.textAlign = 'right';
+  g.fillText('t', axisX + gw - 2, tAxisY - 6);
 }
 
 function applyUI(){
