@@ -156,6 +156,9 @@ setHome();
 const COLORS = {
   bg:0x0b0f14,
   axis:0x7a8ca5,
+  axisX:0xe45a5a,
+  axisY:0x5fd36f,
+  axisZ:0x5f8dff,
   rod:0xd8dee7,
   electron:0xff5a5a,
   ePos:0xff2f2f,
@@ -306,6 +309,40 @@ function updateChargeTextSprite(sp, text, colorHex, mag){
   sp.material.opacity = alpha;
 }
 
+function makeTextSprite(){
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 256;
+  const tex = new THREE.CanvasTexture(c);
+  tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent:true, depthWrite:false, depthTest:false });
+  const sp = new THREE.Sprite(mat);
+  sp.userData.canvas = c;
+  sp.userData.ctx = c.getContext('2d');
+  sp.userData.texture = tex;
+  return sp;
+}
+function updateTextSprite(sp, text, colorHex, opts={}){
+  const c = sp.userData.canvas, g = sp.userData.ctx, tex = sp.userData.texture;
+  const alpha = opts.alpha ?? 1;
+  const size = opts.size ?? 150;
+  const outline = opts.outline ?? true;
+  const outlineColor = opts.outlineColor ?? 'rgba(0,0,0,0.95)';
+  const shadowBlur = opts.shadowBlur ?? 14;
+  const scaleX = opts.scaleX ?? 0.44;
+  const scaleY = opts.scaleY ?? 0.22;
+  g.clearRect(0,0,c.width,c.height);
+  g.textAlign='center'; g.textBaseline='middle'; g.lineJoin='round'; g.lineCap='round';
+  g.shadowBlur = shadowBlur; g.shadowColor = 'rgba(0,0,0,0.55)';
+  g.font = `800 ${size}px system-ui, Arial`;
+  if(outline){ g.lineWidth = Math.max(10, Math.round(size*0.12)); g.strokeStyle = outlineColor; g.strokeText(text, c.width/2, c.height/2); }
+  const r = (colorHex >> 16) & 255, gg = (colorHex >> 8) & 255, b = colorHex & 255;
+  g.fillStyle = `rgba(${r},${gg},${b},${alpha})`;
+  g.fillText(text, c.width/2, c.height/2);
+  tex.needsUpdate = true;
+  sp.scale.set(scaleX, scaleY, 1);
+  sp.material.opacity = alpha;
+}
+
 const planes = new THREE.Group();
 root.add(planes);
 const ePlaneUpper = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), planeMaterial(COLORS.planeEPos, 0.04));
@@ -326,9 +363,12 @@ function axisCylinder(length, radius, color, axis){
   return m;
 }
 const AXIS_RADIUS = 0.006;
-const xAxis = axisCylinder(PLANE_LEN, AXIS_RADIUS, COLORS.axis, 'x'); axes.add(xAxis);
-axes.add(axisCylinder(2 * PLANE_Y_EXT, AXIS_RADIUS, COLORS.axis, 'y'));
-axes.add(axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axis, 'z'));
+const xAxis = axisCylinder(PLANE_LEN, AXIS_RADIUS, COLORS.axisX, 'x'); axes.add(xAxis);
+const yAxis = axisCylinder(2 * PLANE_Y_EXT, AXIS_RADIUS, COLORS.axisY, 'y'); axes.add(yAxis);
+const zAxis = axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axisZ, 'z'); axes.add(zAxis);
+const xLabel = makeTextSprite(); updateTextSprite(xLabel, 'x', COLORS.axisX, { size:160, scaleX:0.26, scaleY:0.13 }); xLabel.position.set(PLANE_X_MAX + 0.18, 0.06, 0.02); axes.add(xLabel);
+const yLabel = makeTextSprite(); updateTextSprite(yLabel, 'y', COLORS.axisY, { size:160, scaleX:0.26, scaleY:0.13 }); yLabel.position.set(0.10, PLANE_Y_EXT + 0.18, 0.02); axes.add(yLabel);
+const zLabel = makeTextSprite(); updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:160, scaleX:0.26, scaleY:0.13 }); zLabel.position.set(0.10, 0.06, PLANE_Z_EXT + 0.18); axes.add(zLabel);
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
@@ -391,10 +431,14 @@ for(let i=0;i<ELECTRON_COUNT;i++){
 const currentGroup = new THREE.Group();
 currentGroup.position.set(-0.25, 0.34, 0.14);
 root.add(currentGroup);
-const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.38, 14), solidMat(COLORS.bPos, 0.34, 0.34));
+const currentShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.38, 14), solidMat(COLORS.bPos, 0.05, 0.34));
 currentGroup.add(currentShaft);
-const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.110, 0.16, 18), solidMat(COLORS.bPos, 0.40, 0.40));
+const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.110, 0.16, 18), solidMat(COLORS.bPos, 0.05, 0.40));
 currentHead.position.y = 0.22; currentGroup.add(currentHead);
+const currentLabel = makeTextSprite();
+updateTextSprite(currentLabel, 'i', 0x000000, { size:170, scaleX:0.22, scaleY:0.12, outline:false, outlineColor:'rgba(0,0,0,0.98)' });
+currentLabel.position.set(0, -0.01, 0.12);
+currentGroup.add(currentLabel);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
 const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 24;
@@ -1027,6 +1071,7 @@ function updateParticles(u){
   currentHead.material.color.setHex(arrowColor); currentHead.material.emissive.setHex(arrowColor);
   currentShaft.material.opacity = dynOpacity; currentShaft.material.transparent = true; currentShaft.material.depthWrite = false;
   currentHead.material.opacity = dynOpacity; currentHead.material.transparent = true; currentHead.material.depthWrite = false;
+  currentLabel.material.opacity = Math.min(1, 0.55 + 0.45 * imag);
   rod.material.opacity = 0.20 + 0.12 * imag;
   rodInnerGlow.material.opacity = 0.06 + 0.22 * imag;
   rodInnerGlow.material.color.setHex(arrowColor);
