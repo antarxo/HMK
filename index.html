@@ -53,7 +53,7 @@
             <div></div><button id="down">▼</button><div></div>
           </div>
         </div>
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="0"></div>
+        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="960"></div>
         <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
         <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
         <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="20" value="4"></div>
@@ -259,6 +259,8 @@ const rodGroup = new THREE.Group();
 root.add(rodGroup);
 const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.060, 0.060, 2 * ROD_HALF_LENGTH, 28, 1, true), new THREE.MeshPhysicalMaterial({ color:0xe8eef7, transparent:true, opacity:0.18, transmission:0.38, roughness:0.12, metalness:0.0, thickness:0.22, clearcoat:0.35, clearcoatRoughness:0.25, side:THREE.DoubleSide }));
 rodGroup.add(rod);
+const rodOutline = new THREE.Mesh(new THREE.CylinderGeometry(0.0635, 0.0635, 2 * ROD_HALF_LENGTH, 28, 1, true), new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.82, side:THREE.BackSide }));
+rodGroup.add(rodOutline);
 
 const glowTexture = makeGlowTexture();
 function glowSprite(hex){
@@ -297,7 +299,7 @@ const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.050, 0.14, 12), soli
 currentHead.position.y = 0.47; currentGroup.add(currentHead);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
-const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 3;
+const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 24;
 const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
 const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
 const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
@@ -365,18 +367,37 @@ function flatArrowGeometry(scale=1){
   geom.computeVertexNormals();
   return geom;
 }
-function buildArrowHeadXY(position, angleRad, color, scale=0.030, opacity=1){
-  const m = new THREE.Mesh(flatArrowGeometry(scale), solidMat(color, 0.10, opacity));
-  m.position.copy(position);
-  m.rotation.z = angleRad;
-  return m;
+function buildArrowHeadXY(position, angleRad, color, scale=0.052, opacity=1){
+  const g = new THREE.Group();
+  const outline = new THREE.Mesh(flatArrowGeometry(scale * 1.34), new THREE.MeshBasicMaterial({ color:0x000000, transparent:opacity < 0.999, opacity:Math.max(0.92, opacity), depthWrite:true }));
+  outline.position.copy(position);
+  outline.position.z += 0.010;
+  outline.rotation.z = angleRad;
+  outline.renderOrder = 24;
+  const fill = new THREE.Mesh(flatArrowGeometry(scale), new THREE.MeshBasicMaterial({ color, transparent:opacity < 0.999, opacity:Math.max(0.98, opacity), depthWrite:true }));
+  fill.position.copy(position);
+  fill.position.z += 0.014;
+  fill.rotation.z = angleRad;
+  fill.renderOrder = 25;
+  g.add(outline, fill);
+  return g;
 }
-function buildArrowHeadXZ(position, angleRad, color, scale=0.030, opacity=1){
-  const m = new THREE.Mesh(flatArrowGeometry(scale), solidMat(color, 0.10, opacity));
-  m.position.copy(position);
-  m.rotation.x = -Math.PI / 2;
-  m.rotation.z = angleRad;
-  return m;
+function buildArrowHeadXZ(position, angleRad, color, scale=0.052, opacity=1){
+  const g = new THREE.Group();
+  const outline = new THREE.Mesh(flatArrowGeometry(scale * 1.34), new THREE.MeshBasicMaterial({ color:0x000000, transparent:opacity < 0.999, opacity:Math.max(0.92, opacity), depthWrite:true }));
+  outline.position.copy(position);
+  outline.position.y += 0.010;
+  outline.rotation.x = -Math.PI / 2;
+  outline.rotation.z = angleRad;
+  outline.renderOrder = 24;
+  const fill = new THREE.Mesh(flatArrowGeometry(scale), new THREE.MeshBasicMaterial({ color, transparent:opacity < 0.999, opacity:Math.max(0.98, opacity), depthWrite:true }));
+  fill.position.copy(position);
+  fill.position.y += 0.014;
+  fill.rotation.x = -Math.PI / 2;
+  fill.rotation.z = angleRad;
+  fill.renderOrder = 25;
+  g.add(outline, fill);
+  return g;
 }
 function seededEFrontsAbsolute(u){
   const fronts = [];
@@ -454,7 +475,7 @@ function addEArrowSpecs3D(group, front){
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
   const safe = Math.max(0.08, Math.max(scaleX, scaleY));
-  const arrowScale = 0.030 / safe;
+  const arrowScale = 0.066 / safe;
   const specs = [
     [ 139.320, -115.360,  66.762],
     [ 139.320,  115.360, 113.238],
@@ -477,7 +498,7 @@ function addBFront3D(group, front, which, drawArrows=true){
     const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
     const isGreen = (quarter === 0 || quarter === 3);
     const ccw = isGreen;
-    const arrowScale = 0.030;
+    const arrowScale = 0.060;
     const thetas = which === 'back' ? [Math.PI * 1.18, Math.PI * 1.82] : [Math.PI * 0.18, Math.PI * 0.82];
     for(const th of thetas){
       const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
@@ -600,7 +621,7 @@ ui.playBtn.addEventListener('click', () => {
 });
 ui.homeBtn.addEventListener('click', () => setHome());
 ui.lectureBtn.addEventListener('click', () => setLectureView());
-ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 0; applyUI(); });
+ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 960; applyUI(); });
 
 function bindHold(button, fn){
   let timer = null;
