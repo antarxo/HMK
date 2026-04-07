@@ -163,10 +163,10 @@ const COLORS = {
   bNeg:0xf2a31b,
   chargeNeg:0xe85a5a,
   chargePos:0x4fa8d8,
-  planeEPos:0xa73333,
-  planeENeg:0x235f84,
-  planeBPos:0x1c6b40,
-  planeBNeg:0x9c6810
+  planeEPos:0x676d75,
+  planeENeg:0x555b63,
+  planeBPos:0x474c53,
+  planeBNeg:0x7a8088
 };
 
 const E_FULL = [
@@ -686,10 +686,10 @@ function rebuildFields(u){
     .sort((a,b) => Math.abs(a.age - 0.56) - Math.abs(b.age - 0.56))[0] || null;
   const bArrowFront = [...bFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01 && fr.radius > 0.10 * B_RADIUS_FINAL)
     .sort((a,b) => Math.abs(a.radius - 0.56 * B_RADIUS_FINAL) - Math.abs(b.radius - 0.56 * B_RADIUS_FINAL))[0] || null;
-  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', fr === eArrowFront));
-  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', fr === eArrowFront));
-  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', fr === bArrowFront));
-  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', fr === bArrowFront));
+  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', false));
+  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', false));
+  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', false));
+  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', false));
 }
 
 function chargeAndCurrent(u){
@@ -938,7 +938,8 @@ function applyUI(){
   camera.lookAt(focusPoint);
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
-  eUpperGroup.visible = eArrowGroup.visible = eLowerGroup.visible = ui.showE.checked;
+  eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
+  eArrowGroup.visible = false;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
   particleGroup.visible = ui.showParticles.checked;
   topGlow.visible = botGlow.visible = ui.showParticles.checked;
