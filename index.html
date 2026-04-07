@@ -449,24 +449,49 @@ function makeLobePoints(scaleX, scaleY, sx, sy){
   return pts;
 }
 
-function findDiagonalAnchorIndex(pts){
-  // Upper-right lobe lives inside the rectangle [0..159] x [-178..0] in local units.
-  // The requested anchor is where the lobe intersects the diagonal that joins the rod center
-  // (the rectangle corner at the rod center) to the opposite corner.
-  const diag = new THREE.Vector2(159, -178).normalize();
-  let best = 1;
-  let bestScore = Infinity;
-  for(let i=1;i<pts.length-1;i++){
-    const v = new THREE.Vector2(pts[i].x, pts[i].y);
-    const len = v.length();
-    if(len < 1e-9) continue;
-    const vn = v.clone().normalize();
-    const angleErr = 1 - Math.abs(vn.dot(diag));
-    const radialErr = Math.abs(v.x * (-178) - v.y * 159); // distance to same diagonal in local frame up to scale
-    const score = angleErr * 1000 + radialErr;
-    if(score < bestScore){ bestScore = score; best = i; }
+function findDiagonalAnchorData(pts, scaleX, scaleY){
+  // Requested anchor on the UPPER-RIGHT lobe:
+  // rectangle lower-left corner = rod center (0,0),
+  // opposite corner = (159*scaleX, 178*scaleY).
+  // So the diagonal is y = m x with m = (178*scaleY)/(159*scaleX).
+  const m = (178 * scaleY) / Math.max(1e-9, 159 * scaleX);
+  let idx = -1;
+  let tSeg = 0.5;
+
+  for(let i=0;i<pts.length-1;i++){
+    const p0 = pts[i], p1 = pts[i+1];
+    const f0 = p0.y - m * p0.x;
+    const f1 = p1.y - m * p1.x;
+    if(Math.abs(f0) < 1e-9){ idx = i; tSeg = 0; break; }
+    if(f0 === 0 || f0 * f1 <= 0){
+      const denom = (f0 - f1);
+      tSeg = Math.abs(denom) < 1e-9 ? 0.5 : (f0 / denom);
+      idx = i;
+      break;
+    }
   }
-  return Math.max(1, Math.min(pts.length-2, best));
+
+  if(idx < 0){
+    // Fallback: nearest point to the diagonal
+    let best = 1, bestErr = Infinity;
+    for(let i=1;i<pts.length-1;i++){
+      const err = Math.abs(pts[i].y - m * pts[i].x);
+      if(err < bestErr){ bestErr = err; best = i; }
+    }
+    idx = Math.max(1, Math.min(pts.length-2, best));
+    tSeg = 0.0;
+  }
+
+  const a = pts[idx], b = pts[idx+1];
+  const pos = new THREE.Vector3(
+    a.x + (b.x - a.x) * tSeg,
+    a.y + (b.y - a.y) * tSeg,
+    a.z + (b.z - a.z) * tSeg
+  );
+
+  // Tangent from the actual segment that intersects the diagonal.
+  const tangent = b.clone().sub(a).normalize();
+  return { pos, tangent, idx, tSeg };
 }
 function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=96, opacity=1){
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
@@ -556,7 +581,7 @@ function buildBranchTube(points, color, radiusMul=1, opacity=1){
 }
 function buildConeArrow(position, tangentVec, color, length=0.22, radius=0.014, opacity=1, plane='xy'){
   const dir = tangentVec.clone().normalize();
-  const baseRadius = Math.max(radius, lineRadius * 1.72);
+  const baseRadius = Math.max(radius, lineRadius * 1.94);
   const cone = new THREE.Mesh(
     new THREE.ConeGeometry(baseRadius, length, 26, 1, false),
     new THREE.MeshBasicMaterial({ color, transparent:true, opacity, depthWrite:false })
@@ -580,9 +605,9 @@ function addEArrowCones(front){
   // Seed on the RIGHT-UP lobe by intersecting the lobe with the diagonal of
   // its bounding rectangle whose lower-left corner is the rod center.
   const ptsRU = makeLobePoints(scaleX, scaleY, +1, -1);
-  const i0 = findDiagonalAnchorIndex(ptsRU);
-  const pRU = ptsRU[i0].clone();
-  const tRU = ptsRU[i0 + 1].clone().sub(ptsRU[i0 - 1]).normalize();
+  const anchorRU = findDiagonalAnchorData(ptsRU, scaleX, scaleY);
+  const pRU = anchorRU.pos.clone();
+  const tRU = anchorRU.tangent.clone().normalize();
 
   const reflectXPos = (p) => new THREE.Vector3( p.x, -p.y, p.z);
   const reflectYPos = (p) => new THREE.Vector3(-p.x,  p.y, p.z);
