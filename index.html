@@ -79,10 +79,10 @@
         <div class="drawerTitle">Έλεγχοι σκηνής</div>
         <div class="drawerHint">Το panel μαζεύτηκε σε συρτάρι στο αριστερό περιθώριο. Το d-pad και η έναρξη/παύση μεταφέρθηκαν μέσα στο παράθυρο της μηχανής.</div>
         <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="1080"></div>
-        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="8"></div>
+        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="17"></div>
         <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
-        <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="20" value="4"></div>
-        <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="20" value="4"></div>
+        <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="60" value="60"></div>
+        <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="60" value="60"></div>
         <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
         <div class="row"><label>Show planes</label><input id="showPlanes" type="checkbox" checked></div>
         <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
@@ -905,7 +905,7 @@ function drawGraphs(){
       const deriv = -2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
       const iNow = -Math.cos(2 * Math.PI * phaseU);
       const m = -(ampPix * deriv) / gw;
-      const dx = 24 / Math.sqrt(1 + m*m);
+      const dx = 60 / Math.sqrt(1 + m*m);
       const dy = m * dx;
       g.strokeStyle = signColor('B', iNow);
       g.lineWidth = 1.8;
