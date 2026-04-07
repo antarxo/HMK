@@ -796,8 +796,9 @@ function drawGraphs(){
     { label:'E', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:false },
     { label:'B', fn:u => -Math.cos(2*Math.PI*u), family:'B', tangent:false },
   ];
-  const leftLabel = 26;
   const axisX = 42;
+  const yLabelDx = 4;
+  const yLabelTopInset = 10;
   const right = 10;
   const top = 8;
   const bottom = 10;
@@ -876,7 +877,7 @@ function drawGraphs(){
     g.font = '12px system-ui';
     g.textAlign = 'right';
     g.textBaseline = 'middle';
-    g.fillText(row.label, leftLabel, midY);
+    g.fillText(row.label, axisX - yLabelDx, y0 + yLabelTopInset);
 
     drawSignedCurve(row, midY);
 
