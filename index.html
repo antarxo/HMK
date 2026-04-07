@@ -697,12 +697,15 @@ function electronCenters(chargeSigned, currentSigned){
   const top = -0.68;
   const bot =  0.68;
   const a = 0.020;
+  // exact baseline arithmetic-progression pattern:
+  // 0, a+d, 3a+2d, 6a+3d, 10a+4d, 15a+5d, 21a+6d
   const tri = [0, 1, 3, 6, 10, 15, 21];
   const targetOffsets = tri.map((t, i) => t * a + i * d);
-  // symmetric odd-count base so the middle electron center is exactly at y = 0
-  const mid = (N - 1) / 2;
-  const gap = 0.22;
-  const base = Array.from({length:N}, (_,i) => (i - mid) * gap);
+
+  const span = bot - top;
+  const uniformGap = span / (N - 1);
+  const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
+
   const q = Math.abs(chargeSigned);
   const moveUp = chargeSigned < 0;
   const ys = new Array(N);
@@ -717,10 +720,9 @@ function electronCenters(chargeSigned, currentSigned){
       ys[i] = base[i] + q * (target - base[i]);
     }
   }
-  const drift = 0.11 * currentSigned;
   const minY = top + r;
   const maxY = bot - r;
-  return ys.map(v => Math.min(maxY, Math.max(minY, v + drift)) * (ROD_LENGTH / 1.6));
+  return ys.map(v => Math.min(maxY, Math.max(minY, v)) * (ROD_LENGTH / 1.6));
 }
 function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
@@ -784,33 +786,74 @@ function drawGraphs(){
   g.fillRect(0,0,w,h);
 
   const rows = [
-    { label:'V', fn:u => -Math.sin(2*Math.PI*u), color:'#f2d35a' },
-    { label:'q', fn:u => -Math.sin(2*Math.PI*u), color:'#7ad7ff', tangent:true },
-    { label:'i', fn:u => -Math.cos(2*Math.PI*u), color:'#71db86' },
-    { label:'E', fn:u => -Math.sin(2*Math.PI*u), color:'#e85a5a' },
-    { label:'B', fn:u => -Math.cos(2*Math.PI*u), color:'#38b66b' },
+    { label:'V', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    { label:'q', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:true },
+    { label:'i', fn:u => -Math.cos(2*Math.PI*u), family:'B', tangent:false },
+    { label:'E', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    { label:'B', fn:u => -Math.cos(2*Math.PI*u), family:'B', tangent:false },
   ];
-  const leftLabel = 20;
-  const axisX = 32;
+  const leftLabel = 26;
+  const axisX = 42;
   const right = 10;
-  const top = 10;
+  const top = 8;
   const bottom = 24;
   const rowGap = 1;
   const gw = w - axisX - right;
   const rowH = (h - top - bottom - rowGap * (rows.length - 1)) / rows.length;
-  const ampPix = rowH * 0.38;
+  const ampPix = rowH * 0.39;
+  const xAxisColor = 'rgba(255,255,255,0.34)';
+  const yAxisColor = 'rgba(255,255,255,0.18)';
+  const minorText = '10px system-ui';
 
   // one shared paper/grid
-  g.strokeStyle = 'rgba(255,255,255,0.08)';
+  g.strokeStyle = 'rgba(255,255,255,0.07)';
   g.lineWidth = 1;
   for(let k=1;k<4;k++){
     const x = axisX + gw * (k/4);
     g.beginPath(); g.moveTo(x, top); g.lineTo(x, h-bottom); g.stroke();
   }
-  g.strokeStyle = 'rgba(255,255,255,0.05)';
+  g.strokeStyle = 'rgba(255,255,255,0.045)';
   for(let r=1;r<rows.length;r++){
     const y = top + r * rowH + (r-1) * rowGap;
     g.beginPath(); g.moveTo(6, y-0.5); g.lineTo(w-6, y-0.5); g.stroke();
+  }
+
+  function familyColors(family, value){
+    if(family === 'E') return value >= 0 ? ['#e85a5a', '#4fa8d8'] : ['#4fa8d8', '#e85a5a'];
+    return value >= 0 ? ['#38b66b', '#f2a31b'] : ['#f2a31b', '#38b66b'];
+  }
+  function signColor(family, value){
+    return family === 'E'
+      ? (value >= 0 ? '#e85a5a' : '#4fa8d8')
+      : (value >= 0 ? '#38b66b' : '#f2a31b');
+  }
+  function drawSignedCurve(row, midY){
+    let started = false;
+    let prevSign = null;
+    for(let i=0;i<=260;i++){
+      const uu = i/260;
+      const val = row.fn(uu);
+      const x = axisX + gw * uu;
+      const y = midY - val * ampPix;
+      const sign = val >= 0 ? 1 : -1;
+      if(!started){
+        g.beginPath();
+        g.strokeStyle = signColor(row.family, val);
+        g.lineWidth = 2.15;
+        g.moveTo(x,y);
+        started = true;
+      } else if(sign !== prevSign){
+        g.lineTo(x,y);
+        g.stroke();
+        g.beginPath();
+        g.strokeStyle = signColor(row.family, val);
+        g.lineWidth = 2.15;
+        g.moveTo(x,y);
+      }
+      g.lineTo(x,y);
+      prevSign = sign;
+    }
+    if(started) g.stroke();
   }
 
   rows.forEach((row, idx) => {
@@ -818,32 +861,47 @@ function drawGraphs(){
     const midY = y0 + rowH / 2;
 
     // local axes close to label
-    g.strokeStyle = 'rgba(255,255,255,0.16)';
+    g.strokeStyle = yAxisColor;
     g.lineWidth = 1;
     g.beginPath(); g.moveTo(axisX, y0 + 3); g.lineTo(axisX, y0 + rowH - 3); g.stroke();
+    g.strokeStyle = xAxisColor;
+    g.lineWidth = 1.45;
     g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
 
-    g.fillStyle = 'rgba(232,238,247,0.88)';
-    g.font = '12px system-ui';
+    // y-axis values
+    g.fillStyle = 'rgba(232,238,247,0.72)';
+    g.font = minorText;
     g.textAlign = 'right';
     g.textBaseline = 'middle';
+    g.fillText('+1', axisX - 4, midY - ampPix);
+    g.fillText('0', axisX - 4, midY);
+    g.fillText('−1', axisX - 4, midY + ampPix);
+
+    g.fillStyle = 'rgba(232,238,247,0.90)';
+    g.font = '12px system-ui';
     g.fillText(row.label, leftLabel, midY);
 
-    g.strokeStyle = row.color;
-    g.lineWidth = 2.2;
-    g.beginPath();
-    for(let i=0;i<=260;i++){
-      const uu = i/260;
-      const x = axisX + gw*uu;
-      const y = midY - row.fn(uu) * ampPix;
-      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
-    }
-    g.stroke();
+    drawSignedCurve(row, midY);
 
+    // per-row x ticks, small labels
+    g.strokeStyle = 'rgba(255,255,255,0.16)';
+    g.lineWidth = 0.9;
+    g.fillStyle = 'rgba(232,238,247,0.56)';
+    g.font = minorText;
+    g.textAlign = 'center';
+    [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu],j) => {
+      const x = axisX + gw * uu;
+      g.beginPath(); g.moveTo(x, midY-2.5); g.lineTo(x, midY+2.5); g.stroke();
+      if(idx === rows.length - 1 || uu === 0 || uu === 1){
+        g.fillText(lab, x, midY + ampPix + 10);
+      }
+    });
+
+    const valNow = row.fn(phaseU);
     const xNow = axisX + gw * phaseU;
-    const yNow = midY - row.fn(phaseU) * ampPix;
-    g.fillStyle = row.color;
-    g.beginPath(); g.arc(xNow, yNow, 3.3, 0, Math.PI*2); g.fill();
+    const yNow = midY - valNow * ampPix;
+    g.fillStyle = signColor(row.family, valNow);
+    g.beginPath(); g.arc(xNow, yNow, 3.1, 0, Math.PI*2); g.fill();
 
     if(row.tangent){
       const deriv = -2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
@@ -859,21 +917,23 @@ function drawGraphs(){
     }
   });
 
-  // one shared time cursor
+  // one shared time cursor, softer dashed guide
   const xNow = axisX + gw * phaseU;
-  g.strokeStyle = 'rgba(255,255,255,0.68)';
-  g.setLineDash([2,3]);
+  g.strokeStyle = 'rgba(255,255,255,0.26)';
+  g.lineWidth = 0.9;
+  g.setLineDash([2,4]);
   g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
   g.setLineDash([]);
 
-  // bottom time axis
+  // bottom shared time axis
   const tAxisY = h - bottom + 6;
-  g.strokeStyle = 'rgba(255,255,255,0.16)';
+  g.strokeStyle = 'rgba(255,255,255,0.18)';
+  g.lineWidth = 1.0;
   g.beginPath(); g.moveTo(axisX, tAxisY); g.lineTo(axisX + gw, tAxisY); g.stroke();
-  g.fillStyle = 'rgba(232,238,247,0.86)';
-  g.font = '11px system-ui';
+  g.fillStyle = 'rgba(232,238,247,0.72)';
+  g.font = minorText;
   g.textAlign = 'center';
-  [['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu]) => {
+  [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu]) => {
     const x = axisX + gw * uu;
     g.beginPath(); g.moveTo(x, tAxisY-3); g.lineTo(x, tAxisY+3); g.stroke();
     g.fillText(lab, x, h - 4);
