@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v11f transparent rod red electrons limited planes</title>
+<title>EMW true 3D v11g transparent rod red electrons limited planes exact baseline arrows</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
@@ -38,7 +38,7 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v11f <span class="badge">2D arrow logic / growing colored planes / transparent rod</span></div>
+    <div class="title">EMW true 3D v11g <span class="badge">2D arrow logic / growing colored planes / transparent rod</span></div>
     <div class="sub">3D βάση: ράβδος ως λεπτός διάφανος κύλινδρος ακριβώς στο κέντρο, κόκκινα ηλεκτρόνια μέσα στο εσωτερικό του, σωστή 2D λογική βελών και χρωματιστά planes που αναπτύσσονται μαζί με τα κύματα αλλά μένουν πιο περιορισμένα οπτικά.</div>
   </div>
   <div class="main">
@@ -166,11 +166,11 @@ const B_HALF_W = PLANE_Z_EXT;
 function currentEPlaneExtents(u){
   const halfW = 0.5 * E_TARGET_TOTAL_WIDTH * u;
   const halfHCore = 0.5 * (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * u);
-  const halfH = halfHCore + 0.40 * ROD_LENGTH * u;
+  const halfH = halfHCore + 0.55 * ROD_LENGTH * u;
   return { x0:-halfW, x1:halfW, y0:-halfH, y1:halfH };
 }
 function currentBPlaneExtents(u){
-  const r = 0.92 * B_RADIUS_FINAL * u;
+  const r = B_RADIUS_FINAL * u;
   return { x0:-r, x1:r, z0:-r, z1:r };
 }
 function updatePlanes(u){
@@ -437,12 +437,15 @@ function addEFront3D(group, front, which, drawArrows=true){
     group.add(buildCurve(pts, color, lineRadius, 0.78, 72, opacity));
   }
   if(drawArrows && (front.arrowLen || 0) > 0.25){
-    const specs = [
+    const allSpecs = [
       [ 139.320, -115.360,  66.762],
       [ 139.320,  115.360, 113.238],
       [-139.320, -115.360, 113.238],
       [-139.320,  115.360,  66.762],
     ];
+    const specs = which === 'upper'
+      ? allSpecs.filter(([,yLocal]) => yLocal < 0)
+      : allSpecs.filter(([,yLocal]) => yLocal > 0);
     for(const [xLocal, yLocal, aDeg] of specs){
       const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
       const dir = front.reverseArrows ? Math.PI : 0;
