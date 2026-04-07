@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>EMW true 3D v14 field-vector mode test</title>
 <style>
-  :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
+  :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; --cardBorder:rgba(255,255,255,.08); --topBg:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel); --cardBg:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel); --footBg:transparent; }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
   .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
-  .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
+  .top{padding:12px 16px;background:var(--topBg);border-bottom:1px solid var(--cardBorder)}
   .title{font-size:18px;font-weight:700}
   .sub{color:var(--muted);margin-top:4px}
   .main{display:grid;grid-template-columns:minmax(250px,27vw) minmax(0,1fr);gap:8px;padding:8px;min-height:0;overflow:hidden}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
+  .card{background:var(--cardBg);border:1px solid var(--cardBorder);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
   .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
   .card .body{padding:4px}
   .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
@@ -36,7 +36,7 @@
   .centerDot{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
   .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
-  .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
+  .foot{padding:9px 14px;color:var(--muted);border-top:1px solid var(--cardBorder);background:var(--footBg);font-size:12px}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
   .paperWrap{position:relative;height:100%;min-height:0;border-radius:10px;overflow:hidden}
   .paperWrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -158,10 +158,48 @@ const HOME_Y = THREE.MathUtils.degToRad(-21 + 50);
 const VIEW_SCREEN = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1080 };
 const VIEW_PRINT  = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1080 };
 
+function cssVar(name, value){ document.documentElement.style.setProperty(name, value); }
+function applyThemeMode(mode){
+  activeViewTheme = mode;
+  const th = VIEW_THEMES[mode] || VIEW_THEMES.screen;
+  Object.entries(th.css).forEach(([k,v]) => cssVar(k,v));
+  renderer.setClearColor(th.rendererBg, 1);
+  COLORS.bg = th.rendererBg;
+  COLORS.ePos = parseInt(th.ePos.slice(1), 16);
+  COLORS.eNeg = parseInt(th.eNeg.slice(1), 16);
+  COLORS.bPos = parseInt(th.bPos.slice(1), 16);
+  COLORS.bNeg = parseInt(th.bNeg.slice(1), 16);
+  COLORS.chargeNeg = COLORS.ePos;
+  COLORS.chargePos = COLORS.eNeg;
+  COLORS.axisX = th.axisX; COLORS.axisY = th.axisY; COLORS.axisZ = th.axisZ;
+  COLORS.rod = th.rod; COLORS.electron = th.electron;
+  COLORS.planeEPos = th.planeEPos; COLORS.planeENeg = th.planeENeg; COLORS.planeBPos = th.planeBPos; COLORS.planeBNeg = th.planeBNeg;
+  if (typeof xAxis !== 'undefined') {
+    xAxis.material.color.setHex(COLORS.axisX);
+    yAxis.material.color.setHex(COLORS.axisY);
+    zAxis.material.color.setHex(COLORS.axisZ);
+    updateTextSprite(xLabel, 'x', COLORS.axisX, { size:160, scaleX:0.26, scaleY:0.13 });
+    updateTextSprite(yLabel, 'y', COLORS.axisY, { size:160, scaleX:0.26, scaleY:0.13 });
+    updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:160, scaleX:0.26, scaleY:0.13 });
+    ePlaneUpper.material.color.setHex(COLORS.planeEPos);
+    ePlaneLower.material.color.setHex(COLORS.planeENeg);
+    bPlaneBack.material.color.setHex(COLORS.planeBPos);
+    bPlaneFront.material.color.setHex(COLORS.planeBNeg);
+    rod.material.color.setHex(COLORS.rod);
+    rodInnerGlow.material.color.setHex(COLORS.electron);
+    rodOutline.material.opacity = mode === 'printSharp' ? 0.74 : 0.94;
+    electrons.forEach(e => { e.material.color.setHex(COLORS.electron); e.material.emissive.setHex(COLORS.electron); if(e.children[0]) e.children[0].material.color.setHex(COLORS.electron); });
+    rebuildFields(phaseU);
+    updateParticles(phaseU);
+    applyUI();
+  }
+}
+
 function applyViewPreset(v){
   root.rotation.y = v.rotY;
   root.rotation.x = v.rotX;
   ui.zoom.value = v.zoom;
+  applyThemeMode(v===VIEW_PRINT ? 'printSharp' : 'screen');
   applyUI();
   markViewButtons(v===VIEW_PRINT ? 'print' : 'screen');
 }
@@ -194,6 +232,26 @@ const COLORS = {
   planeBPos:0x474c53,
   planeBNeg:0x7a8088
 };
+
+const VIEW_THEMES = {
+  screen:{
+    css:{ '--bg':'#0b0f14','--panel':'#111822','--text':'#e8eef7','--muted':'#9aa8bc','--cardBorder':'rgba(255,255,255,.08)','--topBg':'linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel)','--cardBg':'linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel)','--footBg':'transparent' },
+    rendererBg:0x0b0f14,
+    graphBg:'#0b0f14', graphGrid:'rgba(255,255,255,0.07)', graphRow:'rgba(255,255,255,0.045)', graphXAxis:'rgba(255,255,255,0.44)', graphYAxis:'rgba(255,255,255,0.18)', graphText:'rgba(232,238,247,0.90)', graphTick:'rgba(232,238,247,0.56)', graphCursor:'rgba(255,255,255,0.26)',
+    ePos:'#e85a5a', eNeg:'#4fa8d8', bPos:'#38b66b', bNeg:'#f2a31b',
+    planeEPos:0x676d75, planeENeg:0x555b63, planeBPos:0x474c53, planeBNeg:0x7a8088,
+    axisX:0xe45a5a, axisY:0x5fd36f, axisZ:0x5f8dff, rod:0xd8dee7, electron:0xff5a5a
+  },
+  printSharp:{
+    css:{ '--bg':'#ffffff','--panel':'#f1ece2','--text':'#0f1820','--muted':'#42505c','--cardBorder':'rgba(24,34,44,.20)','--topBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.76)), var(--panel)','--cardBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.58)), var(--panel)','--footBg':'rgba(255,255,255,.72)' },
+    rendererBg:0xffffff,
+    graphBg:'#ffffff', graphGrid:'rgba(20,26,32,0.08)', graphRow:'rgba(20,26,32,0.06)', graphXAxis:'rgba(47,58,68,0.62)', graphYAxis:'rgba(47,58,68,0.24)', graphText:'rgba(15,24,32,0.96)', graphTick:'rgba(15,24,32,0.64)', graphCursor:'rgba(15,24,32,0.22)',
+    ePos:'#ad1e1e', eNeg:'#0058ad', bPos:'#00723d', bNeg:'#d26f00',
+    planeEPos:0xd9d4cb, planeENeg:0xcfc8bd, planeBPos:0xc6c0b5, planeBNeg:0xe3ddd4,
+    axisX:0xbb2424, axisY:0x008749, axisZ:0x005bb4, rod:0x7a8490, electron:0xa52a2a
+  }
+};
+let activeViewTheme = 'screen';
 
 const E_FULL = [
   0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
@@ -468,11 +526,11 @@ const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
 const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 24;
 const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
 const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
+const bArrowGroup = new THREE.Group(); bArrowGroup.renderOrder = 24;
 const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
-const bArrowGroup = new THREE.Group(); bArrowGroup.renderOrder = 25;
 const eFieldModeGroup = new THREE.Group(); eFieldModeGroup.renderOrder = 12;
 const bFieldModeGroup = new THREE.Group(); bFieldModeGroup.renderOrder = 12;
-root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bFrontGroup, bArrowGroup, eFieldModeGroup, bFieldModeGroup);
+root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bArrowGroup, bFrontGroup, eFieldModeGroup, bFieldModeGroup);
 
 function disposeGroup(group){
   while(group.children.length){
@@ -1004,6 +1062,7 @@ function rebuildFields(u){
   disposeGroup(eArrowGroup);
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
+  disposeGroup(bArrowGroup);
   disposeGroup(bFrontGroup);
   disposeGroup(eFieldModeGroup);
   disposeGroup(bFieldModeGroup);
@@ -1115,7 +1174,8 @@ function resizeGraphCanvas(c){
 function drawGraphs(){
   const { g, w, h } = resizeGraphCanvas(graphPaper);
   g.clearRect(0,0,w,h);
-  g.fillStyle = '#0b0f14';
+  const th = VIEW_THEMES[activeViewTheme] || VIEW_THEMES.screen;
+  g.fillStyle = th.graphBg;
   g.fillRect(0,0,w,h);
 
   const rows = [
@@ -1135,32 +1195,30 @@ function drawGraphs(){
   const gw = w - axisX - right;
   const rowH = (h - top - bottom - rowGap * (rows.length - 1)) / rows.length;
   const ampPix = rowH * 0.39;
-  const xAxisColor = 'rgba(255,255,255,0.44)';
-  const yAxisColor = 'rgba(255,255,255,0.18)';
+  const xAxisColor = th.graphXAxis;
+  const yAxisColor = th.graphYAxis;
   const minorText = '10px system-ui';
 
   // one shared paper/grid
-  g.strokeStyle = 'rgba(255,255,255,0.07)';
+  g.strokeStyle = th.graphGrid;
   g.lineWidth = 1;
   for(let k=1;k<4;k++){
     const x = axisX + gw * (k/4);
     g.beginPath(); g.moveTo(x, top); g.lineTo(x, h-bottom); g.stroke();
   }
-  g.strokeStyle = 'rgba(255,255,255,0.045)';
+  g.strokeStyle = th.graphRow;
   for(let r=1;r<rows.length;r++){
     const y = top + r * rowH + (r-1) * rowGap;
     g.beginPath(); g.moveTo(6, y-0.5); g.lineTo(w-6, y-0.5); g.stroke();
   }
 
   function familyColors(family, value){
-    if(family === 'E') return value >= 0 ? ['#e85a5a', '#4fa8d8'] : ['#4fa8d8', '#e85a5a'];
-    // i / B simple alternation only
-    return value >= 0 ? ['#f2a31b', '#38b66b'] : ['#38b66b', '#f2a31b'];
+    if(family === 'E') return value >= 0 ? [th.ePos, th.eNeg] : [th.eNeg, th.ePos];
+    return value >= 0 ? [th.bNeg, th.bPos] : [th.bPos, th.bNeg];
   }
   function signColor(family, value){
-    if(family === 'E') return value >= 0 ? '#e85a5a' : '#4fa8d8';
-    // i and B: simple color alternation only
-    return value >= 0 ? '#f2a31b' : '#38b66b';
+    if(family === 'E') return value >= 0 ? th.ePos : th.eNeg;
+    return value >= 0 ? th.bNeg : th.bPos;
   }
   function drawSignedCurve(row, midY){
     let started = false;
@@ -1203,7 +1261,7 @@ function drawGraphs(){
     g.lineWidth = 1.45;
     g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
 
-    g.fillStyle = 'rgba(232,238,247,0.90)';
+    g.fillStyle = th.graphText;
     g.font = '12px system-ui';
     g.textAlign = 'right';
     g.textBaseline = 'middle';
@@ -1212,9 +1270,9 @@ function drawGraphs(){
     drawSignedCurve(row, midY);
 
     // per-row x ticks, small labels
-    g.strokeStyle = 'rgba(255,255,255,0.16)';
+    g.strokeStyle = th.graphYAxis;
     g.lineWidth = 0.9;
-    g.fillStyle = 'rgba(232,238,247,0.56)';
+    g.fillStyle = th.graphTick;
     g.font = minorText;
     g.textAlign = 'center';
     [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu],j) => {
@@ -1246,7 +1304,7 @@ function drawGraphs(){
 
   // one shared time cursor, softer dashed guide
   const xNow = axisX + gw * phaseU;
-  g.strokeStyle = 'rgba(255,255,255,0.26)';
+  g.strokeStyle = th.graphCursor;
   g.lineWidth = 0.9;
   g.setLineDash([2,4]);
   g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
@@ -1268,7 +1326,8 @@ function applyUI(){
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
   eArrowGroup.visible = ui.showE.checked;
-  bBackGroup.visible = bFrontGroup.visible = bArrowGroup.visible = ui.showB.checked;
+  bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
+  bArrowGroup.visible = ui.showB.checked;
   // field-vector mode is an independent representation: it can stand alone
   // even when the E/B curve fronts are hidden.
   eFieldModeGroup.visible = ui.showFieldMode.checked;
@@ -1376,7 +1435,7 @@ window.addEventListener('resize', () => {
 });
 
 refreshSpeedPresetButtons();
-applyUI();
+applyViewPreset(VIEW_SCREEN);
 updatePlanes(0);
 rebuildFields(0);
 let last = performance.now();
