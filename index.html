@@ -535,13 +535,17 @@ function buildBranchTube(points, color, radiusMul=1, opacity=1){
   return buildCurve(points, color, lineRadius * radiusMul, 0.82, 34, opacity);
 }
 function buildConeArrow(position, tangentVec, color, length=0.22, radius=0.014, opacity=1, plane='xy'){
+  // Integrated cone: the tangent axis of the curve is the axis of the cone.
+  // The cone is centered on the anchor point of the curve itself, instead
+  // of floating beside it, and its base diameter is slightly larger than
+  // the curve diameter so it visually 'swallows' the line thickness.
   const dir = tangentVec.clone().normalize();
-  const offset = plane === 'xy' ? new THREE.Vector3(0,0,0.030) : new THREE.Vector3(0,0.030,0);
+  const baseRadius = Math.max(radius, lineRadius * 1.45);
   const cone = new THREE.Mesh(
-    new THREE.ConeGeometry(radius, length, 22, 1, false),
+    new THREE.ConeGeometry(baseRadius, length, 26, 1, false),
     new THREE.MeshBasicMaterial({ color, transparent:true, opacity, depthWrite:false })
   );
-  cone.position.copy(position.clone().add(offset).add(dir.clone().multiplyScalar(-length * 0.5)));
+  cone.position.copy(position.clone());
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
   cone.renderOrder = 62;
   return cone;
