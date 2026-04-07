@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v11k arrows visible, charge signs, current arrow width</title>
+<title>EMW true 3D v12 drawer + graphs + correct electron/current convention</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
@@ -12,11 +12,10 @@
   .top{padding:12px 16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid rgba(255,255,255,.08)}
   .title{font-size:18px;font-weight:700}
   .sub{color:var(--muted);margin-top:4px}
-  .main{display:grid;grid-template-columns:minmax(270px,31vw) minmax(0,1fr);gap:var(--gap);padding:var(--pad);min-height:0;overflow:hidden}
+  .main{display:grid;grid-template-columns:minmax(290px,31vw) minmax(0,1fr);gap:var(--gap);padding:var(--pad);min-height:0;overflow:hidden}
   .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
   .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
   .card .body{padding:10px}
-  .sidebar{display:flex;flex-direction:column;min-height:0;overflow:auto}
   .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
   .row label{color:var(--muted);font-size:12px}
   input[type="range"]{width:min(190px,34vw)}
@@ -32,19 +31,48 @@
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
   .foot{padding:9px 14px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08);font-size:12px}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
-  @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} }
+  .graphs{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:8px;height:100%}
+  .gcard{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02);overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-height:0}
+  .ghead{padding:6px 10px;color:var(--muted);font-size:12px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .gwrap{position:relative;min-height:0}
+  .gwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .drawerShell{position:fixed;left:0;top:88px;bottom:52px;z-index:30;display:flex;align-items:stretch;pointer-events:none}
+  .drawerPanel{width:320px;max-width:min(84vw,320px);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.10);border-left:none;border-radius:0 14px 14px 0;box-shadow:0 10px 28px rgba(0,0,0,.35);transform:translateX(calc(-100% + 22px));transition:transform .22s ease;pointer-events:auto;display:flex;flex-direction:column;min-height:0}
+  .drawerPanel.open{transform:translateX(0)}
+  .drawerHandle{position:absolute;right:-18px;top:20px;width:18px;height:58px;border-radius:0 10px 10px 0;border:1px solid rgba(255,255,255,.14);border-left:none;background:rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;color:var(--text);font-size:15px;cursor:pointer;pointer-events:auto}
+  .drawerBody{padding:12px 12px 14px;overflow:auto}
+  .drawerTitle{font-size:13px;font-weight:700;margin:0 0 10px;color:var(--text)}
+  .drawerHint{color:var(--muted);font-size:12px;margin:0 0 10px}
+  @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} .graphsCol{min-height:48vh} .drawerShell{top:74px;bottom:44px} }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v11m <span class="badge">embedded arrows / visible electrons / default yaw tuned</span></div>
-    <div class="sub">3D βάση: διάφανος κύλινδρος ακριβώς στο κέντρο με ορατά κόκκινα ηλεκτρόνια στο εσωτερικό, βέλη ως οργανικά τμήματα των αντίστοιχων καμπυλών και προεπιλεγμένη γωνία κοντά σε ~18 δεξιά κλικ από το παλιό home.</div>
+    <div class="title">EMW true 3D v12 <span class="badge">drawer controls / graphs / electrons vs current fixed</span></div>
+    <div class="sub">3D βάση: controls σε αριστερό drawer, γραφήματα στη θέση του panel και διατήρηση της σύμβασης ότι τα ηλεκτρόνια κινούνται αντίθετα από το ρεύμα, με αρχική φορά ηλεκτρονίων προς τα πάνω και ρεύματος προς τα κάτω.</div>
   </div>
   <div class="main">
-    <div class="card sidebar">
-      <h3>Έλεγχοι</h3>
-      <div class="body">
+    <div class="card graphsCol">
+      <h3>Γραφήματα</h3>
+      <div class="body" style="height:100%">
+        <div class="graphs">
+          <div class="gcard"><div class="ghead">V(t)</div><div class="gwrap"><canvas id="gV"></canvas></div></div>
+          <div class="gcard"><div class="ghead">q(t)</div><div class="gwrap"><canvas id="gQ"></canvas></div></div>
+          <div class="gcard"><div class="ghead">i(t)</div><div class="gwrap"><canvas id="gI"></canvas></div></div>
+          <div class="gcard"><div class="ghead">E(t)</div><div class="gwrap"><canvas id="gE"></canvas></div></div>
+          <div class="gcard"><div class="ghead">B(t)</div><div class="gwrap"><canvas id="gB"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card viewport"><div id="stage"></div></div>
+  </div>
+  <div class="drawerShell">
+    <div class="drawerPanel" id="drawerPanel">
+      <button class="drawerHandle" id="drawerToggle" aria-label="Άνοιγμα/κλείσιμο ελέγχων">❯</button>
+      <div class="drawerBody">
+        <div class="drawerTitle">Έλεγχοι σκηνής</div>
+        <div class="drawerHint">Το panel μαζεύτηκε σε συρτάρι στο αριστερό περιθώριο. Στη θέση του μπήκαν τα γραφήματα.</div>
         <div class="row">
           <label>Περιστροφή</label>
           <div class="dpad">
@@ -77,7 +105,6 @@
         </div>
       </div>
     </div>
-    <div class="card viewport"><div id="stage"></div></div>
   </div>
   <div class="foot">Μία περίοδος εκπομπής από t = 0 μέχρι και T, με λεπτό διάφανο κύλινδρο στο κέντρο, κόκκινα ηλεκτρόνια στο εσωτερικό του και πιο περιορισμένα σε διαφάνεια/οπτική ένταση χρωματιστά planes.</div>
 </div>
@@ -86,14 +113,19 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn'];
+const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn','drawerToggle','drawerPanel'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+const graphEls = { V:document.getElementById('gV'), Q:document.getElementById('gQ'), I:document.getElementById('gI'), E:document.getElementById('gE'), B:document.getElementById('gB') };
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
 renderer.setClearColor(0x0b0f14, 1);
 stage.appendChild(renderer.domElement);
+ui.drawerToggle.addEventListener('click', () => {
+  const open = ui.drawerPanel.classList.toggle('open');
+  ui.drawerToggle.textContent = open ? '❮' : '❯';
+});
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, Math.max(1, stage.clientWidth / stage.clientHeight), 0.1, 250);
@@ -109,7 +141,8 @@ const root = new THREE.Group();
 scene.add(root);
 
 const DSTEP = 0.004;
-const HOME_Y_OFFSET = 18 * DSTEP;
+const DEFAULT_RIGHT_CLICKS = 18;
+const HOME_Y_OFFSET = DEFAULT_RIGHT_CLICKS * DSTEP;
 
 function setHome(){
   root.rotation.y = THREE.MathUtils.degToRad(-21) + HOME_Y_OFFSET;
@@ -722,6 +755,66 @@ function updateParticles(u){
   updateChargeTextSprite(topChargeSign, topIsNegative ? '−' : '+', topHex, qmag);
   updateChargeTextSprite(botChargeSign, topIsNegative ? '+' : '−', botHex, qmag);
 }
+function resizeGraphCanvas(c){
+  const box = c.parentElement.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = Math.max(160, Math.round(box.width * dpr));
+  c.height = Math.max(80, Math.round(box.height * dpr));
+  const g = c.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  return { g, w: box.width, h: box.height };
+}
+function drawGraphCanvas(canvas, label, fn, color){
+  const { g, w, h } = resizeGraphCanvas(canvas);
+  g.clearRect(0,0,w,h);
+  g.fillStyle = '#0b0f14'; g.fillRect(0,0,w,h);
+  const left = 26, right = 10, top = 10, bottom = 16;
+  const gw = w - left - right, gh = h - top - bottom;
+  const midY = top + gh/2;
+  g.strokeStyle = 'rgba(255,255,255,0.12)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(left, midY); g.lineTo(left+gw, midY); g.stroke();
+  g.beginPath(); g.moveTo(left, top); g.lineTo(left, top+gh); g.stroke();
+  g.strokeStyle = 'rgba(255,255,255,0.09)';
+  g.setLineDash([3,4]);
+  for(let k=1;k<4;k++){
+    const x = left + gw * (k/4);
+    g.beginPath(); g.moveTo(x, top); g.lineTo(x, top+gh); g.stroke();
+  }
+  g.setLineDash([]);
+  g.strokeStyle = color; g.lineWidth = 2.1;
+  g.beginPath();
+  for(let i=0;i<=220;i++){
+    const uu = i/220;
+    const x = left + gw*uu;
+    const y = midY - fn(uu) * gh*0.40;
+    if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+  }
+  g.stroke();
+  const xNow = left + gw * phaseU;
+  g.strokeStyle = 'rgba(255,255,255,0.72)';
+  g.setLineDash([2,3]);
+  g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, top+gh); g.stroke();
+  g.setLineDash([]);
+  const yNow = midY - fn(phaseU) * gh*0.40;
+  g.fillStyle = color;
+  g.beginPath(); g.arc(xNow, yNow, 3.2, 0, Math.PI*2); g.fill();
+  g.fillStyle = 'rgba(232,238,247,0.86)';
+  g.font = '11px system-ui';
+  g.textAlign = 'right'; g.textBaseline = 'alphabetic';
+  g.fillText('T', left+gw, h-4);
+  g.textAlign = 'center';
+  g.fillText('T/4', left+gw*0.25, h-4);
+  g.fillText('T/2', left+gw*0.50, h-4);
+  g.fillText('3T/4', left+gw*0.75, h-4);
+}
+function drawGraphs(){
+  drawGraphCanvas(graphEls.V, 'V', u => Math.cos(2*Math.PI*u), '#f2d35a');
+  drawGraphCanvas(graphEls.Q, 'q', u => -Math.sin(2*Math.PI*u), '#7ad7ff');
+  drawGraphCanvas(graphEls.I, 'i', u => -Math.cos(2*Math.PI*u), '#71db86');
+  drawGraphCanvas(graphEls.E, 'E', u => -Math.sin(2*Math.PI*u), '#e85a5a');
+  drawGraphCanvas(graphEls.B, 'B', u => -Math.cos(2*Math.PI*u), '#38b66b');
+}
+
 function applyUI(){
   const eOpacity = (+ui.eAlpha.value) / 100;
   const bOpacity = (+ui.bAlpha.value) / 100;
@@ -741,6 +834,7 @@ function applyUI(){
   topChargeSign.visible = botChargeSign.visible = ui.showParticles.checked;
   currentGroup.visible = ui.showCurrent.checked;
   updatePlanes(phaseU);
+  drawGraphs();
 }
 for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showParticles','showCurrent']){
   const el = ui[key];
@@ -789,6 +883,7 @@ window.addEventListener('resize', () => {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  drawGraphs();
 });
 
 applyUI();
@@ -815,6 +910,7 @@ function animate(now){
   }
   updatePlanes(phaseU);
   updateParticles(phaseU);
+  drawGraphs();
   camera.lookAt(focusPoint);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
