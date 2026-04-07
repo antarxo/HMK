@@ -920,11 +920,11 @@ function drawGraphs(){
   g.fillRect(0,0,w,h);
 
   const rows = [
-    { label:'V', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:false },
-    { label:'q', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:true },
-    { label:'i', fn:u => -Math.cos(2*Math.PI*u), family:'B', tangent:false },
-    { label:'E', fn:u => -Math.sin(2*Math.PI*u), family:'E', tangent:false },
-    { label:'B', fn:u => -Math.cos(2*Math.PI*u), family:'B', tangent:false },
+    { label:'V', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    { label:'q', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:true },
+    { label:'i', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false },
+    { label:'E', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    { label:'B', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false },
   ];
   const axisX = 42;
   const yLabelDx = 4;
@@ -1030,8 +1030,8 @@ function drawGraphs(){
     g.beginPath(); g.arc(xNow, yNow, 3.1, 0, Math.PI*2); g.fill();
 
     if(row.tangent){
-      const deriv = -2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
-      const iNow = -Math.cos(2 * Math.PI * phaseU);
+      const deriv = 2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
+      const iNow = Math.cos(2 * Math.PI * phaseU);
       const m = -(ampPix * deriv) / gw;
       const dx = 60 / Math.sqrt(1 + m*m);
       const dy = m * dx;
