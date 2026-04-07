@@ -637,7 +637,7 @@ function addEArrowCones(front){
   // red lobes point downward, blue lobes upward.
   // The seeded RU tangent already gives the downward family, so we keep it for red
   // and flip the full family for blue.
-  const globalFlip = front.reverseArrows ? 1 : -1;
+  const globalFlip = front.reverseArrows ? -1 : 1;
   for(const ent of entries){
     const tangent = ent.tangent.clone().multiplyScalar(globalFlip);
     eArrowGroup.add(buildConeArrow(ent.pos, tangent, color, 0.19, 0.011, opacity, 'xy'));
@@ -763,7 +763,7 @@ function collectFieldSamplesB(fronts){
     return {
       x: B_RADIUS_FINAL * fr.age,
       v: signedVal,
-      color: signedVal >= 0 ? COLORS.bPos : COLORS.bNeg,
+      color: signedVal >= 0 ? COLORS.bNeg : COLORS.bPos,
       opacity: (fr.birthOpacity ?? 1) * Math.exp(-0.22 * fr.age)
     };
   }).sort((a,b) => a.x - b.x);
@@ -773,8 +773,8 @@ function rebuildFieldVectorMode(u, eFronts, bFronts){
   disposeGroup(bFieldModeGroup);
   const eSamples = collectFieldSamplesE(eFronts);
   const bSamples = collectFieldSamplesB(bFronts);
-  const eMax = E_HALF_H * 0.84;
-  const bMax = B_HALF_W * 0.84;
+  const eMax = E_HALF_H * 0.42;
+  const bMax = B_HALF_W * 0.42;
   const eZ = 0.020;
   const bY = 0.020;
   function buildSideE(signX){
@@ -795,7 +795,7 @@ function rebuildFieldVectorMode(u, eFronts, bFronts){
         const base1 = new THREE.Vector3(p1.x, 0, eZ);
         const base2 = new THREE.Vector3(p2.x, 0, eZ);
         const fillColor = ((p1.y + p2.y) * 0.5) >= 0 ? COLORS.ePos : COLORS.eNeg;
-        eFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x2a2f36, 0.32));
+        eFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x1b2026, 0.46));
       }
     }
   }
@@ -817,7 +817,7 @@ function rebuildFieldVectorMode(u, eFronts, bFronts){
         const base1 = new THREE.Vector3(p1.x, bY, 0);
         const base2 = new THREE.Vector3(p2.x, bY, 0);
         const fillColor = ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bPos : COLORS.bNeg;
-        bFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x1f242b, 0.34));
+        bFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x14191f, 0.48));
       }
     }
   }
@@ -1199,8 +1199,10 @@ function applyUI(){
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
   eArrowGroup.visible = ui.showE.checked || ui.showB.checked;
   bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
-  eFieldModeGroup.visible = ui.showFieldMode.checked && ui.showE.checked;
-  bFieldModeGroup.visible = ui.showFieldMode.checked && ui.showB.checked;
+  // field-vector mode is an independent representation: it can stand alone
+  // even when the E/B curve fronts are hidden.
+  eFieldModeGroup.visible = ui.showFieldMode.checked;
+  bFieldModeGroup.visible = ui.showFieldMode.checked;
   particleGroup.visible = ui.showParticles.checked;
   topGlow.visible = botGlow.visible = ui.showParticles.checked;
   topChargeSign.visible = botChargeSign.visible = ui.showParticles.checked;
