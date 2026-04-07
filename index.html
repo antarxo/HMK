@@ -113,8 +113,9 @@ const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','s
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 const graphPaper = document.getElementById('graphsPaper');
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
 renderer.setClearColor(0x0b0f14, 1);
 stage.appendChild(renderer.domElement);
@@ -430,7 +431,7 @@ function cubicPoint(p0,c1,c2,p3,t){
 }
 function makeLobePoints(scaleX, scaleY, sx, sy){
   const pts = [];
-  const steps = 52;
+  const steps = 88;
   const p0 = [0 * sx, -142 * sy];
   const c1 = [18 * sx, -158 * sy];
   const c2 = [45 * sx, -178 * sy];
@@ -447,9 +448,10 @@ function makeLobePoints(scaleX, scaleY, sx, sy){
   }
   return pts;
 }
-function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=56, opacity=1){
+function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=96, opacity=1){
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
-  return new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 10, false), solidMat(color, 0.17, opacity));
+  curve.arcLengthDivisions = Math.max(240, tubular * 4);
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 18, false), solidMat(color, 0.17, opacity));
 }
 function flatArrowGeometry(scale=1){
   const k = scale;
@@ -530,7 +532,7 @@ function buildArrowHeadXZ(position, angleRad, color, scale=0.052, opacity=1){
   return g;
 }
 function buildBranchTube(points, color, radiusMul=1, opacity=1){
-  return buildCurve(points, color, lineRadius * radiusMul, 0.82, 18, opacity);
+  return buildCurve(points, color, lineRadius * radiusMul, 0.82, 34, opacity);
 }
 function buildEmbeddedArrowXY(position, angleRad, color, scale=0.17, opacity=1){
   const g = new THREE.Group();
@@ -610,7 +612,7 @@ function seededBFrontsAbsolute(u){
   }
   return fronts;
 }
-function makeBCircleHalf(centerX, radius, which='front', n=46){
+function makeBCircleHalf(centerX, radius, which='front', n=96){
   const r = Math.max(0.0001, radius);
   const t0 = which === 'front' ? 0 : Math.PI;
   const t1 = which === 'front' ? Math.PI : 2 * Math.PI;
@@ -631,7 +633,7 @@ function addEFront3D(group, front, which, drawArrows=false){
   const lobes = [[1, signY], [-1, signY]];
   for(const [sx, sy] of lobes){
     const pts = makeLobePoints(scaleX, scaleY, sx, sy);
-    group.add(buildCurve(pts, color, lineRadius, 0.78, 72, opacity));
+    group.add(buildCurve(pts, color, lineRadius, 0.78, 144, opacity));
   }
   if(drawArrows && (front.arrowLen || 0) > 0.25){
     const safe = Math.max(0.08, Math.max(scaleX, scaleY));
@@ -656,7 +658,7 @@ function addBFront3D(group, front, which, drawArrows=true){
   const r = Math.max(0.0001, front.radius);
   const color = front.color;
   const opacity = front.birthOpacity ?? 1;
-  group.add(buildCurve(makeBCircleHalf(0, r, which, 68), color, lineRadius, 0.82, 64, opacity));
+  group.add(buildCurve(makeBCircleHalf(0, r, which, 120), color, lineRadius, 0.82, 136, opacity));
   if(drawArrows && r >= 0.16 * B_RADIUS_FINAL){
     const quarter = front.t0 >= 1 ? 3 : Math.floor(front.t0 * 4);
     const isGreen = (quarter === 0 || quarter === 3);
@@ -989,6 +991,7 @@ window.addEventListener('keydown', (ev) => {
 window.addEventListener('resize', () => {
   const w = Math.max(100, stage.clientWidth);
   const h = Math.max(100, stage.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
@@ -1012,7 +1015,7 @@ function animate(now){
       ui.playBtn.textContent = 'Έναρξη';
     }
   }
-  const bucket = Math.floor(phaseU * 120);
+  const bucket = Math.floor(phaseU * 240);
   if(bucket !== lastPhaseBucket){
     rebuildFields(phaseU);
     lastPhaseBucket = bucket;
