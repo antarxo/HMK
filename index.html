@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v12 drawer + graphs + correct electron/current convention</title>
+<title>EMW true 3D v13m anchored arrows per front</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
@@ -51,8 +51,8 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v12 <span class="badge">drawer controls / graphs / electrons vs current fixed</span></div>
-    <div class="sub">3D βάση: controls σε αριστερό drawer, γραφήματα στη θέση του panel και διατήρηση της σύμβασης ότι τα ηλεκτρόνια κινούνται αντίθετα από το ρεύμα, με αρχική φορά ηλεκτρονίων προς τα πάνω και ρεύματος προς τα κάτω.</div>
+    <div class="title">EMW true 3D v13m <span class="badge">anchored arrows per front / symmetry build</span></div>
+    <div class="sub">3D βάση με βέλη αγκυρωμένα ανά front: seed στην άνω δεξιά μηλοειδή και παραγωγή των υπολοίπων με συμμετρίες, ώστε κάθε καμπύλη να διαδίδεται με τα βέλη καρφωμένα πάνω της.</div>
   </div>
   <div class="main">
     <div class="card graphsCol">
@@ -556,42 +556,50 @@ function addEArrowCones(front){
   const scaleY = getPulseScaleY(age);
   const color = front.color;
 
-  // Build one arrow in the upper-right quarter and obtain the other three
-  // ONLY through symmetries, as in the 2D construction.
-  // Coordinates come from the 2D baseline anchor.
-  const x0 = 139.320;
-  const y0 = 115.360;
+  // Build ONE anchored arrow on the upper-right lobe and get the remaining
+  // three ONLY by symmetries. This keeps each front carrying its own arrows
+  // as it propagates.
+  const baseLocal = { x: 139.320, y: -115.360 };
+  const ptsUR = makeLobePoints(scaleX, scaleY, +1, -1);
+  const target = localToWorldXY(scaleX, scaleY, baseLocal.x, baseLocal.y);
+  let best = 0;
+  let bestD = Infinity;
+  for(let i=0;i<ptsUR.length;i++){
+    const d = ptsUR[i].distanceToSquared(target);
+    if(d < bestD){ bestD = d; best = i; }
+  }
+  const i0 = Math.max(1, Math.min(ptsUR.length - 2, best));
+  const pUR = ptsUR[i0].clone();
+  const tUR = ptsUR[i0 + 1].clone().sub(ptsUR[i0 - 1]).normalize();
 
-  // Screen-space anchor angle from the 2D baseline for the upper-right quarter.
-  // In screen coords (+y downward) this points downward-right on the red lobe.
-  // Convert to world tangent (+y upward) by flipping the y component.
-  const aScreen = 66.762 * Math.PI / 180;
-  const tUR = new THREE.Vector3(Math.cos(aScreen), -Math.sin(aScreen), 0);
+  const reflectXPos = (p) => new THREE.Vector3( p.x, -p.y, p.z);
+  const reflectYPos = (p) => new THREE.Vector3(-p.x,  p.y, p.z);
+  const reflectXVec = (v) => new THREE.Vector3( v.x, -v.y, v.z);
+  const reflectYVec = (v) => new THREE.Vector3(-v.x,  v.y, v.z);
 
-  const reflectX = (v) => new THREE.Vector3(v.x, -v.y, v.z);
-  const reflectY = (v) => new THREE.Vector3(-v.x, v.y, v.z);
-
-  // Right half: lower-right is the mirror of upper-right w.r.t. x-axis,
-  // with reversed direction, so that all red arrows point downward and
-  // all blue arrows upward after a global reversal.
-  const tLR = reflectX(tUR).multiplyScalar(-1);
-
-  // Left half obtained from the right half by symmetry w.r.t. y-axis.
-  const tUL = reflectY(tUR);
-  const tLL = reflectY(tLR);
+  // As requested:
+  // 1) upper-right is the seed,
+  // 2) lower-right comes from x-symmetry AND reversed direction,
+  // 3) left half comes from y-symmetry of the right half.
+  const pLR = reflectXPos(pUR);
+  const tLR = reflectXVec(tUR).multiplyScalar(-1);
+  const pUL = reflectYPos(pUR);
+  const tUL = reflectYVec(tUR);
+  const pLL = reflectYPos(pLR);
+  const tLL = reflectYVec(tLR);
 
   const entries = [
-    { x: +x0, y: -y0, tangent: tUR }, // upper-right
-    { x: +x0, y: +y0, tangent: tLR }, // lower-right
-    { x: -x0, y: -y0, tangent: tUL }, // upper-left
-    { x: -x0, y: +y0, tangent: tLL }, // lower-left
+    { pos: pUR, tangent: tUR },
+    { pos: pLR, tangent: tLR },
+    { pos: pUL, tangent: tUL },
+    { pos: pLL, tangent: tLL },
   ];
 
+  // Blue family is the global reversal of the red one.
+  const globalFlip = front.reverseArrows ? -1 : 1;
   for(const ent of entries){
-    const pos = localToWorldXY(scaleX, scaleY, ent.x, ent.y);
-    const tangent = ent.tangent.clone();
-    if(front.reverseArrows) tangent.multiplyScalar(-1);
-    eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.19, 0.010, opacity, 'xy'));
+    const tangent = ent.tangent.clone().multiplyScalar(globalFlip);
+    eArrowGroup.add(buildConeArrow(ent.pos, tangent, color, 0.19, 0.010, opacity, 'xy'));
   }
 }
 function addBArrowCones(front){
@@ -766,16 +774,12 @@ function rebuildFields(u){
   disposeGroup(bFrontGroup);
   const eFronts = seededEFrontsAbsolute(u);
   const bFronts = seededBFrontsAbsolute(u);
-  const eArrowFront = [...eFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01 && (fr.arrowLen || 0) > 0.25)
-    .sort((a,b) => Math.abs(a.age - 0.56) - Math.abs(b.age - 0.56))[0] || null;
-  const bArrowFront = [...bFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01 && fr.radius > 0.10 * B_RADIUS_FINAL)
-    .sort((a,b) => Math.abs(a.radius - 0.56 * B_RADIUS_FINAL) - Math.abs(b.radius - 0.56 * B_RADIUS_FINAL))[0] || null;
   eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', false));
   eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', false));
   bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', false));
   bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', false));
-  if(eArrowFront) addEArrowCones(eArrowFront);
-  if(bArrowFront) addBArrowCones(bArrowFront);
+  eFronts.forEach(fr => addEArrowCones(fr));
+  bFronts.forEach(fr => addBArrowCones(fr));
 }
 
 function chargeAndCurrent(u){
