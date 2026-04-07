@@ -21,13 +21,9 @@
   input[type="range"]{width:min(190px,34vw)}
   .viewport{position:relative;min-height:0;height:100%}
   #stage{position:absolute;inset:0}
-  .machineHud{position:absolute;left:10px;top:10px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none;max-width:220px}
+  .machineHud{position:absolute;left:10px;top:10px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none}
   .machineHud .dpad,.machineHud button{pointer-events:auto}
   .machineHud .playDock{display:flex;gap:6px;align-items:center}
-  .controlGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;pointer-events:auto}
-  .controlGrid button{min-width:0;padding:8px 10px;font-size:12px;white-space:nowrap}
-  .controlGrid .span2{grid-column:1 / span 2}
-  .presetActive{background:rgba(79,168,216,.18)!important;border-color:rgba(79,168,216,.42)!important;color:#e7f6ff}
   .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
   button:hover{background:rgba(255,255,255,.1)}
@@ -72,19 +68,7 @@
           <button id="left">◀</button><div class="centerDot" id="resetView">•</div><button id="right">▶</button>
           <div></div><button id="down">▼</button><div></div>
         </div>
-        <div class="playDock"><button id="playBtn">Παύση</button><button id="resetBtn">Reset</button></div>
-        <div class="controlGrid">
-          <button id="stepBack">◀ Βήμα</button>
-          <button id="stepFwd">Βήμα ▶</button>
-          <button id="qBack">◀ T/4</button>
-          <button id="qFwd">T/4 ▶</button>
-          <button id="speed025">0.25x</button>
-          <button id="speed05">0.5x</button>
-          <button id="speed075">0.75x</button>
-          <button id="speed1">1x</button>
-          <button id="screenBtn">Οθόνη</button>
-          <button id="printBtn">Print</button>
-        </div>
+        <div class="playDock"><button id="playBtn">Παύση</button></div>
       </div>
     </div>
   </div>
@@ -106,6 +90,10 @@
         <div class="row"><label>Show field-vector mode</label><input id="showFieldMode" type="checkbox"></div>
         <div class="row"><label>Show particles</label><input id="showParticles" type="checkbox" checked></div>
         <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
+        <div class="controls">
+          <button id="homeBtn">Home view</button>
+          <button id="lectureBtn">Lecture view</button>
+        </div>
         <div class="legend">
           <div><span class="sw" style="background:#e85a5a"></span>μηλοειδείς E / πάνω–κάτω ημιεπίπεδα</div>
           <div><span class="sw" style="background:#38b66b"></span>ημικύκλια B / πίσω–μπροστινό ημιεπίπεδο</div>
@@ -122,7 +110,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showFieldMode','showParticles','showCurrent','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','speed025','speed05','speed075','speed1','screenBtn','printBtn','drawerToggle','drawerPanel'];
+const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showFieldMode','showParticles','showCurrent','up','down','left','right','resetView','playBtn','homeBtn','lectureBtn','drawerToggle','drawerPanel'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 const graphPaper = document.getElementById('graphsPaper');
 
@@ -448,10 +436,8 @@ currentGroup.add(currentShaft);
 const currentHead = new THREE.Mesh(new THREE.ConeGeometry(0.110, 0.16, 18), solidMat(COLORS.bPos, 0.05, 0.40));
 currentHead.position.y = 0.22; currentGroup.add(currentHead);
 const currentLabel = makeTextSprite();
-updateTextSprite(currentLabel, 'i', 0x000000, { size:260, scaleX:0.32, scaleY:0.18, outline:false, shadowBlur:0, outlineColor:'rgba(0,0,0,0.98)' });
-currentLabel.center.set(0.5, 0.5);
-currentLabel.position.set(0, 0.0, 0.001);
-currentLabel.renderOrder = 999;
+updateTextSprite(currentLabel, 'i', 0x000000, { size:170, scaleX:0.22, scaleY:0.12, outline:false, outlineColor:'rgba(0,0,0,0.98)' });
+currentLabel.position.set(0, -0.01, 0.12);
 currentGroup.add(currentLabel);
 
 const eUpperGroup = new THREE.Group(); eUpperGroup.renderOrder = 2;
@@ -459,9 +445,10 @@ const eArrowGroup = new THREE.Group(); eArrowGroup.renderOrder = 24;
 const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
 const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
 const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
+const bArrowGroup = new THREE.Group(); bArrowGroup.renderOrder = 24;
 const eFieldModeGroup = new THREE.Group(); eFieldModeGroup.renderOrder = 12;
 const bFieldModeGroup = new THREE.Group(); bFieldModeGroup.renderOrder = 12;
-root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bFrontGroup, eFieldModeGroup, bFieldModeGroup);
+root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bFrontGroup, bArrowGroup, eFieldModeGroup, bFieldModeGroup);
 
 function disposeGroup(group){
   while(group.children.length){
@@ -721,7 +708,7 @@ function addBArrowCones(front){
       const pos = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
       let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
       if(!ccw) tangent.multiplyScalar(-1);
-      eArrowGroup.add(buildConeArrow(pos, tangent, color, 0.18, 0.012, opacity, 'xz'));
+      bArrowGroup.add(buildConeArrow(pos, tangent, color, 0.18, 0.012, opacity, 'xz'));
     }
   }
 }
@@ -994,6 +981,7 @@ function rebuildFields(u){
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
   disposeGroup(bFrontGroup);
+  disposeGroup(bArrowGroup);
   disposeGroup(eFieldModeGroup);
   disposeGroup(bFieldModeGroup);
   const eFronts = seededEFrontsAbsolute(u);
@@ -1256,8 +1244,8 @@ function applyUI(){
   axes.visible = ui.showAxes.checked;
   planes.visible = ui.showPlanes.checked;
   eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
-  eArrowGroup.visible = ui.showE.checked || ui.showB.checked;
-  bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
+  eArrowGroup.visible = ui.showE.checked;
+  bBackGroup.visible = bFrontGroup.visible = bArrowGroup.visible = ui.showB.checked;
   // field-vector mode is an independent representation: it can stand alone
   // even when the E/B curve fronts are hidden.
   eFieldModeGroup.visible = ui.showFieldMode.checked;
@@ -1286,52 +1274,8 @@ ui.playBtn.addEventListener('click', () => {
   playing = !playing;
   ui.playBtn.textContent = playing ? 'Παύση' : 'Έναρξη';
 });
-ui.resetBtn.addEventListener('click', () => {
-  forcePause();
-  phaseU = 0;
-  syncPhase();
-});
-
-const SPEED_PRESETS = { speed025:5, speed05:10, speed075:15, speed1:20 };
-function refreshSpeedPresetButtons(){
-  Object.keys(SPEED_PRESETS).forEach(id => {
-    ui[id].classList.toggle('presetActive', (+ui.speed.value) === SPEED_PRESETS[id]);
-  });
-}
-function setSpeedPreset(val){
-  ui.speed.value = String(val);
-  refreshSpeedPresetButtons();
-  applyUI();
-}
-function forcePause(){
-  if(playing){
-    playing = false;
-    ui.playBtn.textContent = 'Έναρξη';
-  }
-}
-function syncPhase(){
-  phaseU = Math.max(0, Math.min(1, phaseU));
-  lastPhaseBucket = -1;
-  rebuildFields(phaseU);
-  updatePlanes(phaseU);
-  updateParticles(phaseU);
-  drawGraphs();
-}
-function stepPhase(delta){
-  forcePause();
-  phaseU += delta;
-  syncPhase();
-}
-ui.stepBack.addEventListener('click', () => stepPhase(-1/32));
-ui.stepFwd.addEventListener('click', () => stepPhase( 1/32));
-ui.qBack.addEventListener('click', () => stepPhase(-1/4));
-ui.qFwd.addEventListener('click', () => stepPhase( 1/4));
-ui.speed025.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed025));
-ui.speed05.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed05));
-ui.speed075.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed075));
-ui.speed1.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed1));
-ui.screenBtn.addEventListener('click', () => { setHome(); ui.zoom.value = 1080; applyUI(); });
-ui.printBtn.addEventListener('click', () => { setHome(); ui.zoom.value = 1080; applyUI(); });
+ui.homeBtn.addEventListener('click', () => setHome());
+ui.lectureBtn.addEventListener('click', () => setLectureView());
 ui.resetView.addEventListener('click', () => { setHome(); ui.zoom.value = 1080; applyUI(); });
 
 function bindHold(button, fn){
@@ -1364,7 +1308,6 @@ window.addEventListener('resize', () => {
   drawGraphs();
 });
 
-refreshSpeedPresetButtons();
 applyUI();
 updatePlanes(0);
 rebuildFields(0);
