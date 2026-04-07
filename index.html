@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v13o diagonal-anchored E arrows / stronger B cone base</title>
+<title>EMW true 3D v13q red-down blue-up E arrows</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; }
   *{box-sizing:border-box}
@@ -51,7 +51,7 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v13m <span class="badge">diagonal-anchored E arrows / stronger B cone base</span></div>
+    <div class="title">EMW true 3D v13q <span class="badge">red-down / blue-up E arrows</span></div>
     <div class="sub">3D βάση με βέλη αγκυρωμένα ανά front: seed στην άνω δεξιά μηλοειδή και παραγωγή των υπολοίπων με συμμετρίες, ώστε κάθε καμπύλη να διαδίδεται με τα βέλη καρφωμένα πάνω της.</div>
   </div>
   <div class="main">
@@ -630,7 +630,11 @@ function addEArrowCones(front){
     { pos: pLD, tangent: tLD },
   ];
 
-  const globalFlip = front.reverseArrows ? -1 : 1;
+  // Lock the semantic orientation explicitly:
+  // red lobes point downward, blue lobes upward.
+  // The seeded RU tangent already gives the downward family, so we keep it for red
+  // and flip the full family for blue.
+  const globalFlip = front.reverseArrows ? 1 : -1;
   for(const ent of entries){
     const tangent = ent.tangent.clone().multiplyScalar(globalFlip);
     eArrowGroup.add(buildConeArrow(ent.pos, tangent, color, 0.19, 0.011, opacity, 'xy'));
