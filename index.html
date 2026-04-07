@@ -38,8 +38,8 @@
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v11k <span class="badge">visible arrows / charge signs / variable current arrow</span></div>
-    <div class="sub">3D βάση: ράβδος ως λεπτός διάφανος κύλινδρος ακριβώς στο κέντρο, κόκκινα ηλεκτρόνια μέσα στο εσωτερικό του, σωστή 2D λογική βελών και χρωματιστά planes που αναπτύσσονται μαζί με τα κύματα αλλά μένουν πιο περιορισμένα οπτικά.</div>
+    <div class="title">EMW true 3D v11m <span class="badge">embedded arrows / visible electrons / default yaw tuned</span></div>
+    <div class="sub">3D βάση: διάφανος κύλινδρος ακριβώς στο κέντρο με ορατά κόκκινα ηλεκτρόνια στο εσωτερικό, βέλη ως οργανικά τμήματα των αντίστοιχων καμπυλών και προεπιλεγμένη γωνία κοντά σε ~18 δεξιά κλικ από το παλιό home.</div>
   </div>
   <div class="main">
     <div class="card sidebar">
@@ -109,7 +109,7 @@ const root = new THREE.Group();
 scene.add(root);
 
 function setHome(){
-  root.rotation.y = THREE.MathUtils.degToRad(-25);
+  root.rotation.y = THREE.MathUtils.degToRad(-21);
   root.rotation.x = THREE.MathUtils.degToRad(15);
 }
 function setLectureView(){
@@ -297,9 +297,9 @@ axes.add(axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axis, 'z'));
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
-const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.060, 0.060, 2 * ROD_HALF_LENGTH, 28, 1, true), new THREE.MeshPhysicalMaterial({ color:0xeef3fb, transparent:true, opacity:0.26, transmission:0.62, roughness:0.08, metalness:0.0, thickness:0.28, clearcoat:0.55, clearcoatRoughness:0.18, side:THREE.DoubleSide }));
+const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.060, 0.060, 2 * ROD_HALF_LENGTH, 28, 1, true), new THREE.MeshPhongMaterial({ color:0xeef3fb, transparent:true, opacity:0.12, shininess:85, side:THREE.DoubleSide, depthWrite:false }));
 rodGroup.add(rod);
-const rodInnerGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 2 * ROD_HALF_LENGTH * 0.985, 24, 1, true), new THREE.MeshBasicMaterial({ color:0xff6a6a, transparent:true, opacity:0.08, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false }));
+const rodInnerGlow = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 2 * ROD_HALF_LENGTH * 0.985, 24, 1, true), new THREE.MeshBasicMaterial({ color:0xff6a6a, transparent:true, opacity:0.12, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false }));
 rodGroup.add(rodInnerGlow);
 const rodOutline = new THREE.Mesh(new THREE.CylinderGeometry(0.0645, 0.0645, 2 * ROD_HALF_LENGTH, 28, 1, true), new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.94, side:THREE.BackSide }));
 rodGroup.add(rodOutline);
@@ -332,7 +332,9 @@ const particleGroup = new THREE.Group();
 root.add(particleGroup);
 const electrons = [];
 for(let i=0;i<7;i++){
-  const e = new THREE.Mesh(new THREE.SphereGeometry(0.034, 18, 18), solidMat(COLORS.electron, 0.92, 0.98));
+  const e = new THREE.Mesh(new THREE.SphereGeometry(0.040, 20, 20), new THREE.MeshBasicMaterial({ color:COLORS.electron, transparent:true, opacity:0.98, depthWrite:false }));
+  e.renderOrder = 70;
+  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.11); glow.material.opacity = 0.65; e.add(glow);
   electrons.push(e);
   particleGroup.add(e);
 }
@@ -480,6 +482,44 @@ function buildArrowHeadXZ(position, angleRad, color, scale=0.052, opacity=1){
   g.add(shaftOutline, shaftFill, outline, fill);
   return g;
 }
+function buildBranchTube(points, color, radiusMul=1, opacity=1){
+  return buildCurve(points, color, lineRadius * radiusMul, 0.82, 18, opacity);
+}
+function buildEmbeddedArrowXY(position, angleRad, color, scale=0.17, opacity=1){
+  const g = new THREE.Group();
+  const tip = position.clone();
+  const back = new THREE.Vector3(Math.cos(angleRad), Math.sin(angleRad), 0).multiplyScalar(-scale);
+  const left = new THREE.Vector3(Math.cos(angleRad + 0.64), Math.sin(angleRad + 0.64), 0).multiplyScalar(0.62 * scale);
+  const right = new THREE.Vector3(Math.cos(angleRad - 0.64), Math.sin(angleRad - 0.64), 0).multiplyScalar(0.62 * scale);
+  const zOff = new THREE.Vector3(0,0,0.022);
+  const a1 = [tip.clone().add(zOff), tip.clone().add(back).add(left).add(zOff)];
+  const a2 = [tip.clone().add(zOff), tip.clone().add(back).add(right).add(zOff)];
+  const a1o = [tip.clone().add(new THREE.Vector3(0,0,0.016)), tip.clone().add(back.clone().multiplyScalar(1.02)).add(left.clone().multiplyScalar(1.08)).add(new THREE.Vector3(0,0,0.016))];
+  const a2o = [tip.clone().add(new THREE.Vector3(0,0,0.016)), tip.clone().add(back.clone().multiplyScalar(1.02)).add(right.clone().multiplyScalar(1.08)).add(new THREE.Vector3(0,0,0.016))];
+  g.add(buildBranchTube(a1o, 0x000000, 1.9, Math.max(0.92, opacity)));
+  g.add(buildBranchTube(a2o, 0x000000, 1.9, Math.max(0.92, opacity)));
+  g.add(buildBranchTube(a1, color, 1.15, opacity));
+  g.add(buildBranchTube(a2, color, 1.15, opacity));
+  return g;
+}
+function buildEmbeddedArrowXZ(position, angleRad, color, scale=0.17, opacity=1){
+  const g = new THREE.Group();
+  const tip = position.clone();
+  const back = new THREE.Vector3(Math.cos(angleRad), 0, Math.sin(angleRad)).multiplyScalar(-scale);
+  const left = new THREE.Vector3(Math.cos(angleRad + 0.64), 0, Math.sin(angleRad + 0.64)).multiplyScalar(0.62 * scale);
+  const right = new THREE.Vector3(Math.cos(angleRad - 0.64), 0, Math.sin(angleRad - 0.64)).multiplyScalar(0.62 * scale);
+  const yOff = new THREE.Vector3(0,0.022,0);
+  const a1 = [tip.clone().add(yOff), tip.clone().add(back).add(left).add(yOff)];
+  const a2 = [tip.clone().add(yOff), tip.clone().add(back).add(right).add(yOff)];
+  const a1o = [tip.clone().add(new THREE.Vector3(0,0.016,0)), tip.clone().add(back.clone().multiplyScalar(1.02)).add(left.clone().multiplyScalar(1.08)).add(new THREE.Vector3(0,0.016,0))];
+  const a2o = [tip.clone().add(new THREE.Vector3(0,0.016,0)), tip.clone().add(back.clone().multiplyScalar(1.02)).add(right.clone().multiplyScalar(1.08)).add(new THREE.Vector3(0,0.016,0))];
+  g.add(buildBranchTube(a1o, 0x000000, 1.9, Math.max(0.92, opacity)));
+  g.add(buildBranchTube(a2o, 0x000000, 1.9, Math.max(0.92, opacity)));
+  g.add(buildBranchTube(a1, color, 1.15, opacity));
+  g.add(buildBranchTube(a2, color, 1.15, opacity));
+  return g;
+}
+
 function seededEFrontsAbsolute(u){
   const fronts = [];
   for(const tEmit of E_FULL){
@@ -534,7 +574,7 @@ function makeBCircleHalf(centerX, radius, which='front', n=46){
   }
   return pts;
 }
-function addEFront3D(group, front, which){
+function addEFront3D(group, front, which, drawArrows=false){
   const age = front.age;
   const scaleX = getPulseScaleX(age);
   const scaleY = getPulseScaleY(age);
@@ -546,28 +586,23 @@ function addEFront3D(group, front, which){
     const pts = makeLobePoints(scaleX, scaleY, sx, sy);
     group.add(buildCurve(pts, color, lineRadius, 0.78, 72, opacity));
   }
-}
-
-function addEArrowSpecs3D(group, front){
-  if((front.arrowLen || 0) <= 0.25) return;
-  const age = front.age;
-  const scaleX = getPulseScaleX(age);
-  const scaleY = getPulseScaleY(age);
-  const color = front.color;
-  const opacity = front.birthOpacity ?? 1;
-  const safe = Math.max(0.08, Math.max(scaleX, scaleY));
-  const arrowScale = 0.195 / safe;
-  const specs = [
-    [ 139.320, -115.360,  66.762],
-    [ 139.320,  115.360, 113.238],
-    [-139.320, -115.360, 113.238],
-    [-139.320,  115.360,  66.762],
-  ];
-  for(const [xLocal, yLocal, aDeg] of specs){
-    const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
-    const dir = front.reverseArrows ? Math.PI : 0;
-    const a = aDeg * Math.PI / 180 + dir;
-    group.add(buildArrowHeadXY(pos, a, color, arrowScale, opacity));
+  if(drawArrows && (front.arrowLen || 0) > 0.25){
+    const safe = Math.max(0.08, Math.max(scaleX, scaleY));
+    const arrowScale = 0.19 / safe;
+    const specs = [
+      [ 139.320, -115.360,  66.762],
+      [ 139.320,  115.360, 113.238],
+      [-139.320, -115.360, 113.238],
+      [-139.320,  115.360,  66.762],
+    ];
+    for(const [xLocal, yLocal, aDeg] of specs){
+      if(which === 'upper' && yLocal > 0) continue;
+      if(which === 'lower' && yLocal < 0) continue;
+      const pos = localToWorldXY(scaleX, scaleY, xLocal, yLocal);
+      const dir = front.reverseArrows ? Math.PI : 0;
+      const a = aDeg * Math.PI / 180 + dir;
+      group.add(buildEmbeddedArrowXY(pos, a, color, arrowScale, opacity));
+    }
   }
 }
 function addBFront3D(group, front, which, drawArrows=true){
@@ -585,9 +620,8 @@ function addBFront3D(group, front, which, drawArrows=true){
       const p = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
       let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
       if(!ccw) tangent.multiplyScalar(-1);
-      const ang = Math.atan2(tangent.y, tangent.x);
       const angXZ = Math.atan2(tangent.z, tangent.x);
-      group.add(buildArrowHeadXZ(p, angXZ, color, arrowScale, opacity));
+      group.add(buildEmbeddedArrowXZ(p, angXZ, color, arrowScale, opacity));
     }
   }
 }
@@ -603,12 +637,12 @@ function rebuildFields(u){
     .sort((a,b) => Math.abs(a.age - 0.56) - Math.abs(b.age - 0.56))[0] || null;
   const bArrowFront = [...bFronts].filter(fr => (fr.birthOpacity ?? 1) > 0.01 && fr.radius > 0.10 * B_RADIUS_FINAL)
     .sort((a,b) => Math.abs(a.radius - 0.56 * B_RADIUS_FINAL) - Math.abs(b.radius - 0.56 * B_RADIUS_FINAL))[0] || null;
-  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper'));
-  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower'));
-  if(eArrowFront) addEArrowSpecs3D(eArrowGroup, eArrowFront);
+  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', fr === eArrowFront));
+  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', fr === eArrowFront));
   bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', fr === bArrowFront));
   bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', fr === bArrowFront));
 }
+
 function chargeAndCurrent(u){
   const phase = 2 * Math.PI * u;
   return { chargeSigned: -Math.sin(phase), currentSigned: -Math.cos(phase) };
@@ -732,16 +766,17 @@ function bindHold(button, fn){
   button.addEventListener('pointerleave', stop);
   button.addEventListener('pointercancel', stop);
 }
-bindHold(ui.left,  () => { root.rotation.y -= 0.006; });
-bindHold(ui.right, () => { root.rotation.y += 0.006; });
-bindHold(ui.up,    () => { root.rotation.x -= 0.006; });
-bindHold(ui.down,  () => { root.rotation.x += 0.006; });
+const DSTEP = 0.004;
+bindHold(ui.left,  () => { root.rotation.y -= DSTEP; });
+bindHold(ui.right, () => { root.rotation.y += DSTEP; });
+bindHold(ui.up,    () => { root.rotation.x -= DSTEP; });
+bindHold(ui.down,  () => { root.rotation.x += DSTEP; });
 
 window.addEventListener('keydown', (ev) => {
-  if(ev.key === 'ArrowLeft') root.rotation.y -= 0.006;
-  else if(ev.key === 'ArrowRight') root.rotation.y += 0.006;
-  else if(ev.key === 'ArrowUp') root.rotation.x -= 0.006;
-  else if(ev.key === 'ArrowDown') root.rotation.x += 0.006;
+  if(ev.key === 'ArrowLeft') root.rotation.y -= DSTEP;
+  else if(ev.key === 'ArrowRight') root.rotation.y += DSTEP;
+  else if(ev.key === 'ArrowUp') root.rotation.x -= DSTEP;
+  else if(ev.key === 'ArrowDown') root.rotation.x += DSTEP;
 });
 window.addEventListener('resize', () => {
   const w = Math.max(100, stage.clientWidth);
