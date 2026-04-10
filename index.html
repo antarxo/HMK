@@ -3,128 +3,285 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EMW true 3D v14 field-vector mode test</title>
+<title>Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος</title>
 <style>
   :root{ --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc; --gap:12px; --pad:12px; --cardBorder:rgba(255,255,255,.08); --topBg:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel); --cardBg:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)), var(--panel); --footBg:transparent; }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
-  .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;min-height:100dvh}
-  .top{padding:12px 16px;background:var(--topBg);border-bottom:1px solid var(--cardBorder)}
-  .title{font-size:18px;font-weight:700}
-  .sub{color:var(--muted);margin-top:4px}
-  .main{display:grid;grid-template-columns:minmax(250px,27vw) minmax(0,1fr);gap:8px;padding:8px;min-height:0;overflow:hidden}
+  .app{display:grid;grid-template-rows:auto 1fr;height:100dvh;min-height:100dvh}
+  .top{padding:6px 10px;background:var(--topBg);border-bottom:1px solid var(--cardBorder);display:flex;justify-content:center;align-items:center}
+  .title{font-size:19px;font-weight:700;display:flex;align-items:baseline;justify-content:center;gap:10px;text-align:center}
+  .sub{color:var(--muted);margin-top:0;font-size:11px;font-weight:500;white-space:nowrap}
+  .titleBar{display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+  .langSwitch{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+  .langBtn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:3px 7px;border-radius:8px;cursor:pointer;font-size:11px;line-height:1;font-weight:700;min-width:32px}
+  .langBtn.active{background:rgba(79,168,216,.18);border-color:rgba(79,168,216,.42);color:#e7f6ff}
+  .main{display:block;padding:2px;min-height:0;overflow:hidden}
   .card{background:var(--cardBg);border:1px solid var(--cardBorder);border-radius:14px;overflow:hidden;min-height:0;min-width:0}
   .card h3{margin:0;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
   .card .body{padding:4px}
   .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:8px 0}
   .row label{color:var(--muted);font-size:12px}
+  .inlineVal{display:inline-block;min-width:3.2em;margin-left:6px;color:var(--text);font-weight:700}
   input[type="range"]{width:min(190px,34vw)}
+  select{width:min(190px,34vw);background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 6px}
   .viewport{position:relative;min-height:0;height:100%}
   #stage{position:absolute;inset:0}
-  .machineHud{position:absolute;left:10px;top:10px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none;max-width:220px}
-  .machineHud .dpad,.machineHud button{pointer-events:auto}
-  .machineHud .playDock{display:flex;gap:6px;align-items:center}
-  .controlGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;pointer-events:auto}
-  .controlGrid button{min-width:0;padding:8px 10px;font-size:12px;white-space:nowrap}
+  .leftOverlayStack{position:absolute;left:4px;top:2px;bottom:2px;z-index:20;display:flex;flex-direction:column;gap:1px;align-items:flex-start;pointer-events:none;width:min(248px,25vw);min-height:0}
+  .machineHud{position:relative;left:auto;top:auto;bottom:auto;z-index:20;display:flex;flex-direction:column;gap:2px;align-items:flex-start;pointer-events:none;max-width:none;width:100%;margin-top:auto}
+  .machineHud .dpad,.machineHud button,.machineHud input,.machineHud label{pointer-events:auto}
+  .hudGroup{display:flex;flex-direction:column;gap:1px;padding:2px;border:1px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(10,14,20,.34);backdrop-filter:blur(2px);pointer-events:auto;width:100%}
+  .transportRow{display:grid;grid-template-columns:repeat(6,32px);gap:3px;align-items:center;justify-content:center;width:100%}
+  .transportRow button{width:32px;height:30px;min-width:32px;padding:0;font-size:16px;line-height:1;border-radius:9px;display:flex;align-items:center;justify-content:center}
+  .navDock{display:flex;gap:4px;align-items:center;justify-content:center;width:100%}
+  .statPad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;min-width:40px;min-height:82px}
+  .statPad button{width:22px;height:16px;padding:0;font-size:11px;line-height:1;border-radius:7px}
+  .statReadout{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;min-height:24px;padding:1px 2px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:rgba(255,255,255,.05);font-size:10px;font-weight:700;line-height:1.0}
+  .statReadout .mini{font-size:8px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+  .statReadout .val{font-size:10px;color:var(--text)}
+  .controlGrid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+  .controlGrid button{min-width:0;padding:4px 6px;font-size:16px;line-height:1;white-space:nowrap;border-radius:9px;display:flex;align-items:center;justify-content:center;min-height:30px}
   .controlGrid .span2{grid-column:1 / span 2}
+  .modeGrid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+  .modeGrid button{min-width:0;padding:5px 6px;font-size:11px;white-space:nowrap;border-radius:9px}
+  .modeRowWide{grid-column:1 / span 2;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px;align-items:center}
+  .miniCheck{display:flex;align-items:center;gap:3px;padding:0 2px;font-size:11px;color:var(--text)}
+  .miniCheck input{margin:0}
+  .displayGrid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+  .planesRow{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+  .hStatPad{display:grid;grid-template-columns:18px minmax(0,1fr) 18px;gap:3px;align-items:center}
+  .hStatPad button{width:18px;height:28px;padding:0;font-size:11px;line-height:1;border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .statReadout.horiz{min-width:0;min-height:28px;padding:2px 4px}
+  .statReadout.horiz .mini{font-size:8px}
+  .statReadout.horiz .val{font-size:10px}
+
   .presetActive{background:rgba(79,168,216,.18)!important;border-color:rgba(79,168,216,.42)!important;color:#e7f6ff}
   .controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-  button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 9px;border-radius:10px;cursor:pointer;font-size:12px}
+  button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:4px 6px;border-radius:8px;cursor:pointer;font-size:10px}
+  .modeGrid button,.displayGrid button{padding:4px 6px;font-size:10px}
   button:hover{background:rgba(255,255,255,.1)}
-  .dpad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:6px;justify-content:end;align-items:center}
-  .dpad button,.centerDot{padding:0;border-radius:12px;font-size:18px;font-weight:700}
+  .dpad{display:grid;grid-template-columns:repeat(3,26px);grid-template-rows:repeat(3,26px);gap:1px;justify-content:center;align-items:center}
+  .dpad button,.centerDot{padding:0;border-radius:7px;font-size:12px;font-weight:700}
   .centerDot{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
   .legend{display:grid;gap:6px;margin-top:10px;font-size:12px}
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-2px}
-  .foot{padding:9px 14px;color:var(--muted);border-top:1px solid var(--cardBorder);background:var(--footBg);font-size:12px}
+  .foot{display:none}
   .badge{display:inline-block;padding:3px 7px;border-radius:999px;background:rgba(79,168,216,.14);border:1px solid rgba(79,168,216,.28);color:#d8f1ff;font-size:11px;margin-left:8px}
   .paperWrap{position:relative;height:100%;min-height:0;border-radius:10px;overflow:hidden}
   .paperWrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .drawerShell{position:fixed;left:0;top:88px;bottom:52px;z-index:30;display:flex;align-items:stretch;pointer-events:none}
-  .drawerPanel{width:320px;max-width:min(84vw,320px);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),var(--panel);border:1px solid rgba(255,255,255,.10);border-left:none;border-radius:0 14px 14px 0;box-shadow:0 10px 28px rgba(0,0,0,.35);transform:translateX(calc(-100% + 22px));transition:transform .22s ease;pointer-events:auto;display:flex;flex-direction:column;min-height:0}
-  .drawerPanel.open{transform:translateX(0)}
-  .drawerHandle{position:absolute;right:-18px;top:20px;width:18px;height:58px;border-radius:0 10px 10px 0;border:1px solid rgba(255,255,255,.14);border-left:none;background:rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;color:var(--text);font-size:15px;cursor:pointer;pointer-events:auto}
-  .drawerBody{padding:12px 12px 14px;overflow:auto}
-  .drawerTitle{font-size:13px;font-weight:700;margin:0 0 10px;color:var(--text)}
-  .drawerHint{color:var(--muted);font-size:12px;margin:0 0 10px}
-  .graphsCol .body{padding:4px!important;height:100%}
-  .graphsCol{min-width:0}
-  @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-columns:1fr;overflow:visible}.viewport{min-height:54vh;height:min(62vh,680px)} .graphsCol{min-height:48vh} .drawerShell{top:74px;bottom:44px} }
+  .graphPanel{border:1px solid rgba(255,255,255,.10);border-radius:12px;background:rgba(10,14,20,.22);backdrop-filter:blur(2px);overflow:hidden;pointer-events:none}
+  .graphPanel canvas{opacity:.96}
+  .vqiOverlay{width:100%;display:grid;flex:1 1 auto;min-height:0;grid-template-rows:repeat(3,minmax(0,1fr));gap:1px}
+  .topWaveOverlay{position:absolute;left:50%;right:auto;top:2px;transform:translateX(-50%);z-index:18;display:grid;grid-template-columns:repeat(2,minmax(0,248px));gap:6px;pointer-events:none;width:min(502px,52vw)}
+  .topWaveOverlay .graphPanel{min-height:102px;height:min(124px,16vh)}
+  @media (max-width:1080px){ .leftOverlayStack{width:min(250px,31vw)} .topWaveOverlay{width:min(506px,62vw);grid-template-columns:repeat(2,minmax(0,250px))} }
+  @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{overflow:visible}.viewport{min-height:72vh;height:min(82vh,920px)} .leftOverlayStack{left:4px;top:2px;bottom:2px;width:min(250px,44vw)} .vqiOverlay{grid-template-rows:repeat(3,minmax(0,1fr));gap:1px} .topWaveOverlay{left:50%;right:auto;top:2px;transform:translateX(-50%);width:min(506px,92vw);grid-template-columns:1fr 1fr;gap:4px} .topWaveOverlay .graphPanel{height:min(110px,14.5vh)} }
+  @media (max-width:640px){ .leftOverlayStack{top:2px;bottom:2px;width:min(96vw,248px)} .vqiOverlay{grid-template-rows:repeat(3,minmax(0,1fr));gap:1px} .topWaveOverlay{grid-template-columns:1fr 1fr;left:50%;right:auto;transform:translateX(-50%);width:min(506px,96vw);gap:4px} .topWaveOverlay .graphPanel{height:min(102px,13.6vh)} }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <div class="title">EMW true 3D v14 <span class="badge">field-vector mode test</span></div>
-    <div class="sub">3D βάση με δεύτερη αναπαράσταση πεδίου: βέλη κατά μήκος της ευθείας διάδοσης, περιβάλλουσα από τις αιχμές και γεμισμένα τραπέζια στο xy/xz, με δυνατότητα on/off.</div>
+    <div class="titleBar">
+      <div class="langSwitch" aria-label="Language selector">
+        <button id="langEl" class="langBtn active" type="button">EL</button>
+        <button id="langEn" class="langBtn" type="button">EN</button>
+      </div>
+      <div class="title"><span data-i18n="app_title">Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος</span> <span class="sub">© antarxo, 2026</span></div>
+    </div>
   </div>
   <div class="main">
-    <div class="card graphsCol">
-      <div class="body" style="height:100%">
-        <div class="paperWrap"><canvas id="graphsPaper"></canvas></div>
-      </div>
-    </div>
     <div class="card viewport">
       <div id="stage"></div>
+      <div class="topWaveOverlay">
+        <div class="graphPanel"><div class="paperWrap"><canvas id="eGraphPaper"></canvas></div></div>
+        <div class="graphPanel"><div class="paperWrap"><canvas id="bGraphPaper"></canvas></div></div>
+      </div>
+      <div class="leftOverlayStack">
+        <div class="vqiOverlay">
+          <div class="graphPanel"><div class="paperWrap"><canvas id="vGraphPaper"></canvas></div></div>
+          <div class="graphPanel"><div class="paperWrap"><canvas id="qGraphPaper"></canvas></div></div>
+          <div class="graphPanel"><div class="paperWrap"><canvas id="iGraphPaper"></canvas></div></div>
+        </div>
       <div class="machineHud">
-        <div class="dpad">
-          <div></div><button id="up">▲</button><div></div>
-          <button id="left">◀</button><div class="centerDot" id="resetView">•</div><button id="right">▶</button>
-          <div></div><button id="down">▼</button><div></div>
+        <div class="hudGroup">
+          <div class="navDock">
+            <div class="statPad">
+              <button id="zoomIn" data-i18n-aria="zoom_in" aria-label="Zoom in">▲</button>
+              <div class="statReadout"><span class="mini" data-i18n="zoom">Zoom</span><span class="val" id="zoomPct">95%</span></div>
+              <button id="zoomOut" data-i18n-aria="zoom_out" aria-label="Zoom out">▼</button>
+              <input id="zoom" type="range" min="0" max="1200" value="1140" data-i18n-aria="zoom" aria-label="Zoom" style="display:none">
+            </div>
+            <div class="statPad">
+              <button id="speedUp" data-i18n-aria="faster" aria-label="Faster">▲</button>
+              <div class="statReadout"><span class="mini" data-i18n="speed_short">Ταχ/τα</span><span class="val" id="speedPct">30%</span></div>
+              <button id="speedDown" data-i18n-aria="slower" aria-label="Slower">▼</button>
+            </div>
+            <div class="dpad">
+              <div></div><button id="up">▲</button><div></div>
+              <button id="left">◀</button><div class="centerDot" id="resetView">•</div><button id="right">▶</button>
+              <div></div><button id="down">▼</button><div></div>
+            </div>
+          </div>
+          <div class="transportRow">
+            <button id="qBack" data-i18n-title="back_T8" data-i18n-aria="back_T8" title="Πίσω κατά T/8" aria-label="Πίσω κατά T/8">⏪</button>
+            <button id="stepBack" data-i18n-title="step_back" data-i18n-aria="step_back" title="Βήμα πίσω" aria-label="Βήμα πίσω">⏴</button>
+            <button id="playBtn" data-i18n-title="play_pause" data-i18n-aria="play_pause" title="Έναρξη / Παύση" aria-label="Έναρξη / Παύση">❚❚</button>
+            <button id="resetBtn" data-i18n-title="reset" data-i18n-aria="reset" title="Reset" aria-label="Reset">⏮</button>
+            <button id="stepFwd" data-i18n-title="step_forward" data-i18n-aria="step_forward" title="Βήμα μπροστά" aria-label="Βήμα μπροστά">⏵</button>
+            <button id="qFwd" data-i18n-title="forward_T8" data-i18n-aria="forward_T8" title="Μπροστά κατά T/8" aria-label="Μπροστά κατά T/8">⏩</button>
+          </div>
         </div>
-        <div class="playDock"><button id="playBtn">Παύση</button><button id="resetBtn">Reset</button></div>
-        <div class="controlGrid">
-          <button id="stepBack">◀ Βήμα</button>
-          <button id="stepFwd">Βήμα ▶</button>
-          <button id="qBack">◀ T/4</button>
-          <button id="qFwd">T/4 ▶</button>
-          <button id="speed025">0.25x</button>
-          <button id="speed05">0.5x</button>
-          <button id="speed075">0.75x</button>
-          <button id="speed1">1x</button>
-          <button id="screenBtn">Οθόνη</button>
-          <button id="printBtn">Print Sharp</button>
+        <div class="hudGroup">
+          <div class="modeGrid">
+            <button id="modeRod" data-i18n="mode_dipole">Δίπολο</button>
+            <button id="waveModeArrows" data-i18n="mode_arrows">Ευθεία Διάδοση</button>
+            <div class="modeRowWide">
+              <button id="modeSource" data-i18n="mode_lines_eb">Δυναμικές γραμμές</button>
+              <label class="miniCheck"><input id="showE" type="checkbox" checked> E</label>
+              <label class="miniCheck"><input id="showB" type="checkbox" checked> B</label>
+            </div>
+            <button id="modeReceive" data-i18n="mode_receiver_lines">Δέκτης στο πεδίο</button>
+            <button id="waveModeFronts" data-i18n="mode_receiver_arrows">Δέκτης σε ευθεία</button>
+          </div>
         </div>
+        <div class="hudGroup">
+          <div class="planesRow">
+            <div class="hStatPad">
+              <button id="eAlphaDown" data-i18n-aria="e_alpha_down" aria-label="Μείωση διαφάνειας E επιπέδων">◀</button>
+              <div class="statReadout horiz"><span class="mini" data-i18n="e_planes">Επίπεδο Ε</span><span class="val" id="eAlphaPct">20%</span></div>
+              <button id="eAlphaUp" data-i18n-aria="e_alpha_up" aria-label="Αύξηση διαφάνειας E επιπέδων">▶</button>
+            </div>
+            <div class="hStatPad">
+              <button id="bAlphaDown" data-i18n-aria="b_alpha_down" aria-label="Μείωση διαφάνειας B επιπέδων">◀</button>
+              <div class="statReadout horiz"><span class="mini" data-i18n="b_planes">Επίπεδο Β</span><span class="val" id="bAlphaPct">20%</span></div>
+              <button id="bAlphaUp" data-i18n-aria="b_alpha_up" aria-label="Αύξηση διαφάνειας B επιπέδων">▶</button>
+            </div>
+          </div>
+          <div class="displayGrid">
+            <button id="screenBtn" data-i18n="screen">Οθόνη</button>
+            <button id="printBtn" data-i18n="paper">Χαρτί</button>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
   </div>
-  <div class="drawerShell">
-    <div class="drawerPanel" id="drawerPanel">
-      <button class="drawerHandle" id="drawerToggle" aria-label="Άνοιγμα/κλείσιμο ελέγχων">❯</button>
-      <div class="drawerBody">
-        <div class="drawerTitle">Έλεγχοι σκηνής</div>
-        <div class="drawerHint">Το panel μαζεύτηκε σε συρτάρι στο αριστερό περιθώριο. Το d-pad και η έναρξη/παύση μεταφέρθηκαν μέσα στο παράθυρο της μηχανής.</div>
-        <div class="row"><label>Zoom</label><input id="zoom" type="range" min="0" max="1200" value="1080"></div>
-        <div class="row"><label>Ταχύτητα</label><input id="speed" type="range" min="1" max="20" value="17"></div>
-        <div class="row"><label>Πάχος γραμμών</label><div style="color:var(--text);font-size:12px">Ελαφρά αυξημένο</div></div>
-        <div class="row"><label>Διαφάνεια E planes</label><input id="eAlpha" type="range" min="0" max="60" value="60"></div>
-        <div class="row"><label>Διαφάνεια B planes</label><input id="bAlpha" type="range" min="0" max="60" value="60"></div>
-        <div class="row"><label>Show axes</label><input id="showAxes" type="checkbox" checked></div>
-        <div class="row"><label>Show planes</label><input id="showPlanes" type="checkbox" checked></div>
-        <div class="row"><label>Show E fronts</label><input id="showE" type="checkbox" checked></div>
-        <div class="row"><label>Show B fronts</label><input id="showB" type="checkbox" checked></div>
-        <div class="row"><label>Show field-vector mode</label><input id="showFieldMode" type="checkbox"></div>
-        <div class="row"><label>Show particles</label><input id="showParticles" type="checkbox" checked></div>
-        <div class="row"><label>Show current arrow</label><input id="showCurrent" type="checkbox" checked></div>
-        <div class="legend">
-          <div><span class="sw" style="background:#e85a5a"></span>μηλοειδείς E / πάνω–κάτω ημιεπίπεδα</div>
-          <div><span class="sw" style="background:#38b66b"></span>ημικύκλια B / πίσω–μπροστινό ημιεπίπεδο</div>
-          <div><span class="sw" style="background:#ff5a5a"></span>κόκκινα ηλεκτρόνια μέσα στη ράβδο / φορτία / ρεύμα</div>
-          <div><span class="sw" style="background:#d8dee7"></span>ράβδος / άξονες</div>
-        </div>
-      </div>
-    </div>
+  <div id="hiddenSettings" style="display:none">
+    <input id="speed" type="range" min="1" max="40" value="12">
+    <select id="emitPeriods"><option value="1">1T</option><option value="2">2T</option><option value="3" selected>3T</option></select>
+    <input id="autoFit" type="checkbox" checked>
+    <input id="fieldFillAlpha" type="hidden" value="90">
+    <input id="showFieldMode" type="checkbox">
+    <input id="showParticles" type="checkbox" checked>
+    <input id="showCurrent" type="checkbox" checked>
+    <input id="receiverX" type="hidden" value="1.6">
+    <input id="eAlpha" type="range" min="0" max="100" value="20">
+    <input id="bAlpha" type="range" min="0" max="100" value="20">
+    <input id="showAxes" type="checkbox" checked>
+    <input id="showPlanes" type="checkbox" checked>
   </div>
-  <div class="foot">Μία περίοδος εκπομπής από t = 0 μέχρι και T, με λεπτό διάφανο κύλινδρο στο κέντρο, κόκκινα ηλεκτρόνια στο εσωτερικό του και πιο περιορισμένα σε διαφάνεια/οπτική ένταση χρωματιστά planes.</div>
+  <div class="foot"></div>
 </div>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showFieldMode','showParticles','showCurrent','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','speed025','speed05','speed075','speed1','screenBtn','printBtn','drawerToggle','drawerPanel'];
+const ids = ['langEl','langEn','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
-const graphPaper = document.getElementById('graphsPaper');
+ui.langEl?.addEventListener('click', () => applyLanguage('el'));
+ui.langEn?.addEventListener('click', () => applyLanguage('en'));
+const graphPapers = {
+  V: document.getElementById('vGraphPaper'),
+  Q: document.getElementById('qGraphPaper'),
+  I: document.getElementById('iGraphPaper'),
+  E: document.getElementById('eGraphPaper'),
+  B: document.getElementById('bGraphPaper'),
+};
+function updateTopReadouts(){
+  if(ui.zoomPct) ui.zoomPct.textContent = `${Math.round((+ui.zoom.value || 0) / 12)}%`;
+  if(ui.speedPct) ui.speedPct.textContent = `${Math.round((+ui.speed.value || 0) * 2.5)}%`;
+  if(ui.eAlphaPct) ui.eAlphaPct.textContent = `${Math.round(+ui.eAlpha.value || 0)}%`;
+  if(ui.bAlphaPct) ui.bAlphaPct.textContent = `${Math.round(+ui.bAlpha.value || 0)}%`;
+}
+
+const graphState = { staticDirty:true, dynamicDirty:true, phaseBucket:-1 };
+function invalidateGraphs(staticToo=false){
+  graphState.dynamicDirty = true;
+  if(staticToo) graphState.staticDirty = true;
+}
+const RECEIVER_NAT_RATIO = 1.34;
+const appModes = { main:'rod' };
+const RECEIVER_X_LIMITS = {
+  normal:{ min:0.5, max:9.5 },
+  receive:{ min:0.8, max:4.0 }
+};
+function isReceiveMode(){ return appModes.main === 'receiveFronts' || appModes.main === 'receiveArrows'; }
+function isRodMode(){ return appModes.main === 'rod'; }
+function clampReceiverXToMode(){
+  if(!ui.receiverX) return;
+  const lim = isReceiveMode() ? RECEIVER_X_LIMITS.receive : RECEIVER_X_LIMITS.normal;
+  ui.receiverX.min = String(lim.min);
+  ui.receiverX.max = String(lim.max);
+  const v = Math.max(lim.min, Math.min(lim.max, +(ui.receiverX.value || lim.min)));
+  ui.receiverX.value = v.toFixed(1);
+}
+function activeWaveMaxX(){
+  return Infinity;
+}
+function syncModeToCheckboxes(){
+  if(appModes.main === 'rod'){
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = false;
+  } else if(appModes.main === 'lines'){
+    if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
+    ui.showFieldMode.checked = false;
+  } else if(appModes.main === 'arrows'){
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = true;
+  } else if(appModes.main === 'receiveFronts'){
+    ui.showE.checked = true;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = false;
+  } else {
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = true;
+  }
+}
+function markOperationalButtons(){
+  ui.modeRod?.classList.toggle('presetActive', appModes.main === 'rod');
+  ui.modeSource?.classList.toggle('presetActive', appModes.main === 'lines');
+  ui.waveModeArrows?.classList.toggle('presetActive', appModes.main === 'arrows');
+  ui.modeReceive?.classList.toggle('presetActive', appModes.main === 'receiveFronts');
+  ui.waveModeFronts?.classList.toggle('presetActive', appModes.main === 'receiveArrows');
+}
+function updateModeLocks(){
+  const receive = isReceiveMode();
+  if(ui.receiverX) ui.receiverX.disabled = !receive;
+  if(ui.showE) ui.showE.disabled = appModes.main !== 'lines';
+  if(ui.showB) ui.showB.disabled = appModes.main !== 'lines';
+  if(ui.showFieldMode) ui.showFieldMode.disabled = true;
+  const eRow = ui.showE?.closest('.row');
+  const bRow = ui.showB?.closest('.row');
+  const fieldRow = ui.showFieldMode?.closest('.row');
+  if(eRow) eRow.style.display = appModes.main === 'lines' ? '' : 'none';
+  if(bRow) bRow.style.display = appModes.main === 'lines' ? '' : 'none';
+  if(fieldRow) fieldRow.style.display = 'none';
+  markOperationalButtons();
+}
+function applyMainMode(mode, skipApply=false){
+  const allowed = new Set(['rod','lines','arrows','receiveFronts','receiveArrows']);
+  appModes.main = allowed.has(mode) ? mode : 'rod';
+  syncModeToCheckboxes();
+  clampReceiverXToMode();
+  applyFieldFillDefault();
+  updateModeLocks();
+  if(!skipApply){ restartEvolutionForSelection(); }
+}
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -132,10 +289,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
 renderer.setClearColor(0x0b0f14, 1);
 stage.appendChild(renderer.domElement);
-ui.drawerToggle.addEventListener('click', () => {
-  const open = ui.drawerPanel.classList.toggle('open');
-  ui.drawerToggle.textContent = open ? '❮' : '❯';
-});
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, Math.max(1, stage.clientWidth / stage.clientHeight), 0.1, 250);
@@ -155,8 +308,8 @@ const DEFAULT_RIGHT_CLICKS = 18;
 // Η ζητούμενη προεπιλογή προσεγγίζεται ως σαφής δεξιά στροφή ~90° από το αρχικό κάδρο.
 const HOME_Y = THREE.MathUtils.degToRad(-21 + 50);
 
-const VIEW_SCREEN = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1080 };
-const VIEW_PRINT  = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1080 };
+const VIEW_SCREEN = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1140, eAlpha: 20, bAlpha: 20, speed: 12 };
+const VIEW_PRINT  = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1140, eAlpha: 20, bAlpha: 30, speed: 12 };
 
 function cssVar(name, value){ document.documentElement.style.setProperty(name, value); }
 function applyThemeMode(mode){
@@ -173,14 +326,16 @@ function applyThemeMode(mode){
   COLORS.chargePos = COLORS.eNeg;
   COLORS.axisX = th.axisX; COLORS.axisY = th.axisY; COLORS.axisZ = th.axisZ;
   COLORS.rod = th.rod; COLORS.electron = th.electron;
+  COLORS.receiverRodShell = th.receiverRodShell ?? COLORS.receiverRodShell;
+  COLORS.receiverRodInner = th.receiverRodInner ?? COLORS.receiverRodInner;
   COLORS.planeEPos = th.planeEPos; COLORS.planeENeg = th.planeENeg; COLORS.planeBPos = th.planeBPos; COLORS.planeBNeg = th.planeBNeg;
   if (typeof xAxis !== 'undefined') {
     xAxis.material.color.setHex(COLORS.axisX);
     yAxis.material.color.setHex(COLORS.axisY);
     zAxis.material.color.setHex(COLORS.axisZ);
-    updateTextSprite(xLabel, 'x', COLORS.axisX, { size:160, scaleX:0.26, scaleY:0.13 });
-    updateTextSprite(yLabel, 'y', COLORS.axisY, { size:160, scaleX:0.26, scaleY:0.13 });
-    updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:160, scaleX:0.26, scaleY:0.13 });
+    updateTextSprite(xLabel, 'x', COLORS.axisX, { size:220, scaleX:0.34, scaleY:0.17 });
+    updateTextSprite(yLabel, 'y', COLORS.axisY, { size:220, scaleX:0.34, scaleY:0.17 });
+    updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:220, scaleX:0.34, scaleY:0.17 });
     ePlaneUpper.material.color.setHex(COLORS.planeEPos);
     ePlaneLower.material.color.setHex(COLORS.planeENeg);
     bPlaneBack.material.color.setHex(COLORS.planeBPos);
@@ -188,17 +343,36 @@ function applyThemeMode(mode){
     rod.material.color.setHex(COLORS.rod);
     rodInnerGlow.material.color.setHex(COLORS.electron);
     rodOutline.material.opacity = mode === 'printSharp' ? 0.74 : 0.94;
+    if(receiverRodGroup?.userData?.shell) receiverRodGroup.userData.shell.material.color.setHex(COLORS.receiverRodShell);
+    if(receiverRodGroup?.userData?.inner) receiverRodGroup.userData.inner.material.color.setHex(COLORS.receiverRodInner);
+    if(receiverRodGroup?.userData?.outline){
+      receiverRodGroup.userData.outline.material.color.setHex(mode === 'printSharp' ? 0x767f89 : 0x58616b);
+      receiverRodGroup.userData.outline.material.opacity = mode === 'printSharp' ? 0.56 : 0.72;
+    }
     electrons.forEach(e => { e.material.color.setHex(COLORS.electron); e.material.emissive.setHex(COLORS.electron); if(e.children[0]) e.children[0].material.color.setHex(COLORS.electron); });
+    receiverElectron.material.color.setHex(COLORS.electron); receiverElectron.material.emissive.setHex(COLORS.electron); if(receiverElectron.children[0]) receiverElectron.children[0].material.color.setHex(COLORS.electron);
+    invalidateGraphs(true);
     rebuildFields(phaseU);
     updateParticles(phaseU);
     applyUI();
   }
 }
 
+function fieldFillDefaultValue(){
+  return (ui.showFieldMode && ui.showFieldMode.checked && ui.showE && !ui.showE.checked && ui.showB && !ui.showB.checked) ? 30 : 90;
+}
+function applyFieldFillDefault(){
+  if(ui.fieldFillAlpha) ui.fieldFillAlpha.value = String(fieldFillDefaultValue());
+}
+
 function applyViewPreset(v){
   root.rotation.y = v.rotY;
   root.rotation.x = v.rotX;
   ui.zoom.value = v.zoom;
+  if (typeof v.speed === 'number') ui.speed.value = String(v.speed);
+  if (typeof v.eAlpha === 'number') ui.eAlpha.value = String(v.eAlpha);
+  if (typeof v.bAlpha === 'number') ui.bAlpha.value = String(v.bAlpha);
+  applyFieldFillDefault();
   applyThemeMode(v===VIEW_PRINT ? 'printSharp' : 'screen');
   applyUI();
   markViewButtons(v===VIEW_PRINT ? 'print' : 'screen');
@@ -212,6 +386,73 @@ function setHome(){
   root.rotation.x = VIEW_SCREEN.rotX;
 }
 setHome();
+
+function getEmitPeriods(){
+  const n = Number(ui.emitPeriods?.value || 1);
+  return Math.max(1, Math.min(3, Number.isFinite(n) ? n : 1));
+}
+function phaseWrapped(t = phaseU){
+  const p = t % 1;
+  return p < 0 ? p + 1 : p;
+}
+function getGraphPhaseState(){
+  const total = getEmitPeriods();
+  if(phaseU >= total) return { periodIndex: Math.max(0, total - 1), local: 1 };
+  const periodIndex = Math.max(0, Math.floor(phaseU));
+  return { periodIndex, local: phaseWrapped(phaseU) };
+}
+function formatQuarterLabel(qCount){
+  if(qCount === 0) return '0';
+  if(qCount % 4 === 0){
+    const n = qCount / 4;
+    return n === 1 ? 'T' : `${n}T`;
+  }
+  if(qCount % 2 === 0){
+    const n = qCount / 2;
+    return n === 1 ? 'T/2' : `${n}T/2`;
+  }
+  return qCount === 1 ? 'T/4' : `${qCount}T/4`;
+}
+function graphTickLabels(){
+  const { periodIndex } = getGraphPhaseState();
+  const baseQ = periodIndex * 4;
+  return [0,1,2,3,4].map(off => [formatQuarterLabel(baseQ + off), off / 4]);
+}
+function computeWaveHalfExtent(uAbs){
+  return Math.max(0.5 * E_TARGET_TOTAL_WIDTH * Math.max(0, uAbs), B_RADIUS_FINAL * Math.max(0, uAbs));
+}
+let autoFitApplied = false;
+function maybeAutoFit(){
+  if(!ui.autoFit || !ui.autoFit.checked) return;
+  const totalPeriods = getEmitPeriods();
+  if(totalPeriods <= 1) return;
+  if(autoFitApplied) return;
+  if(phaseU < 1.0) return;
+  const halfX = computeWaveHalfExtent(totalPeriods);
+  if(halfX <= 0.001) return;
+  root.updateWorldMatrix(true, false);
+  camera.updateMatrixWorld();
+  const canvas = renderer.domElement;
+  const w = Math.max(1, canvas.clientWidth || stage.clientWidth || 1);
+  const marginFrac = 0.08;
+  const leftLimit = w * marginFrac;
+  const rightLimit = w * (1 - marginFrac);
+  let currentZoom = +ui.zoom.value;
+  let nextZoom = currentZoom;
+  for(let i=0;i<200;i++){
+    const probeL = new THREE.Vector3(-halfX, 0, 0).applyMatrix4(root.matrixWorld).project(camera);
+    const probeR = new THREE.Vector3( halfX, 0, 0).applyMatrix4(root.matrixWorld).project(camera);
+    const sxL = (probeL.x * 0.5 + 0.5) * w;
+    const sxR = (probeR.x * 0.5 + 0.5) * w;
+    if(sxL >= leftLimit && sxR <= rightLimit) break;
+    nextZoom = Math.max(0, nextZoom - 6);
+    if(nextZoom >= currentZoom || nextZoom === 0) break;
+    ui.zoom.value = String(nextZoom);
+    applyUI();
+    currentZoom = nextZoom;
+  }
+  autoFitApplied = true;
+}
 
 const COLORS = {
   bg:0x0b0f14,
@@ -230,7 +471,10 @@ const COLORS = {
   planeEPos:0x676d75,
   planeENeg:0x555b63,
   planeBPos:0x474c53,
-  planeBNeg:0x7a8088
+  planeBNeg:0x7a8088,
+  receiverVel:0xf5d76e,
+  receiverRodShell:0xb9c1c9,
+  receiverRodInner:0xf0f4f8
 };
 
 const VIEW_THEMES = {
@@ -240,18 +484,100 @@ const VIEW_THEMES = {
     graphBg:'#0b0f14', graphGrid:'rgba(255,255,255,0.07)', graphRow:'rgba(255,255,255,0.045)', graphXAxis:'rgba(255,255,255,0.44)', graphYAxis:'rgba(255,255,255,0.18)', graphText:'rgba(232,238,247,0.90)', graphTick:'rgba(232,238,247,0.56)', graphCursor:'rgba(255,255,255,0.26)',
     ePos:'#e85a5a', eNeg:'#4fa8d8', bPos:'#38b66b', bNeg:'#f2a31b',
     planeEPos:0x676d75, planeENeg:0x555b63, planeBPos:0x474c53, planeBNeg:0x7a8088,
-    axisX:0xe45a5a, axisY:0x5fd36f, axisZ:0x5f8dff, rod:0xd8dee7, electron:0xff5a5a
+    axisX:0xe45a5a, axisY:0x5fd36f, axisZ:0x5f8dff, rod:0xd8dee7, electron:0xff5a5a, receiverRodShell:0xb9c1c9, receiverRodInner:0xf0f4f8
   },
   printSharp:{
     css:{ '--bg':'#ffffff','--panel':'#f1ece2','--text':'#0f1820','--muted':'#42505c','--cardBorder':'rgba(24,34,44,.20)','--topBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.76)), var(--panel)','--cardBg':'linear-gradient(180deg,rgba(255,255,255,1),rgba(255,255,255,.58)), var(--panel)','--footBg':'rgba(255,255,255,.72)' },
     rendererBg:0xffffff,
     graphBg:'#ffffff', graphGrid:'rgba(20,26,32,0.08)', graphRow:'rgba(20,26,32,0.06)', graphXAxis:'rgba(47,58,68,0.62)', graphYAxis:'rgba(47,58,68,0.24)', graphText:'rgba(15,24,32,0.96)', graphTick:'rgba(15,24,32,0.64)', graphCursor:'rgba(15,24,32,0.22)',
-    ePos:'#ad1e1e', eNeg:'#0058ad', bPos:'#00723d', bNeg:'#d26f00',
+    ePos:'#ff2f2f', eNeg:'#2f6dff', bPos:'#00c853', bNeg:'#ff9800',
     planeEPos:0xd9d4cb, planeENeg:0xcfc8bd, planeBPos:0xc6c0b5, planeBNeg:0xe3ddd4,
-    axisX:0xbb2424, axisY:0x008749, axisZ:0x005bb4, rod:0x7a8490, electron:0xa52a2a
+    axisX:0xe45a5a, axisY:0x20b45a, axisZ:0x2f6dff, rod:0x7a8490, electron:0xff4a4a, receiverRodShell:0xa4acb5, receiverRodInner:0xe0e5eb
   }
 };
 let activeViewTheme = 'screen';
+
+const I18N = {
+  el: {
+    app_title:'Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος',
+    zoom:'Zoom',
+    speed_short:'Ταχ/τα',
+    mode_dipole:'Δίπολο',
+    mode_arrows:'Ευθεία Διάδοση',
+    mode_lines_eb:'Δυναμικές γραμμές',
+    mode_receiver_lines:'Δέκτης στο πεδίο',
+    mode_receiver_arrows:'Δέκτης σε ευθεία',
+    e_planes:'Επίπεδο Ε',
+    b_planes:'Επίπεδο Β',
+    screen:'Οθόνη',
+    paper:'Χαρτί',
+    zoom_in:'Μεγέθυνση',
+    zoom_out:'Σμίκρυνση',
+    faster:'Ταχύτερα',
+    slower:'Βραδύτερα',
+    back_T8:'Πίσω κατά T/8',
+    step_back:'Βήμα πίσω',
+    play_pause:'Έναρξη / Παύση',
+    reset:'Reset',
+    step_forward:'Βήμα μπροστά',
+    forward_T8:'Μπροστά κατά T/8',
+    e_alpha_down:'Μείωση διαφάνειας E επιπέδων',
+    e_alpha_up:'Αύξηση διαφάνειας E επιπέδων',
+    b_alpha_down:'Μείωση διαφάνειας B επιπέδων',
+    b_alpha_up:'Αύξηση διαφάνειας B επιπέδων',
+  },
+  en: {
+    app_title:'Generation Propagation and Reception of EM Wave',
+    zoom:'Zoom',
+    speed_short:'Speed',
+    mode_dipole:'Dipole',
+    mode_arrows:'Linear propagation',
+    mode_lines_eb:'Dynamic lines',
+    mode_receiver_lines:'Receiver in field',
+    mode_receiver_arrows:'Receiver on line',
+    e_planes:'E plane',
+    b_planes:'B plane',
+    screen:'Screen',
+    paper:'Paper',
+    zoom_in:'Zoom in',
+    zoom_out:'Zoom out',
+    faster:'Faster',
+    slower:'Slower',
+    back_T8:'Back by T/8',
+    step_back:'Step back',
+    play_pause:'Play / Pause',
+    reset:'Reset',
+    step_forward:'Step forward',
+    forward_T8:'Forward by T/8',
+    e_alpha_down:'Decrease E plane opacity',
+    e_alpha_up:'Increase E plane opacity',
+    b_alpha_down:'Decrease B plane opacity',
+    b_alpha_up:'Increase B plane opacity',
+  }
+};
+let currentLang = 'el';
+function applyLanguage(lang){
+  currentLang = I18N[lang] ? lang : 'el';
+  const t = I18N[currentLang];
+  document.documentElement.lang = currentLang === 'el' ? 'el' : 'en';
+  document.title = t.app_title;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if(t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.dataset.i18nTitle;
+    if(t[key]) el.title = t[key];
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    const key = el.dataset.i18nAria;
+    if(t[key]) el.setAttribute('aria-label', t[key]);
+  });
+  if(ui.langEl && ui.langEn){
+    ui.langEl.classList.toggle('active', currentLang === 'el');
+    ui.langEn.classList.toggle('active', currentLang === 'en');
+  }
+}
 
 const E_FULL = [
   0.0000, 0.0434, 0.0855, 0.1250, 0.1607, 0.1915, 0.2165, 0.2349, 0.2462, 0.2500,
@@ -265,6 +591,10 @@ const B_FULL = [
   0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500,
   0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000
 ];
+const B_Q1 = [0.0000, 0.0038, 0.0151, 0.0335, 0.0585, 0.0893, 0.1250, 0.1645, 0.2066, 0.2500];
+const B_Q2 = [0.2500, 0.2934, 0.3355, 0.3750, 0.4107, 0.4415, 0.4665, 0.4849, 0.4962, 0.5000];
+const B_Q3 = [0.5000, 0.5038, 0.5151, 0.5335, 0.5585, 0.5893, 0.6250, 0.6645, 0.7066, 0.7500];
+const B_Q4 = [0.7500, 0.7934, 0.8355, 0.8750, 0.9107, 0.9415, 0.9665, 0.9849, 0.9962, 1.0000];
 const WORLD_PER_LOCAL = 0.8 / 142;
 const ROD_HALF_LENGTH = 0.8;
 const ROD_LENGTH = 2 * ROD_HALF_LENGTH;
@@ -272,6 +602,7 @@ const E_BIRTH_HALF_WIDTH = 159 * WORLD_PER_LOCAL;
 const E_TARGET_TOTAL_WIDTH = 4 * ROD_LENGTH;
 const E_TARGET_TOTAL_HEIGHT = 5 * ROD_LENGTH;
 const B_RADIUS_FINAL = 2 * ROD_LENGTH;
+const RECEIVER_WAVE_SPEED_X = 0.5 * E_TARGET_TOTAL_WIDTH;
 let lineRadius = 36 / 3800;
 const PLANE_X_MIN = -3 * ROD_LENGTH;
 const PLANE_X_MAX =  3 * ROD_LENGTH;
@@ -320,6 +651,18 @@ function solidMat(color, emissiveIntensity=0.14, opacity=1){
     opacity,
     depthWrite: opacity >= 0.999
   });
+}
+function curveMat(color, opacity=1){
+  if(activeViewTheme === 'printSharp'){
+    return new THREE.MeshBasicMaterial({
+      color,
+      transparent: opacity < 0.999,
+      opacity,
+      depthWrite: opacity >= 0.999,
+      toneMapped: false
+    });
+  }
+  return solidMat(color, 0.17, opacity);
 }
 function planeMaterial(color, opacity){
   return new THREE.MeshBasicMaterial({
@@ -446,9 +789,14 @@ const AXIS_RADIUS = 0.006;
 const xAxis = axisCylinder(PLANE_LEN, AXIS_RADIUS, COLORS.axisX, 'x'); axes.add(xAxis);
 const yAxis = axisCylinder(2 * PLANE_Y_EXT, AXIS_RADIUS, COLORS.axisY, 'y'); axes.add(yAxis);
 const zAxis = axisCylinder(2 * PLANE_Z_EXT, AXIS_RADIUS, COLORS.axisZ, 'z'); axes.add(zAxis);
-const xLabel = makeTextSprite(); updateTextSprite(xLabel, 'x', COLORS.axisX, { size:160, scaleX:0.26, scaleY:0.13 }); xLabel.position.set(PLANE_X_MAX + 0.18, 0.06, 0.02); axes.add(xLabel);
-const yLabel = makeTextSprite(); updateTextSprite(yLabel, 'y', COLORS.axisY, { size:160, scaleX:0.26, scaleY:0.13 }); yLabel.position.set(0.10, PLANE_Y_EXT + 0.18, 0.02); axes.add(yLabel);
-const zLabel = makeTextSprite(); updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:160, scaleX:0.26, scaleY:0.13 }); zLabel.position.set(0.10, 0.06, PLANE_Z_EXT + 0.18); axes.add(zLabel);
+const xLabel = makeTextSprite(); updateTextSprite(xLabel, 'x', COLORS.axisX, { size:220, scaleX:0.34, scaleY:0.17 }); xLabel.position.set(PLANE_X_MAX + 0.18, 0.06, 0.02); axes.add(xLabel);
+const yLabel = makeTextSprite(); updateTextSprite(yLabel, 'y', COLORS.axisY, { size:220, scaleX:0.34, scaleY:0.17 }); yLabel.position.set(0.10, PLANE_Y_EXT + 0.18, 0.02); axes.add(yLabel);
+const zLabel = makeTextSprite(); updateTextSprite(zLabel, 'z', COLORS.axisZ, { size:220, scaleX:0.34, scaleY:0.17 }); zLabel.position.set(0.10, 0.06, PLANE_Z_EXT + 0.18); axes.add(zLabel);
+function updateXAxisForEmitPeriods(){
+  const periods = getEmitPeriods();
+  xAxis.scale.y = periods;
+  xLabel.position.x = PLANE_X_MAX * periods + 0.18;
+}
 
 const rodGroup = new THREE.Group();
 root.add(rodGroup);
@@ -508,6 +856,136 @@ for(let i=0;i<ELECTRON_COUNT;i++){
   particleGroup.add(e);
 }
 
+function buildRodAssembly(){
+  const group = new THREE.Group();
+  const shell = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.060, 0.060, 2 * ROD_HALF_LENGTH, 28, 1, true),
+    new THREE.MeshPhongMaterial({
+      color:COLORS.receiverRodShell,
+      transparent:true,
+      opacity:0.52,
+      shininess:155,
+      reflectivity:0.95,
+      side:THREE.DoubleSide,
+      depthWrite:false
+    })
+  );
+  const inner = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.038, 0.038, 2 * ROD_HALF_LENGTH * 0.985, 24, 1, true),
+    new THREE.MeshBasicMaterial({
+      color:COLORS.receiverRodInner,
+      transparent:true,
+      opacity:0.28,
+      side:THREE.DoubleSide,
+      blending:THREE.AdditiveBlending,
+      depthWrite:false
+    })
+  );
+  const outline = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.0645, 0.0645, 2 * ROD_HALF_LENGTH, 28, 1, true),
+    new THREE.MeshBasicMaterial({ color:0x58616b, transparent:true, opacity:0.72, side:THREE.BackSide })
+  );
+  group.add(shell, inner, outline);
+  group.userData.shell = shell;
+  group.userData.inner = inner;
+  group.userData.outline = outline;
+  return group;
+}
+
+function buildSingleElectron(){
+  const e = new THREE.Mesh(
+    new THREE.SphereGeometry(ELECTRON_RADIUS, 21, 21),
+    new THREE.MeshPhongMaterial({
+      color:0xff8c8c,
+      emissive:0xff3f3f,
+      emissiveIntensity:1.10,
+      shininess:150,
+      transparent:true,
+      opacity:0.98,
+      depthWrite:false
+    })
+  );
+  e.renderOrder = 70;
+  const glow = glowSprite(COLORS.electron); glow.scale.setScalar(0.17); glow.material.opacity = 0.90; e.add(glow);
+  const coreGlow = glowSprite(0xffffff); coreGlow.scale.setScalar(0.085); coreGlow.material.opacity = 0.22; e.add(coreGlow);
+  return e;
+}
+
+function buildReceiverArrow(fillColor){
+  const group = new THREE.Group();
+  const shaftOutline = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.020, 0.020, 0.30, 16),
+    new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.92, depthWrite:false, toneMapped:false })
+  );
+  const shaftFill = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.012, 0.012, 0.30, 16),
+    new THREE.MeshBasicMaterial({ color:fillColor, transparent:true, opacity:0.96, depthWrite:false, toneMapped:false })
+  );
+  const headOutline = new THREE.Mesh(
+    new THREE.ConeGeometry(0.050, 0.13, 18),
+    new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.92, depthWrite:false, toneMapped:false })
+  );
+  const headFill = new THREE.Mesh(
+    new THREE.ConeGeometry(0.036, 0.11, 18),
+    new THREE.MeshBasicMaterial({ color:fillColor, transparent:true, opacity:0.97, depthWrite:false, toneMapped:false })
+  );
+  shaftOutline.renderOrder = 82;
+  shaftFill.renderOrder = 83;
+  headOutline.renderOrder = 84;
+  headFill.renderOrder = 85;
+  group.add(shaftOutline, shaftFill, headOutline, headFill);
+  group.userData = { shaftOutline, shaftFill, headOutline, headFill, baseShaftLen:0.30, baseHeadLen:0.13 };
+  return group;
+}
+function setReceiverArrowState(group, opts){
+  const { shaftOutline, shaftFill, headOutline, headFill, baseShaftLen, baseHeadLen } = group.userData;
+  const visible = !!opts.visible;
+  if(!visible){ group.visible = false; return; }
+  group.visible = true;
+  const dir = opts.direction >= 0 ? 1 : -1;
+  const length = Math.max(0.02, opts.length || 0.02);
+  const headLen = Math.min(0.17, Math.max(0.09, length * 0.34));
+  const shaftLen = Math.max(0.02, length - headLen * 0.78);
+  const anchorY = opts.anchorY || 0;
+  const x = opts.x || 0;
+  const z = opts.z || 0.22;
+  const fillColor = opts.color ?? 0xffffff;
+  const opacity = opts.opacity ?? 1;
+  shaftOutline.material.opacity = Math.min(1, 0.60 + 0.32 * opacity);
+  headOutline.material.opacity = Math.min(1, 0.60 + 0.32 * opacity);
+  shaftFill.material.opacity = Math.min(1, 0.38 + 0.60 * opacity);
+  headFill.material.opacity = Math.min(1, 0.38 + 0.60 * opacity);
+  shaftFill.material.color.setHex(fillColor);
+  headFill.material.color.setHex(fillColor);
+  const shaftCenterY = anchorY + dir * shaftLen * 0.5;
+  const headCenterY = anchorY + dir * (shaftLen + headLen * 0.5);
+  for(const obj of [shaftOutline, shaftFill, headOutline, headFill]) obj.rotation.z = dir > 0 ? 0 : Math.PI;
+  shaftOutline.position.set(x, shaftCenterY, z);
+  shaftFill.position.set(x, shaftCenterY, z + 0.004);
+  headOutline.position.set(x, headCenterY, z);
+  headFill.position.set(x, headCenterY, z + 0.004);
+  shaftOutline.scale.set(1, shaftLen / baseShaftLen, 1);
+  shaftFill.scale.set(1, shaftLen / baseShaftLen, 1);
+  headOutline.scale.set(1, headLen / baseHeadLen, 1);
+  headFill.scale.set(1, headLen / baseHeadLen, 1);
+}
+
+const receiverGroup = new THREE.Group();
+root.add(receiverGroup);
+const receiverRodGroup = buildRodAssembly();
+receiverGroup.add(receiverRodGroup);
+const receiverElectron = buildSingleElectron();
+receiverElectron.position.set(0, 0, 0);
+receiverGroup.add(receiverElectron);
+const receiverVelocityArrow = buildReceiverArrow(COLORS.receiverVel);
+receiverGroup.add(receiverVelocityArrow);
+
+function updateReceiverPlacement(){
+  const lim = isReceiveMode() ? RECEIVER_X_LIMITS.receive : RECEIVER_X_LIMITS.normal;
+  const x = Math.max(lim.min, Math.min(lim.max, +(ui.receiverX?.value || 2)));
+  receiverGroup.position.set(x, 0, 0);
+}
+
 const currentGroup = new THREE.Group();
 currentGroup.position.set(-0.25, 0.34, 0.14);
 root.add(currentGroup);
@@ -528,9 +1006,17 @@ const eLowerGroup = new THREE.Group(); eLowerGroup.renderOrder = 4;
 const bBackGroup = new THREE.Group(); bBackGroup.renderOrder = 0;
 const bArrowGroup = new THREE.Group(); bArrowGroup.renderOrder = 24;
 const bFrontGroup = new THREE.Group(); bFrontGroup.renderOrder = 5;
-const eFieldModeGroup = new THREE.Group(); eFieldModeGroup.renderOrder = 12;
-const bFieldModeGroup = new THREE.Group(); bFieldModeGroup.renderOrder = 12;
-root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bArrowGroup, bFrontGroup, eFieldModeGroup, bFieldModeGroup);
+const bFieldBackGroup = new THREE.Group(); bFieldBackGroup.renderOrder = 12; bFieldBackGroup.position.z = -0.030;
+const eFieldGroup = new THREE.Group(); eFieldGroup.renderOrder = 13;
+const bFieldFrontGroup = new THREE.Group(); bFieldFrontGroup.renderOrder = 14; bFieldFrontGroup.position.z = 0.030;
+const bFieldBackDirectGroup = new THREE.Group(); bFieldBackDirectGroup.renderOrder = 12; bFieldBackDirectGroup.position.z = -0.030;
+const eFieldDirectGroup = new THREE.Group(); eFieldDirectGroup.renderOrder = 13;
+const bFieldFrontDirectGroup = new THREE.Group(); bFieldFrontDirectGroup.renderOrder = 14; bFieldFrontDirectGroup.position.z = 0.030;
+const eUpperDirectGroup = new THREE.Group(); eUpperDirectGroup.renderOrder = 2;
+const eLowerDirectGroup = new THREE.Group(); eLowerDirectGroup.renderOrder = 4;
+const bBackDirectCurveGroup = new THREE.Group(); bBackDirectCurveGroup.renderOrder = 0;
+const bFrontDirectCurveGroup = new THREE.Group(); bFrontDirectCurveGroup.renderOrder = 5;
+root.add(eUpperGroup, eArrowGroup, eLowerGroup, bBackGroup, bArrowGroup, bFrontGroup, bFieldBackGroup, eFieldGroup, bFieldFrontGroup, bFieldBackDirectGroup, eFieldDirectGroup, bFieldFrontDirectGroup, eUpperDirectGroup, eLowerDirectGroup, bBackDirectCurveGroup, bFrontDirectCurveGroup);
 
 function disposeGroup(group){
   while(group.children.length){
@@ -546,7 +1032,12 @@ function disposeGroup(group){
   }
 }
 
-function frontQuarterIndex(tEmit){ return tEmit >= 1 ? 3 : Math.floor(tEmit * 4); }
+function frontQuarterIndex(tEmit){
+  const eps = 1e-9;
+  if(tEmit > 0 && Math.abs(tEmit - Math.round(tEmit)) < eps) return 3;
+  const local = ((tEmit % 1) + 1) % 1;
+  return Math.min(3, Math.floor(local * 4));
+}
 function getPulseScaleX(age){ return (E_TARGET_TOTAL_WIDTH * age) / (2 * E_BIRTH_HALF_WIDTH); }
 function getPulseScaleY(age){ return (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_LENGTH) * age) / ROD_LENGTH; }
 function localToWorldXY(scaleX, scaleY, xLocal, yLocal){
@@ -561,7 +1052,7 @@ function cubicPoint(p0,c1,c2,p3,t){
 }
 function makeLobePoints(scaleX, scaleY, sx, sy){
   const pts = [];
-  const steps = 88;
+  const steps = LOBE_STEPS;
   const p0 = [0 * sx, -142 * sy];
   const c1 = [18 * sx, -158 * sy];
   const c2 = [45 * sx, -178 * sy];
@@ -626,7 +1117,7 @@ function findDiagonalAnchorData(pts, scaleX, scaleY){
 function buildCurve(points, color, radius=lineRadius, headScale=1, tubular=96, opacity=1){
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   curve.arcLengthDivisions = Math.max(240, tubular * 4);
-  return new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 18, false), solidMat(color, 0.17, opacity));
+  return new THREE.Mesh(new THREE.TubeGeometry(curve, tubular, radius, 18, false), curveMat(color, opacity));
 }
 function flatArrowGeometry(scale=1){
   const k = scale;
@@ -725,7 +1216,7 @@ function buildConeArrow(position, tangentVec, color, length=0.22, radius=0.014, 
 function addEArrowCones(front){
   if((front.arrowLen || 0) <= 0.25) return;
   const age = front.age;
-  if(age < 0 || age > 1) return;
+  if(age < 0 || age > getEmitPeriods()) return;
   const fade = Math.exp(-0.22 * age);
   const opacity = Math.min(1, (front.birthOpacity ?? 1) * fade * 1.12);
   const scaleX = getPulseScaleX(age);
@@ -772,7 +1263,7 @@ function addEArrowCones(front){
 }
 function addBArrowCones(front){
   const age = front.age;
-  if(age < 0 || age > 1) return;
+  if(age < 0 || age > getEmitPeriods()) return;
   const r = Math.max(0.0001, front.radius);
   if(r < 0.16 * B_RADIUS_FINAL) return;
   const fade = Math.exp(-0.22 * age);
@@ -781,17 +1272,12 @@ function addBArrowCones(front){
   const isGreen = (quarter === 0 || quarter === 3);
   const ccw = isGreen;
   const color = front.color;
-  const packs = [
-    ['back', [Math.PI * 1.18, Math.PI * 1.82]],
-    ['front', [Math.PI * 0.18, Math.PI * 0.82]],
-  ];
-  for(const [which, thetas] of packs){
-    for(const th of thetas){
-      const pos = new THREE.Vector3(r * Math.cos(th), 0, r * Math.sin(th));
-      let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
-      if(!ccw) tangent.multiplyScalar(-1);
-      bArrowGroup.add(buildConeArrow(pos, tangent, color, 0.18, 0.012, opacity, 'xz'));
-    }
+  const thetas = [Math.PI * 0.5, Math.PI * 1.5];
+  for(const th of thetas){
+    const pos = new THREE.Vector3(0, 0, r * Math.sin(th));
+    let tangent = new THREE.Vector3(-Math.sin(th), 0, Math.cos(th));
+    if(!ccw) tangent.multiplyScalar(-1);
+    bArrowGroup.add(buildConeArrow(pos, tangent, color, 0.18, 0.012, opacity, 'xz'));
   }
 }
 function buildEmbeddedArrowXY(position, angleRad, color, scale=0.17, opacity=1){
@@ -831,44 +1317,79 @@ function buildEmbeddedArrowXZ(position, angleRad, color, scale=0.17, opacity=1){
 
 
 function fieldVectorMat(color, opacity=1){
-  return new THREE.MeshBasicMaterial({ color, transparent:true, opacity, depthWrite:false, side:THREE.DoubleSide });
+  return new THREE.MeshBasicMaterial({
+    color,
+    transparent: opacity < 0.999,
+    opacity,
+    depthWrite: opacity >= 0.999,
+    depthTest:true,
+    side:THREE.DoubleSide,
+    toneMapped:false
+  });
 }
-function makeFieldArrow(p0, p1, color, opacity=1, radius=0.010){
+function fieldFillOpacity(){
+  return ui.fieldFillAlpha ? Math.max(0, Math.min(1, (+ui.fieldFillAlpha.value) / 100)) : 0.70;
+}
+const FIELD_E_THICK = 0.006;
+const FIELD_B_THICK = 0.006;
+const FIELD_E_TOP_Z = FIELD_E_THICK * 0.5 + 0.0012;
+const FIELD_B_TOP_Y = FIELD_B_THICK * 0.5 + 0.0012;
+function fieldArrowRadius(){ return lineRadius * 1.22; }
+function fieldArrowInset(){ return Math.max(0.0035, fieldArrowRadius() * 0.58); }
+function makeFieldArrow3D(p0, p1, color, visible=true, radius=fieldArrowRadius()){ 
   const group = new THREE.Group();
+  if(!visible) return group;
   const dir = p1.clone().sub(p0);
   const len = dir.length();
   if(len < 1e-5) return group;
   const unit = dir.clone().normalize();
-  const headLen = Math.min(0.11, len * 0.36);
-  const shaftLen = Math.max(1e-5, len - headLen * 0.78);
+  const headLen = Math.min(0.10, len * 0.34);
+  const shaftLen = Math.max(1e-5, len - headLen * 0.72);
+  const mat = new THREE.MeshBasicMaterial({ color, transparent:false, opacity:1, depthWrite:true, depthTest:true, toneMapped:false });
   if(shaftLen > 1e-5){
-    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, shaftLen, 12), fieldVectorMat(color, opacity));
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, shaftLen, 14), mat.clone());
     shaft.position.copy(p0.clone().add(unit.clone().multiplyScalar(shaftLen * 0.5)));
     shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), unit);
-    shaft.renderOrder = 46;
     group.add(shaft);
   }
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(radius * 2.25, headLen, 16), fieldVectorMat(color, opacity));
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(radius * 2.05, headLen, 18), mat.clone());
   cone.position.copy(p1.clone().sub(unit.clone().multiplyScalar(headLen * 0.5)));
   cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), unit);
-  cone.renderOrder = 47;
   group.add(cone);
   return group;
 }
-function makeTrapFill(points, color, opacity=0.16){
-  const geom = new THREE.BufferGeometry();
-  const verts = [];
-  for(const p of points) verts.push(p.x,p.y,p.z);
-  geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  geom.setIndex([0,1,2, 0,2,3]);
-  geom.computeVertexNormals();
-  const mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({ color, transparent:true, opacity, side:THREE.DoubleSide, depthWrite:false }));
-  mesh.renderOrder = 44;
+function buildFieldCurve(points, color, radius, visible=true){
+  if(!visible || points.length < 2) return new THREE.Group();
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  curve.arcLengthDivisions = 280;
+  const mesh = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, 84, radius, 14, false),
+    new THREE.MeshBasicMaterial({ color, transparent:false, opacity:1, depthWrite:true, depthTest:true, toneMapped:false })
+  );
   return mesh;
 }
-function makePolyline(points, color, radiusMul=0.52, opacity=1){
-  if(points.length < 2) return new THREE.Group();
-  return buildCurve(points, color, lineRadius * radiusMul, 0.72, 72, opacity);
+function makeFieldPlateE(base1, tip1, tip2, base2, opacity){
+  const shape = new THREE.Shape();
+  shape.moveTo(base1.x, base1.y);
+  shape.lineTo(tip1.x, tip1.y);
+  shape.lineTo(tip2.x, tip2.y);
+  shape.lineTo(base2.x, base2.y);
+  shape.closePath();
+  const geom = new THREE.ExtrudeGeometry(shape, { depth: FIELD_E_THICK, bevelEnabled:false, curveSegments:1, steps:1 });
+  geom.translate(0, 0, -FIELD_E_THICK * 0.5);
+  return new THREE.Mesh(geom, fieldVectorMat(0xffffff, opacity));
+}
+function makeFieldPlateB(base1, tip1, tip2, base2, opacity){
+  const shape = new THREE.Shape();
+  shape.moveTo(base1.x, base1.z);
+  shape.lineTo(tip1.x, tip1.z);
+  shape.lineTo(tip2.x, tip2.z);
+  shape.lineTo(base2.x, base2.z);
+  shape.closePath();
+  const geom = new THREE.ExtrudeGeometry(shape, { depth: FIELD_B_THICK, bevelEnabled:false, curveSegments:1, steps:1 });
+  geom.rotateX(Math.PI * 0.5);
+  geom.translate(0, -FIELD_B_THICK * 0.5, 0);
+  return new THREE.Mesh(geom, fieldVectorMat(0xffffff, opacity));
 }
 function collectFieldSamplesE(fronts){
   const halfX = 0.5 * E_TARGET_TOTAL_WIDTH;
@@ -876,129 +1397,482 @@ function collectFieldSamplesE(fronts){
     const phaseEmit = Math.PI + 2 * Math.PI * fr.t0;
     const signedVal = -Math.sin(phaseEmit);
     return {
+      t0: fr.t0,
       x: halfX * fr.age,
       v: signedVal,
       color: signedVal >= 0 ? COLORS.ePos : COLORS.eNeg,
-      opacity: (fr.birthOpacity ?? 1) * Math.exp(-0.22 * fr.age)
+      show: (fr.birthOpacity ?? 1) > 0.5
     };
-  }).sort((a,b) => a.x - b.x);
+  }).sort((a,b) => a.x - b.x || a.t0 - b.t0);
 }
-function collectFieldSamplesB(fronts){
-  return fronts.map(fr => {
-    const phaseEmit = Math.PI + 2 * Math.PI * fr.t0;
-    const signedVal = -Math.cos(phaseEmit);
-    return {
-      x: B_RADIUS_FINAL * fr.age,
-      v: signedVal,
-      color: signedVal >= 0 ? COLORS.bNeg : COLORS.bPos,
-      opacity: (fr.birthOpacity ?? 1) * Math.exp(-0.22 * fr.age)
-    };
-  }).sort((a,b) => a.x - b.x);
+function collectFieldSamplesEDirect(u, maxX = Infinity){
+  const out = [];
+  const totalPeriods = getEmitPeriods();
+  const halfX = 0.5 * E_TARGET_TOTAL_WIDTH;
+  for(let k=0; k<totalPeriods; k++){
+    for(const localEmit of E_FULL){
+      const tEmit = k + localEmit;
+      const age = u - tEmit;
+      if(age < 0 || age > totalPeriods) continue;
+      const x = halfX * age;
+      if(x > maxX) continue;
+      const phaseEmit = Math.PI + 2 * Math.PI * localEmit;
+      const signedVal = -Math.sin(phaseEmit);
+      out.push({
+        t0:tEmit,
+        x,
+        v:signedVal,
+        color: signedVal >= 0 ? COLORS.ePos : COLORS.eNeg,
+        show: Math.abs(signedVal) > 1e-9
+      });
+    }
+  }
+  return out.sort((a,b) => a.x - b.x || a.t0 - b.t0);
+}
+function collectBQuarterSamples(times, u, periodIndex, maxX = Infinity){
+  const out = [];
+  const totalPeriods = getEmitPeriods();
+  for(const localEmit of times){
+    const tEmit = periodIndex + localEmit;
+    const age = u - tEmit;
+    if(age < 0 || age > totalPeriods) continue;
+    const x = B_RADIUS_FINAL * age;
+    if(x > maxX) continue;
+    const phaseEmit = Math.PI + 2 * Math.PI * localEmit;
+    const v = -Math.cos(phaseEmit);
+    out.push({ t0:tEmit, x, v, color:v >= 0 ? COLORS.bNeg : COLORS.bPos, show: Math.abs(v) > 1e-9 });
+  }
+  return out.sort((a,b) => a.x - b.x || a.t0 - b.t0);
+}
+function buildEFieldSequence(samples){
+  const g = eFieldGroup;
+  const tips = [];
+  const envColors = [];
+  for(let i=0;i<samples.length;i++){
+    const s = samples[i];
+    const x = s.x;
+    const y = E_HALF_H * 0.21 * s.v; // half of previous max
+    const topTip = new THREE.Vector3(x, y, FIELD_E_TOP_Z);
+    const arrowZ = FIELD_E_TOP_Z - fieldArrowInset();
+    const base = new THREE.Vector3(x, 0, arrowZ);
+    const tip = new THREE.Vector3(x, y, arrowZ);
+    tips.push(topTip);
+    envColors.push(s.color);
+    g.add(makeFieldArrow3D(base, tip, s.color, s.show, fieldArrowRadius()));
+  }
+  for(let i=0;i<samples.length-1;i++){
+    const a = samples[i], b = samples[i+1];
+    const p1 = tips[i], p2 = tips[i+1];
+    const base1 = new THREE.Vector3(p1.x, 0, 0);
+    const base2 = new THREE.Vector3(p2.x, 0, 0);
+    g.add(makeFieldPlateE(base1, p1, p2, base2, fieldFillOpacity()));
+    const envPts = [p1.clone(), p2.clone()];
+    g.add(buildFieldCurve(envPts, ((p1.y + p2.y) * 0.5) >= 0 ? COLORS.ePos : COLORS.eNeg, lineRadius * 0.86, true));
+  }
+}
+function buildBFieldSequence(targetGroup, samples){
+  const tips = [];
+  for(let i=0;i<samples.length;i++){
+    const s = samples[i];
+    const x = s.x;
+    const z = B_HALF_W * 0.21 * s.v; // half of previous max
+    const topTip = new THREE.Vector3(x, FIELD_B_TOP_Y, z);
+    const arrowY = FIELD_B_TOP_Y - fieldArrowInset();
+    const base = new THREE.Vector3(x, arrowY, 0);
+    const tip = new THREE.Vector3(x, arrowY, z);
+    tips.push(topTip);
+    targetGroup.add(makeFieldArrow3D(base, tip, s.color, s.show, fieldArrowRadius()));
+  }
+  for(let i=0;i<samples.length-1;i++){
+    const p1 = tips[i], p2 = tips[i+1];
+    const base1 = new THREE.Vector3(p1.x, 0, 0);
+    const base2 = new THREE.Vector3(p2.x, 0, 0);
+    targetGroup.add(makeFieldPlateB(base1, p1, p2, base2, fieldFillOpacity()));
+    targetGroup.add(buildFieldCurve([p1.clone(), p2.clone()], ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bNeg : COLORS.bPos, lineRadius * 0.86, true));
+  }
 }
 function rebuildFieldVectorMode(u, eFronts, bFronts){
-  disposeGroup(eFieldModeGroup);
-  disposeGroup(bFieldModeGroup);
+  disposeGroup(bFieldBackGroup);
+  disposeGroup(eFieldGroup);
+  disposeGroup(bFieldFrontGroup);
   const eSamples = collectFieldSamplesE(eFronts);
-  const bSamples = collectFieldSamplesB(bFronts);
-  const eMax = E_HALF_H * 0.42;
-  const bMax = B_HALF_W * 0.42;
-  const eZ = 0.020;
-  const bY = 0.020;
-  function buildSideE(signX){
-    const tips = [];
-    for(const s of eSamples){
-      const x = signX * s.x;
-      const y = eMax * s.v;
-      const base = new THREE.Vector3(x, 0, eZ);
-      const tip = new THREE.Vector3(x, y, eZ);
-      const alpha = Math.min(0.96, Math.max(0, s.opacity));
-      eFieldModeGroup.add(makeFieldArrow(base, tip, s.color, alpha, lineRadius * 1.00));
-      tips.push(tip);
-    }
-    if(tips.length > 1){
-      eFieldModeGroup.add(makePolyline(tips, 0x5b616a, 0.34, 0.58));
-      for(let i=0;i<tips.length-1;i++){
-        const p1 = tips[i], p2 = tips[i+1];
-        const base1 = new THREE.Vector3(p1.x, 0, eZ);
-        const base2 = new THREE.Vector3(p2.x, 0, eZ);
-        const fillColor = ((p1.y + p2.y) * 0.5) >= 0 ? COLORS.ePos : COLORS.eNeg;
-        eFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x1b2026, 0.46));
-      }
-    }
+  const totalPeriods = getEmitPeriods();
+  const waveMaxX = activeWaveMaxX();
+
+  for(let k=0; k<totalPeriods; k++){
+    buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q2, u, k, waveMaxX));
+    buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q3, u, k, waveMaxX));
   }
-  function buildSideB(signX){
-    const tips = [];
-    for(const s of bSamples){
-      const x = signX * s.x;
-      const z = bMax * s.v;
-      const base = new THREE.Vector3(x, bY, 0);
-      const tip = new THREE.Vector3(x, bY, z);
-      const alpha = Math.min(0.96, Math.max(0, s.opacity));
-      bFieldModeGroup.add(makeFieldArrow(base, tip, s.color, alpha, lineRadius * 1.00));
-      tips.push(tip);
-    }
-    if(tips.length > 1){
-      bFieldModeGroup.add(makePolyline(tips, 0x4d535c, 0.34, 0.56));
-      for(let i=0;i<tips.length-1;i++){
-        const p1 = tips[i], p2 = tips[i+1];
-        const base1 = new THREE.Vector3(p1.x, bY, 0);
-        const base2 = new THREE.Vector3(p2.x, bY, 0);
-        const fillColor = ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bPos : COLORS.bNeg;
-        bFieldModeGroup.add(makeTrapFill([base1, p1, p2, base2], 0x14191f, 0.48));
-      }
-    }
+
+  buildEFieldSequence(eSamples);
+
+  for(let k=0; k<totalPeriods; k++){
+    buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q1, u, k, waveMaxX));
+    buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q4, u, k, waveMaxX));
   }
-  buildSideE(+1);
-  buildSideB(+1);
 }
 
+
+const LOBE_STEPS = 88;
+const LOBE_POINT_COUNT = LOBE_STEPS + 1;
+const directFrontPools = { inited:false, eUpper:[], eLower:[] };
+function createRibbonGeometry(pointCount){
+  const geom = new THREE.BufferGeometry();
+  const arr = new Float32Array(pointCount * 2 * 3);
+  const idx = [];
+  for(let i=0;i<pointCount-1;i++){
+    const a = 2 * i, b = a + 1, c = a + 2, d = a + 3;
+    idx.push(a, b, c, b, d, c);
+  }
+  geom.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  geom.setIndex(idx);
+  return geom;
+}
+function createPooledFrontRibbon(parent, pointCount=LOBE_POINT_COUNT){
+  const mesh = new THREE.Mesh(
+    createRibbonGeometry(pointCount),
+    new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:1, depthWrite:false, side:THREE.DoubleSide, toneMapped:false })
+  );
+  mesh.visible = false;
+  parent.add(mesh);
+  return mesh;
+}
+function updatePooledFrontRibbon(mesh, pts, color, opacity, halfWidth=lineRadius * 1.06, plane='xy'){
+  if(!pts || pts.length < 2){ mesh.visible = false; return; }
+  mesh.visible = true;
+  mesh.material.color.setHex(color);
+  mesh.material.opacity = opacity;
+  mesh.material.transparent = opacity < 0.999;
+  mesh.material.depthWrite = false;
+  const arr = mesh.geometry.attributes.position.array;
+  const pointCount = mesh.geometry.attributes.position.count / 2;
+  const n = Math.min(pts.length, pointCount);
+  for(let i=0;i<n;i++){
+    const p = pts[i];
+    const prev = pts[Math.max(0, i - 1)];
+    const next = pts[Math.min(pts.length - 1, i + 1)];
+    let lx, ly, lz, rx, ry, rz;
+    if(plane === 'xz'){
+      let tx = next.x - prev.x;
+      let tz = next.z - prev.z;
+      const tl = Math.hypot(tx, tz) || 1;
+      tx /= tl; tz /= tl;
+      const nx = -tz, nz = tx;
+      lx = p.x + nx * halfWidth; ly = p.y; lz = p.z + nz * halfWidth;
+      rx = p.x - nx * halfWidth; ry = p.y; rz = p.z - nz * halfWidth;
+    } else {
+      let tx = next.x - prev.x;
+      let ty = next.y - prev.y;
+      const tl = Math.hypot(tx, ty) || 1;
+      tx /= tl; ty /= tl;
+      const nx = -ty, ny = tx;
+      lx = p.x + nx * halfWidth; ly = p.y + ny * halfWidth; lz = p.z;
+      rx = p.x - nx * halfWidth; ry = p.y - ny * halfWidth; rz = p.z;
+    }
+    const j = i * 6;
+    arr[j + 0] = lx; arr[j + 1] = ly; arr[j + 2] = lz;
+    arr[j + 3] = rx; arr[j + 4] = ry; arr[j + 5] = rz;
+  }
+  mesh.geometry.attributes.position.needsUpdate = true;
+  mesh.geometry.computeBoundingSphere();
+}
+function ensureDirectFrontPools(){
+  if(directFrontPools.inited) return;
+  const maxFronts = 3 * E_FULL.length * 2;
+  directFrontPools.eUpper = Array.from({length:maxFronts}, () => createPooledFrontRibbon(eUpperDirectGroup));
+  directFrontPools.eLower = Array.from({length:maxFronts}, () => createPooledFrontRibbon(eLowerDirectGroup));
+  directFrontPools.inited = true;
+}
+function hideDirectFrontPools(){
+  if(!directFrontPools.inited) return;
+  directFrontPools.eUpper.forEach(m => m.visible = false);
+  directFrontPools.eLower.forEach(m => m.visible = false);
+}
+function updateDirectEFrontPools(eFronts){
+  ensureDirectFrontPools();
+  hideDirectFrontPools();
+  let iu = 0, il = 0;
+  for(const fr of eFronts){
+    const age = fr.age;
+    const scaleX = getPulseScaleX(age);
+    const scaleY = getPulseScaleY(age);
+    const color = fr.color;
+    const opacity = fr.birthOpacity ?? 1;
+    for(const sx of [1, -1]){
+      if(iu < directFrontPools.eUpper.length) updatePooledFrontRibbon(directFrontPools.eUpper[iu++], makeLobePoints(scaleX, scaleY, sx, -1), color, opacity, lineRadius * 1.08);
+      if(il < directFrontPools.eLower.length) updatePooledFrontRibbon(directFrontPools.eLower[il++], makeLobePoints(scaleX, scaleY, sx, 1), color, opacity, lineRadius * 1.08);
+    }
+  }
+}
+const BCIRCLE_STEPS = 120;
+const BCIRCLE_POINT_COUNT = BCIRCLE_STEPS;
+const directCirclePools = { inited:false, back:[], front:[] };
+function ensureDirectCirclePools(){
+  if(directCirclePools.inited) return;
+  const maxFronts = 3 * B_FULL.length;
+  directCirclePools.back = Array.from({length:maxFronts}, () => createPooledFrontRibbon(bBackDirectCurveGroup, BCIRCLE_POINT_COUNT));
+  directCirclePools.front = Array.from({length:maxFronts}, () => createPooledFrontRibbon(bFrontDirectCurveGroup, BCIRCLE_POINT_COUNT));
+  directCirclePools.inited = true;
+}
+function hideDirectCirclePools(){
+  if(!directCirclePools.inited) return;
+  directCirclePools.back.forEach(m => m.visible = false);
+  directCirclePools.front.forEach(m => m.visible = false);
+}
+function updateDirectBFrontPools(bFronts){
+  ensureDirectCirclePools();
+  hideDirectCirclePools();
+  let ib = 0, ifr = 0;
+  for(const fr of bFronts){
+    const r = Math.max(0.0001, fr.radius);
+    const color = fr.color;
+    const opacity = fr.birthOpacity ?? 1;
+    if(ib < directCirclePools.back.length) updatePooledFrontRibbon(directCirclePools.back[ib++], makeBCircleHalf(0, r, 'back', BCIRCLE_STEPS), color, opacity, lineRadius * 1.08, 'xz');
+    if(ifr < directCirclePools.front.length) updatePooledFrontRibbon(directCirclePools.front[ifr++], makeBCircleHalf(0, r, 'front', BCIRCLE_STEPS), color, opacity, lineRadius * 1.08, 'xz');
+  }
+}
+
+
+const directFieldPools = { inited:false, e:null, bBack:null, bFront:null };
+const pooledFieldUnitCylinder = new THREE.CylinderGeometry(1,1,1,12);
+const pooledFieldUnitCone = new THREE.ConeGeometry(1,1,16,1);
+function setFieldMat(mat, color, opacity=1, depthWrite=true){
+  mat.color.setHex(color);
+  mat.opacity = opacity;
+  mat.transparent = opacity < 0.999;
+  mat.depthWrite = depthWrite && opacity >= 0.999;
+}
+function createPooledFieldArrow(parent){
+  const group = new THREE.Group();
+  const shaft = new THREE.Mesh(pooledFieldUnitCylinder, new THREE.MeshBasicMaterial({ color:0xffffff, toneMapped:false }));
+  const cone = new THREE.Mesh(pooledFieldUnitCone, new THREE.MeshBasicMaterial({ color:0xffffff, toneMapped:false }));
+  shaft.visible = false;
+  cone.visible = false;
+  group.visible = false;
+  group.add(shaft, cone);
+  parent.add(group);
+  return { group, shaft, cone };
+}
+function updatePooledFieldArrow(entry, p0, p1, color, visible=true, radius=fieldArrowRadius()){
+  if(!visible){ entry.group.visible = false; return; }
+  const dir = p1.clone().sub(p0);
+  const len = dir.length();
+  if(len < 1e-5){ entry.group.visible = false; return; }
+  entry.group.visible = true;
+  const unit = dir.clone().normalize();
+  const headLen = Math.min(0.10, len * 0.34);
+  const shaftLen = Math.max(1e-5, len - headLen * 0.72);
+  setFieldMat(entry.shaft.material, color, 1, true);
+  setFieldMat(entry.cone.material, color, 1, true);
+  entry.shaft.visible = shaftLen > 1e-5;
+  if(entry.shaft.visible){
+    entry.shaft.position.copy(p0.clone().add(unit.clone().multiplyScalar(shaftLen * 0.5)));
+    entry.shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), unit);
+    entry.shaft.scale.set(radius, shaftLen, radius);
+  }
+  const baseRadius = radius * 2.05;
+  entry.cone.visible = true;
+  entry.cone.position.copy(p1.clone().sub(unit.clone().multiplyScalar(headLen * 0.5)));
+  entry.cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), unit);
+  entry.cone.scale.set(baseRadius, headLen, baseRadius);
+}
+function createPooledFieldQuad(parent){
+  const geom = new THREE.BufferGeometry();
+  const arr = new Float32Array(12);
+  geom.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+  geom.setIndex([0,1,2,0,2,3]);
+  const mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.7, depthWrite:false, side:THREE.DoubleSide, toneMapped:false }));
+  mesh.visible = false;
+  parent.add(mesh);
+  return mesh;
+}
+function updatePooledFieldQuad(mesh, p0, p1, p2, p3, color, opacity){
+  mesh.visible = true;
+  setFieldMat(mesh.material, color, opacity, false);
+  const a = mesh.geometry.attributes.position.array;
+  a[0]=p0.x; a[1]=p0.y; a[2]=p0.z;
+  a[3]=p1.x; a[4]=p1.y; a[5]=p1.z;
+  a[6]=p2.x; a[7]=p2.y; a[8]=p2.z;
+  a[9]=p3.x; a[10]=p3.y; a[11]=p3.z;
+  mesh.geometry.attributes.position.needsUpdate = true;
+  mesh.geometry.computeVertexNormals();
+}
+function createPooledFieldSegment(parent){
+  const mesh = new THREE.Mesh(pooledFieldUnitCylinder, new THREE.MeshBasicMaterial({ color:0xffffff, toneMapped:false }));
+  mesh.visible = false;
+  parent.add(mesh);
+  return mesh;
+}
+function updatePooledFieldSegment(mesh, p0, p1, color, radius, visible=true){
+  if(!visible){ mesh.visible = false; return; }
+  const dir = p1.clone().sub(p0);
+  const len = dir.length();
+  if(len < 1e-5){ mesh.visible = false; return; }
+  mesh.visible = true;
+  setFieldMat(mesh.material, color, 1, true);
+  const unit = dir.clone().normalize();
+  mesh.position.copy(p0.clone().add(unit.clone().multiplyScalar(len * 0.5)));
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), unit);
+  mesh.scale.set(radius, len, radius);
+}
+function createFieldSequencePool(parent, maxSamples, maxConnectors){
+  return {
+    arrows: Array.from({length:maxSamples}, () => createPooledFieldArrow(parent)),
+    quads: Array.from({length:maxConnectors}, () => createPooledFieldQuad(parent)),
+    segs: Array.from({length:maxConnectors}, () => createPooledFieldSegment(parent))
+  };
+}
+function hideFieldSequencePool(pool){
+  if(!pool) return;
+  pool.arrows.forEach(o => o.group.visible = false);
+  pool.quads.forEach(o => o.visible = false);
+  pool.segs.forEach(o => o.visible = false);
+}
+function ensureDirectFieldPools(){
+  if(directFieldPools.inited) return;
+  directFieldPools.e = createFieldSequencePool(eFieldDirectGroup, 3 * E_FULL.length, 3 * E_FULL.length - 1);
+  directFieldPools.bBack = createFieldSequencePool(bFieldBackDirectGroup, 3 * (B_Q2.length + B_Q3.length), 3 * (B_Q2.length + B_Q3.length) - 1);
+  directFieldPools.bFront = createFieldSequencePool(bFieldFrontDirectGroup, 3 * (B_Q1.length + B_Q4.length), 3 * (B_Q1.length + B_Q4.length) - 1);
+  directFieldPools.inited = true;
+}
+function updateEFieldSequencePool(samples, pool){
+  const tips = [];
+  for(let i=0;i<pool.arrows.length;i++) pool.arrows[i].group.visible = false;
+  for(let i=0;i<pool.quads.length;i++){ pool.quads[i].visible = false; pool.segs[i].visible = false; }
+  for(let i=0;i<samples.length;i++){
+    const s = samples[i];
+    const x = s.x;
+    const y = E_HALF_H * 0.21 * s.v;
+    const topTip = new THREE.Vector3(x, y, FIELD_E_TOP_Z);
+    const arrowZ = FIELD_E_TOP_Z - fieldArrowInset();
+    const base = new THREE.Vector3(x, 0, arrowZ);
+    const tip = new THREE.Vector3(x, y, arrowZ);
+    tips.push(topTip);
+    if(i < pool.arrows.length) updatePooledFieldArrow(pool.arrows[i], base, tip, s.color, s.show, fieldArrowRadius());
+  }
+  const connOpacity = fieldFillOpacity();
+  for(let i=0;i<samples.length-1;i++){
+    const p1 = tips[i], p2 = tips[i+1];
+    const base1 = new THREE.Vector3(p1.x, 0, 0);
+    const base2 = new THREE.Vector3(p2.x, 0, 0);
+    const c = ((p1.y + p2.y) * 0.5) >= 0 ? COLORS.ePos : COLORS.eNeg;
+    if(i < pool.quads.length){
+      updatePooledFieldQuad(pool.quads[i], base1, p1, p2, base2, 0xffffff, connOpacity);
+      updatePooledFieldSegment(pool.segs[i], p1, p2, c, lineRadius * 0.86, true);
+    }
+  }
+}
+function updateBFieldSequencePool(samples, pool){
+  const tips = [];
+  for(let i=0;i<pool.arrows.length;i++) pool.arrows[i].group.visible = false;
+  for(let i=0;i<pool.quads.length;i++){ pool.quads[i].visible = false; pool.segs[i].visible = false; }
+  for(let i=0;i<samples.length;i++){
+    const s = samples[i];
+    const x = s.x;
+    const z = B_HALF_W * 0.21 * s.v;
+    const topTip = new THREE.Vector3(x, FIELD_B_TOP_Y, z);
+    const arrowY = FIELD_B_TOP_Y - fieldArrowInset();
+    const base = new THREE.Vector3(x, arrowY, 0);
+    const tip = new THREE.Vector3(x, arrowY, z);
+    tips.push(topTip);
+    if(i < pool.arrows.length) updatePooledFieldArrow(pool.arrows[i], base, tip, s.color, s.show, fieldArrowRadius());
+  }
+  const connOpacity = fieldFillOpacity();
+  for(let i=0;i<samples.length-1;i++){
+    const p1 = tips[i], p2 = tips[i+1];
+    const base1 = new THREE.Vector3(p1.x, 0, 0);
+    const base2 = new THREE.Vector3(p2.x, 0, 0);
+    const c = ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bNeg : COLORS.bPos;
+    if(i < pool.quads.length){
+      updatePooledFieldQuad(pool.quads[i], base1, p1, p2, base2, 0xffffff, connOpacity);
+      updatePooledFieldSegment(pool.segs[i], p1, p2, c, lineRadius * 0.86, true);
+    }
+  }
+}
+function collectBDirectSideSamples(u, quarterSets, maxX = Infinity){
+  const out = [];
+  const totalPeriods = getEmitPeriods();
+  for(let k=0; k<totalPeriods; k++){
+    for(const arr of quarterSets) out.push(...collectBQuarterSamples(arr, u, k, maxX));
+  }
+  return out.sort((a,b) => a.x - b.x || a.t0 - b.t0);
+}
+
+function rebuildFieldVectorModeDirect(u, includeB=true){
+  disposeGroup(bFieldBackGroup);
+  disposeGroup(eFieldGroup);
+  disposeGroup(bFieldFrontGroup);
+  ensureDirectFieldPools();
+  const waveMaxX = activeWaveMaxX();
+  const eSamples = collectFieldSamplesEDirect(u, waveMaxX);
+  updateEFieldSequencePool(eSamples, directFieldPools.e);
+  if(includeB){
+    updateBFieldSequencePool(collectBDirectSideSamples(u, [B_Q2, B_Q3], waveMaxX), directFieldPools.bBack);
+    updateBFieldSequencePool(collectBDirectSideSamples(u, [B_Q1, B_Q4], waveMaxX), directFieldPools.bFront);
+  } else {
+    hideFieldSequencePool(directFieldPools.bBack);
+    hideFieldSequencePool(directFieldPools.bFront);
+  }
+}
 function seededEFrontsAbsolute(u){
   const fronts = [];
-  for(const tEmit of E_FULL){
-    const age = u - tEmit;
-    if(age < 0 || age > 1) continue;
-    const quarter = frontQuarterIndex(tEmit);
-    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
-    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
-    const eAtBirth = -Math.sin(phaseEmit);
-    fronts.push({
-      t0: tEmit,
-      age,
-      sign,
-      reverseArrows: sign > 0,
-      color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
-      arrowLen: 80 * Math.abs(eAtBirth),
-      birthOpacity: Math.abs(eAtBirth) < 1e-9 ? 0 : 1
-    });
+  const totalPeriods = getEmitPeriods();
+  for(let k=0; k<totalPeriods; k++){
+    for(const localEmit of E_FULL){
+      const tEmit = k + localEmit;
+      const age = u - tEmit;
+      if(age < 0 || age > totalPeriods) continue;
+      const quarter = frontQuarterIndex(localEmit);
+      const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+      const phaseEmit = Math.PI + 2 * Math.PI * localEmit;
+      const eAtBirth = -Math.sin(phaseEmit);
+      fronts.push({
+        t0: tEmit,
+        age,
+        sign,
+        reverseArrows: sign > 0,
+        color: sign < 0 ? COLORS.eNeg : COLORS.ePos,
+        arrowLen: 80 * Math.abs(eAtBirth),
+        birthOpacity: Math.abs(eAtBirth) < 1e-9 ? 0 : 1
+      });
+    }
   }
   return fronts;
 }
 function seededBFrontsAbsolute(u){
   const fronts = [];
-  for(const tEmit of B_FULL){
-    const age = u - tEmit;
-    if(age < 0 || age > 1) continue;
-    const quarter = frontQuarterIndex(tEmit);
-    const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
-    const phaseEmit = Math.PI + 2 * Math.PI * tEmit;
-    const bAtBirth = -Math.cos(phaseEmit);
-    const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
-    fronts.push({
-      t0: tEmit,
-      age,
-      sign,
-      color,
-      amp: Math.abs(bAtBirth),
-      birthOpacity: Math.abs(bAtBirth) < 1e-9 ? 0 : 1,
-      radius: B_RADIUS_FINAL * age
-    });
+  const totalPeriods = getEmitPeriods();
+  for(let k=0; k<totalPeriods; k++){
+    for(const localEmit of B_FULL){
+      const tEmit = k + localEmit;
+      const age = u - tEmit;
+      if(age < 0 || age > totalPeriods) continue;
+      const quarter = frontQuarterIndex(localEmit);
+      const sign = (quarter === 0 || quarter === 1) ? 1 : -1;
+      const phaseEmit = Math.PI + 2 * Math.PI * localEmit;
+      const bAtBirth = -Math.cos(phaseEmit);
+      const color = (quarter === 0 || quarter === 3) ? COLORS.bNeg : COLORS.bPos;
+      fronts.push({
+        t0: tEmit,
+        age,
+        sign,
+        color,
+        amp: Math.abs(bAtBirth),
+        birthOpacity: Math.abs(bAtBirth) < 1e-9 ? 0 : 1,
+        radius: B_RADIUS_FINAL * age
+      });
+    }
   }
   return fronts;
 }
 function makeBCircleHalf(centerX, radius, which='front', n=96){
   const r = Math.max(0.0001, radius);
-  const t0 = which === 'front' ? 0 : Math.PI;
-  const t1 = which === 'front' ? Math.PI : 2 * Math.PI;
+  // In pooled-ribbon mode the front/back semicircles meet on two seam points.
+  // If we sample exactly [0,π] and [π,2π], tiny cracks appear at the two joins.
+  // Add a small angular overlap so the two halves cover each other there.
+  const seamOverlap = 0.03;
+  const t0 = which === 'front' ? -seamOverlap : Math.PI - seamOverlap;
+  const t1 = which === 'front' ? Math.PI + seamOverlap : 2 * Math.PI + seamOverlap;
   const pts = [];
   for(let i=0;i<n;i++){
     const t = t0 + (t1 - t0) * (i/(n-1));
@@ -1057,30 +1931,251 @@ function addBFront3D(group, front, which, drawArrows=true){
     }
   }
 }
+
+let wavePipelineMode = 'legacy';
+function setGroupVisibleSafe(group, visible){ if(group) group.visible = visible; }
+function hideLegacyArrowOnlyArtifacts(){
+  setGroupVisibleSafe(eUpperGroup, false);
+  setGroupVisibleSafe(eLowerGroup, false);
+  setGroupVisibleSafe(bBackGroup, false);
+  setGroupVisibleSafe(bFrontGroup, false);
+  setGroupVisibleSafe(eArrowGroup, false);
+  setGroupVisibleSafe(bArrowGroup, false);
+  setGroupVisibleSafe(bFieldBackGroup, false);
+  setGroupVisibleSafe(eFieldGroup, false);
+  setGroupVisibleSafe(bFieldFrontGroup, false);
+}
+function showLegacyWaveArtifacts(){
+  setGroupVisibleSafe(eArrowGroup, true);
+  setGroupVisibleSafe(bArrowGroup, true);
+  setGroupVisibleSafe(bFieldBackGroup, true);
+  setGroupVisibleSafe(eFieldGroup, true);
+  setGroupVisibleSafe(bFieldFrontGroup, true);
+}
+function hideDirectArrowArtifacts(){
+  setGroupVisibleSafe(bFieldBackDirectGroup, false);
+  setGroupVisibleSafe(eFieldDirectGroup, false);
+  setGroupVisibleSafe(bFieldFrontDirectGroup, false);
+  if(directFieldPools.inited){
+    hideFieldSequencePool(directFieldPools.e);
+    hideFieldSequencePool(directFieldPools.bBack);
+    hideFieldSequencePool(directFieldPools.bFront);
+  }
+}
+function showDirectArrowArtifacts(){
+  setGroupVisibleSafe(bFieldBackDirectGroup, true);
+  setGroupVisibleSafe(eFieldDirectGroup, true);
+  setGroupVisibleSafe(bFieldFrontDirectGroup, true);
+}
+function enterArrowAutonomousPipeline(){
+  if(wavePipelineMode === 'arrows') return;
+  hideLegacyArrowOnlyArtifacts();
+  disposeGroup(bFieldBackGroup);
+  disposeGroup(eFieldGroup);
+  disposeGroup(bFieldFrontGroup);
+  showDirectArrowArtifacts();
+  wavePipelineMode = 'arrows';
+}
+function enterLinePipeline(){
+  if(wavePipelineMode === 'lines') return;
+  hideDirectArrowArtifacts();
+  showLegacyWaveArtifacts();
+  wavePipelineMode = 'lines';
+}
+function rebuildArrowAutonomousFields(u, includeB=true){
+  enterArrowAutonomousPipeline();
+  ensureDirectFieldPools();
+  const waveMaxX = activeWaveMaxX();
+  const eSamples = collectFieldSamplesEDirect(u, waveMaxX);
+  updateEFieldSequencePool(eSamples, directFieldPools.e);
+  if(includeB){
+    updateBFieldSequencePool(collectBDirectSideSamples(u, [B_Q2, B_Q3], waveMaxX), directFieldPools.bBack);
+    updateBFieldSequencePool(collectBDirectSideSamples(u, [B_Q1, B_Q4], waveMaxX), directFieldPools.bFront);
+  } else {
+    hideFieldSequencePool(directFieldPools.bBack);
+    hideFieldSequencePool(directFieldPools.bFront);
+  }
+}
 function rebuildFields(u){
+  const needFieldMode = !!(ui.showFieldMode && ui.showFieldMode.checked);
+  const showEFronts = !!(ui.showE && ui.showE.checked);
+  const showBFronts = !!(ui.showB && ui.showB.checked);
+  const arrowOnlyMode = appModes.main === 'arrows' || appModes.main === 'receiveArrows';
+
+  if(arrowOnlyMode){
+    hideDirectFrontPools();
+    hideDirectCirclePools();
+    if(needFieldMode) rebuildArrowAutonomousFields(u, true);
+    else {
+      enterArrowAutonomousPipeline();
+      if(directFieldPools.inited){
+        hideFieldSequencePool(directFieldPools.e);
+        hideFieldSequencePool(directFieldPools.bBack);
+        hideFieldSequencePool(directFieldPools.bFront);
+      }
+    }
+    return;
+  }
+
+  enterLinePipeline();
   disposeGroup(eUpperGroup);
   disposeGroup(eArrowGroup);
   disposeGroup(eLowerGroup);
   disposeGroup(bBackGroup);
   disposeGroup(bArrowGroup);
   disposeGroup(bFrontGroup);
-  disposeGroup(eFieldModeGroup);
-  disposeGroup(bFieldModeGroup);
-  const eFronts = seededEFrontsAbsolute(u);
-  const bFronts = seededBFrontsAbsolute(u);
-  eFronts.forEach(fr => addEFront3D(eUpperGroup, fr, 'upper', false));
-  eFronts.forEach(fr => addEFront3D(eLowerGroup, fr, 'lower', false));
-  bFronts.forEach(fr => addBFront3D(bBackGroup, fr, 'back', false));
-  bFronts.forEach(fr => addBFront3D(bFrontGroup, fr, 'front', false));
-  eFronts.forEach(fr => addEArrowCones(fr));
-  bFronts.forEach(fr => addBArrowCones(fr));
-  rebuildFieldVectorMode(u, eFronts, bFronts);
+  disposeGroup(bFieldBackGroup);
+  disposeGroup(eFieldGroup);
+  disposeGroup(bFieldFrontGroup);
+
+  const waveMaxX = activeWaveMaxX();
+  const eFronts = showEFronts ? seededEFrontsAbsolute(u).filter(fr => (0.5 * E_TARGET_TOTAL_WIDTH * fr.age) <= waveMaxX) : [];
+  const bFronts = showBFronts ? seededBFrontsAbsolute(u).filter(fr => (B_RADIUS_FINAL * fr.age) <= waveMaxX) : [];
+
+  if(showEFronts){
+    updateDirectEFrontPools(eFronts);
+    eFronts.forEach(fr => addEArrowCones(fr));
+  } else {
+    hideDirectFrontPools();
+  }
+  if(showBFronts){
+    updateDirectBFrontPools(bFronts);
+    bFronts.forEach(fr => addBArrowCones(fr));
+  } else {
+    hideDirectCirclePools();
+  }
+  if(needFieldMode){
+    if(directFieldPools.inited){
+      hideFieldSequencePool(directFieldPools.e);
+      hideFieldSequencePool(directFieldPools.bBack);
+      hideFieldSequencePool(directFieldPools.bFront);
+    }
+    rebuildFieldVectorMode(u, eFronts, bFronts);
+  } else if(directFieldPools.inited){
+    hideFieldSequencePool(directFieldPools.e);
+    hideFieldSequencePool(directFieldPools.bBack);
+    hideFieldSequencePool(directFieldPools.bFront);
+  }
 }
 
+
+
 function chargeAndCurrent(u){
-  const phase = 2 * Math.PI * u;
+  const phase = 2 * Math.PI * phaseWrapped(u);
   return { chargeSigned: -Math.sin(phase), currentSigned: -Math.cos(phase) };
 }
+const RECEIVER_BASE_Y = 0; // αρχική θέση ηλεκτρονίου στο μηδέν
+const RECEIVER_DYNAMIC_AMP = 0.72 * ROD_HALF_LENGTH;
+
+// Τοπικό σήμα του Ε στη θέση του δέκτη.
+// Στο πρώτο Τ/2 θέλουμε το Ε να έχει ίδιο χρώμα/σήμα και η δύναμη στο ηλεκτρόνιο
+// (αρνητικό φορτίο) να είναι αντίθετη: προς τα κάτω όσο το Ε "δείχνει" προς τα πάνω.
+function receiverFieldState(localU, emitPeriods){
+  const wavePresent = localU > 0 && localU <= emitPeriods;
+  if(!wavePresent){
+    return { wavePresent:false, envelope:0, eSigned:0, forceSigned:0 };
+  }
+  const phase = 2 * Math.PI * localU;
+  const eSigned = Math.sin(phase);
+  const forceSigned = -eSigned;
+  return { wavePresent:true, envelope:Math.abs(eSigned), eSigned, forceSigned };
+}
+
+// Μεταβατική εξαναγκασμένη κίνηση με απόσβεση:
+// y'' + c y' + k y = G * F(t)
+// όπου F(t) μηδενίζεται όταν περάσει το pulse train, αλλά η κίνηση συνεχίζει λόγω αδράνειας.
+const receiverSim = { initialized:false, paramsKey:'', lastU:0, y:0, v:0, a:0 };
+function receiverParamsKey(){
+  return `${getEmitPeriods()}|${+(ui.receiverX?.value || 2)}|${RECEIVER_NAT_RATIO}`;
+}
+function resetReceiverSim(){
+  receiverSim.initialized = false;
+  receiverSim.paramsKey = receiverParamsKey();
+  receiverSim.lastU = 0;
+  receiverSim.y = 0;
+  receiverSim.v = 0;
+  receiverSim.a = 0;
+}
+
+function receiverDriveState(u){
+  if(!isReceiveMode()){
+    return { wavePresent:false, eSigned:0, forceSigned:0, disp:0, speed:0, envelope:0, accel:0 };
+  }
+  const receiverX = Math.max(0.5, Math.min(9.5, +(ui.receiverX?.value || 2)));
+  const emitPeriods = getEmitPeriods();
+  const localU = u - receiverX / RECEIVER_WAVE_SPEED_X;
+  const DRIVE_GAIN = 22.0;
+  const DRIVE_OMEGA = 2 * Math.PI;
+  const NAT_RATIO = RECEIVER_NAT_RATIO;
+  const NATURAL_OMEGA = DRIVE_OMEGA * NAT_RATIO;
+  const RESTORE_K = NATURAL_OMEGA * NATURAL_OMEGA;
+  const DAMP_RATIO = 0.14;
+  const DAMP_C = 2 * DAMP_RATIO * NATURAL_OMEGA;
+  const paramsKey = receiverParamsKey();
+  const targetU = Math.max(0, u);
+
+  if(!receiverSim.initialized || receiverSim.paramsKey !== paramsKey || targetU < receiverSim.lastU - 1e-9){
+    resetReceiverSim();
+  }
+  receiverSim.initialized = true;
+
+  const deltaU = targetU - receiverSim.lastU;
+  if(deltaU > 0){
+    const steps = Math.max(1, Math.ceil(deltaU * 240));
+    const du = deltaU / steps;
+    let absSampleU = receiverSim.lastU;
+    for(let i=0;i<steps;i++){
+      absSampleU += du;
+      const sampleLocalU = absSampleU - receiverX / RECEIVER_WAVE_SPEED_X;
+      const s = receiverFieldState(sampleLocalU, emitPeriods);
+      receiverSim.a = DRIVE_GAIN * s.forceSigned - RESTORE_K * receiverSim.y - DAMP_C * receiverSim.v;
+      receiverSim.v += receiverSim.a * du;
+      receiverSim.y += receiverSim.v * du;
+    }
+    receiverSim.lastU = targetU;
+  }
+
+  const now = receiverFieldState(localU, emitPeriods);
+  const moving = Math.abs(receiverSim.y) > 1e-4 || Math.abs(receiverSim.v) > 1e-4;
+  const active = now.wavePresent || moving;
+  const envelope = Math.max(now.envelope, Math.min(1, 0.18 * Math.abs(receiverSim.y) + 0.10 * Math.abs(receiverSim.v)));
+  return {
+    active,
+    localU,
+    wavePresent:now.wavePresent,
+    envelope,
+    disp:receiverSim.y,
+    speed:receiverSim.v,
+    eSigned:now.eSigned,
+    forceSigned:now.forceSigned,
+    accel:receiverSim.a
+  };
+}
+
+
+function updateReceiverArrows(receiverState, electronY){
+  const shown = ui.showParticles.checked;
+  const velMag = Math.tanh(Math.abs(receiverState.speed || 0) / 3.0);
+  const velDir = (receiverState.speed || 0) >= 0 ? 1 : -1;
+  const velColor = COLORS.receiverVel;
+  const velLen = 0.10 + 0.34 * velMag;
+  const velVisible = shown && velMag > 0.02;
+  const velX = 0.0;
+  const velZ = 0.17;
+  const clearance = 0.11;
+  const velAnchorY = electronY + clearance;
+  setReceiverArrowState(receiverVelocityArrow, {
+    visible: velVisible,
+    direction: velDir,
+    length: velLen,
+    anchorY: velAnchorY,
+    x: velX,
+    z: velZ,
+    color: velColor,
+    opacity: 0.30 + 0.70 * velMag
+  });
+}
+
 function electronCenters(chargeSigned, currentSigned){
   const N = ELECTRON_COUNT;
   const r = 0.052;
@@ -1117,199 +2212,188 @@ function electronCenters(chargeSigned, currentSigned){
 }
 function updateParticles(u){
   const { chargeSigned, currentSigned } = chargeAndCurrent(u);
-  const ys = electronCenters(chargeSigned, currentSigned);
-  electrons.forEach((e, idx) => {
-    // keep centers on the y axis so the axis 'skewers' the spheres
-    e.position.set(0, ys[idx], 0);
-    const pulse = 0.82 + 0.28 * Math.abs(currentSigned);
-    e.material.opacity = 0.90 + 0.08 * Math.abs(currentSigned);
-    e.material.emissiveIntensity = 0.90 + 0.45 * Math.abs(currentSigned);
-    if(e.children[0]) e.children[0].material.opacity = 0.72 + 0.26 * Math.abs(currentSigned);
-    if(e.children[0]) e.children[0].scale.setScalar(0.16 * pulse + 0.04);
-    if(e.children[1]) e.children[1].material.opacity = 0.18 + 0.12 * Math.abs(currentSigned);
-  });
+  const showParticles = !!(ui.showParticles && ui.showParticles.checked);
+  const showCurrent = !isReceiveMode();
+  const receiverActive = isReceiveMode() && showParticles;
 
-  const qmag = Math.abs(chargeSigned);
-  const topIsNegative = chargeSigned < 0;
-  const topHex = topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-  const botHex = topIsNegative ? COLORS.chargePos : COLORS.chargeNeg;
-  topGlow.material.color.setHex(topHex);
-  botGlow.material.color.setHex(botHex);
-  const glowOpacity = 0.84 * Math.pow(qmag, 1.18);
-  const glowScale = 0.24 + 1.02 * qmag;
-  topGlow.material.opacity = glowOpacity;
-  botGlow.material.opacity = glowOpacity;
-  topGlow.scale.setScalar(glowScale);
-  botGlow.scale.setScalar(glowScale);
+  if(showParticles){
+    const ys = electronCenters(chargeSigned, currentSigned);
+    const receiverState = receiverActive ? receiverDriveState(u) : null;
+    electrons.forEach((e, idx) => {
+      e.position.set(0, ys[idx], 0);
+      const pulse = 0.82 + 0.28 * Math.abs(currentSigned);
+      e.material.opacity = 0.90 + 0.08 * Math.abs(currentSigned);
+      e.material.emissiveIntensity = 0.90 + 0.45 * Math.abs(currentSigned);
+      if(e.children[0]) e.children[0].material.opacity = 0.72 + 0.26 * Math.abs(currentSigned);
+      if(e.children[0]) e.children[0].scale.setScalar(0.16 * pulse + 0.04);
+      if(e.children[1]) e.children[1].material.opacity = 0.18 + 0.12 * Math.abs(currentSigned);
+    });
+    if(receiverActive && receiverState){
+      const receiverDispClamped = THREE.MathUtils.clamp(receiverState.disp, -2.2, 2.2);
+      const receiverY = RECEIVER_BASE_Y + RECEIVER_DYNAMIC_AMP * receiverDispClamped;
+      receiverElectron.position.set(0, receiverY, 0);
+      const receiverPulse = 0.92 + 0.26 * Math.abs(receiverState.speed);
+      receiverElectron.material.opacity = 0.88 + 0.10 * receiverState.envelope;
+      receiverElectron.material.emissiveIntensity = 0.92 + 0.56 * Math.abs(receiverState.speed);
+      if(receiverElectron.children[0]) receiverElectron.children[0].material.opacity = 0.40 + 0.46 * receiverState.envelope;
+      if(receiverElectron.children[0]) receiverElectron.children[0].scale.setScalar(0.16 * receiverPulse + 0.03);
+      if(receiverElectron.children[1]) receiverElectron.children[1].material.opacity = 0.10 + 0.18 * receiverState.envelope;
+      updateReceiverArrows(receiverState, receiverY);
+    } else {
+      receiverVelocityArrow.visible = false;
+    }
 
-  const arrowColor = currentSigned >= 0 ? COLORS.bPos : COLORS.bNeg;
-  currentGroup.rotation.z = currentSigned >= 0 ? 0 : Math.PI;
-  const imag = Math.abs(currentSigned);
-  const shaftRadiusScale = 0.90 + 1.70 * imag;
-  const shaftLengthScale = 0.62 + 0.10 * imag;
-  const dynOpacity = 0.20 + 0.76 * imag;
-  currentShaft.scale.set(shaftRadiusScale, shaftLengthScale, shaftRadiusScale);
-  currentHead.scale.set(0.84 + 1.05 * imag, 0.84 + 0.08 * imag, 0.84 + 1.05 * imag);
-  currentHead.position.y = 0.14 + 0.095 * shaftLengthScale;
-  currentShaft.material.color.setHex(arrowColor); currentShaft.material.emissive.setHex(arrowColor);
-  currentHead.material.color.setHex(arrowColor); currentHead.material.emissive.setHex(arrowColor);
-  currentShaft.material.opacity = dynOpacity; currentShaft.material.transparent = true; currentShaft.material.depthWrite = false;
-  currentHead.material.opacity = dynOpacity; currentHead.material.transparent = true; currentHead.material.depthWrite = false;
-  currentLabel.material.opacity = Math.min(1, 0.55 + 0.45 * imag);
-  rod.material.opacity = 0.20 + 0.12 * imag;
-  rodInnerGlow.material.opacity = 0.06 + 0.22 * imag;
-  rodInnerGlow.material.color.setHex(arrowColor);
-  updateChargeTextSprite(topChargeSign, topIsNegative ? '−' : '+', topHex, qmag);
-  updateChargeTextSprite(botChargeSign, topIsNegative ? '+' : '−', botHex, qmag);
+    const qmag = Math.abs(chargeSigned);
+    const topIsNegative = chargeSigned < 0;
+    const topHex = topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
+    const botHex = topIsNegative ? COLORS.chargePos : COLORS.chargeNeg;
+    topGlow.material.color.setHex(topHex);
+    botGlow.material.color.setHex(botHex);
+    const glowOpacity = 0.84 * Math.pow(qmag, 1.18);
+    const glowScale = 0.24 + 1.02 * qmag;
+    topGlow.material.opacity = glowOpacity;
+    botGlow.material.opacity = glowOpacity;
+    topGlow.scale.setScalar(glowScale);
+    botGlow.scale.setScalar(glowScale);
+    updateChargeTextSprite(topChargeSign, topIsNegative ? '−' : '+', topHex, qmag);
+    updateChargeTextSprite(botChargeSign, topIsNegative ? '+' : '−', botHex, qmag);
+  } else {
+    receiverVelocityArrow.visible = false;
+  }
+
+  if(showCurrent){
+    const arrowColor = currentSigned >= 0 ? COLORS.bPos : COLORS.bNeg;
+    currentGroup.rotation.z = currentSigned >= 0 ? 0 : Math.PI;
+    const imag = Math.abs(currentSigned);
+    const shaftRadiusScale = 0.90 + 1.70 * imag;
+    const shaftLengthScale = 0.62 + 0.10 * imag;
+    const dynOpacity = 0.20 + 0.76 * imag;
+    currentShaft.scale.set(shaftRadiusScale, shaftLengthScale, shaftRadiusScale);
+    currentHead.scale.set(0.84 + 1.05 * imag, 0.84 + 0.08 * imag, 0.84 + 1.05 * imag);
+    currentHead.position.y = 0.14 + 0.095 * shaftLengthScale;
+    currentShaft.material.color.setHex(arrowColor); currentShaft.material.emissive.setHex(arrowColor);
+    currentHead.material.color.setHex(arrowColor); currentHead.material.emissive.setHex(arrowColor);
+    currentShaft.material.opacity = dynOpacity; currentShaft.material.transparent = true; currentShaft.material.depthWrite = false;
+    currentHead.material.opacity = dynOpacity; currentHead.material.transparent = true; currentHead.material.depthWrite = false;
+    currentLabel.material.opacity = Math.min(1, 0.55 + 0.45 * imag);
+    rod.material.opacity = 0.20 + 0.12 * imag;
+    rodInnerGlow.material.opacity = 0.06 + 0.22 * imag;
+    rodInnerGlow.material.color.setHex(arrowColor);
+  }
 }
-function resizeGraphCanvas(c){
-  const box = c.parentElement.getBoundingClientRect();
+function drawSingleGraph(canvas, row, opts={}){
+  const box = canvas.parentElement.getBoundingClientRect();
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  c.width = Math.max(220, Math.round(box.width * dpr));
-  c.height = Math.max(220, Math.round(box.height * dpr));
-  const g = c.getContext('2d');
+  const w = Math.max(180, Math.round(box.width));
+  const h = Math.max(opts.minH || 62, Math.round(box.height));
+  const pxW = Math.max(180, Math.round(w * dpr));
+  const pxH = Math.max(opts.minH || 62, Math.round(h * dpr));
+  if(canvas.width !== pxW || canvas.height !== pxH){
+    canvas.width = pxW; canvas.height = pxH;
+  }
+  const g = canvas.getContext('2d');
   g.setTransform(dpr,0,0,dpr,0,0);
-  return { g, w: box.width, h: box.height };
-}
-function drawGraphs(){
-  const { g, w, h } = resizeGraphCanvas(graphPaper);
-  g.clearRect(0,0,w,h);
   const th = VIEW_THEMES[activeViewTheme] || VIEW_THEMES.screen;
-  g.fillStyle = th.graphBg;
+  g.clearRect(0,0,w,h);
+  g.fillStyle = 'rgba(0,0,0,0)';
   g.fillRect(0,0,w,h);
-
-  const rows = [
-    { label:'V', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
-    { label:'q', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:true },
-    { label:'i', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false, simpleAlt:true },
-    { label:'E', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
-    { label:'B', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false, simpleAlt:true },
-  ];
-  const axisX = 42;
-  const yLabelDx = 4;
-  const yLabelTopInset = 10;
-  const right = 10;
-  const top = 8;
-  const bottom = 10;
-  const rowGap = 1;
-  const gw = w - axisX - right;
-  const rowH = (h - top - bottom - rowGap * (rows.length - 1)) / rows.length;
-  const ampPix = rowH * 0.39;
-  const xAxisColor = th.graphXAxis;
-  const yAxisColor = th.graphYAxis;
-  const minorText = '10px system-ui';
-
-  // one shared paper/grid
-  g.strokeStyle = th.graphGrid;
-  g.lineWidth = 1;
-  for(let k=1;k<4;k++){
-    const x = axisX + gw * (k/4);
-    g.beginPath(); g.moveTo(x, top); g.lineTo(x, h-bottom); g.stroke();
-  }
-  g.strokeStyle = th.graphRow;
-  for(let r=1;r<rows.length;r++){
-    const y = top + r * rowH + (r-1) * rowGap;
-    g.beginPath(); g.moveTo(6, y-0.5); g.lineTo(w-6, y-0.5); g.stroke();
-  }
-
-  function familyColors(family, value){
-    if(family === 'E') return value >= 0 ? [th.ePos, th.eNeg] : [th.eNeg, th.ePos];
-    return value >= 0 ? [th.bNeg, th.bPos] : [th.bPos, th.bNeg];
-  }
+  const axisX = 28;
+  const right = 8;
+  const top = 6;
+  const bottom = opts.showTicks === false ? 6 : 16;
+  const gw = Math.max(80, w - axisX - right);
+  const midY = Math.round((top + (h - bottom)) * 0.5);
+  const ampPix = Math.max(10, (h - top - bottom) * 0.36);
+  const graphStateNow = getGraphPhaseState();
+  const pw = graphStateNow.local;
   function signColor(family, value){
     if(family === 'E') return value >= 0 ? th.ePos : th.eNeg;
     return value >= 0 ? th.bNeg : th.bPos;
   }
-  function drawSignedCurve(row, midY){
-    let started = false;
-    let prevSign = null;
-    for(let i=0;i<=260;i++){
-      const uu = i/260;
-      const val = row.fn(uu);
-      const x = axisX + gw * uu;
-      const y = midY - val * ampPix;
-      const sign = val >= 0 ? 1 : -1;
-      if(!started){
-        g.beginPath();
-        g.strokeStyle = signColor(row.family, val);
-        g.lineWidth = 2.15;
-        g.moveTo(x,y);
-        started = true;
-      } else if(sign !== prevSign){
-        g.lineTo(x,y);
-        g.stroke();
-        g.beginPath();
-        g.strokeStyle = signColor(row.family, val);
-        g.lineWidth = 2.15;
-        g.moveTo(x,y);
-      }
-      g.lineTo(x,y);
-      prevSign = sign;
+  // background guides
+  g.strokeStyle = th.graphGrid;
+  g.lineWidth = 1;
+  [0.25,0.5,0.75].forEach(fr => { const x = axisX + gw * fr; g.beginPath(); g.moveTo(x, top); g.lineTo(x, h-bottom); g.stroke(); });
+  g.strokeStyle = th.graphYAxis;
+  g.beginPath(); g.moveTo(axisX, top); g.lineTo(axisX, h-bottom); g.stroke();
+  g.strokeStyle = th.graphXAxis;
+  g.lineWidth = 1.3;
+  g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
+  g.fillStyle = th.graphText;
+  g.font = '11px system-ui';
+  g.textAlign = 'left';
+  g.textBaseline = 'top';
+  g.fillText(row.label, 8, 6);
+  let started = false, prevSign = null;
+  for(let i=0;i<=220;i++){
+    const uu = i/220;
+    const val = row.fn(uu);
+    const x = axisX + gw * uu;
+    const y = midY - val * ampPix;
+    const sign = val >= 0 ? 1 : -1;
+    if(!started){
+      g.beginPath();
+      g.strokeStyle = signColor(row.family, val);
+      g.lineWidth = 2.05;
+      g.moveTo(x,y); started = true;
+    } else if(sign !== prevSign){
+      g.lineTo(x,y); g.stroke();
+      g.beginPath(); g.strokeStyle = signColor(row.family, val); g.lineWidth = 2.05; g.moveTo(x,y);
     }
-    if(started) g.stroke();
+    g.lineTo(x,y); prevSign = sign;
   }
-
-  rows.forEach((row, idx) => {
-    const y0 = top + idx * (rowH + rowGap);
-    const midY = y0 + rowH / 2;
-
-    // local axes close to label
-    g.strokeStyle = yAxisColor;
-    g.lineWidth = 1;
-    g.beginPath(); g.moveTo(axisX, y0 + 3); g.lineTo(axisX, y0 + rowH - 3); g.stroke();
-    g.strokeStyle = xAxisColor;
-    g.lineWidth = 1.45;
-    g.beginPath(); g.moveTo(axisX, midY); g.lineTo(axisX + gw, midY); g.stroke();
-
-    g.fillStyle = th.graphText;
-    g.font = '12px system-ui';
-    g.textAlign = 'right';
-    g.textBaseline = 'middle';
-    g.fillText(row.label, axisX - yLabelDx, y0 + yLabelTopInset);
-
-    drawSignedCurve(row, midY);
-
-    // per-row x ticks, small labels
+  if(started) g.stroke();
+  if(opts.showTicks !== false){
     g.strokeStyle = th.graphYAxis;
     g.lineWidth = 0.9;
     g.fillStyle = th.graphTick;
-    g.font = minorText;
+    g.font = '9px system-ui';
     g.textAlign = 'center';
-    [['0',0],['T/4',0.25],['T/2',0.50],['3T/4',0.75],['T',1]].forEach(([lab,uu],j) => {
+    graphTickLabels().forEach(([lab,uu]) => {
       const x = axisX + gw * uu;
       g.beginPath(); g.moveTo(x, midY-2.5); g.lineTo(x, midY+2.5); g.stroke();
       g.textBaseline = 'top'; g.fillText(lab, x, midY + 4);
     });
-
-    const valNow = row.fn(phaseU);
-    const xNow = axisX + gw * phaseU;
-    const yNow = midY - valNow * ampPix;
-    g.fillStyle = signColor(row.family, valNow);
-    g.beginPath(); g.arc(xNow, yNow, 3.1, 0, Math.PI*2); g.fill();
-
-    if(row.tangent){
-      const deriv = 2 * Math.PI * Math.cos(2 * Math.PI * phaseU); // dq/du proportional to i
-      const iNow = Math.cos(2 * Math.PI * phaseU);
-      const m = -(ampPix * deriv) / gw;
-      const dx = 60 / Math.sqrt(1 + m*m);
-      const dy = m * dx;
-      g.strokeStyle = iNow >= 0 ? '#f2a31b' : '#38b66b';
-      g.lineWidth = 1.8;
-      g.beginPath();
-      g.moveTo(xNow - dx, yNow - dy);
-      g.lineTo(xNow + dx, yNow + dy);
-      g.stroke();
-    }
-  });
-
-  // one shared time cursor, softer dashed guide
-  const xNow = axisX + gw * phaseU;
-  g.strokeStyle = th.graphCursor;
-  g.lineWidth = 0.9;
-  g.setLineDash([2,4]);
-  g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
-  g.setLineDash([]);
-
+  }
+  const valNow = row.fn(pw);
+  const xNow = axisX + gw * pw;
+  const yNow = midY - valNow * ampPix;
+  g.fillStyle = signColor(row.family, valNow);
+  g.beginPath(); g.arc(xNow, yNow, 3.0, 0, Math.PI*2); g.fill();
+  if(row.tangent){
+    const deriv = 2 * Math.PI * Math.cos(2 * Math.PI * pw);
+    const iNow = Math.cos(2 * Math.PI * pw);
+    const m = -(ampPix * deriv) / gw;
+    const dx = 36 / Math.sqrt(1 + m*m);
+    const dy = m * dx;
+    g.strokeStyle = iNow >= 0 ? '#f2a31b' : '#38b66b';
+    g.lineWidth = 1.6;
+    g.beginPath(); g.moveTo(xNow - dx, yNow - dy); g.lineTo(xNow + dx, yNow + dy); g.stroke();
+  }
+  if(opts.showCursor){
+    g.strokeStyle = th.graphCursor;
+    g.lineWidth = 0.9;
+    g.setLineDash([2,4]);
+    g.beginPath(); g.moveTo(xNow, top); g.lineTo(xNow, h-bottom); g.stroke();
+    g.setLineDash([]);
+  }
+}
+function drawGraphs(force=false){
+  if(!force && !graphState.dynamicDirty) return;
+  const rows = {
+    V:{ label:'V', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    Q:{ label:'q', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:true },
+    I:{ label:'i', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false },
+    E:{ label:'E', fn:u => Math.sin(2*Math.PI*u), family:'E', tangent:false },
+    B:{ label:'B', fn:u => Math.cos(2*Math.PI*u), family:'B', tangent:false },
+  };
+  drawSingleGraph(graphPapers.V, rows.V, { minH:56, showTicks:true, showCursor:true });
+  drawSingleGraph(graphPapers.Q, rows.Q, { minH:56, showTicks:true, showCursor:true });
+  drawSingleGraph(graphPapers.I, rows.I, { minH:56, showTicks:true, showCursor:true });
+  drawSingleGraph(graphPapers.E, rows.E, { minH:72, showTicks:true, showCursor:true });
+  drawSingleGraph(graphPapers.B, rows.B, { minH:72, showTicks:true, showCursor:true });
+  graphState.dynamicDirty = false;
+  graphState.staticDirty = false;
 }
 
 function applyUI(){
@@ -1319,73 +2403,98 @@ function applyUI(){
   ePlaneLower.material.opacity = eOpacity;
   bPlaneBack.material.opacity = bOpacity;
   bPlaneFront.material.opacity = bOpacity;
-  lineRadius = 42 / 3800;
+  lineRadius = (activeViewTheme === 'printSharp' ? 34 : 42) / 3800;
   camera.position.z = Math.max(8, 42 - (+ui.zoom.value) * 0.028);
   camera.lookAt(focusPoint);
-  axes.visible = ui.showAxes.checked;
-  planes.visible = ui.showPlanes.checked;
-  eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked;
+  updateXAxisForEmitPeriods();
+  axes.visible = ui.showAxes.checked && !isRodMode();
+  planes.visible = ui.showPlanes.checked && !isRodMode();
+  const directFrontMode = ui.showE.checked && (appModes.main === 'lines' || appModes.main === 'receiveFronts');
+  const directCircleMode = ui.showB.checked && (appModes.main === 'lines' || appModes.main === 'receiveFronts');
+  eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked && !directFrontMode;
+  eUpperDirectGroup.visible = eLowerDirectGroup.visible = directFrontMode;
   eArrowGroup.visible = ui.showE.checked;
-  bBackGroup.visible = bFrontGroup.visible = ui.showB.checked;
+  bBackGroup.visible = bFrontGroup.visible = ui.showB.checked && !directCircleMode;
+  bBackDirectCurveGroup.visible = bFrontDirectCurveGroup.visible = directCircleMode;
   bArrowGroup.visible = ui.showB.checked;
   // field-vector mode is an independent representation: it can stand alone
   // even when the E/B curve fronts are hidden.
-  eFieldModeGroup.visible = ui.showFieldMode.checked;
-  bFieldModeGroup.visible = ui.showFieldMode.checked;
+  const directArrowMode = ui.showFieldMode.checked && (appModes.main === 'arrows' || appModes.main === 'receiveArrows');
+  bFieldBackGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  eFieldGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  bFieldFrontGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  bFieldBackDirectGroup.visible = directArrowMode;
+  eFieldDirectGroup.visible = directArrowMode;
+  bFieldFrontDirectGroup.visible = directArrowMode;
   particleGroup.visible = ui.showParticles.checked;
   topGlow.visible = botGlow.visible = ui.showParticles.checked;
   topChargeSign.visible = botChargeSign.visible = ui.showParticles.checked;
-  currentGroup.visible = ui.showCurrent.checked;
+  receiverGroup.visible = isReceiveMode();
+  receiverElectron.visible = receiverGroup.visible && ui.showParticles.checked;
+  if(!receiverGroup.visible || !ui.showParticles.checked){ receiverVelocityArrow.visible = false; }
+  currentGroup.visible = !isReceiveMode();
+  updateModeLocks();
+  updateReceiverPlacement();
   updatePlanes(phaseU);
-  drawGraphs();
+  invalidateGraphs(true);
+  drawGraphs(true);
+  updateTopReadouts();
 }
-for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showFieldMode','showParticles','showCurrent']){
+for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX']){
   const el = ui[key];
-  el.addEventListener('input', applyUI);
+  if(key === 'showE' || key === 'showB' || key === 'showFieldMode'){
+    el.addEventListener('input', () => { applyFieldFillDefault(); invalidateGraphs(true); applyUI(); });
+  } else if(key === 'receiverX'){
+    el.addEventListener('input', () => { resetReceiverSim(); invalidateGraphs(true); applyUI(); });
+  } else {
+    el.addEventListener('input', () => { invalidateGraphs(true); applyUI(); });
+  }
 }
 
 let playing = true;
 let phaseU = 0;
 ui.playBtn.addEventListener('click', () => {
-  if(!playing && phaseU >= 1){
+  if(!playing && phaseU >= getEmitPeriods()){
     phaseU = 0;
     lastPhaseBucket = -1;
+    resetReceiverSim();
     rebuildFields(phaseU);
     updateParticles(phaseU);
   }
   playing = !playing;
-  ui.playBtn.textContent = playing ? 'Παύση' : 'Έναρξη';
+  ui.playBtn.textContent = playing ? '❚❚' : '▶';
 });
 ui.resetBtn.addEventListener('click', () => {
   forcePause();
+  autoFitApplied = false;
   phaseU = 0;
   syncPhase();
 });
 
-const SPEED_PRESETS = { speed025:5, speed05:10, speed075:15, speed1:20 };
-function refreshSpeedPresetButtons(){
-  Object.keys(SPEED_PRESETS).forEach(id => {
-    ui[id].classList.toggle('presetActive', (+ui.speed.value) === SPEED_PRESETS[id]);
-  });
-}
-function setSpeedPreset(val){
-  ui.speed.value = String(val);
-  refreshSpeedPresetButtons();
-  applyUI();
-}
 function forcePause(){
   if(playing){
     playing = false;
-    ui.playBtn.textContent = 'Έναρξη';
+    ui.playBtn.textContent = '▶';
   }
 }
+function restartEvolutionForSelection(){
+  forcePause();
+  autoFitApplied = false;
+  phaseU = 0;
+  syncPhase();
+  invalidateGraphs(true);
+  applyUI();
+}
 function syncPhase(){
-  phaseU = Math.max(0, Math.min(1, phaseU));
+  phaseU = Math.max(0, Math.min(getEmitPeriods(), phaseU));
+  autoFitApplied = false;
   lastPhaseBucket = -1;
+  resetReceiverSim();
   rebuildFields(phaseU);
   updatePlanes(phaseU);
   updateParticles(phaseU);
   drawGraphs();
+  updateTopReadouts();
 }
 function stepPhase(delta){
   forcePause();
@@ -1394,12 +2503,27 @@ function stepPhase(delta){
 }
 ui.stepBack.addEventListener('click', () => stepPhase(-1/32));
 ui.stepFwd.addEventListener('click', () => stepPhase( 1/32));
-ui.qBack.addEventListener('click', () => stepPhase(-1/4));
-ui.qFwd.addEventListener('click', () => stepPhase( 1/4));
-ui.speed025.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed025));
-ui.speed05.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed05));
-ui.speed075.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed075));
-ui.speed1.addEventListener('click', () => setSpeedPreset(SPEED_PRESETS.speed1));
+ui.qBack.addEventListener('click', () => stepPhase(-1/8));
+ui.qFwd.addEventListener('click', () => stepPhase( 1/8));
+ui.zoomIn?.addEventListener('click', () => { ui.zoom.value = String(Math.min(1200, (+ui.zoom.value||0) + 60)); applyUI(); });
+ui.zoomOut?.addEventListener('click', () => { ui.zoom.value = String(Math.max(0, (+ui.zoom.value||0) - 60)); applyUI(); });
+ui.speedUp?.addEventListener('click', () => { ui.speed.value = String(Math.min(40, (+ui.speed.value||0) + 2)); applyUI(); });
+ui.speedDown?.addEventListener('click', () => { ui.speed.value = String(Math.max(1, (+ui.speed.value||0) - 2)); applyUI(); });
+ui.eAlphaUp?.addEventListener('click', () => { ui.eAlpha.value = String(Math.min(100, (+ui.eAlpha.value||0) + 5)); applyUI(); });
+ui.eAlphaDown?.addEventListener('click', () => { ui.eAlpha.value = String(Math.max(0, (+ui.eAlpha.value||0) - 5)); applyUI(); });
+ui.bAlphaUp?.addEventListener('click', () => { ui.bAlpha.value = String(Math.min(100, (+ui.bAlpha.value||0) + 5)); applyUI(); });
+ui.bAlphaDown?.addEventListener('click', () => { ui.bAlpha.value = String(Math.max(0, (+ui.bAlpha.value||0) - 5)); applyUI(); });
+ui.emitPeriods.addEventListener('change', () => {
+  forcePause();
+  autoFitApplied = false;
+  phaseU = Math.min(phaseU, getEmitPeriods());
+  resetReceiverSim();
+  syncPhase();
+});
+ui.autoFit.addEventListener('input', () => {
+  autoFitApplied = false;
+  if(ui.autoFit.checked) maybeAutoFit();
+});
 ui.screenBtn.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
 ui.printBtn.addEventListener('click', () => { applyViewPreset(VIEW_PRINT); });
 ui.resetView.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
@@ -1431,11 +2555,31 @@ window.addEventListener('resize', () => {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  drawGraphs();
+  invalidateGraphs(true);
+  drawGraphs(true);
+  updateTopReadouts();
 });
 
-refreshSpeedPresetButtons();
+ui.modeRod?.addEventListener('click', () => applyMainMode('rod'));
+ui.modeSource?.addEventListener('click', () => applyMainMode('lines'));
+ui.waveModeArrows?.addEventListener('click', () => applyMainMode('arrows'));
+ui.modeReceive?.addEventListener('click', () => applyMainMode('receiveFronts'));
+ui.waveModeFronts?.addEventListener('click', () => applyMainMode('receiveArrows'));
+ui.showE?.addEventListener('input', () => {
+  if(appModes.main !== 'lines') return;
+  if(!ui.showE.checked && !ui.showB.checked) ui.showB.checked = true;
+  restartEvolutionForSelection();
+});
+ui.showB?.addEventListener('input', () => {
+  if(appModes.main !== 'lines') return;
+  if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
+  restartEvolutionForSelection();
+});
+
+applyMainMode('rod', true);
+invalidateGraphs(true);
 applyViewPreset(VIEW_SCREEN);
+updateReceiverPlacement();
 updatePlanes(0);
 rebuildFields(0);
 let last = performance.now();
@@ -1443,24 +2587,37 @@ let lastPhaseBucket = -1;
 function animate(now){
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
+  const totalPeriods = getEmitPeriods();
   if(playing){
     const nextU = phaseU + dt * ((+ui.speed.value) / 100);
-    phaseU = Math.min(1, nextU);
-    if(nextU >= 1){
-      phaseU = 1;
+    phaseU = Math.min(totalPeriods, nextU);
+    if(nextU >= totalPeriods){
+      phaseU = totalPeriods;
       playing = false;
-      ui.playBtn.textContent = 'Έναρξη';
+      ui.playBtn.textContent = '▶';
     }
   }
-  const bucket = Math.floor(phaseU * 240);
-  if(bucket !== lastPhaseBucket){
-    rebuildFields(phaseU);
-    lastPhaseBucket = bucket;
+  const needWaveVisuals = !!((ui.showE && ui.showE.checked) || (ui.showB && ui.showB.checked) || (ui.showFieldMode && ui.showFieldMode.checked));
+  if(needWaveVisuals){
+    const bucket = Math.floor(phaseU * 240);
+    if(bucket !== lastPhaseBucket){
+      rebuildFields(phaseU);
+      lastPhaseBucket = bucket;
+    }
   }
-  updatePlanes(phaseU);
-  updateParticles(phaseU);
+  if(planes.visible){
+    updatePlanes(phaseU);
+  }
+  if(ui.showParticles.checked || (ui.showCurrent.checked && !isReceiveMode())){
+    updateParticles(phaseU);
+  }
+  const graphBucket = Math.floor(phaseWrapped(phaseU) * 180);
+  if(graphBucket !== graphState.phaseBucket){
+    graphState.phaseBucket = graphBucket;
+    invalidateGraphs(false);
+  }
   drawGraphs();
-  camera.lookAt(focusPoint);
+  maybeAutoFit();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
