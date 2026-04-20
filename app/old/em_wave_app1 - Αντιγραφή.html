@@ -77,6 +77,133 @@
   @media (max-width:1080px){ .leftOverlayStack{width:min(250px,31vw)} .topWaveOverlay{width:min(506px,62vw);grid-template-columns:repeat(2,minmax(0,250px))} }
   @media (max-width:900px){ html,body{overflow:auto}.app{height:auto;min-height:100dvh}.main{overflow:visible}.viewport{min-height:72vh;height:min(82vh,920px)} .leftOverlayStack{left:4px;top:2px;bottom:2px;width:min(250px,44vw)} .vqiOverlay{grid-template-rows:repeat(3,minmax(0,1fr));gap:1px} .topWaveOverlay{left:50%;right:auto;top:2px;transform:translateX(-50%);width:min(506px,92vw);grid-template-columns:1fr 1fr;gap:4px} .topWaveOverlay .graphPanel{height:min(110px,14.5vh)} }
   @media (max-width:640px){ .leftOverlayStack{top:2px;bottom:2px;width:min(96vw,248px)} .vqiOverlay{grid-template-rows:repeat(3,minmax(0,1fr));gap:1px} .topWaveOverlay{grid-template-columns:1fr 1fr;left:50%;right:auto;transform:translateX(-50%);width:min(506px,96vw);gap:4px} .topWaveOverlay .graphPanel{height:min(102px,13.6vh)} }
+
+  .focusMiniControls{position:absolute;right:14px;bottom:14px;z-index:42;display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(10,14,20,.52);backdrop-filter:blur(4px)}
+  .focusMiniControls[hidden]{display:none!important}
+  .focusMiniControls button{min-width:36px;min-height:32px;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .focusMiniControls .miniLabel{font-size:11px;color:var(--muted);padding-right:2px;white-space:nowrap}
+  body.focus-mode .top{display:none}
+  body.focus-mode .main{padding:0}
+  body.focus-mode .card{border:none;border-radius:0;background:transparent}
+  body.focus-mode .viewport{height:100dvh}
+  body.focus-mode .leftOverlayStack{left:12px;top:12px;bottom:auto;width:min(308px,44vw);gap:6px}
+  body.focus-mode .topWaveOverlay{top:12px;width:min(560px,64vw)}
+  body.focus-mode .machineHud{display:none}
+  body.focus-mode .vqiOverlay{gap:6px}
+  body.focus-mode .graphPanel{background:rgba(10,14,20,.32)}
+  body.focus-stage-hidden #stage{opacity:0;pointer-events:none}
+  body.focus-hide-topwaves .topWaveOverlay{display:none!important}
+  body.focus-hide-leftstack .leftOverlayStack{display:none!important}
+  body.focus-controls-none .focusMiniControls{display:none!important}
+  body.focus-controls-minimal .focusMiniControls{display:flex}
+  body.focus-controls-full .focusMiniControls{display:flex}
+  @media (max-width:900px){ body.focus-mode .leftOverlayStack{width:min(340px,56vw)} body.focus-mode .topWaveOverlay{width:min(560px,92vw)} }
+  @media (max-width:640px){ body.focus-mode .leftOverlayStack{left:10px;right:10px;width:auto} body.focus-mode .topWaveOverlay{left:10px;right:10px;transform:none;width:auto} .focusMiniControls{left:10px;right:10px;bottom:10px;justify-content:flex-end} }
+
+  body.focus-mode .viewport{height:100dvh}
+  body.focus-mode .focusMiniControls{right:16px;bottom:16px}
+  body.focus-mode[data-focus="rod_v"] #stage,
+  body.focus-mode[data-focus="rod_vq"] #stage,
+  body.focus-mode[data-focus="rod_vqi"] #stage{
+    left:16px; top:16px; right:16px; bottom:43vh;
+  }
+  body.focus-mode[data-focus="rod_v"] .leftOverlayStack,
+  body.focus-mode[data-focus="rod_vq"] .leftOverlayStack,
+  body.focus-mode[data-focus="rod_vqi"] .leftOverlayStack{
+    left:16px; right:16px; top:auto; bottom:58px; width:auto;
+    transform:none; justify-content:flex-start; gap:10px;
+  }
+  body.focus-mode[data-focus="rod_v"] .vqiOverlay,
+  body.focus-mode[data-focus="rod_vq"] .vqiOverlay,
+  body.focus-mode[data-focus="rod_vqi"] .vqiOverlay{gap:10px}
+  body.focus-mode[data-focus="rod_v"] .graphPanel,
+  body.focus-mode[data-focus="rod_vq"] .graphPanel,
+  body.focus-mode[data-focus="rod_vqi"] .graphPanel{
+    min-height:0;
+    height:calc(14vh - 8px);
+    flex:0 0 auto;
+  }
+  body.focus-mode[data-focus="rod_v"] .topWaveOverlay,
+  body.focus-mode[data-focus="rod_vq"] .topWaveOverlay,
+  body.focus-mode[data-focus="rod_vqi"] .topWaveOverlay{
+    display:none!important;
+  }
+
+  body.focus-mode[data-focus="graphs_qieb"] #stage{display:none}
+  body.focus-mode[data-focus="graphs_qieb"] .leftOverlayStack{
+    left:16px; top:16px; bottom:16px; width:calc(50% - 24px);
+    justify-content:flex-start; gap:12px;
+  }
+  body.focus-mode[data-focus="graphs_qieb"] .topWaveOverlay{
+    left:auto; right:16px; top:16px; transform:none; width:calc(50% - 24px);
+    grid-template-columns:1fr; gap:12px;
+  }
+  body.focus-mode[data-focus="graphs_qieb"] .vqiOverlay{gap:12px}
+  body.focus-mode[data-focus="graphs_qieb"] .graphPanel{
+    min-height:0;
+    height:calc(50dvh - 34px);
+  }
+
+  body.focus-mode[data-focus="rod_e_propagation"] #stage{
+    left:16px; top:16px; bottom:16px; right:344px;
+  }
+  body.focus-mode[data-focus="rod_e_propagation"] .leftOverlayStack{
+    display:none!important;
+  }
+  body.focus-mode[data-focus="rod_e_propagation"] .topWaveOverlay{
+    left:auto; right:16px; top:16px; transform:none; width:312px; grid-template-columns:1fr;
+  }
+  body.focus-mode[data-focus="rod_e_propagation"] .topWaveOverlay .graphPanel{
+    height:calc(100dvh - 88px);
+    min-height:0;
+  }
+
+  @media (max-width: 980px){
+    body.focus-mode[data-focus="rod_v"] #stage,
+    body.focus-mode[data-focus="rod_vq"] #stage,
+    body.focus-mode[data-focus="rod_vqi"] #stage,
+    body.focus-mode[data-focus="rod_e_propagation"] #stage{
+      left:12px; right:12px; top:12px; bottom:50vh;
+    }
+    body.focus-mode[data-focus="rod_v"] .leftOverlayStack,
+    body.focus-mode[data-focus="rod_vq"] .leftOverlayStack,
+    body.focus-mode[data-focus="rod_vqi"] .leftOverlayStack{
+      left:12px; right:12px; top:auto; bottom:60px; width:auto;
+    }
+    body.focus-mode[data-focus="rod_e_propagation"] .topWaveOverlay{
+      left:12px; right:12px; top:auto; bottom:60px; width:auto; transform:none;
+    }
+    body.focus-mode[data-focus="graphs_qieb"] .leftOverlayStack,
+    body.focus-mode[data-focus="graphs_qieb"] .topWaveOverlay{
+      left:12px; right:12px; width:auto; transform:none;
+    }
+    body.focus-mode[data-focus="graphs_qieb"] .leftOverlayStack{
+      top:12px; bottom:auto;
+    }
+    body.focus-mode[data-focus="graphs_qieb"] .topWaveOverlay{
+      top:auto; bottom:60px; grid-template-columns:1fr 1fr;
+    }
+    body.focus-mode[data-focus="graphs_qieb"] .graphPanel{
+      height:min(26vh, 210px);
+    }
+  }
+  @media (max-width: 640px){
+    body.focus-mode[data-focus="rod_v"] #stage,
+    body.focus-mode[data-focus="rod_vq"] #stage,
+    body.focus-mode[data-focus="rod_vqi"] #stage,
+    body.focus-mode[data-focus="rod_e_propagation"] #stage{
+      bottom:58vh;
+    }
+    body.focus-mode[data-focus="rod_v"] .leftOverlayStack,
+    body.focus-mode[data-focus="rod_vq"] .leftOverlayStack,
+    body.focus-mode[data-focus="rod_vqi"] .leftOverlayStack{
+      bottom:56px;
+    }
+    body.focus-mode[data-focus="graphs_qieb"] .topWaveOverlay{
+      grid-template-columns:1fr;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -167,6 +294,12 @@
       </div>
     </div>
   </div>
+
+  <div id="focusMiniControls" class="focusMiniControls" hidden>
+    <span class="miniLabel">Scene</span>
+    <button id="miniPlayBtn" type="button" aria-label="Play / Pause">▶</button>
+    <button id="miniResetBtn" type="button" aria-label="Reset">↺</button>
+  </div>
   <div id="hiddenSettings" style="display:none">
     <input id="speed" type="range" min="1" max="40" value="12">
     <select id="emitPeriods"><option value="1">1T</option><option value="2">2T</option><option value="3" selected>3T</option></select>
@@ -188,7 +321,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['langEl','langEn','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn'];
+const ids = ['langEl','langEn','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn','focusMiniControls','miniPlayBtn','miniResetBtn'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 ui.langEl?.addEventListener('click', () => applyLanguage('el'));
 ui.langEn?.addEventListener('click', () => applyLanguage('en'));
@@ -199,6 +332,167 @@ const graphPapers = {
   E: document.getElementById('eGraphPaper'),
   B: document.getElementById('bGraphPaper'),
 };
+const domRefs = {
+  top: document.querySelector('.top'),
+  topWaveOverlay: document.querySelector('.topWaveOverlay'),
+  leftOverlayStack: document.querySelector('.leftOverlayStack'),
+  vqiOverlay: document.querySelector('.vqiOverlay'),
+  machineHud: document.querySelector('.machineHud'),
+  stage: document.getElementById('stage'),
+  graphPanels: {
+    V: graphPapers.V?.closest('.graphPanel'),
+    Q: graphPapers.Q?.closest('.graphPanel'),
+    I: graphPapers.I?.closest('.graphPanel'),
+    E: graphPapers.E?.closest('.graphPanel'),
+    B: graphPapers.B?.closest('.graphPanel'),
+  }
+};
+let activeFocus = 'default';
+let activeControlsMode = 'full';
+let EXTERNAL_PRESET_DATA = { focusPresets:{}, scenes:{}, framePresets:{} };
+const FOCUS_PRESETS = {
+  default: { focusMode:false, controls:'full', showTop:true, showStage:true, graphs:{ V:true, Q:true, I:true, E:true, B:true } },
+  rod_v: { focusMode:true, controls:'minimal', showTop:false, showStage:true, graphs:{ V:true, Q:false, I:false, E:false, B:false } },
+  rod_vq: { focusMode:true, controls:'minimal', showTop:false, showStage:true, graphs:{ V:true, Q:true, I:false, E:false, B:false } },
+  rod_vqi: { focusMode:true, controls:'minimal', showTop:false, showStage:true, graphs:{ V:true, Q:true, I:true, E:false, B:false } },
+  graphs_qieb: { focusMode:true, controls:'minimal', showTop:false, showStage:false, graphs:{ V:false, Q:true, I:true, E:true, B:true } },
+  graphs_qieb_only: { focusMode:true, controls:'minimal', showTop:false, showStage:false, graphs:{ V:false, Q:true, I:true, E:true, B:true } },
+  rod_e_propagation: { focusMode:true, controls:'minimal', showTop:false, showStage:true, graphs:{ V:false, Q:false, I:false, E:true, B:false } }
+};
+function getFocusPresetConfig(name){
+  if(!name) return null;
+  const key = String(name).trim();
+  return EXTERNAL_PRESET_DATA.focusPresets?.[key] || FOCUS_PRESETS[key] || null;
+}
+function getSceneConfig(name){
+  if(!name) return null;
+  const key = String(name).trim();
+  return EXTERNAL_PRESET_DATA.scenes?.[key] || SCENES[key] || null;
+}
+function normalizeFocusName(name){
+  if(!name) return 'default';
+  const key = String(name).trim();
+  return getFocusPresetConfig(key) ? key : 'default';
+}
+function deepMerge(base, extra){
+  if(Array.isArray(base) || Array.isArray(extra)) return extra !== undefined ? extra : base;
+  const out = { ...(base || {}) };
+  for(const [k,v] of Object.entries(extra || {})){
+    if(v && typeof v === 'object' && !Array.isArray(v) && out[k] && typeof out[k] === 'object' && !Array.isArray(out[k])) out[k] = deepMerge(out[k], v);
+    else out[k] = v;
+  }
+  return out;
+}
+async function loadExternalPresetData(){
+  try{
+    const presetsUrl = new URLSearchParams(window.location.search).get('presets') || 'scene_presets.json';
+    const res = await fetch(presetsUrl, { cache:'no-store' });
+    if(!res.ok) return;
+    const data = await res.json();
+    EXTERNAL_PRESET_DATA = {
+      focusPresets: data.focusPresets || {},
+      scenes: data.scenes || {},
+      framePresets: data.framePresets || {}
+    };
+  }catch(err){
+    console.warn('scene_presets.json not loaded', err);
+  }
+}
+function normalizeControlsMode(value){
+  const v = String(value || '').trim().toLowerCase();
+  if(['none','minimal','full'].includes(v)) return v;
+  return null;
+}
+function setGraphPanelVisible(key, visible){
+  const panel = domRefs.graphPanels[key];
+  if(panel) panel.style.display = visible ? '' : 'none';
+}
+function setRegionRect(el, rect){
+  if(!el) return;
+  if(!rect){
+    el.style.left = '';
+    el.style.top = '';
+    el.style.width = '';
+    el.style.height = '';
+    el.style.right = '';
+    el.style.bottom = '';
+    el.style.transform = '';
+    return;
+  }
+  el.style.left = `${(rect.x || 0) * 100}%`;
+  el.style.top = `${(rect.y || 0) * 100}%`;
+  el.style.width = `${(rect.w || 1) * 100}%`;
+  el.style.height = `${(rect.h || 1) * 100}%`;
+  el.style.right = 'auto';
+  el.style.bottom = 'auto';
+  el.style.transform = 'none';
+}
+function relayoutGraphContainers(cfg){
+  const g = cfg.graphs || {};
+  const leftKeys = ['V','Q','I'].filter(k => !!g[k]);
+  const topKeys = ['E','B'].filter(k => !!g[k]);
+  ['V','Q','I','E','B'].forEach(k => setGraphPanelVisible(k, !!g[k]));
+  if(domRefs.vqiOverlay){
+    domRefs.vqiOverlay.style.display = leftKeys.length ? 'grid' : 'none';
+    domRefs.vqiOverlay.style.gridTemplateRows = leftKeys.length ? `repeat(${leftKeys.length}, minmax(0, 1fr))` : '';
+    domRefs.vqiOverlay.style.height = '100%';
+  }
+  if(domRefs.topWaveOverlay){
+    domRefs.topWaveOverlay.style.display = topKeys.length ? 'grid' : 'none';
+    domRefs.topWaveOverlay.style.gridTemplateColumns = topKeys.length ? `repeat(${topKeys.length}, minmax(0, 1fr))` : '';
+  }
+  if(domRefs.leftOverlayStack){
+    const showLeft = leftKeys.length > 0 || (cfg.showHud !== false);
+    domRefs.leftOverlayStack.style.display = showLeft ? 'flex' : 'none';
+  }
+  setRegionRect(domRefs.stage, cfg.regions?.stage || null);
+  setRegionRect(domRefs.leftOverlayStack, cfg.regions?.leftOverlayStack || null);
+  setRegionRect(domRefs.topWaveOverlay, cfg.regions?.topWaveOverlay || null);
+  if(domRefs.graphPanels && cfg.panelMaxWidth){
+    for(const key of ['V','Q','I','E','B']){
+      const panel = domRefs.graphPanels[key];
+      if(panel) panel.style.maxWidth = cfg.panelMaxWidth;
+    }
+  } else {
+    for(const key of ['V','Q','I','E','B']){
+      const panel = domRefs.graphPanels[key];
+      if(panel) panel.style.maxWidth = '';
+    }
+  }
+  if(domRefs.leftOverlayStack && cfg.regions?.leftOverlayStack && cfg.centerGraphs){
+    domRefs.leftOverlayStack.style.alignItems = 'center';
+  } else if(domRefs.leftOverlayStack){
+    domRefs.leftOverlayStack.style.alignItems = 'flex-start';
+  }
+}
+function applyFocusPreset(name='default', controlsOverride=null){
+  activeFocus = normalizeFocusName(name);
+  const cfg = deepMerge(FOCUS_PRESETS.default, getFocusPresetConfig(activeFocus) || {});
+  const controls = normalizeControlsMode(controlsOverride) || cfg.controls || 'full';
+  activeControlsMode = controls;
+  document.body.classList.toggle('focus-mode', !!cfg.focusMode);
+  document.body.classList.toggle('focus-stage-hidden', cfg.showStage === false);
+  document.body.classList.toggle('focus-hide-topwaves', cfg.graphs && !cfg.graphs.E && !cfg.graphs.B);
+  document.body.classList.toggle('focus-hide-leftstack', cfg.graphs && !cfg.graphs.V && !cfg.graphs.Q && !cfg.graphs.I && cfg.showHud === false);
+  document.body.classList.remove('focus-controls-none','focus-controls-minimal','focus-controls-full');
+  document.body.classList.add(`focus-controls-${controls}`);
+  document.body.dataset.focus = activeFocus;
+  if(domRefs.top) domRefs.top.style.display = cfg.showTop === false ? 'none' : '';
+  if(domRefs.machineHud) domRefs.machineHud.style.display = cfg.showHud === false || cfg.focusMode ? 'none' : '';
+  if(domRefs.stage) domRefs.stage.style.opacity = cfg.showStage === false ? '0' : '1';
+  relayoutGraphContainers(cfg);
+  scheduleRendererResize();
+  if(ui.focusMiniControls){
+    ui.focusMiniControls.hidden = !(cfg.focusMode && controls !== 'none');
+  }
+  drawGraphs(true);
+}
+function updatePlayButtons(){
+  const label = playing ? '❚❚' : '▶';
+  if(ui.playBtn) ui.playBtn.textContent = label;
+  if(ui.miniPlayBtn) ui.miniPlayBtn.textContent = label;
+}
+
 function updateTopReadouts(){
   if(ui.zoomPct) ui.zoomPct.textContent = `${Math.round((+ui.zoom.value || 0) / 12)}%`;
   if(ui.speedPct) ui.speedPct.textContent = `${Math.round((+ui.speed.value || 0) * 2.5)}%`;
@@ -290,6 +584,20 @@ renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHei
 renderer.setClearColor(0x0b0f14, 1);
 stage.appendChild(renderer.domElement);
 
+function resizeRendererToStage(){
+  const w = Math.max(100, stage.clientWidth || 100);
+  const h = Math.max(100, stage.clientHeight || 100);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  invalidateGraphs(true);
+  drawGraphs(true);
+}
+function scheduleRendererResize(){
+  requestAnimationFrame(() => requestAnimationFrame(resizeRendererToStage));
+}
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, Math.max(1, stage.clientWidth / stage.clientHeight), 0.1, 250);
 camera.position.set(0, 0, 42);
@@ -310,6 +618,22 @@ const HOME_Y = THREE.MathUtils.degToRad(-21 + 50);
 
 const VIEW_SCREEN = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1140, eAlpha: 20, bAlpha: 20, speed: 12 };
 const VIEW_PRINT  = { rotY: HOME_Y, rotX: THREE.MathUtils.degToRad(15), zoom: 1140, eAlpha: 20, bAlpha: 30, speed: 12 };
+const VIEW_PRESETS = { screen: VIEW_SCREEN, print: VIEW_PRINT };
+const SCENES = {
+  source_initial: { mode:'rod', phase:0, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  source_q1: { mode:'lines', showE:true, showB:true, phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  source_q2: { mode:'lines', showE:true, showB:true, phase:0.25, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  source_q3: { mode:'lines', showE:true, showB:true, phase:0.50, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  source_q4: { mode:'lines', showE:true, showB:true, phase:0.75, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  source_period: { mode:'lines', showE:true, showB:true, phase:1.0, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  e_only_q1: { mode:'lines', showE:true, showB:false, phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } },
+  b_only_q1: { mode:'lines', showE:false, showB:true, phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } },
+  rod_v: { focus:'rod_v', mode:'rod', phase:0, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } },
+  rod_vq: { focus:'rod_vq', mode:'rod', phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } },
+  rod_vqi: { focus:'rod_vqi', mode:'rod', phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } },
+  graphs_qieb: { focus:'graphs_qieb', mode:'lines', showE:true, showB:true, phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1160 } },
+  rod_e_propagation: { focus:'rod_e_propagation', mode:'lines', showE:true, showB:false, phase:0.125, play:false, theme:'screen', emitPeriods:1, view:{ ...VIEW_SCREEN, zoom:1180 } }
+};
 
 function cssVar(name, value){ document.documentElement.style.setProperty(name, value); }
 function applyThemeMode(mode){
@@ -365,7 +689,7 @@ function applyFieldFillDefault(){
   if(ui.fieldFillAlpha) ui.fieldFillAlpha.value = String(fieldFillDefaultValue());
 }
 
-function applyViewPreset(v){
+function applyViewConfig(v, which='custom', themeOverride=null){
   root.rotation.y = v.rotY;
   root.rotation.x = v.rotX;
   ui.zoom.value = v.zoom;
@@ -373,9 +697,14 @@ function applyViewPreset(v){
   if (typeof v.eAlpha === 'number') ui.eAlpha.value = String(v.eAlpha);
   if (typeof v.bAlpha === 'number') ui.bAlpha.value = String(v.bAlpha);
   applyFieldFillDefault();
-  applyThemeMode(v===VIEW_PRINT ? 'printSharp' : 'screen');
+  const resolvedTheme = themeOverride || (which === 'print' ? 'printSharp' : 'screen');
+  applyThemeMode(resolvedTheme);
   applyUI();
-  markViewButtons(v===VIEW_PRINT ? 'print' : 'screen');
+  markViewButtons(which);
+}
+function applyViewPreset(v){
+  const which = v === VIEW_PRINT ? 'print' : 'screen';
+  applyViewConfig(v, which);
 }
 function markViewButtons(which){
   ui.screenBtn.classList.toggle('activePreset', which==='screen');
@@ -2062,7 +2391,7 @@ function rebuildFields(u){
 
 function chargeAndCurrent(u){
   const phase = 2 * Math.PI * phaseWrapped(u);
-  return { chargeSigned: -Math.sin(phase), currentSigned: -Math.cos(phase) };
+  return { chargeSigned: Math.sin(phase), currentSigned: -Math.cos(phase) };
 }
 const RECEIVER_BASE_Y = 0; // αρχική θέση ηλεκτρονίου στο μηδέν
 const RECEIVER_DYNAMIC_AMP = 0.72 * ROD_HALF_LENGTH;
@@ -2180,34 +2509,36 @@ function electronCenters(chargeSigned, currentSigned){
   const N = ELECTRON_COUNT;
   const r = 0.052;
   const d = 2 * r;
-  const top = -0.68;
-  const bot =  0.68;
+  const lower = -0.68;
+  const upper =  0.68;
   const a = 0.020;
   // exact baseline arithmetic-progression pattern:
   // 0, a+d, 3a+2d, 6a+3d, 10a+4d, 15a+5d, 21a+6d
   const tri = [0, 1, 3, 6, 10, 15, 21];
   const targetOffsets = tri.map((t, i) => t * a + i * d);
 
-  const span = bot - top;
+  const span = upper - lower;
   const uniformGap = span / (N - 1);
-  const base = Array.from({length:N}, (_,i) => top + i * uniformGap);
+  const base = Array.from({length:N}, (_,i) => lower + i * uniformGap);
 
   const q = Math.abs(chargeSigned);
-  const moveUp = chargeSigned < 0;
+  // Με τη σύμβασή μας q>0 σημαίνει θετικό κάτω άκρο,
+  // άρα τα ηλεκτρόνια έχουν κινηθεί προς τα ΠΑΝΩ.
+  const moveUp = chargeSigned > 0;
   const ys = new Array(N);
   if(moveUp){
     for(let i=0;i<N;i++){
-      const target = top + targetOffsets[i];
+      const target = upper - targetOffsets[N - 1 - i];
       ys[i] = base[i] + q * (target - base[i]);
     }
   } else {
     for(let i=0;i<N;i++){
-      const target = bot - targetOffsets[N - 1 - i];
+      const target = lower + targetOffsets[i];
       ys[i] = base[i] + q * (target - base[i]);
     }
   }
-  const minY = top + r;
-  const maxY = bot - r;
+  const minY = lower + r;
+  const maxY = upper - r;
   return ys.map(v => Math.min(maxY, Math.max(minY, v)) * (ROD_LENGTH / 1.6));
 }
 function updateParticles(u){
@@ -2244,19 +2575,21 @@ function updateParticles(u){
     }
 
     const qmag = Math.abs(chargeSigned);
-    const topIsNegative = chargeSigned < 0;
-    const topHex = topIsNegative ? COLORS.chargeNeg : COLORS.chargePos;
-    const botHex = topIsNegative ? COLORS.chargePos : COLORS.chargeNeg;
-    topGlow.material.color.setHex(topHex);
-    botGlow.material.color.setHex(botHex);
+    // Προσοχή: στο συγκεκριμένο scene graph τα αντικείμενα με όνομα top*
+    // βρίσκονται οπτικά στο ΚΑΤΩ άκρο (y<0), ενώ τα bot* στο ΠΑΝΩ (y>0).
+    // Με τη σύμβαση q>0: κάτω άκρο θετικό, πάνω άκρο αρνητικό.
+    const lowerHex = chargeSigned > 0 ? COLORS.chargePos : COLORS.chargeNeg;
+    const upperHex = chargeSigned > 0 ? COLORS.chargeNeg : COLORS.chargePos;
+    topGlow.material.color.setHex(lowerHex);
+    botGlow.material.color.setHex(upperHex);
     const glowOpacity = 0.84 * Math.pow(qmag, 1.18);
     const glowScale = 0.24 + 1.02 * qmag;
     topGlow.material.opacity = glowOpacity;
     botGlow.material.opacity = glowOpacity;
     topGlow.scale.setScalar(glowScale);
     botGlow.scale.setScalar(glowScale);
-    updateChargeTextSprite(topChargeSign, topIsNegative ? '−' : '+', topHex, qmag);
-    updateChargeTextSprite(botChargeSign, topIsNegative ? '+' : '−', botHex, qmag);
+    updateChargeTextSprite(topChargeSign, chargeSigned > 0 ? '+' : '−', lowerHex, qmag);
+    updateChargeTextSprite(botChargeSign, chargeSigned > 0 ? '−' : '+', upperHex, qmag);
   } else {
     receiverVelocityArrow.visible = false;
   }
@@ -2462,7 +2795,7 @@ ui.playBtn.addEventListener('click', () => {
     updateParticles(phaseU);
   }
   playing = !playing;
-  ui.playBtn.textContent = playing ? '❚❚' : '▶';
+  updatePlayButtons();
 });
 ui.resetBtn.addEventListener('click', () => {
   forcePause();
@@ -2470,11 +2803,13 @@ ui.resetBtn.addEventListener('click', () => {
   phaseU = 0;
   syncPhase();
 });
+ui.miniPlayBtn?.addEventListener('click', () => { if(playing){ setPlayingState(false); } else { setPlayingState(true); } });
+ui.miniResetBtn?.addEventListener('click', () => { window.EMWaveApp.reset(); });
 
 function forcePause(){
   if(playing){
     playing = false;
-    ui.playBtn.textContent = '▶';
+    updatePlayButtons();
   }
 }
 function restartEvolutionForSelection(){
@@ -2496,6 +2831,209 @@ function syncPhase(){
   drawGraphs();
   updateTopReadouts();
 }
+function setPlayingState(shouldPlay){
+  playing = !!shouldPlay;
+  updatePlayButtons();
+}
+function sceneClone(name){
+  const base = getSceneConfig(name);
+  if(!base) return null;
+  return structuredClone ? structuredClone(base) : JSON.parse(JSON.stringify(base));
+}
+function normalizeModeName(mode){
+  if(!mode) return null;
+  const m = String(mode).trim();
+  const aliases = {
+    rod:'rod',
+    dipole:'rod',
+    lines:'lines',
+    source:'lines',
+    arrows:'arrows',
+    direct:'arrows',
+    receivefronts:'receiveFronts',
+    receive_lines:'receiveFronts',
+    receiver_lines:'receiveFronts',
+    receivearrows:'receiveArrows',
+    receive_arrows:'receiveArrows',
+    receiver_arrows:'receiveArrows'
+  };
+  return aliases[m.toLowerCase()] || null;
+}
+function parseBoolLike(value){
+  if(value == null) return null;
+  if(typeof value === 'boolean') return value;
+  const v = String(value).trim().toLowerCase();
+  if(['1','true','yes','on'].includes(v)) return true;
+  if(['0','false','no','off'].includes(v)) return false;
+  return null;
+}
+function parseNumberLike(value){
+  if(value == null || value === '') return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+function parseThemeName(value){
+  if(!value) return null;
+  const v = String(value).trim().toLowerCase();
+  if(['print','paper','printsharp'].includes(v)) return 'printSharp';
+  if(['screen','default'].includes(v)) return 'screen';
+  return null;
+}
+function getExternalState(){
+  return {
+    scene:null,
+    mode:appModes.main,
+    phase:phaseU,
+    play:playing,
+    showE:!!ui.showE?.checked,
+    showB:!!ui.showB?.checked,
+    showFieldMode:!!ui.showFieldMode?.checked,
+    emitPeriods:getEmitPeriods(),
+    zoom:+ui.zoom.value,
+    speed:+ui.speed.value,
+    eAlpha:+ui.eAlpha.value,
+    bAlpha:+ui.bAlpha.value,
+    receiverX:+ui.receiverX.value,
+    lang:currentLang,
+    theme:activeViewTheme,
+    focus:activeFocus,
+    controls:activeControlsMode,
+    view:{ rotY:root.rotation.y, rotX:root.rotation.x, zoom:+ui.zoom.value, speed:+ui.speed.value, eAlpha:+ui.eAlpha.value, bAlpha:+ui.bAlpha.value }
+  };
+}
+function applyExternalState(rawState={}, options={}){
+  const sceneBase = rawState.scene ? sceneClone(rawState.scene) : null;
+  const state = sceneBase ? { ...sceneBase, ...rawState } : { ...rawState };
+  const lang = state.lang && I18N[state.lang] ? state.lang : null;
+  if(lang) applyLanguage(lang);
+
+  const emitPeriods = parseNumberLike(state.emitPeriods);
+  if(emitPeriods != null){
+    ui.emitPeriods.value = String(Math.max(1, Math.min(3, Math.round(emitPeriods))));
+  }
+
+  const mode = normalizeModeName(state.mode);
+  if(mode) applyMainMode(mode, true);
+
+  const showFieldMode = parseBoolLike(state.showFieldMode);
+  if(showFieldMode != null) ui.showFieldMode.checked = showFieldMode;
+  const showE = parseBoolLike(state.showE);
+  const showB = parseBoolLike(state.showB);
+  if(showE != null) ui.showE.checked = showE;
+  if(showB != null) ui.showB.checked = showB;
+  if(appModes.main === 'lines' && !ui.showE.checked && !ui.showB.checked){
+    ui.showE.checked = true;
+  }
+
+  const receiverX = parseNumberLike(state.receiverX);
+  if(receiverX != null) ui.receiverX.value = String(receiverX);
+  const speed = parseNumberLike(state.speed);
+  if(speed != null) ui.speed.value = String(Math.max(1, Math.min(40, speed)));
+  const eAlpha = parseNumberLike(state.eAlpha);
+  if(eAlpha != null) ui.eAlpha.value = String(Math.max(0, Math.min(100, eAlpha)));
+  const bAlpha = parseNumberLike(state.bAlpha);
+  if(bAlpha != null) ui.bAlpha.value = String(Math.max(0, Math.min(100, bAlpha)));
+
+  const explicitView = state.view && typeof state.view === 'object' ? state.view : null;
+  const zoom = parseNumberLike(state.zoom);
+  let viewToApply = null;
+  if(explicitView){
+    viewToApply = {
+      rotY: parseNumberLike(explicitView.rotY) ?? root.rotation.y,
+      rotX: parseNumberLike(explicitView.rotX) ?? root.rotation.x,
+      zoom: parseNumberLike(explicitView.zoom) ?? (+ui.zoom.value),
+      speed: parseNumberLike(explicitView.speed) ?? (+ui.speed.value),
+      eAlpha: parseNumberLike(explicitView.eAlpha) ?? (+ui.eAlpha.value),
+      bAlpha: parseNumberLike(explicitView.bAlpha) ?? (+ui.bAlpha.value)
+    };
+  } else if(zoom != null){
+    viewToApply = {
+      rotY: root.rotation.y,
+      rotX: root.rotation.x,
+      zoom: Math.max(0, Math.min(1200, zoom)),
+      speed: +ui.speed.value,
+      eAlpha: +ui.eAlpha.value,
+      bAlpha: +ui.bAlpha.value
+    };
+  }
+
+  const theme = parseThemeName(state.theme);
+  const requestedFocusRaw = state.focus || state.window || '';
+  const requestedFocus = normalizeFocusName(requestedFocusRaw);
+  const sceneFocus = normalizeFocusName(sceneBase?.focus || 'default');
+  const focus = (requestedFocusRaw && requestedFocus === 'default' && sceneBase?.focus) ? sceneFocus : (requestedFocusRaw ? requestedFocus : sceneFocus);
+  const controlsMode = normalizeControlsMode(state.controls || state.ui) || normalizeControlsMode(sceneBase?.controls) || null;
+  if(viewToApply){
+    const which = theme === 'printSharp' ? 'print' : 'custom';
+    applyViewConfig(viewToApply, which, theme || null);
+  } else if(theme){
+    applyThemeMode(theme);
+    applyUI();
+  } else {
+    applyUI();
+  }
+
+  applyFocusPreset(focus, controlsMode);
+
+  const phase = parseNumberLike(state.phase);
+  if(phase != null) phaseU = phase;
+  syncPhase();
+
+  const shouldPlay = parseBoolLike(state.play);
+  if(shouldPlay != null) setPlayingState(shouldPlay);
+  else if(options.forcePause) setPlayingState(false);
+
+  if(options.announce && state.scene){
+    window.dispatchEvent(new CustomEvent('emwave:scenechange', { detail:{ scene:state.scene, state:getExternalState() } }));
+  }
+  return getExternalState();
+}
+function applyUrlState(){
+  const params = new URLSearchParams(window.location.search);
+  if(!params.size) return;
+  const raw = {};
+  for(const [k,v] of params.entries()) raw[k] = v;
+  applyExternalState(raw, { announce:true });
+}
+window.EMWaveApp = {
+  scenes: () => Object.keys(SCENES),
+  focuses: () => Object.keys(FOCUS_PRESETS),
+  getState: () => getExternalState(),
+  setState: (state={}) => applyExternalState(state, { announce:true }),
+  setScene: (scene, overrides={}) => applyExternalState({ ...overrides, scene }, { announce:true }),
+  setFocus: (focus, overrides={}) => applyExternalState({ ...overrides, focus }, { announce:true }),
+  play: () => setPlayingState(true),
+  pause: () => setPlayingState(false),
+  reset: () => { phaseU = 0; syncPhase(); setPlayingState(false); return getExternalState(); },
+  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); }
+};
+window.addEventListener('message', (event) => {
+  const data = event.data;
+  if(!data || typeof data !== 'object') return;
+  switch(data.type){
+    case 'setScene':
+      if(data.scene) window.EMWaveApp.setScene(data.scene, data.overrides || {});
+      break;
+    case 'setState':
+      window.EMWaveApp.setState(data.state || {});
+      break;
+    case 'setFocus':
+      if(data.focus) window.EMWaveApp.setFocus(data.focus, data.overrides || {});
+      break;
+    case 'play':
+      window.EMWaveApp.play();
+      break;
+    case 'pause':
+      window.EMWaveApp.pause();
+      break;
+    case 'reset':
+      window.EMWaveApp.reset();
+      break;
+    case 'step':
+      window.EMWaveApp.step(parseNumberLike(data.delta) ?? (1/8));
+      break;
+  }
+});
 function stepPhase(delta){
   forcePause();
   phaseU += delta;
@@ -2549,14 +3087,7 @@ window.addEventListener('keydown', (ev) => {
   else if(ev.key === 'ArrowDown') root.rotation.x += DSTEP;
 });
 window.addEventListener('resize', () => {
-  const w = Math.max(100, stage.clientWidth);
-  const h = Math.max(100, stage.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-  invalidateGraphs(true);
-  drawGraphs(true);
+  resizeRendererToStage();
   updateTopReadouts();
 });
 
@@ -2576,14 +3107,20 @@ ui.showB?.addEventListener('input', () => {
   restartEvolutionForSelection();
 });
 
-applyMainMode('rod', true);
-invalidateGraphs(true);
-applyViewPreset(VIEW_SCREEN);
-updateReceiverPlacement();
-updatePlanes(0);
-rebuildFields(0);
 let last = performance.now();
-let lastPhaseBucket = -1;
+var lastPhaseBucket = -1;
+async function initializeApp(){
+  await loadExternalPresetData();
+  applyMainMode('rod', true);
+  invalidateGraphs(true);
+  applyViewPreset(VIEW_SCREEN);
+  updateReceiverPlacement();
+  updatePlanes(0);
+  rebuildFields(0);
+  applyFocusPreset('default');
+  updatePlayButtons();
+  applyUrlState();
+}
 function animate(now){
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
@@ -2594,7 +3131,7 @@ function animate(now){
     if(nextU >= totalPeriods){
       phaseU = totalPeriods;
       playing = false;
-      ui.playBtn.textContent = '▶';
+      updatePlayButtons();
     }
   }
   const needWaveVisuals = !!((ui.showE && ui.showE.checked) || (ui.showB && ui.showB.checked) || (ui.showFieldMode && ui.showFieldMode.checked));
@@ -2621,7 +3158,7 @@ function animate(now){
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
-requestAnimationFrame(animate);
+initializeApp().then(() => { requestAnimationFrame(animate); });
 </script>
 </body>
 </html>

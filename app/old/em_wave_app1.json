@@ -1,0 +1,619 @@
+{
+  "layoutMaster": {
+    "panelWidth": "min(340px, 76vw)",
+    "graphUnitHeight": 92.4,
+    "rodUnitHeight": 138.6,
+    "propagationSceneHeight": 220,
+    "panelGap": 6,
+    "panelPad": 4
+  },
+  "framePresets": {
+    "medium": {
+      "width": "min(340px, 76vw)",
+      "aspectRatio": "4 / 5"
+    }
+  },
+  "focusPresets": {
+    "rod_v": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "230px",
+      "graphs": {
+        "V": true,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.29,
+          "y": 0.05,
+          "w": 0.42,
+          "h": 0.25
+        },
+        "stage": {
+          "x": 0.26,
+          "y": 0.34,
+          "w": 0.48,
+          "h": 0.5
+        }
+      }
+    },
+    "rod_vq": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "230px",
+      "graphs": {
+        "V": true,
+        "Q": true,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.22,
+          "y": 0.05,
+          "w": 0.56,
+          "h": 0.34
+        },
+        "stage": {
+          "x": 0.2,
+          "y": 0.42,
+          "w": 0.6,
+          "h": 0.42
+        }
+      }
+    },
+    "rod_vqi": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "230px",
+      "graphs": {
+        "V": true,
+        "Q": true,
+        "I": true,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.18,
+          "y": 0.04,
+          "w": 0.64,
+          "h": 0.44
+        },
+        "stage": {
+          "x": 0.22,
+          "y": 0.5,
+          "w": 0.56,
+          "h": 0.34
+        }
+      }
+    },
+    "graphs_qieb": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": true,
+        "I": true,
+        "E": true,
+        "B": true
+      }
+    },
+    "graph_v_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "none",
+      "graphs": {
+        "V": true,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.08,
+          "y": 0.08,
+          "w": 0.84,
+          "h": 0.84
+        }
+      }
+    },
+    "graph_vq_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "none",
+      "graphs": {
+        "V": true,
+        "Q": true,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.08,
+          "y": 0.06,
+          "w": 0.84,
+          "h": 0.88
+        }
+      }
+    },
+    "graph_vqi_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "none",
+      "graphs": {
+        "V": true,
+        "Q": true,
+        "I": true,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.08,
+          "y": 0.05,
+          "w": 0.84,
+          "h": 0.9
+        }
+      }
+    },
+    "graph_q_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "none",
+      "graphs": {
+        "V": false,
+        "Q": true,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.08,
+          "y": 0.08,
+          "w": 0.84,
+          "h": 0.84
+        }
+      }
+    },
+    "graph_i_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "none",
+      "graphs": {
+        "V": false,
+        "Q": false,
+        "I": true,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.08,
+          "y": 0.08,
+          "w": 0.84,
+          "h": 0.84
+        }
+      }
+    },
+    "graph_e_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": false,
+        "I": false,
+        "E": true,
+        "B": false
+      },
+      "regions": {
+        "topWaveOverlay": {
+          "x": 0.1,
+          "y": 0.08,
+          "w": 0.8,
+          "h": 0.84
+        }
+      }
+    },
+    "graph_b_only": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": true
+      },
+      "regions": {
+        "topWaveOverlay": {
+          "x": 0.1,
+          "y": 0.08,
+          "w": 0.8,
+          "h": 0.84
+        }
+      }
+    },
+    "rod_only_compact": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "stage": {
+          "x": 0.16,
+          "y": 0.1,
+          "w": 0.68,
+          "h": 0.76
+        }
+      }
+    },
+    "dynamic_stage": {
+      "focusMode": true,
+      "controls": "none",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "stage": {
+          "x": 0.08,
+          "y": 0.1,
+          "w": 0.84,
+          "h": 0.78
+        }
+      }
+    },
+    "graphs_qieb_only": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": false,
+      "showHud": false,
+      "graphs": {
+        "V": false,
+        "Q": true,
+        "I": true,
+        "E": true,
+        "B": true
+      }
+    }
+  },
+  "scenes": {
+    "rod_v_top": {
+      "focus": "graph_v_only",
+      "mode": "rod",
+      "phase": 0,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "rod_v_bottom": {
+      "focus": "rod_only_compact",
+      "mode": "rod",
+      "phase": 0,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1360
+      }
+    },
+    "rod_vq_top": {
+      "focus": "graph_vq_only",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "rod_vq_bottom": {
+      "focus": "rod_only_compact",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1360
+      }
+    },
+    "rod_vqi_top": {
+      "focus": "graph_vqi_only",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "rod_vqi_bottom": {
+      "focus": "rod_only_compact",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1360
+      }
+    },
+    "graph_q_scene": {
+      "focus": "graph_q_only",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "graph_i_scene": {
+      "focus": "graph_i_only",
+      "mode": "rod",
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "graph_e_scene": {
+      "focus": "graph_e_only",
+      "mode": "lines",
+      "showE": true,
+      "showB": false,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "graph_b_scene": {
+      "focus": "graph_b_only",
+      "mode": "lines",
+      "showE": false,
+      "showB": true,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "panel5_dynamic_e": {
+      "focus": "dynamic_stage",
+      "mode": "lines",
+      "showE": true,
+      "showB": false,
+      "showFieldMode": false,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "panel5_dynamic_b": {
+      "focus": "dynamic_stage",
+      "mode": "lines",
+      "showE": false,
+      "showB": true,
+      "showFieldMode": false,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "panel5_dynamic_eb": {
+      "focus": "dynamic_stage",
+      "mode": "lines",
+      "showE": true,
+      "showB": true,
+      "showFieldMode": false,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "panel6_dynamic_e": {
+      "focus": "dynamic_stage",
+      "mode": "lines",
+      "showE": true,
+      "showB": false,
+      "showFieldMode": false,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    },
+    "panel6_dynamic_e_linear": {
+      "focus": "dynamic_stage",
+      "mode": "lines",
+      "showE": true,
+      "showB": false,
+      "showFieldMode": true,
+      "phase": 0.125,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1180
+      }
+    }
+  },
+  "panels": {
+    "rod_v": {
+      "type": "composite",
+      "title": "Ράβδος και τάση",
+      "graphCount": 1,
+      "hasRod": true,
+      "topScene": "rod_v_top",
+      "bottomScene": "rod_v_bottom",
+      "controls": [
+        "play",
+        "reset"
+      ]
+    },
+    "rod_vq": {
+      "type": "composite",
+      "title": "Ράβδος, τάση και φορτίο",
+      "graphCount": 2,
+      "hasRod": true,
+      "topScene": "rod_vq_top",
+      "bottomScene": "rod_vq_bottom",
+      "controls": [
+        "play",
+        "reset"
+      ]
+    },
+    "rod_vqi": {
+      "type": "composite",
+      "title": "Ράβδος, τάση, φορτίο και ρεύμα",
+      "graphCount": 3,
+      "hasRod": true,
+      "topScene": "rod_vqi_top",
+      "bottomScene": "rod_vqi_bottom",
+      "controls": [
+        "play",
+        "reset"
+      ]
+    },
+    "graphs_qieb": {
+      "type": "stack",
+      "title": "q, i, E, B",
+      "stackScenes": [
+        "graph_q_scene",
+        "graph_i_scene",
+        "graph_e_scene",
+        "graph_b_scene"
+      ],
+      "controls": [
+        "play",
+        "reset"
+      ]
+    },
+    "panel5": {
+      "type": "composite-select",
+      "title": "Δυναμικές γραμμές και επιλογή πεδίου",
+      "topStackScenes": [
+        "graph_e_scene",
+        "graph_b_scene"
+      ],
+      "bottomDefault": "panel5_dynamic_e",
+      "bottomOptions": {
+        "E": "panel5_dynamic_e",
+        "B": "panel5_dynamic_b",
+        "E+B": "panel5_dynamic_eb"
+      },
+      "controls": [
+        "stepBack",
+        "play",
+        "reset",
+        "stepFwd"
+      ]
+    },
+    "panel6": {
+      "type": "composite-toggle",
+      "title": "Δυναμικές γραμμές E με πρόσθετη ευθεία διάδοση",
+      "topStackScenes": [
+        "graph_e_scene",
+        "graph_b_scene"
+      ],
+      "bottomScene": "panel6_dynamic_e",
+      "toggleLabel": "Ευθεία διάδοση",
+      "toggleScene": "panel6_dynamic_e_linear",
+      "controls": [
+        "stepBack",
+        "play",
+        "reset",
+        "stepFwd"
+      ]
+    }
+  }
+}

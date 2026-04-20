@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Η/Μ κύμα · ηλεκτρονικό βιβλίο</title>
+  <style>
+    :root{
+      --bg:#f3efe6;
+      --paper:#fffdf9;
+      --ink:#1d2730;
+      --muted:#5e6d79;
+      --line:#ddd3c3;
+      --accent:#1f5f8b;
+      --accent-soft:#e7f0f6;
+      --note:#f6efdc;
+      --figure:#f6f8fa;
+      --max-page:1180px;
+      --paper-width:980px;
+      --article-width:860px;
+      --shape-width:340px;
+      --shadow:0 12px 32px rgba(0,0,0,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#efe9dc 0,#f3efe6 120px);
+      color:var(--ink);
+      font:18px/1.72 Georgia,"Noto Serif",serif;
+    }
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(10px);
+      background:rgba(243,239,230,.88);
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .topbar-inner{
+      max-width:var(--paper-width);
+      margin:0 auto;
+      padding:10px 18px 12px;
+    }
+    .topbar-main{
+      display:block;
+      width:100%;
+    }
+    button,a.action{
+      appearance:none;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color:var(--ink);
+      padding:10px 14px;
+      border-radius:999px;
+      font:600 14px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .page{
+      max-width:var(--max-page);
+      margin:0 auto;
+      padding:22px 18px 80px;
+    }
+    .hero{
+      max-width:var(--paper-width);
+      margin:0 auto 20px;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:30px 28px 24px;
+    }
+    .eyebrow{
+      margin:0 0 10px;
+      font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--accent);
+    }
+    h1{
+      margin:0 0 10px;
+      font-family:Georgia,"Times New Roman",serif;
+      font-size:clamp(30px,3.25vw,42px);
+      line-height:1.08;
+      letter-spacing:-.016em;
+      font-weight:760;
+      color:#1b506f;
+      white-space:nowrap;
+      overflow:visible;
+      text-wrap:nowrap;
+    }
+    .subtitle{
+      margin:0;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.5;
+      max-width:56ch;
+    }
+    .intro-note{
+      margin-top:18px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:var(--accent-soft);
+      border:1px solid #cddfea;
+      font:500 16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      color:#28485f;
+    }
+
+    .mega-nav{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:10px;
+      align-items:stretch;
+      justify-content:center;
+      position:relative;
+      z-index:30;
+      width:100%;
+      min-width:0;
+      max-width:var(--paper-width);
+      margin:0 auto;
+    }
+    .menu-item{position:relative; min-width:0}
+    .menu-item::after{content:""; position:absolute; left:0; right:0; top:100%; height:12px; background:transparent}
+    .menu-trigger{
+      appearance:none;
+      display:flex;
+      width:100%;
+      min-width:0;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:18px;
+      font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      text-decoration:none;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      white-space:nowrap;
+      text-align:center;
+    }
+    .menu-item:hover > .menu-trigger,
+    .menu-item:focus-within > .menu-trigger,
+    .menu-item.active > .menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+    .menu-trigger .caret{font-size:11px; color:var(--muted)}
+    .menu-dropdown{
+      position:absolute;
+      left:0;
+      top:calc(100% + 2px);
+      min-width:100%;
+      width:max-content;
+      display:none;
+      padding:10px;
+      background:#fffdf9;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 14px 34px rgba(0,0,0,.12);
+    }
+    .menu-item:hover > .menu-dropdown,
+    .menu-item:focus-within > .menu-dropdown{display:block}
+        .menu-dropdown .menu-section-link,
+    .menu-dropdown .menu-part-link,
+    .menu-dropdown .menu-planned{
+      display:block;
+      text-decoration:none;
+      color:var(--ink);
+      background:#faf8f3;
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:12px;
+      padding:10px 12px;
+      font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      margin:0 0 8px;
+    }
+    .menu-dropdown .menu-part-link{background:var(--accent-soft); border-color:#cddfea; color:#204863}
+    .menu-dropdown .menu-planned{color:var(--muted); background:#fcfbf8}
+    .menu-dropdown .menu-section-link:last-child,
+    .menu-dropdown .menu-part-link:last-child,
+    .menu-dropdown .menu-planned:last-child{margin-bottom:0}
+    .menu-dropdown .menu-section-link.active{background:var(--accent-soft); border-color:#cddfea; color:#204863}
+    .toolbar button,.toolbar .file-label{padding:8px 10px; border-radius:12px; font-size:12px}
+    @media (max-width:1100px){
+      .mega-nav{grid-template-columns:repeat(5,minmax(150px,1fr)); overflow-x:auto; padding-bottom:2px}
+      .mega-nav::-webkit-scrollbar{height:6px}
+    }
+    @media (max-width:720px){
+      .topbar-inner{padding:8px 10px 10px}
+      .mega-nav{grid-template-columns:repeat(5,minmax(140px,1fr)); gap:8px}
+      .menu-trigger{padding:10px 10px; font-size:12px}
+      .menu-dropdown{min-width:100%}
+    }
+    .menu-print-panel{display:grid; gap:10px; min-width:250px}
+    .menu-print-panel label{display:grid; gap:6px; font:650 13px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:var(--muted)}
+    .menu-print-panel select{
+      appearance:none;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:12px;
+      font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    }
+    .menu-print-panel .menu-print-btn{justify-content:center}
+
+    .chapter{
+      max-width:var(--paper-width);
+      margin:0 auto;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:34px 28px 38px;
+      overflow:hidden;
+    }
+    .section{
+      scroll-margin-top:82px;
+      margin:0 0 36px;
+      padding-bottom:20px;
+      border-bottom:1px solid rgba(0,0,0,.06);
+    }
+    .section:last-child{margin-bottom:0; padding-bottom:0; border-bottom:0}
+    .section h2{
+      margin:0 0 8px;
+      font:690 clamp(17px,1.55vw,21px)/1.2 Georgia,"Noto Serif",serif;
+      letter-spacing:-.008em;
+      color:#5d7281;
+    }
+    .lead{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:19px;
+      max-width:60ch;
+    }
+    .article-body{
+      max-width:var(--article-width);
+      margin:0 auto;
+      text-align:justify;
+      text-justify:inter-word;
+      hyphens:auto;
+      overflow:visible;
+    }
+    .article-body p{margin:0 0 15px}
+
+    .note{
+      margin:18px 0;
+      padding:14px 16px;
+      border-radius:16px;
+      background:var(--note);
+      border:1px solid #e4d7ae;
+      font:500 16px/1.58 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    }
+    .note .label{
+      display:block;
+      margin:0 0 6px;
+      font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#8d6d1c;
+    }
+
+    figure.media{
+      margin:6px 0 16px;
+      background:var(--figure);
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+    }
+    figure.media.float-right,
+    figure.media.float-left{
+      width:min(var(--figure-width, var(--shape-width)), 42vw);
+      margin-top:4px;
+    }
+    figure.media.float-right{
+      float:right;
+      margin:4px 0 10px 20px;
+    }
+    figure.media.float-right + figure.media.float-right{
+      clear:right;
+      margin-top:0;
+    }
+    figure.media.float-left{
+      float:left;
+      margin:4px 20px 10px 0;
+    }
+    figure.media.float-left + figure.media.float-left{
+      clear:left;
+      margin-top:0;
+    }
+    figure.media.wide{
+      clear:both;
+      width:100%;
+      max-width:100%;
+      margin:22px 0;
+    }
+    .media-frame{
+      position:relative;
+      width:100%;
+      background:#dde7ee;
+      overflow:hidden;
+      aspect-ratio:16/9;
+    }
+    .media-frame.square{aspect-ratio:1}
+    .media-frame.tall{aspect-ratio:4/5}
+    .media-frame.natural{aspect-ratio:auto; background:#fff; overflow:visible}
+    .media-frame.split,.media-frame.stack{display:grid; background:#fff}
+    .media-frame.split .pane,.media-frame.stack .pane{position:relative; overflow:hidden; background:#fff}
+    .media-frame.split .pane + .pane,.media-frame.stack .pane + .pane{border-top:1px solid rgba(0,0,0,.08)}
+    .scene-controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(0,0,0,.07);background:#f8fafc;align-items:center}
+    .scene-controls .group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .scene-controls .spacer{flex:1 1 auto}
+    .scene-btn{appearance:none;border:1px solid rgba(0,0,0,.14);background:#fff;color:var(--ink);padding:8px 12px;border-radius:999px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;cursor:pointer}
+    .scene-btn:hover{background:#f5f7fa}
+    .scene-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .scene-btn.compact{min-width:38px;padding:8px 10px;text-align:center}
+    .media-frame iframe,
+    .media-frame img,
+    .media-placeholder{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
+    .media-frame img{object-fit:cover}
+    .media-frame.natural img{position:static; inset:auto; width:100%; height:auto; object-fit:contain; display:block}
+    .media-placeholder{
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:22px;
+      background:linear-gradient(135deg,#f7fbfd,#e1ebf1);
+      color:#465666;
+      font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    }
+    figcaption{
+      padding:12px 14px 14px;
+      font:500 14px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      color:var(--muted);
+      border-top:1px solid rgba(0,0,0,.07);
+    }
+    .clear{clear:both}
+    .status{
+      margin-top:14px;
+      color:var(--muted);
+      font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    }
+    code{font:600 .95em/1.2 ui-monospace,SFMono-Regular,Consolas,monospace; background:#f2eee6; padding:.12em .38em; border-radius:8px}
+
+    @media (max-width: 900px){
+      .chapter{padding:26px 18px 30px}
+      figure.media.float-right,
+      figure.media.float-left,
+      figure.media.wide{
+        float:none;
+        width:100%;
+        max-width:100%;
+        margin:18px 0;
+      }
+      .article-body{max-width:100%}
+    }
+
+    .part-shell{margin:0 0 42px; padding:0 0 8px; border-bottom:1px solid rgba(0,0,0,.08)}
+    .part-shell:last-child{border-bottom:0; margin-bottom:0}
+    .part-kicker{margin:0 0 8px; font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif; text-transform:uppercase; letter-spacing:.11em; color:#8a6a32}
+    .part-title-main{margin:0 0 16px; font:780 clamp(24px,2.4vw,31px)/1.09 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif; letter-spacing:-.022em; color:#2f627f}
+    .part-planned{margin:0 0 22px; padding:14px 16px; border-radius:16px; background:#faf8f3; border:1px solid var(--line)}
+    .part-planned ul{margin:8px 0 0 20px; padding:0}
+    .part-planned li{margin:4px 0}
+
+    .callout{margin:16px 0; padding:10px 12px; border:1px solid #d6e2eb; border-radius:14px; background:#f8fbfd; font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:#29414f}
+    .callout-title{margin:0 0 8px; font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif; text-transform:uppercase; letter-spacing:.08em; color:#2f698f}
+    .callout-row{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 6px}
+    .callout-label{font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:#5a7386; padding:4px 7px; border-radius:999px; background:#eef4f8; border:1px solid #d7e4ec}
+    .callout-chip{display:inline-flex; align-items:center; justify-content:center; min-height:24px; padding:4px 8px; border-radius:999px; background:#fff; border:1px solid #d6e2eb; font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:#203848}
+    .callout-observe{margin-top:4px; padding-top:6px; border-top:1px dashed #cfdbe3}
+    .callout-observe-title{font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:#7b5c2a; margin-right:6px}
+    .callout-observe ul{margin:6px 0 0 18px; padding:0}
+    .callout-observe li{margin:4px 0; font-style:italic}
+
+    @media print{
+      @page{size:A4 portrait; margin:12mm}
+      body{background:#fff !important; font-size:13.2pt; line-height:1.55}
+      .topbar,.status,.scene-controls,.print-tools{display:none !important}
+      .page{max-width:none; padding:0}
+      .hero,.chapter,.part-card,figure.media,.note,.callout{box-shadow:none !important}
+      .hero,.chapter{border-color:#d8d2c8}
+      .parts-nav{grid-template-columns:1fr 1fr; gap:8px}
+      .part-shell{break-before:page; page-break-before:always}
+      .part-shell:first-child{break-before:auto; page-break-before:auto}
+      figure.media,.note,.callout,.section h2{break-inside:avoid; page-break-inside:avoid}
+      .media-frame iframe{display:none !important}
+      .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]"; position:absolute; inset:0; display:grid; place-items:center; padding:18px; color:#5e6d79; font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif; background:#f4f6f8}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-main">
+        <nav class="mega-nav" id="megaNav" aria-label="Κύρια πλοήγηση βιβλίου"></nav>
+      </div>
+    </div>
+  </div>
+
+  <main class="page">
+    <section class="hero" id="hero"></section>
+    <article class="chapter" id="chapter"></article>
+    <div class="status" id="status"></div>
+  </main>
+
+  <script>
+    const heroEl = document.getElementById('hero');
+    const megaNavEl = document.getElementById('megaNav');
+    const chapterEl = document.getElementById('chapter');
+    const dynamicMultisceneRegistry = new Map();
+    const statusEl = document.getElementById('status');
+
+    const DEFAULT_JSON = 'chapter_content.json';
+    let currentData = null;
+    let loadedFromFileHandle = false;
+
+    function setStatus(msg){ statusEl.textContent = msg || ''; }
+    function withCacheBust(url){
+      try{
+        const u = new URL(url, window.location.href);
+        u.searchParams.set('_cb', String(Date.now()));
+        return u.toString();
+      }catch(err){
+        return url;
+      }
+    }
+
+    function applyPrintPageStyle(orientation='portrait'){
+      let styleEl = document.getElementById('printPageStyle');
+      if(!styleEl){
+        styleEl = document.createElement('style');
+        styleEl.id = 'printPageStyle';
+        document.head.appendChild(styleEl);
+      }
+      const size = orientation === 'landscape' ? 'A4 landscape' : 'A4 portrait';
+      styleEl.textContent = `@page{ size:${size}; margin:12mm; }`;
+    }
+    function setupPrintTools(){
+      const printBtn = document.getElementById('printBtn');
+      const printOrient = document.getElementById('printOrient');
+      if(!printBtn || !printOrient) return;
+      const saved = localStorage.getItem('hmBookPrintOrient');
+      if(saved) printOrient.value = saved;
+      if(!printOrient.dataset.bound){
+        printOrient.addEventListener('change', ()=> localStorage.setItem('hmBookPrintOrient', printOrient.value));
+        printOrient.dataset.bound = '1';
+      }
+      if(!printBtn.dataset.bound){
+        printBtn.addEventListener('click', ()=>{
+          const orientation = printOrient.value || 'portrait';
+          localStorage.setItem('hmBookPrintOrient', orientation);
+          applyPrintPageStyle(orientation);
+          window.print();
+        });
+        printBtn.dataset.bound = '1';
+      }
+    }
+
+    function normalizeMainTitle(title=''){
+      return String(title || '').replace('Γέννηση και διάδοση του ηλεκτρομαγνητικού κύματος','Γέννηση και διάδοση του ΗΜ κύματος');
+    }
+
+    function renderHero(meta={}){
+      const mainTitle = normalizeMainTitle(meta.title || '');
+      heroEl.innerHTML = `
+        ${meta.eyebrow ? `<p class="eyebrow">${meta.eyebrow}</p>` : ''}
+        ${mainTitle ? `<h1>${mainTitle}</h1>` : ''}
+        ${meta.subtitle ? `<p class="subtitle">${meta.subtitle}</p>` : ''}
+        ${meta.introNote ? `<div class="intro-note">${meta.introNote}</div>` : ''}
+      `;
+      document.title = mainTitle || 'Ανάγνωσμα Η/Μ κύματος';
+    }
+
+    function renderNav(sections=[], parts=[]){
+      if(!megaNavEl) return;
+      const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+      const partItems = (Array.isArray(parts) && parts.length) ? parts.map(part => {
+        const directHref = part.id ? `#${part.id}` : '#';
+        const links = (part.sectionIds || []).map(id => {
+          const sec = byId[id];
+          if(!sec) return '';
+          return `<a class="menu-section-link" data-section-id="${id}" href="#${id}">${sec.navLabel || sec.title || id}</a>`;
+        }).join('');
+        const planned = (part.plannedTitles || []).map(t => `<span class="menu-planned">${t}</span>`).join('');
+        return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${directHref}">${part.title || ''}<span class="caret">▾</span></a><div class="menu-dropdown">${links}${planned}</div></div>`;
+      }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
+
+      megaNavEl.innerHTML = `${partItems}
+        <div class="menu-item" data-part-id="print">
+          <button class="menu-trigger" type="button">Εκτύπωση<span class="caret">▾</span></button>
+          <div class="menu-dropdown">
+            <div class="menu-print-panel">
+              <label>Προσανατολισμός
+                <select id="printOrient">
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </label>
+              <button id="printBtn" class="menu-trigger menu-print-btn" type="button">Εκτύπωση / PDF</button>
+            </div>
+          </div>
+        </div>`;
+      setupPrintTools();
+    }
+
+    function setupScrollSpy(sections=[], parts=[]){
+      if(!megaNavEl) return;
+      const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+      const entries = [];
+      const sectionToPart = new Map();
+      (parts || []).forEach(part => {
+        (part.sectionIds || []).forEach(id => {
+          sectionToPart.set(id, part);
+          const el = document.getElementById(id);
+          if(el) entries.push({ el, section: byId[id], part });
+        });
+      });
+      (sections || []).forEach(sec => {
+        if(sectionToPart.has(sec.id)) return;
+        const el = document.getElementById(sec.id);
+        if(el) entries.push({ el, section: sec, part: null });
+      });
+      entries.sort((a,b) => a.el.offsetTop - b.el.offsetTop);
+      const partNodes = Array.from(megaNavEl.querySelectorAll('.menu-item[data-part-id]'));
+      const linkNodes = Array.from(megaNavEl.querySelectorAll('.menu-section-link[data-section-id]'));
+      const update = () => {
+        const y = window.scrollY + 150;
+        let current = entries[0] || null;
+        for(const item of entries){
+          if(item.el.offsetTop <= y) current = item;
+          else break;
+        }
+        partNodes.forEach(n => n.classList.remove('active'));
+        linkNodes.forEach(n => n.classList.remove('active'));
+        if(!current){
+          return;
+        }
+        if(current.part?.id){
+          const node = megaNavEl.querySelector(`.menu-item[data-part-id="${current.part.id}"]`);
+          if(node) node.classList.add('active');
+        }
+        if(current.section?.id){
+          const link = megaNavEl.querySelector(`.menu-section-link[data-section-id="${current.section.id}"]`);
+          if(link) link.classList.add('active');
+        }
+      };
+      window.removeEventListener('scroll', window.__hmBookScrollSpy || (()=>{}));
+      window.__hmBookScrollSpy = update;
+      window.addEventListener('scroll', update, { passive:true });
+      window.addEventListener('resize', update, { passive:true });
+      update();
+    }
+
+
+    function escapeHtml(text=''){
+      return text
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+
+    function resolvePanelSeries(block){
+      const series = block.panelSeries;
+      if(!series) return block;
+
+      const presets = 'scene_presets.json';
+      const common = { simulationSrc:'../app/em_wave_app.html', presets, controls:'none', embed:true, freeze:true };
+      const graphHeight = 146.2;
+      const rodHeight = 219.3;
+      const withRod = (count, topSrc, bottomSrc) => {
+        const total = (graphHeight * count) + rodHeight;
+        const top = ((graphHeight * count) / total) * 100;
+        const bottom = (rodHeight / total) * 100;
+        return {
+          ...block,
+          ...common,
+          frameWidth: block.frameWidth || 340,
+          frameAspectRatio: `340 / ${total.toFixed(1)}`,
+          rows: `${top.toFixed(3)}% ${bottom.toFixed(3)}%`,
+          topSrc,
+          bottomSrc
+        };
+      };
+
+      if(series === 'core_progression'){
+        const n = Number(block.graphCount || 1);
+        if(n === 1) return withRod(1,
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_top&focus=graph_v_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_bottom&focus=rod_only_compact&controls=none&play=0'
+        );
+        if(n === 2) return withRod(2,
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+        );
+        if(n === 3) return withRod(3,
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_top&focus=graph_vqi_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+        );
+        if(n === 4) return withRod(4,
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=graphs_qieb&focus=graphs_qieb_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+        );
+      }
+
+      if(series === 'temp_like_vq'){
+        return withRod(2,
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+        );
+      }
+
+      return block;
+    }
+
+    function placementClass(block){
+      const p = String(block?.placement || '').toLowerCase();
+      if(p === 'left') return 'float-left';
+      if(p === 'right') return 'float-right';
+      return 'wide';
+    }
+
+    function aspectClass(block){
+      const a = String(block?.aspect || '').toLowerCase();
+      if(['square','tall','natural','split','stack'].includes(a)) return a;
+      return '';
+    }
+
+    function registerDynamicMultisceneFrame(frame, iframe, block){
+      if(!frame || !iframe) return;
+      const src = String(iframe.src || block?.singleSrc || '');
+      if(!src.includes('scene=book_multiscene')) return;
+      dynamicMultisceneRegistry.set(iframe, { frame, iframe, frameWidth: block?.frameWidth || 340, metrics:null });
+      const applyMetrics = () => {
+        const rec = dynamicMultisceneRegistry.get(iframe);
+        if(!rec || !rec.metrics) return;
+        const renderWidth = Math.max(120, frame.clientWidth || rec.frameWidth || 340);
+        const baseWidth = Math.max(1, rec.frameWidth || 340);
+        const scaledHeight = (rec.metrics.totalHeight || rec.metrics.rodHeight || 219.3) * (renderWidth / baseWidth);
+        frame.style.aspectRatio = 'auto';
+        frame.style.height = `${scaledHeight}px`;
+        frame.dataset.dynamicHeight = String(scaledHeight);
+      };
+      iframe.addEventListener('load', () => setTimeout(applyMetrics, 0));
+      if(window.ResizeObserver){
+        const ro = new ResizeObserver(() => applyMetrics());
+        ro.observe(frame);
+      }
+    }
+
+    window.addEventListener('message', (event) => {
+      if(!event || !event.data || event.data.type !== 'book_multiscene_metrics') return;
+      for(const [iframe, rec] of dynamicMultisceneRegistry.entries()){
+        if(iframe.contentWindow === event.source){
+          rec.metrics = event.data.metrics || null;
+          const renderWidth = Math.max(120, rec.frame.clientWidth || rec.frameWidth || 340);
+          const baseWidth = Math.max(1, rec.frameWidth || 340);
+          const scaledHeight = (rec.metrics?.totalHeight || rec.metrics?.rodHeight || 219.3) * (renderWidth / baseWidth);
+          rec.frame.style.aspectRatio = 'auto';
+          rec.frame.style.height = `${scaledHeight}px`;
+          rec.frame.dataset.dynamicHeight = String(scaledHeight);
+          break;
+        }
+      }
+    });
+
+    function renderScene(block){
+      block = resolvePanelSeries(block);
+      const figure = document.createElement('figure');
+      figure.className = `media ${placementClass(block)}`;
+      if(block.frameWidth){ figure.style.setProperty('--figure-width', `${block.frameWidth}px`); }
+
+      const isSplit = !!(block.topScene || block.topSrc || block.bottomScene || block.bottomSrc);
+      const isStack = Array.isArray(block.stackSrcs) && block.stackSrcs.length;
+      const isCompositeSelect = Array.isArray(block.topStackSrcs) && block.topStackSrcs.length && block.bottomOptions && typeof block.bottomOptions === 'object';
+      const frame = document.createElement('div');
+      frame.className = `media-frame ${aspectClass(block)}`.trim();
+      if(block.frameAspectRatio){ frame.style.aspectRatio = block.frameAspectRatio; }
+
+      const makeIframe = (src) => {
+        const iframe = document.createElement('iframe');
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'no-referrer';
+        iframe.allow = 'fullscreen';
+        const freezeUrl = withCacheBust(src);
+        iframe.src = freezeUrl;
+        iframe.dataset.freezeSrc = freezeUrl;
+        iframe.dataset.playSrc = freezeUrl.includes('play=0') ? freezeUrl.replace('play=0','play=1') : freezeUrl;
+        return iframe;
+      };
+      const makeIframePaneFromSrc = (src) => {
+        const pane = document.createElement('div');
+        pane.className = 'pane';
+        pane.appendChild(makeIframe(src));
+        return pane;
+      };
+
+      let controlSpec = null;
+
+      if(isCompositeSelect){
+        frame.classList.add('split');
+        if(block.rows){ frame.style.gridTemplateRows = block.rows; }
+        const topPane = document.createElement('div');
+        topPane.className = 'pane';
+        const topFrame = document.createElement('div');
+        topFrame.className = 'media-frame stack';
+        topFrame.style.aspectRatio = 'auto';
+        topFrame.style.height = '100%';
+        topFrame.style.gridTemplateRows = `repeat(${block.topStackSrcs.length}, minmax(0, 1fr))`;
+        block.topStackSrcs.forEach(src => {
+          const pane = makeIframePaneFromSrc(src);
+          topFrame.appendChild(pane);
+          const ifr = pane.querySelector('iframe');
+          if(ifr) registerDynamicMultisceneFrame(pane, ifr, block);
+        });
+        topPane.appendChild(topFrame);
+        frame.appendChild(topPane);
+
+        const bottomPane = document.createElement('div');
+        bottomPane.className = 'pane';
+        const defaultKey = block.bottomDefaultKey || Object.keys(block.bottomOptions)[0];
+        const bottomIframe = makeIframe(block.bottomOptions[defaultKey]);
+        bottomPane.appendChild(bottomIframe);
+        registerDynamicMultisceneFrame(bottomPane, bottomIframe, block);
+        frame.appendChild(bottomPane);
+
+        const topIframes = Array.from(topFrame.querySelectorAll('iframe'));
+        controlSpec = {
+          kind:'select_scene',
+          iframe:bottomIframe,
+          iframes:[...topIframes, bottomIframe],
+          options:block.bottomOptions,
+          defaultKey,
+          controls:block.extraControls || ['play','reset']
+        };
+      } else if(isStack){
+        frame.classList.add('stack');
+        frame.style.gridTemplateRows = `repeat(${block.stackSrcs.length}, minmax(0, 1fr))`;
+        block.stackSrcs.forEach(src => frame.appendChild(makeIframePaneFromSrc(src)));
+        const stackIframes = Array.from(frame.querySelectorAll('iframe'));
+        controlSpec = {
+          kind:'broadcast',
+          iframes:stackIframes,
+          controls:block.extraControls || ['play','reset']
+        };
+      } else if(isSplit){
+        frame.classList.add('split');
+        if(block.rows){ frame.style.gridTemplateRows = block.rows; }
+
+        const makePane = (kind) => {
+          const pane = document.createElement('div');
+          pane.className = 'pane';
+          const explicitSrc = block[`${kind}Src`];
+          if(explicitSrc){
+            const ifr = makeIframe(explicitSrc);
+            pane.appendChild(ifr);
+            registerDynamicMultisceneFrame(pane, ifr, block);
+          } else {
+            const paneBlock = {
+              ...block,
+              scene: block[`${kind}Scene`] || block.scene,
+              focus: block[`${kind}Focus`] || block.focus
+            };
+            const ifr = makeIframe(sceneUrl(paneBlock,false));
+            pane.appendChild(ifr);
+            registerDynamicMultisceneFrame(pane, ifr, paneBlock);
+          }
+          return pane;
+        };
+
+        if(block.topScene || block.topSrc) frame.appendChild(makePane('top'));
+        if(block.bottomScene || block.bottomSrc) frame.appendChild(makePane('bottom'));
+        const splitIframes = Array.from(frame.querySelectorAll('iframe'));
+        controlSpec = {
+          kind:'broadcast',
+          iframes:splitIframes,
+          controls:block.extraControls || ['play','reset']
+        };
+      } else {
+        const explicitSingleSrc = block.singleSrc || '';
+        const canEmbed = !!(explicitSingleSrc || block.simulationSrc);
+        const freezeUrl = explicitSingleSrc ? withCacheBust(explicitSingleSrc) : (canEmbed ? withCacheBust(sceneUrl(block,false)) : '');
+        if(canEmbed){
+          const iframe = document.createElement('iframe');
+          iframe.loading = 'lazy';
+          iframe.referrerPolicy = 'no-referrer';
+          iframe.allow = 'fullscreen';
+          iframe.src = freezeUrl;
+          iframe.dataset.freezeSrc = freezeUrl;
+          iframe.dataset.playSrc = explicitSingleSrc
+            ? (freezeUrl.includes('play=0') ? freezeUrl.replace('play=0','play=1') : freezeUrl)
+            : sceneUrl(block,true);
+          frame.appendChild(iframe);
+          registerDynamicMultisceneFrame(frame, iframe, block);
+        } else {
+          const ph = document.createElement('div');
+          ph.className = 'media-placeholder';
+          ph.innerHTML = `<div><strong>${escapeHtml(block.title || 'Σκηνή')}</strong><br>${escapeHtml(block.placeholder || 'Θέση για εστιασμένο τμήμα της εφαρμογής.')}</div>`;
+          frame.appendChild(ph);
+        }
+      }
+
+      figure.appendChild(frame);
+
+      if(controlSpec){
+        const controls = document.createElement('div');
+        controls.className = 'scene-controls';
+        const modeGroup = document.createElement('div');
+        modeGroup.className = 'group';
+        const transportGroup = document.createElement('div');
+        transportGroup.className = 'group';
+        const spacer = document.createElement('div');
+        spacer.className = 'spacer';
+
+        const getFrames = () => (controlSpec.iframes || []).filter(Boolean);
+        const broadcast = (msg) => { getFrames().forEach(fr => fr.contentWindow?.postMessage(msg, '*')); };
+        const setBottomSrc = (src, shouldPlay=false) => {
+          if(!controlSpec.iframe) return;
+          const url = withCacheBust(src);
+          controlSpec.iframe.src = shouldPlay && url.includes('play=0') ? url.replace('play=0','play=1') : url;
+          controlSpec.iframe.dataset.freezeSrc = url;
+          controlSpec.iframe.dataset.playSrc = url.includes('play=0') ? url.replace('play=0','play=1') : url;
+        };
+        const setActiveKey = (key) => {
+          [...modeGroup.querySelectorAll('[data-scene-key]')].forEach(btn => btn.classList.toggle('active', btn.dataset.sceneKey === key));
+          controls.dataset.sceneKey = key;
+        };
+
+        if(controlSpec.kind === 'select_scene'){
+          Object.entries(controlSpec.options).forEach(([key, src]) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'scene-btn';
+            btn.dataset.sceneKey = key;
+            btn.textContent = key;
+            btn.addEventListener('click', () => {
+              const playBtn = transportGroup.querySelector('[data-action="play"]');
+              const shouldPlay = !!(playBtn && playBtn.dataset.playing === '1');
+              setBottomSrc(src, shouldPlay);
+              setActiveKey(key);
+            });
+            modeGroup.appendChild(btn);
+          });
+          setActiveKey(controlSpec.defaultKey);
+        }
+
+        const actions = {
+          stepBack:{ label:'⏴', title:'Βήμα πίσω', fn:() => broadcast({type:'step', delta:-1/32}) },
+          play:{ label:'▶', title:'Έναρξη / Παύση', fn:(btn) => {
+            const playing = btn.dataset.playing === '1';
+            if(playing){ broadcast({type:'pause'}); btn.dataset.playing = '0'; btn.textContent = '▶'; }
+            else { broadcast({type:'play'}); btn.dataset.playing = '1'; btn.textContent = '❚❚'; }
+          } },
+          reset:{ label:'Reset', title:'Reset', fn:() => {
+            broadcast({type:'reset'});
+            broadcast({type:'pause'});
+            const playBtn = transportGroup.querySelector('[data-action="play"]');
+            if(playBtn){ playBtn.dataset.playing = '0'; playBtn.textContent = '▶'; }
+          } },
+          stepFwd:{ label:'⏵', title:'Βήμα μπροστά', fn:() => broadcast({type:'step', delta:1/32}) },
+          qBack:{ label:'⏪', title:'Πίσω κατά T/8', fn:() => broadcast({type:'step', delta:-1/8}) },
+          qFwd:{ label:'⏩', title:'Μπροστά κατά T/8', fn:() => broadcast({type:'step', delta:1/8}) }
+        };
+        if(controlSpec.kind === 'select_scene') controls.appendChild(modeGroup);
+        controls.appendChild(spacer);
+        (controlSpec.controls || ['play','reset']).forEach(name => {
+          const spec = actions[name];
+          if(!spec) return;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scene-btn compact';
+          btn.dataset.action = name;
+          btn.title = spec.title;
+          btn.textContent = spec.label;
+          if(name === 'play') btn.dataset.playing = '0';
+          btn.addEventListener('click', () => spec.fn(btn));
+          transportGroup.appendChild(btn);
+        });
+        controls.appendChild(transportGroup);
+        figure.appendChild(controls);
+      }
+
+      if(block.title || block.caption || block.debugUrl){
+        const caption = document.createElement('figcaption');
+        const debug = block.debugUrl ? `<br><span style="font:600 12px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;color:#7a2f2f">SRC: ${escapeHtml((block.singleSrc || block.topSrc || block.simulationSrc || ''))}</span>` : '';
+        const sameCaption = block.title && block.caption && String(block.title).trim() === String(block.caption).trim();
+        caption.innerHTML = `${block.title ? `<strong>${block.title}</strong>${(!sameCaption && (block.caption || block.debugUrl)) ? '<br>' : ''}` : ''}${sameCaption ? '' : (block.caption || '')}${debug}`;
+        figure.appendChild(caption);
+      }
+      return figure;
+    }
+
+    function renderFigure(block){
+      const figure = document.createElement('figure');
+      figure.className = `media ${placementClass(block)}`;
+      const frame = document.createElement('div');
+      frame.className = `media-frame ${aspectClass(block)}`.trim();
+      if(block.src){
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = block.src;
+        img.alt = block.alt || block.title || '';
+        frame.appendChild(img);
+      } else {
+        const ph = document.createElement('div');
+        ph.className = 'media-placeholder';
+        ph.textContent = block.placeholder || 'Θέση για σχήμα';
+        frame.appendChild(ph);
+      }
+      figure.appendChild(frame);
+      if(block.title || block.caption || block.debugUrl){
+        const caption = document.createElement('figcaption');
+        const debug = block.debugUrl ? `<br><span style="font:600 12px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;color:#7a2f2f">SRC: ${escapeHtml((block.singleSrc || block.topSrc || block.simulationSrc || ''))}</span>` : '';
+        const sameCaption = block.title && block.caption && String(block.title).trim() === String(block.caption).trim();
+        caption.innerHTML = `${block.title ? `<strong>${block.title}</strong>${(!sameCaption && (block.caption || block.debugUrl)) ? '<br>' : ''}` : ''}${sameCaption ? '' : (block.caption || '')}${debug}`;
+        figure.appendChild(caption);
+      }
+      return figure;
+    }
+
+
+    function appendFlowTextBlock(container, entry, kind='paragraph', forcedLabel=''){
+      const obj = (typeof entry === 'string') ? { html: entry } : (entry || {});
+      if(obj.figureBefore) container.appendChild(renderFigure(obj.figureBefore));
+      if(kind === 'note'){
+        const note = document.createElement('aside');
+        note.className = 'note';
+        const label = forcedLabel || obj.label || '';
+        note.innerHTML = `${label ? `<span class="label">${label}</span>` : ''}${obj.html || obj.text || ''}`;
+        container.appendChild(note);
+      } else {
+        const p = document.createElement('p');
+        p.innerHTML = obj.html || obj.text || '';
+        container.appendChild(p);
+      }
+      if(obj.figureAfter) container.appendChild(renderFigure(obj.figureAfter));
+    }
+
+    function renderQuarterNarrative(block, data){
+      const lib = data?.contentLibrary?.quarterNarratives || {};
+      const item = lib[block.ref];
+      if(!item) return null;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'quarter-narrative';
+
+      if(item.meta?.title){
+        const p = document.createElement('p');
+        p.innerHTML = `<strong>${item.meta.title}</strong>`;
+        wrap.appendChild(p);
+      }
+      if(item.meta?.scope || item.meta?.warning){
+        const noteObj = { html: `${item.meta.scope ? `<span class="label">Πεδίο εφαρμογής</span>${item.meta.scope}${item.meta.warning ? '<br><br>' : ''}` : ''}${item.meta.warning || ''}` };
+        const note = document.createElement('aside');
+        note.className = 'note';
+        note.innerHTML = noteObj.html;
+        wrap.appendChild(note);
+      }
+      if(item.convention?.qPositiveWhen || item.convention?.iInitialState){
+        const note = document.createElement('aside');
+        note.className = 'note';
+        note.innerHTML = `<span class="label">Σύμβαση</span>${item.convention?.qPositiveWhen || ''}${item.convention?.iInitialState ? `<br>${item.convention.iInitialState}` : ''}`;
+        wrap.appendChild(note);
+      }
+
+      for(const q of (item.quarters || [])){
+        const head = document.createElement('p');
+        head.innerHTML = `<strong>${q.range}</strong> — ${q.title}`;
+        wrap.appendChild(head);
+        if(q.summary) appendFlowTextBlock(wrap, { html: q.summary }, 'paragraph');
+        for(const p of (q.paragraphs || [])) appendFlowTextBlock(wrap, p, 'paragraph');
+        if(q.studentTakeaway){
+          appendFlowTextBlock(wrap, { html: q.studentTakeaway }, 'note', 'Τι να κρατήσει ο μαθητής');
+        }
+      }
+      if(item.farFieldClarification?.title){
+        const head = document.createElement('p');
+        head.innerHTML = `<strong>${item.farFieldClarification.title}</strong>`;
+        wrap.appendChild(head);
+        for(const p of (item.farFieldClarification.paragraphs || [])) appendFlowTextBlock(wrap, p, 'paragraph');
+      }
+      return wrap;
+    }
+
+
+    function renderInteractiveCallout(block){
+      const wrap = document.createElement('aside');
+      wrap.className = 'callout';
+      const title = block.title || 'Δοκίμασε';
+      const setup = Array.isArray(block.setupChips) ? block.setupChips : [];
+      const press = Array.isArray(block.pressChips) ? block.pressChips : [];
+      const observe = Array.isArray(block.observeItems) ? block.observeItems : [];
+      wrap.innerHTML = `<div class="callout-title">${title}</div>`;
+      const addRow = (label, chips) => {
+        if(!chips.length) return;
+        const row = document.createElement('div');
+        row.className = 'callout-row';
+        row.innerHTML = `<span class="callout-label">${label}</span>` + chips.map(ch => `<span class="callout-chip">${escapeHtml(String(ch))}</span>`).join('');
+        wrap.appendChild(row);
+      };
+      addRow(block.setupLabel || 'Ρύθμισε', setup);
+      addRow(block.pressLabel || 'Πίεσε', press);
+      if(observe.length){
+        const obs = document.createElement('div');
+        obs.className = 'callout-observe';
+        obs.innerHTML = `<span class="callout-observe-title">${block.observeTitle || 'Παρατήρησε'}</span><ul>${observe.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        wrap.appendChild(obs);
+      }
+      return wrap;
+    }
+
+    function appendBlock(container, block){
+      switch(block.type){
+        case 'paragraph': {
+          appendFlowTextBlock(container, block, 'paragraph');
+          break;
+        }
+        case 'note': {
+          appendFlowTextBlock(container, block, 'note');
+          break;
+        }
+        case 'scene':
+          container.appendChild(renderScene(block));
+          break;
+        case 'interactive_callout':
+          container.appendChild(renderInteractiveCallout(block));
+          break;
+        case 'quarter_narrative': {
+          const node = renderQuarterNarrative(block, currentData);
+          if(node) container.appendChild(node);
+          break;
+        }
+        case 'figure':
+          container.appendChild(renderFigure(block));
+          break;
+        case 'clear': {
+          const div = document.createElement('div');
+          div.className = 'clear';
+          container.appendChild(div);
+          break;
+        }
+        default: {
+          const p = document.createElement('p');
+          p.innerHTML = block.html || `<em>Άγνωστο block: ${escapeHtml(block.type || 'undefined')}</em>`;
+          container.appendChild(p);
+        }
+      }
+    }
+
+    function renderSingleSection(sec){
+      const section = document.createElement('section');
+      section.className = 'section';
+      section.id = sec.id || '';
+      section.innerHTML = `
+          ${sec.title ? `<h2>${sec.title}</h2>` : ''}
+          ${sec.lead ? `<p class="lead">${sec.lead}</p>` : ''}
+        `;
+      const body = document.createElement('div');
+      body.className = 'article-body';
+      (sec.blocks || []).forEach(block => appendBlock(body, block));
+      const clear = document.createElement('div');
+      clear.className = 'clear';
+      body.appendChild(clear);
+      section.appendChild(body);
+      return section;
+    }
+
+    function renderSections(sections=[], parts=[]){
+      chapterEl.innerHTML = '';
+      if(Array.isArray(parts) && parts.length){
+        const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+        const used = new Set();
+        const partMarks = ['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄'];
+        parts.forEach((part, idx) => {
+          const shell = document.createElement('section');
+          shell.className = 'part-shell';
+          shell.id = part.id || '';
+          const mark = partMarks[idx] || `${idx + 1}`;
+          shell.innerHTML = `<div class="part-kicker">Μέρος ${mark}</div><h2 class="part-title-main">${part.title || ''}</h2>`;
+          const ids = Array.isArray(part.sectionIds) ? part.sectionIds : [];
+          ids.forEach(id => {
+            const sec = byId[id];
+            if(sec){ shell.appendChild(renderSingleSection(sec)); used.add(id); }
+          });
+          if(Array.isArray(part.plannedTitles) && part.plannedTitles.length){
+            const planned = document.createElement('div');
+            planned.className = 'part-planned article-body';
+            planned.innerHTML = `<p><strong>Προβλεπόμενες ενότητες</strong></p><ul>${part.plannedTitles.map(t => `<li>${t}</li>`).join('')}</ul>`;
+            shell.appendChild(planned);
+          }
+          chapterEl.appendChild(shell);
+        });
+        sections.forEach(sec => {
+          if(!used.has(sec.id)) chapterEl.appendChild(renderSingleSection(sec));
+        });
+        return;
+      }
+      sections.forEach(sec => chapterEl.appendChild(renderSingleSection(sec)));
+    }
+
+    function renderDocument(data){
+      currentData = data;
+      renderHero(data.meta || {});
+      renderNav(data.sections || [], data.parts || []);
+      renderSections(data.sections || [], data.parts || []);
+      setupScrollSpy(data.sections || [], data.parts || []);
+    }
+
+    async function loadDefaultJson(){
+      const res = await fetch(`${DEFAULT_JSON}?v=${Date.now()}`);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      loadedFromFileHandle = false;
+      renderDocument(data);
+      setStatus(`Φορτώθηκε αυτόματα το ${DEFAULT_JSON}.`);
+    }
+
+    setupPrintTools();
+
+    loadDefaultJson().catch(err => {
+      renderDocument({
+        meta:{
+          eyebrow:'Local mode',
+          title:'Το JSON δεν φορτώθηκε αυτόματα',
+          subtitle:'Άνοιξε τη σελίδα μέσω local server και βεβαιώσου ότι το chapter_content.json βρίσκεται δίπλα στο index.html.',
+          introNote:`Αιτία: ${err.message}`
+        },
+        sections:[{
+          id:'help',
+          title:'Τι να κάνεις τώρα',
+          navLabel:'Βοήθεια',
+          lead:'Δύο τρόποι:',
+          blocks:[
+            { type:'paragraph', html:'<strong>1.</strong> Τρέξε local server και άνοιξε το <code>index.html</code> από <code>http://localhost:8000/</code>.' },
+            { type:'paragraph', html:'<strong>2.</strong> Βεβαιώσου ότι το αρχείο <code>chapter_content.json</code> βρίσκεται στον ίδιο φάκελο με το <code>index.html</code>.' }
+          ]
+        }]
+      });
+      setStatus(`Δεν φορτώθηκε αυτόματα το ${DEFAULT_JSON}: ${err.message}`);
+    });
+  </script>
+</body>
+</html>

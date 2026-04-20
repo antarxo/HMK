@@ -1,0 +1,53 @@
+{
+  "framePresets": {
+    "medium": {
+      "width": "min(430px, 84vw)",
+      "aspectRatio": "4 / 5"
+    }
+  },
+  "focusPresets": {
+    "rod_v": {
+      "focusMode": true,
+      "controls": "minimal",
+      "showTop": false,
+      "showStage": true,
+      "showHud": false,
+      "centerGraphs": true,
+      "panelMaxWidth": "190px",
+      "graphs": {
+        "V": true,
+        "Q": false,
+        "I": false,
+        "E": false,
+        "B": false
+      },
+      "regions": {
+        "leftOverlayStack": {
+          "x": 0.275,
+          "y": 0.055,
+          "w": 0.45,
+          "h": 0.245
+        },
+        "stage": {
+          "x": 0.17,
+          "y": 0.35,
+          "w": 0.66,
+          "h": 0.43
+        }
+      }
+    }
+  },
+  "scenes": {
+    "rod_v": {
+      "focus": "rod_v",
+      "mode": "rod",
+      "phase": 0,
+      "play": false,
+      "theme": "screen",
+      "emitPeriods": 1,
+      "view": {
+        "zoom": 1160
+      }
+    }
+  }
+}
