@@ -97,6 +97,12 @@
   .focusMiniControls .miniNavRow{justify-content:center}
   .focusMiniControls .miniOptionRow{justify-content:center;flex-wrap:wrap;overflow:visible;scrollbar-width:thin}
   .focusMiniControls button{min-width:24px;min-height:20px;height:20px;font-size:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;padding:0 4px}
+
+  .bookJumpLink{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:4px 10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);border-radius:10px;text-decoration:none;font-size:11px;font-weight:600;white-space:nowrap}
+  .bookJumpLink:hover{background:rgba(255,255,255,.1)}
+  .standaloneOnly{display:inline-flex}
+  body.embedded-book .standaloneOnly{display:none !important}
+
   .focusMiniControls #miniPlayBtn{min-width:34px;min-height:24px;height:24px;font-size:14px;padding:0 8px}
   .focusMiniControls #miniStepBackBtn,.focusMiniControls #miniStepFwdBtn{min-width:22px;min-height:18px;height:18px;font-size:9px;padding:0 3px}
   .focusMiniControls #miniStartBtn,.focusMiniControls #miniEndBtn{min-width:26px;min-height:20px;height:20px;font-size:9px;padding:0 4px}
@@ -242,6 +248,7 @@
         <button id="regionFar" class="regionBtn" type="button" data-i18n="region_far">ΗΜ κύμα</button>
       </div>
       <div class="title"><span data-i18n="app_title">Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος</span> <span class="sub">© antarxo, 2026</span></div>
+      <a id="bookLinkBtn" class="bookJumpLink standaloneOnly" href="./book/">Βιβλίο</a>
     </div>
   </div>
   <div class="main">
@@ -359,6 +366,10 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.m
 const stage = document.getElementById('stage');
 const ids = ['langEl','langEn','regionNear','regionNearAtt','regionFar','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','toggleCurrentBtn','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn','focusMiniControls','miniStartBtn','miniStepBackBtn','miniPlayBtn','miniStepFwdBtn','miniEndBtn','miniOptionRow','miniExtraControls'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+const sceneParams = new URLSearchParams(window.location.search);
+const isEmbeddedBookScene = (window.parent && window.parent !== window) || String(sceneParams.get('scene')||'').trim()==='book_multiscene';
+if(isEmbeddedBookScene) document.body.classList.add('embedded-book');
+
 ui.langEl?.addEventListener('click', () => applyLanguage('el'));
 ui.langEn?.addEventListener('click', () => applyLanguage('en'));
 ui.regionNear?.addEventListener('click', () => setRegionMode('near', { applyDefaults:true }));

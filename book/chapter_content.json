@@ -200,7 +200,7 @@
           "wrapTight": true,
           "hideCaption": false,
           "status": "scene",
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=V%2CQ&availableGraphs=V%2CQ%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow&timePreset=t0&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphV%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB&play=0&zoom=1620"
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=V%2CQ&availableGraphs=V%2CQ%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow&timePreset=t0&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphV%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB&play=0&zoom=1620"
         },
         {
           "type": "interactive_callout",
@@ -281,7 +281,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene"
         },
         {
@@ -337,7 +337,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene"
         },
         {
@@ -398,7 +398,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene"
         },
         {
@@ -459,7 +459,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene"
         },
         {
@@ -544,7 +544,7 @@
           "wrapTight": true,
           "hideCaption": false,
           "status": "scene",
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=E%2CB&layers=rod%2Ccharges%2CcurrentArrow%2ClinearPropagation&region=nearAtt&timePreset=t0&emitPeriods=3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620&rotY=0.98"
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=E%2CB&layers=rod%2Ccharges%2CcurrentArrow%2ClinearPropagation&region=nearAtt&timePreset=t0&emitPeriods=3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620&rotY=0.98"
         },
         {
           "type": "interactive_callout",
@@ -605,7 +605,7 @@
           "wrapTight": true,
           "hideCaption": false,
           "status": "scene",
-          "singleSrc": "../app/em_wave_app.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=E%2CB&layers=rod%2ClinearPropagation&region=far&timePreset=t0&emitPeriods=3&controlsMode=guided&allowedControls=toggleGraphE%2CtoggleGraphB%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620&rotY=1.05"
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=E%2CB&layers=rod%2ClinearPropagation&region=far&timePreset=t0&emitPeriods=3&controlsMode=guided&allowedControls=toggleGraphE%2CtoggleGraphB%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620&rotY=1.05"
         },
         {
           "type": "interactive_callout",
@@ -668,13 +668,13 @@
         "title": "Παραλλαγές του 5ου σχήματος για την κοντινή αφήγηση",
         "description": "Όλα τα στιγμιότυπα και τα μεσοδιαστήματα της ενότητας 5 αντιμετωπίζονται ως παραλλαγές του 5ου σχήματος, με διαφορετική αρχική χρονική κατάσταση ή χρονικό offset.",
         "topStackSrcs": [
-          "../app/em_wave_app.html?presets=scene_presets.json&scene=graph_e_scene&focus=graph_e_only&controls=none&play=0",
-          "../app/em_wave_app.html?presets=scene_presets.json&scene=graph_b_scene&focus=graph_b_only&controls=none&play=0"
+          "../index.html?presets=scene_presets.json&scene=graph_e_scene&focus=graph_e_only&controls=none&play=0",
+          "../index.html?presets=scene_presets.json&scene=graph_b_scene&focus=graph_b_only&controls=none&play=0"
         ],
         "bottomBaseOptions": {
-          "E": "../app/em_wave_app.html?presets=scene_presets.json&scene=panel5_dynamic_e&focus=dynamic_stage&controls=none&play=0",
-          "B": "../app/em_wave_app.html?presets=scene_presets.json&scene=panel5_dynamic_b&focus=dynamic_stage&controls=none&play=0",
-          "E+B": "../app/em_wave_app.html?presets=scene_presets.json&scene=panel5_dynamic_eb&focus=dynamic_stage&controls=none&play=0"
+          "E": "../index.html?presets=scene_presets.json&scene=panel5_dynamic_e&focus=dynamic_stage&controls=none&play=0",
+          "B": "../index.html?presets=scene_presets.json&scene=panel5_dynamic_b&focus=dynamic_stage&controls=none&play=0",
+          "E+B": "../index.html?presets=scene_presets.json&scene=panel5_dynamic_eb&focus=dynamic_stage&controls=none&play=0"
         },
         "extraControls": [
           "qBack",

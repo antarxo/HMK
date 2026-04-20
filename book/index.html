@@ -498,6 +498,7 @@
       }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
 
       megaNavEl.innerHTML = `${partItems}
+        <div class="menu-item" data-part-id="app-link"><a class="menu-trigger" href="../index.html">Εφαρμογή</a></div>
         <div class="menu-item" data-part-id="print">
           <button class="menu-trigger" type="button">Εκτύπωση<span class="caret">▾</span></button>
           <div class="menu-dropdown">
@@ -578,7 +579,7 @@
       if(!series) return block;
 
       const presets = 'scene_presets.json';
-      const common = { simulationSrc:'../app/em_wave_app.html', presets, controls:'none', embed:true, freeze:true };
+      const common = { simulationSrc:'../index.html', presets, controls:'none', embed:true, freeze:true };
       const graphHeight = 146.2;
       const rodHeight = 219.3;
       const withRod = (count, topSrc, bottomSrc) => {
@@ -599,27 +600,27 @@
       if(series === 'core_progression'){
         const n = Number(block.graphCount || 1);
         if(n === 1) return withRod(1,
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_top&focus=graph_v_only&controls=none&play=0',
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../index.html?presets=scene_presets.json&scene=rod_v_top&focus=graph_v_only&controls=none&play=0',
+          '../index.html?presets=scene_presets.json&scene=rod_v_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 2) return withRod(2,
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../index.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../index.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 3) return withRod(3,
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_top&focus=graph_vqi_only&controls=none&play=0',
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../index.html?presets=scene_presets.json&scene=rod_vqi_top&focus=graph_vqi_only&controls=none&play=0',
+          '../index.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 4) return withRod(4,
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=graphs_qieb&focus=graphs_qieb_only&controls=none&play=0',
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../index.html?presets=scene_presets.json&scene=graphs_qieb&focus=graphs_qieb_only&controls=none&play=0',
+          '../index.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
         );
       }
 
       if(series === 'temp_like_vq'){
         return withRod(2,
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
-          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../index.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../index.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
         );
       }
 
