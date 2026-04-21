@@ -111,7 +111,7 @@
 
     .mega-nav{
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(6,minmax(0,1fr));
       gap:10px;
       align-items:stretch;
       justify-content:center;
@@ -184,12 +184,12 @@
     .menu-dropdown .menu-section-link.active{background:var(--accent-soft); border-color:#cddfea; color:#204863}
     .toolbar button,.toolbar .file-label{padding:8px 10px; border-radius:12px; font-size:12px}
     @media (max-width:1100px){
-      .mega-nav{grid-template-columns:repeat(5,minmax(150px,1fr)); overflow-x:auto; padding-bottom:2px}
+      .mega-nav{grid-template-columns:repeat(6,minmax(150px,1fr)); overflow-x:auto; padding-bottom:2px}
       .mega-nav::-webkit-scrollbar{height:6px}
     }
     @media (max-width:720px){
       .topbar-inner{padding:8px 10px 10px}
-      .mega-nav{grid-template-columns:repeat(5,minmax(140px,1fr)); gap:8px}
+      .mega-nav{grid-template-columns:repeat(6,minmax(140px,1fr)); gap:8px}
       .menu-trigger{padding:10px 10px; font-size:12px}
       .menu-dropdown{min-width:100%}
     }
@@ -589,6 +589,9 @@
       }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
 
       megaNavEl.innerHTML = `${partItems}
+        <div class="menu-item" data-part-id="app">
+          <a class="menu-trigger" href="../index.html">Εφαρμογή</a>
+        </div>
         <div class="menu-item" data-part-id="print">
           <button class="menu-trigger" type="button">Εκτύπωση<span class="caret">▾</span></button>
           <div class="menu-dropdown">
