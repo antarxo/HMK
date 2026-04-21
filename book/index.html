@@ -52,7 +52,7 @@ figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--l
  .media-frame iframe{display:none!important}
  .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
  .media-frame.print-ready::after{content:none!important}
- .print-scene-snapshot{display:block!important;width:100%!important;height:100%!important;object-fit:contain;background:#fff}
+ .print-scene-snapshot{display:block!important;width:100%!important;height:100%!important;object-fit:fill;background:transparent}.page-break-marker{display:block;height:0;clear:both}
 }
 </style>
 </head>
@@ -137,6 +137,9 @@ function renderParagraph(block){const p=document.createElement('p'); p.innerHTML
 function renderNote(block){const d=document.createElement('div'); d.className='note'; d.innerHTML=`${block.label?`<span class="label">${block.label}</span>`:''}${block.html||''}`; return d}
 function renderCallout(block){const d=document.createElement('div'); d.className='callout'; d.innerHTML=`<div class="callout-title">${block.title||'Δοκίμασε'}</div><div class="callout-row"><span class="callout-label">${block.setupLabel||'Ρύθμισε'}</span>${(block.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-row"><span class="callout-label">${block.pressLabel||'Πίεσε'}</span>${(block.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-observe"><span class="callout-observe-title">${block.observeTitle||'Παρατήρησε'}</span><ul>${(block.observeItems||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>`; return d}
 function renderBlock(block){if(block.type==='paragraph') return renderParagraph(block); if(block.type==='note') return renderNote(block); if(block.type==='figure') return renderFigure(block); if(block.type==='scene') return renderScene(block); if(block.type==='interactive_callout') return renderCallout(block); if(block.type==='clear'){const d=document.createElement('div'); d.className='clear'; return d} const d=document.createElement('div'); d.textContent=`Άγνωστο block: ${block.type}`; return d}
+function blockStartsNewPage(block){return !!(block && (block.pageBreakBefore===true || block.type==='page_break' || block.breakBefore==='page'));}
+function blockEndsPage(block){return !!(block && (block.pageBreakAfter===true || block.breakAfter==='page'));}
+function makePageBreakMarker(){const d=document.createElement('div'); d.className='page-break-marker'; return d}
 function createSheet(pageNo){const wrap=document.createElement('div'); wrap.className='sheet-wrap'; const sheet=document.createElement('section'); sheet.className='sheet'; const inner=document.createElement('div'); inner.className='sheet-inner'; const num=document.createElement('div'); num.className='sheet-number'; num.textContent=String(pageNo); sheet.append(inner,num); wrap.appendChild(sheet); return {wrap,sheet,inner,num}}
 function measureOverflow(inner){return inner.scrollHeight > inner.clientHeight + 1}
 function cloneNodeDeep(node){return node.cloneNode(true)}
@@ -201,22 +204,36 @@ function paginateStructured(data){
   const pages=[]; let current=createSheet(1); pageStack.appendChild(current.wrap); pages.push(current);
   const newPage=()=>{current=createSheet(pages.length+1); pageStack.appendChild(current.wrap); pages.push(current); return current};
   const appendOrNext=(node)=>{current.inner.appendChild(node); if(measureOverflow(current.inner)){node.remove(); if(!current.inner.children.length){current.inner.appendChild(node); return;} newPage(); current.inner.appendChild(node);} };
+  const forceNewPageIfNeeded=(reason='manual')=>{if(current.inner.children.length) newPage();};
   appendOrNext(renderHero(data.meta||{}));
   for(const part of parts){
+    if(part.pageBreakBefore===true || part.breakBefore==='page') forceNewPageIfNeeded('part');
     appendOrNext(makePartHead(part));
     for(const secId of (part.sectionIds||[])){
       const sec=byId[secId]; if(!sec) continue;
+      if(sec.pageBreakBefore===true || sec.breakBefore==='page') forceNewPageIfNeeded('section');
       let sectionWrap=makeSectionShell(sec); appendOrNext(sectionWrap.section);
       for(let i=0;i<(sec.blocks||[]).length;i++){
-        const blockNode=renderBlock(sec.blocks[i]);
+        const block=sec.blocks[i]||{};
+        if(blockStartsNewPage(block)){
+          if(block.type!=='page_break') forceNewPageIfNeeded('block-before');
+          if(block.type==='page_break'){ continue; }
+          sectionWrap=makeSectionShell(sec); current.inner.appendChild(sectionWrap.section);
+        }
+        const blockNode=renderBlock(block);
         sectionWrap.body.appendChild(blockNode);
         if(measureOverflow(current.inner)){
           blockNode.remove();
-          if(!sectionWrap.body.children.length){ sectionWrap.body.appendChild(blockNode); continue; }
-          // move remaining blocks to next page with repeated section header
-          sectionWrap=makeSectionShell(sec); newPage(); current.inner.appendChild(sectionWrap.section); sectionWrap.body.appendChild(blockNode);
-          if(measureOverflow(current.inner)){
-            // if even alone it overflows, keep it and continue
+          if(!sectionWrap.body.children.length){ sectionWrap.body.appendChild(blockNode); }
+          else {
+            sectionWrap=makeSectionShell(sec); newPage(); current.inner.appendChild(sectionWrap.section); sectionWrap.body.appendChild(blockNode);
+          }
+        }
+        if(blockEndsPage(block)){
+          sectionWrap.body.appendChild(makePageBreakMarker());
+          forceNewPageIfNeeded('block-after');
+          if(i < (sec.blocks||[]).length - 1){
+            sectionWrap=makeSectionShell(sec); current.inner.appendChild(sectionWrap.section);
           }
         }
       }

@@ -3701,7 +3701,8 @@ function buildViewportSnapshotClone(sourceRoot){
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.background = '#ffffff';
+  const sourceBg = getComputedStyle(sourceRoot).backgroundColor || 'transparent';
+  clone.style.background = sourceBg;
   return clone;
 }
 async function getBookPrintSnapshot(){
@@ -3715,7 +3716,8 @@ async function getBookPrintSnapshot(){
   clone.style.width = `${width}px`;
   clone.style.height = `${height}px`;
   const serialized = new XMLSerializer().serializeToString(clone);
-  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
+  const bg = getComputedStyle(sourceRoot).backgroundColor || 'transparent';
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
