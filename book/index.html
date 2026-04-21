@@ -396,7 +396,12 @@
       figure.media,.note,.callout,.section h2{break-inside:avoid; page-break-inside:avoid}
       .media-frame iframe{display:none !important}
       .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]"; position:absolute; inset:0; display:grid; place-items:center; padding:18px; color:#5e6d79; font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif; background:#f4f6f8}
+      .media-frame.print-ready::after{content:none !important}
+      .pane[data-print-ready="1"]::after{content:none !important}
+      .media-frame > .print-scene-snapshot, .pane > .print-scene-snapshot{display:block !important; width:100% !important; height:100% !important; object-fit:contain; background:#fff}
     }
+
+    .media-frame > .print-scene-snapshot, .pane > .print-scene-snapshot{display:none; max-width:100%; max-height:100%;}
 
   </style>
 </head>
@@ -421,12 +426,14 @@
     const chapterEl = document.getElementById('chapter');
     const dynamicMultisceneRegistry = new Map();
     const statusEl = document.getElementById('status');
+    let printSnapshotsPrepared = false;
 
     const DEFAULT_JSON = 'chapter_content.json';
     let currentData = null;
     let loadedFromFileHandle = false;
 
     function setStatus(msg){ statusEl.textContent = msg || ''; }
+
     function withCacheBust(url){
       try{
         const u = new URL(url, window.location.href);
@@ -435,6 +442,82 @@
       }catch(err){
         return url;
       }
+    }
+    function normalizeAppSrc(url=''){
+      if(typeof url !== 'string' || !url) return url;
+      return url
+        .replace(/\.\.\/app\/em_wave_app\.html/g, '../index.html')
+        .replace(/\.\/app\/em_wave_app\.html/g, '../index.html');
+    }
+    function waitForImage(img){
+      return new Promise(resolve => {
+        if(!img || img.complete) return resolve();
+        img.addEventListener('load', () => resolve(), { once:true });
+        img.addEventListener('error', () => resolve(), { once:true });
+      });
+    }
+    async function requestIframePrintSnapshot(iframe){
+      if(!iframe) return null;
+      try{
+        const direct = iframe.contentWindow?.getBookPrintSnapshot || iframe.contentWindow?.EMWaveApp?.getPrintSnapshot;
+        if(typeof direct === 'function'){
+          const directResult = await Promise.resolve(direct.call(iframe.contentWindow));
+          if(directResult) return directResult;
+        }
+      }catch(_e){}
+      return await new Promise(resolve => {
+        const requestId = `snap_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        let settled = false;
+        const cleanup = () => {
+          if(settled) return;
+          settled = true;
+          window.removeEventListener('message', onMessage);
+          clearTimeout(timer);
+        };
+        const onMessage = (event) => {
+          if(event.source !== iframe.contentWindow) return;
+          const data = event.data;
+          if(!data || data.type !== 'hm_print_snapshot' || data.requestId !== requestId) return;
+          cleanup();
+          resolve(data.dataUrl || null);
+        };
+        const timer = setTimeout(() => {
+          cleanup();
+          resolve(null);
+        }, 3500);
+        window.addEventListener('message', onMessage);
+        try{ iframe.contentWindow?.postMessage({ type:'capturePrintSnapshot', requestId }, '*'); }
+        catch(_e){ cleanup(); resolve(null); }
+      });
+    }
+    function cleanupPrintSnapshots(){
+      document.querySelectorAll('.print-scene-snapshot').forEach(img => img.remove());
+      document.querySelectorAll('.media-frame.print-ready').forEach(el => el.classList.remove('print-ready'));
+      document.querySelectorAll('[data-print-ready="1"]').forEach(el => el.removeAttribute('data-print-ready'));
+      printSnapshotsPrepared = false;
+    }
+    async function preparePrintSnapshots(){
+      cleanupPrintSnapshots();
+      const iframes = Array.from(document.querySelectorAll('.media-frame iframe'));
+      await Promise.all(iframes.map(async (iframe) => {
+        const dataUrl = await requestIframePrintSnapshot(iframe);
+        if(!dataUrl) return;
+        const holder = iframe.parentElement;
+        if(!holder) return;
+        const img = document.createElement('img');
+        img.className = 'print-scene-snapshot';
+        img.alt = 'Στιγμιότυπο σκηνής';
+        img.src = dataUrl;
+        holder.appendChild(img);
+        holder.dataset.printReady = '1';
+        await waitForImage(img);
+      }));
+      document.querySelectorAll('.media-frame').forEach(frame => {
+        const iframeCount = frame.querySelectorAll('iframe').length;
+        const snapshotCount = frame.querySelectorAll('.print-scene-snapshot').length;
+        if(iframeCount > 0 && snapshotCount >= iframeCount) frame.classList.add('print-ready');
+      });
+      printSnapshotsPrepared = true;
     }
 
     function applyPrintPageStyle(orientation='portrait'){
@@ -458,13 +541,21 @@
         printOrient.dataset.bound = '1';
       }
       if(!printBtn.dataset.bound){
-        printBtn.addEventListener('click', ()=>{
+        printBtn.addEventListener('click', async ()=>{
           const orientation = printOrient.value || 'portrait';
           localStorage.setItem('hmBookPrintOrient', orientation);
           applyPrintPageStyle(orientation);
+          setStatus('Ετοιμάζονται στατικά στιγμιότυπα για εκτύπωση…');
+          try{ await preparePrintSnapshots(); }
+          catch(err){ console.warn('print snapshot preparation failed', err); }
+          setStatus('');
           window.print();
         });
         printBtn.dataset.bound = '1';
+      }
+      if(!window.__hmBookAfterPrintBound){
+        window.addEventListener('afterprint', () => { cleanupPrintSnapshots(); setStatus(''); });
+        window.__hmBookAfterPrintBound = true;
       }
     }
 
@@ -498,7 +589,6 @@
       }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
 
       megaNavEl.innerHTML = `${partItems}
-        <div class="menu-item" data-part-id="app-link"><a class="menu-trigger" href="../index.html">Εφαρμογή</a></div>
         <div class="menu-item" data-part-id="print">
           <button class="menu-trigger" type="button">Εκτύπωση<span class="caret">▾</span></button>
           <div class="menu-dropdown">
@@ -600,27 +690,27 @@
       if(series === 'core_progression'){
         const n = Number(block.graphCount || 1);
         if(n === 1) return withRod(1,
-          '../index.html?presets=scene_presets.json&scene=rod_v_top&focus=graph_v_only&controls=none&play=0',
-          '../index.html?presets=scene_presets.json&scene=rod_v_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_top&focus=graph_v_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_v_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 2) return withRod(2,
-          '../index.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
-          '../index.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 3) return withRod(3,
-          '../index.html?presets=scene_presets.json&scene=rod_vqi_top&focus=graph_vqi_only&controls=none&play=0',
-          '../index.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_top&focus=graph_vqi_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
         );
         if(n === 4) return withRod(4,
-          '../index.html?presets=scene_presets.json&scene=graphs_qieb&focus=graphs_qieb_only&controls=none&play=0',
-          '../index.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=graphs_qieb&focus=graphs_qieb_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vqi_bottom&focus=rod_only_compact&controls=none&play=0'
         );
       }
 
       if(series === 'temp_like_vq'){
         return withRod(2,
-          '../index.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
-          '../index.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_top&focus=graph_vq_only&controls=none&play=0',
+          '../app/em_wave_app.html?presets=scene_presets.json&scene=rod_vq_bottom&focus=rod_only_compact&controls=none&play=0'
         );
       }
 
@@ -696,7 +786,7 @@
         iframe.loading = 'lazy';
         iframe.referrerPolicy = 'no-referrer';
         iframe.allow = 'fullscreen';
-        const freezeUrl = withCacheBust(src);
+        const freezeUrl = withCacheBust(normalizeAppSrc(src));
         iframe.src = freezeUrl;
         iframe.dataset.freezeSrc = freezeUrl;
         iframe.dataset.playSrc = freezeUrl.includes('play=0') ? freezeUrl.replace('play=0','play=1') : freezeUrl;
@@ -791,7 +881,7 @@
           controls:block.extraControls || ['play','reset']
         };
       } else {
-        const explicitSingleSrc = block.singleSrc || '';
+        const explicitSingleSrc = normalizeAppSrc(block.singleSrc || '');
         const canEmbed = !!(explicitSingleSrc || block.simulationSrc);
         const freezeUrl = explicitSingleSrc ? withCacheBust(explicitSingleSrc) : (canEmbed ? withCacheBust(sceneUrl(block,false)) : '');
         if(canEmbed){
@@ -830,7 +920,7 @@
         const broadcast = (msg) => { getFrames().forEach(fr => fr.contentWindow?.postMessage(msg, '*')); };
         const setBottomSrc = (src, shouldPlay=false) => {
           if(!controlSpec.iframe) return;
-          const url = withCacheBust(src);
+          const url = withCacheBust(normalizeAppSrc(src));
           controlSpec.iframe.src = shouldPlay && url.includes('play=0') ? url.replace('play=0','play=1') : url;
           controlSpec.iframe.dataset.freezeSrc = url;
           controlSpec.iframe.dataset.playSrc = url.includes('play=0') ? url.replace('play=0','play=1') : url;

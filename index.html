@@ -97,12 +97,6 @@
   .focusMiniControls .miniNavRow{justify-content:center}
   .focusMiniControls .miniOptionRow{justify-content:center;flex-wrap:wrap;overflow:visible;scrollbar-width:thin}
   .focusMiniControls button{min-width:24px;min-height:20px;height:20px;font-size:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;padding:0 4px}
-
-  .bookJumpLink{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:4px 10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);border-radius:10px;text-decoration:none;font-size:11px;font-weight:600;white-space:nowrap}
-  .bookJumpLink:hover{background:rgba(255,255,255,.1)}
-  .standaloneOnly{display:inline-flex}
-  body.embedded-book .standaloneOnly{display:none !important}
-
   .focusMiniControls #miniPlayBtn{min-width:34px;min-height:24px;height:24px;font-size:14px;padding:0 8px}
   .focusMiniControls #miniStepBackBtn,.focusMiniControls #miniStepFwdBtn{min-width:22px;min-height:18px;height:18px;font-size:9px;padding:0 3px}
   .focusMiniControls #miniStartBtn,.focusMiniControls #miniEndBtn{min-width:26px;min-height:20px;height:20px;font-size:9px;padding:0 4px}
@@ -248,7 +242,6 @@
         <button id="regionFar" class="regionBtn" type="button" data-i18n="region_far">ΗΜ κύμα</button>
       </div>
       <div class="title"><span data-i18n="app_title">Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος</span> <span class="sub">© antarxo, 2026</span></div>
-      <a id="bookLinkBtn" class="bookJumpLink standaloneOnly" href="./book/">Βιβλίο</a>
     </div>
   </div>
   <div class="main">
@@ -366,10 +359,6 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.m
 const stage = document.getElementById('stage');
 const ids = ['langEl','langEn','regionNear','regionNearAtt','regionFar','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','toggleCurrentBtn','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn','focusMiniControls','miniStartBtn','miniStepBackBtn','miniPlayBtn','miniStepFwdBtn','miniEndBtn','miniOptionRow','miniExtraControls'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
-const sceneParams = new URLSearchParams(window.location.search);
-const isEmbeddedBookScene = (window.parent && window.parent !== window) || String(sceneParams.get('scene')||'').trim()==='book_multiscene';
-if(isEmbeddedBookScene) document.body.classList.add('embedded-book');
-
 ui.langEl?.addEventListener('click', () => applyLanguage('el'));
 ui.langEn?.addEventListener('click', () => applyLanguage('en'));
 ui.regionNear?.addEventListener('click', () => setRegionMode('near', { applyDefaults:true }));
@@ -3663,6 +3652,69 @@ function applyUrlState(){
   for(const [k,v] of params.entries()) raw[k] = v;
   applyExternalState(raw, { announce:true });
 }
+
+function inlineSnapshotStyles(sourceEl, targetEl){
+  if(!(sourceEl instanceof Element) || !(targetEl instanceof Element)) return;
+  const cs = getComputedStyle(sourceEl);
+  let styleText = '';
+  for(const prop of Array.from(cs)){
+    styleText += `${prop}:${cs.getPropertyValue(prop)};`;
+  }
+  targetEl.setAttribute('style', styleText);
+  if(sourceEl instanceof HTMLInputElement){
+    targetEl.setAttribute('value', sourceEl.value || '');
+    if(sourceEl.checked) targetEl.setAttribute('checked','checked');
+  }
+  if(sourceEl instanceof HTMLTextAreaElement){
+    targetEl.textContent = sourceEl.value || '';
+  }
+  if(sourceEl instanceof HTMLSelectElement){
+    targetEl.value = sourceEl.value;
+  }
+}
+function buildViewportSnapshotClone(sourceRoot){
+  const clone = sourceRoot.cloneNode(true);
+  const sourceEls = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+  const cloneEls = [clone, ...clone.querySelectorAll('*')];
+  sourceEls.forEach((sourceEl, idx) => {
+    const targetEl = cloneEls[idx];
+    if(!targetEl) return;
+    inlineSnapshotStyles(sourceEl, targetEl);
+    if(sourceEl instanceof HTMLCanvasElement){
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = sourceEl.width;
+      img.height = sourceEl.height;
+      img.src = sourceEl.toDataURL('image/png');
+      img.setAttribute('style', targetEl.getAttribute('style') || '');
+      targetEl.replaceWith(img);
+      cloneEls[idx] = img;
+    }
+  });
+  clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
+  clone.style.margin = '0';
+  clone.style.boxShadow = 'none';
+  clone.style.border = '0';
+  clone.style.overflow = 'hidden';
+  clone.style.background = '#ffffff';
+  return clone;
+}
+async function getBookPrintSnapshot(){
+  const sourceRoot = document.querySelector('.card.viewport');
+  if(!sourceRoot) return null;
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const rect = sourceRoot.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  const clone = buildViewportSnapshotClone(sourceRoot);
+  clone.style.width = `${width}px`;
+  clone.style.height = `${height}px`;
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
   scenes: () => Object.keys(SCENES),
   focuses: () => Object.keys(FOCUS_PRESETS),
@@ -3674,7 +3726,8 @@ window.EMWaveApp = {
   play: () => setPlayingState(true),
   pause: () => setPlayingState(false),
   reset: () => { phaseU = getBookSceneStartPhase(); syncPhase(); setPlayingState(false); return getExternalState(); },
-  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); }
+  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); },
+  getPrintSnapshot: () => getBookPrintSnapshot()
 };
 window.addEventListener('message', (event) => {
   const data = event.data;
@@ -3691,6 +3744,11 @@ window.addEventListener('message', (event) => {
       break;
     case 'setRegion':
       if(data.region) window.EMWaveApp.setRegion(data.region, data.overrides || {});
+      break;
+    case 'capturePrintSnapshot':
+      Promise.resolve(getBookPrintSnapshot()).then((dataUrl) => {
+        try{ if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*'); }catch(_e){}
+      });
       break;
     case 'play':
       window.EMWaveApp.play();
