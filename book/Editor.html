@@ -22,7 +22,7 @@
     button.primary{background:#075985;border-color:#0ea5e9}
     button.good{background:#14532d;border-color:#22c55e}
     button.danger{background:#7f1d1d;border-color:#ef4444}
-    main{display:grid;grid-template-columns:320px 1.05fr 1.2fr;gap:10px;padding:10px;height:calc(100vh - 64px)}
+    main{display:grid;grid-template-columns:320px minmax(560px,1.42fr) minmax(420px,.92fr);gap:10px;padding:10px;height:calc(100vh - 64px)}
     @media (max-width:1200px){main{grid-template-columns:1fr;grid-template-rows:auto auto auto;height:auto}}
     .panel{display:flex;flex-direction:column;gap:8px;min-height:0;border:1px solid #111827;border-radius:12px;background:var(--panel);padding:10px}
     .panel h2{margin:0;padding-bottom:6px;border-bottom:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -58,7 +58,7 @@
       box-shadow:0 10px 26px rgba(0,0,0,.25); position:relative; padding:54px 44px 54px; overflow:hidden;
       font:18px/1.34 Georgia,"Noto Serif",serif;
     }
-    .page-header,.page-footer{position:absolute;left:44px;right:44px;display:flex;justify-content:space-between;align-items:center;color:var(--header);font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+    .page-header,.page-footer{position:absolute;left:44px;right:44px;display:flex;justify-content:space-between;align-items:center;color:var(--header);font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.04em}
     .page-header{top:20px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08)}
     .page-footer{bottom:18px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)}
     .hero-block{margin:0 0 22px}
@@ -95,6 +95,12 @@
     .scene-frame{margin-top:8px;border:1px solid #243244;border-radius:12px;overflow:hidden;background:#fff;color:#111}
     .scene-frame.float{width:min(var(--fw,340px),100%)}
     .danger-note{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);color:#fecaca;font-size:11px}
+    .editor-help{padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#bae6fd;font-size:11px}
+    .image-tools{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:start;margin-top:8px}
+    .image-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .image-thumb{border:1px solid #243244;border-radius:12px;background:#020617;overflow:hidden;min-height:140px;display:grid;place-items:center}
+    .image-thumb.empty{color:var(--soft);font-size:11px;padding:10px;text-align:center}
+    .image-thumb img{display:block;max-width:100%;max-height:220px;width:100%;height:auto;object-fit:contain;background:#fff}
   </style>
 </head>
 <body>
@@ -349,6 +355,56 @@ function bindCheckbox(el, obj, key){
   el.onchange = ()=>{ obj[key] = !!el.checked; renderTree(); renderPreview(); };
 }
 
+function updateImageThumb(container, src, alt=''){
+  if(!container) return;
+  if(src){
+    container.classList.remove('empty');
+    container.innerHTML = `<img src="${esc(src)}" alt="${esc(alt || '')}">`;
+  }else{
+    container.classList.add('empty');
+    container.innerHTML = 'Δεν έχει οριστεί εικόνα ακόμη';
+  }
+}
+function wireFigureImageControls(item){
+  const srcInput = document.getElementById('figSrc');
+  const altInput = document.getElementById('figAlt');
+  const fileInput = document.getElementById('figFile');
+  const thumb = document.getElementById('figThumb');
+  const clearBtn = document.getElementById('figClear');
+  const openBtn = document.getElementById('figOpen');
+  if(!srcInput || !thumb) return;
+  const sync = ()=> updateImageThumb(thumb, srcInput.value || item.src || '', altInput?.value || item.alt || '');
+  sync();
+  srcInput.addEventListener('input', sync);
+  altInput?.addEventListener('input', sync);
+  if(fileInput){
+    fileInput.addEventListener('change', ()=>{
+      const file = fileInput.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        item.src = String(reader.result || '');
+        srcInput.value = item.src;
+        renderTree();
+        renderPreview();
+        sync();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  clearBtn?.addEventListener('click', ()=>{
+    delete item.src;
+    srcInput.value = '';
+    renderTree();
+    renderPreview();
+    sync();
+  });
+  openBtn?.addEventListener('click', ()=>{
+    const src = srcInput.value || item.src || '';
+    if(src) window.open(src, '_blank', 'noopener,noreferrer');
+  });
+}
+
 function renderMetaEditor(){
   editor.innerHTML = `
     <div class="grid">
@@ -407,6 +463,7 @@ function renderPageEditor(page, pageIndex){
       <button class="danger" id="deletePageBtn">Διαγραφή page</button>
     </div>
 
+    <div class="editor-help">Η κεφαλίδα και το υποσέλιδο προβάλλονται πλέον όπως τα γράφεις — χωρίς αυτόματο μετασχηματισμό σε κεφαλαία.</div>
     <div class="hint">Αρχικά μοίρασέ τα χοντρικά. Μετά θα τα ανακατανείμεις με το μάτι από το mini A4 preview.</div>
   `;
   bindTextInput(document.getElementById('pageId'), page, 'id');
@@ -586,6 +643,20 @@ function renderTypeFields(item){
         </label>
         <label><span>caption</span><textarea id="figCaption"></textarea></label>
         <label><span>frameWidth</span><input type="number" id="figWidth"></label>
+      </div>
+      <div class="image-tools">
+        <div>
+          <div class="subhead"><span>Χειρισμός εικόνας</span></div>
+          <div class="row">
+            <input type="file" id="figFile" accept="image/*">
+            <div class="image-actions">
+              <button type="button" id="figOpen">Άνοιγμα</button>
+              <button type="button" id="figClear" class="danger">Καθάρισμα src</button>
+            </div>
+          </div>
+          <div class="hint">Μπορείς είτε να δώσεις src/URL χειροκίνητα είτε να φορτώσεις εικόνα και να περάσει ως data URL μέσα στο JSON.</div>
+        </div>
+        <div id="figThumb" class="image-thumb empty">Δεν έχει οριστεί εικόνα ακόμη</div>
       </div>`;
     bindTextInput(document.getElementById('figSrc'), item, 'src');
     bindTextInput(document.getElementById('figAlt'), item, 'alt');
@@ -595,6 +666,7 @@ function renderTypeFields(item){
     const pl = document.getElementById('figPlacement');
     pl.value = item.placement || 'right';
     pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
+    wireFigureImageControls(item);
     return;
   }
   if(item.type === 'scene'){
