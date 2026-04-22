@@ -3072,7 +3072,7 @@ function drawSingleGraph(canvas, row, opts={}){
   g.setTransform(dpr,0,0,dpr,0,0);
   const th = VIEW_THEMES[activeViewTheme] || VIEW_THEMES.screen;
   g.clearRect(0,0,w,h);
-  g.fillStyle = 'rgba(0,0,0,0)';
+  g.fillStyle = th.graphBg || '#0b0f14';
   g.fillRect(0,0,w,h);
   const axisX = 28;
   const right = 8;
@@ -3829,6 +3829,30 @@ function isVisibleSnapshotBackground(bg){
   if(!s || s === 'transparent') return false;
   return !(/^rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/.test(s));
 }
+function resolveOpaqueSnapshotBg(el, fallback='#0b0f14'){
+  const candidates = [];
+  try{
+    const rootVars = getComputedStyle(document.documentElement);
+    candidates.push(rootVars.getPropertyValue('--bg'));
+  }catch(_e){}
+  for(let cur = el; cur; cur = cur.parentElement){
+    try{
+      const cs = getComputedStyle(cur);
+      candidates.push(cs.backgroundColor);
+      candidates.push(cs.background);
+    }catch(_e){}
+  }
+  try{
+    candidates.push(getComputedStyle(document.body).backgroundColor);
+    candidates.push(getComputedStyle(document.documentElement).backgroundColor);
+  }catch(_e){}
+  for(const raw of candidates){
+    const value = String(raw || '').trim();
+    if(!value) continue;
+    if(isVisibleSnapshotBackground(value)) return value;
+  }
+  return fallback;
+}
 function drawSnapshotBackgroundBlock(ctx, el, rootRect){
   if(!(el instanceof Element) || !elementIsSnapshotVisible(el)) return;
   const rect = el.getBoundingClientRect();
@@ -3860,8 +3884,8 @@ function drawSnapshotBackgroundBlock(ctx, el, rootRect){
 }
 function drawSnapshotBackgroundBlocks(ctx, sourceRoot, controlsEl, rootRect){
   const seen = new Set();
-  const appBg = getComputedStyle(document.querySelector('.app') || sourceRoot).backgroundColor || '#0b0f14';
-  const viewportBg = getComputedStyle(document.querySelector('.card.viewport') || sourceRoot).backgroundColor || appBg;
+  const appBg = resolveOpaqueSnapshotBg(document.querySelector('.app') || sourceRoot, '#0b0f14');
+  const viewportBg = resolveOpaqueSnapshotBg(document.querySelector('.card.viewport') || sourceRoot, appBg);
   const fillOpaque = (el, fillColor) => {
     if(!(el instanceof Element) || !elementIsSnapshotVisible(el)) return;
     const rect = el.getBoundingClientRect();
