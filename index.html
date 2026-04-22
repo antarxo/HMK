@@ -3732,6 +3732,36 @@ function collectSnapshotVisuals(sourceRoot){
   }
   return visuals;
 }
+function canvasHasVisiblePixels(canvas){
+  if(!(canvas instanceof HTMLCanvasElement) || canvas.width < 2 || canvas.height < 2) return false;
+  try{
+    const ctx = canvas.getContext('2d', { willReadFrequently:true });
+    if(!ctx) return false;
+    const sampleW = Math.max(1, Math.min(canvas.width, 96));
+    const sampleH = Math.max(1, Math.min(canvas.height, 96));
+    const data = ctx.getImageData(0, 0, sampleW, sampleH).data;
+    for(let i=0;i<data.length;i+=4){
+      if(data[i] || data[i+1] || data[i+2] || data[i+3]) return true;
+    }
+  }catch(_e){}
+  return false;
+}
+async function waitForSnapshotCanvases(){
+  for(let attempt=0; attempt<8; attempt++){
+    try{ renderer.render(scene, camera); }catch(_e){}
+    try{ drawGraphs(true); }catch(_e){}
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    const needsGraphs = (activeBookSceneState?.graphs || []).filter(Boolean);
+    const graphReady = !needsGraphs.length || needsGraphs.every(key => {
+      const canvas = graphPapers[key];
+      const panel = domRefs.graphPanels[key];
+      if(!canvas || !panel || !elementIsSnapshotVisible(panel)) return true;
+      return canvasHasVisiblePixels(canvas);
+    });
+    const stageReady = !renderer?.domElement || !elementIsSnapshotVisible(renderer.domElement) || canvasHasVisiblePixels(renderer.domElement);
+    if(graphReady && stageReady) break;
+  }
+}
 function drawSnapshotElement(ctx, el, rootRect){
   const rect = el.getBoundingClientRect();
   const x = rect.left - rootRect.left;
@@ -3740,6 +3770,22 @@ function drawSnapshotElement(ctx, el, rootRect){
   const h = rect.height;
   if(w <= 0 || h <= 0) return;
   try{ ctx.drawImage(el, x, y, w, h); }catch(_e){}
+}
+function orderedSnapshotVisuals(sourceRoot, includeControls=false, controlsEl=null){
+  const ordered = [];
+  const seen = new Set();
+  const add = (el) => {
+    if(!el || seen.has(el) || !elementIsSnapshotVisible(el)) return;
+    seen.add(el);
+    ordered.push(el);
+  };
+  add(renderer?.domElement || null);
+  const orderedGraphs = (activeBookSceneState?.graphs || []).filter(Boolean);
+  orderedGraphs.forEach(key => add(graphPapers[key] || null));
+  if(includeControls) (controlsEl?.querySelectorAll('canvas,img') || []).forEach(add);
+  collectSnapshotVisuals(sourceRoot).forEach(add);
+  if(includeControls) collectSnapshotVisuals(controlsEl).forEach(add);
+  return ordered;
 }
 async function renderSvgCloneToPngDataUrl(wrapper, width, height, bg){
   const serialized = new XMLSerializer().serializeToString(wrapper);
@@ -3762,9 +3808,7 @@ async function renderSvgCloneToPngDataUrl(wrapper, width, height, bg){
   return canvas.toDataURL('image/png');
 }
 async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
-  try{ renderer.render(scene, camera); }catch(_e){}
-  try{ drawGraphs(true); }catch(_e){}
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await waitForSnapshotCanvases();
   const rects = [sourceRoot.getBoundingClientRect()];
   const includeControls = controlsEl && elementIsSnapshotVisible(controlsEl);
   if(includeControls) rects.push(controlsEl.getBoundingClientRect());
@@ -3830,16 +3874,7 @@ async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
     ctx.drawImage(shellImg, 0, 0, width, height);
   }catch(_e){}
 
-  const visualRoots = includeControls ? [sourceRoot, controlsEl] : [sourceRoot];
-  const seen = new Set();
-  const visuals = [];
-  visualRoots.filter(Boolean).forEach(root => {
-    collectSnapshotVisuals(root).forEach(el => {
-      if(seen.has(el)) return;
-      seen.add(el);
-      visuals.push(el);
-    });
-  });
+  const visuals = orderedSnapshotVisuals(sourceRoot, includeControls, controlsEl);
   visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
   ctx.restore();
   return canvas.toDataURL('image/png');
