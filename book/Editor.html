@@ -58,7 +58,7 @@
       box-shadow:0 10px 26px rgba(0,0,0,.25); position:relative; padding:54px 44px 54px; overflow:hidden;
       font:18px/1.34 Georgia,"Noto Serif",serif;
     }
-    .page-header,.page-footer{position:absolute;left:44px;right:44px;display:flex;justify-content:space-between;align-items:center;color:var(--header);font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.04em}
+    .page-header,.page-footer{position:absolute;left:44px;right:44px;display:flex;justify-content:space-between;align-items:center;color:var(--header);font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.04em;text-transform:none}
     .page-header{top:20px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08)}
     .page-footer{bottom:18px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)}
     .hero-block{margin:0 0 22px}
@@ -94,6 +94,9 @@
     .meta-line{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a3b1c2}
     .scene-frame{margin-top:8px;border:1px solid #243244;border-radius:12px;overflow:hidden;background:#fff;color:#111}
     .scene-frame.float{width:min(var(--fw,340px),100%)}
+    .scene-preview-reserve{position:relative;width:100%}
+    .scene-media-frame{background:#fff;overflow:hidden}
+    .scene-media-frame iframe{background:#fff}
     .danger-note{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);color:#fecaca;font-size:11px}
     .editor-help{padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#bae6fd;font-size:11px}
     .image-tools{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:start;margin-top:8px}
@@ -202,6 +205,67 @@ function normalizeData(raw){
 function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
 
+function nextPageId(base='page'){
+  const used = new Set((data?.pages || []).map(p => String(p.id || '')));
+  let i = 1;
+  let id = `${base}-${i}`;
+  while(used.has(id)){ i += 1; id = `${base}-${i}`; }
+  return id;
+}
+function createSiblingPageFrom(page, base='page'){
+  return {
+    id: nextPageId(base),
+    header: deepClone(page?.header || {left:'', center:'', right:''}),
+    footer: deepClone(page?.footer || {left:'', center:'', right:'{page}'}),
+    items: []
+  };
+}
+function insertPageAt(index, pageData=null, base='page'){
+  const page = pageData ? deepClone(pageData) : createSiblingPageFrom({}, base);
+  if(!page.id) page.id = nextPageId(base);
+  if(!page.header) page.header = {left:'', center:'', right:''};
+  if(!page.footer) page.footer = {left:'', center:'', right:'{page}'};
+  if(!Array.isArray(page.items)) page.items = [];
+  const idx = Math.max(0, Math.min(index, data.pages.length));
+  data.pages.splice(idx, 0, page);
+  return idx;
+}
+function moveItemToAdjacentPage(pageIndex, itemIndex, delta){
+  const page = data.pages?.[pageIndex];
+  if(!page || !page.items?.[itemIndex]) return;
+  const [item] = page.items.splice(itemIndex, 1);
+  let targetPageIndex = pageIndex + delta;
+  if(targetPageIndex < 0){
+    targetPageIndex = insertPageAt(0, createSiblingPageFrom(page, 'page'));
+    pageIndex += 1;
+  }else if(targetPageIndex >= data.pages.length){
+    targetPageIndex = insertPageAt(data.pages.length, createSiblingPageFrom(page, 'page'));
+  }
+  const targetPage = data.pages[targetPageIndex];
+  const targetItemIndex = delta < 0 ? targetPage.items.length : 0;
+  targetPage.items.splice(targetItemIndex, 0, item);
+  selection = {kind:'item', pageIndex:targetPageIndex, itemIndex:targetItemIndex};
+  renderAll();
+}
+function splitPageAtItem(pageIndex, itemIndex){
+  const page = data.pages?.[pageIndex];
+  if(!page) return;
+  const moved = page.items.splice(itemIndex);
+  const newPage = createSiblingPageFrom(page, 'page');
+  newPage.items = moved;
+  const newIndex = insertPageAt(pageIndex + 1, newPage, 'page');
+  selection = {kind:'page', pageIndex:newIndex};
+  renderAll();
+}
+function fontPresetValue(key, fallback){
+  const presets = {
+    serif: 'Georgia,"Noto Serif","Times New Roman",serif',
+    sans: 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif',
+    classic: '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif'
+  };
+  return presets[key] || fallback;
+}
+
 function summarizeItem(item){
   const t = item?.type || 'unknown';
   if(t==='hero') return (item.title || '').slice(0,72);
@@ -259,7 +323,7 @@ function renderTree(){
   head.className = 'tree-head';
   head.innerHTML = '<div class="tree-title">Σελίδες</div>';
   const addPageBtn = document.createElement('button');
-  addPageBtn.textContent = '+ Page';
+  addPageBtn.textContent = '+ Νέα σελίδα';
   addPageBtn.onclick = ()=> {
     const p = createEmptyPage(data.pages.length + 1);
     data.pages.push(p);
@@ -408,63 +472,98 @@ function wireFigureImageControls(item){
 function renderMetaEditor(){
   editor.innerHTML = `
     <div class="grid">
-      <label><span>meta.eyebrow</span><input type="text" id="metaEyebrow"></label>
-      <label><span>meta.title</span><input type="text" id="metaTitle"></label>
-      <label><span>meta.subtitle</span><input type="text" id="metaSubtitle"></label>
-      <label><span>layoutDefaults.lineHeight</span><input type="number" id="ldLineHeight" step="0.01"></label>
-      <label><span>layoutDefaults.paragraphGap</span><input type="number" id="ldParaGap" step="1"></label>
-      <label><span>layoutDefaults.sectionGap</span><input type="number" id="ldSecGap" step="1"></label>
-      <label><span>layoutDefaults.noteGap</span><input type="number" id="ldNoteGap" step="1"></label>
-      <label><span>layoutDefaults.calloutGap</span><input type="number" id="ldCalloutGap" step="1"></label>
+      <label><span>Υπέρτιτλος βιβλίου</span><input type="text" id="metaEyebrow"></label>
+      <label><span>Κύριος τίτλος βιβλίου</span><input type="text" id="metaTitle"></label>
+      <label><span>Υπότιτλος βιβλίου</span><input type="text" id="metaSubtitle"></label>
+
+      <label><span>Μέγεθος βασικού κειμένου (px)</span><input type="number" id="ldBodyFontSize" step="1"></label>
+      <label><span>Διάστιχο βασικού κειμένου</span><input type="number" id="ldLineHeight" step="0.01"></label>
+      <label><span>Κενό ανάμεσα σε παραγράφους (px)</span><input type="number" id="ldParaGap" step="1"></label>
+
+      <label><span>Κενό ανάμεσα σε ενότητες (px)</span><input type="number" id="ldSecGap" step="1"></label>
+      <label><span>Κενό γύρω από notes (px)</span><input type="number" id="ldNoteGap" step="1"></label>
+      <label><span>Κενό γύρω από callouts (px)</span><input type="number" id="ldCalloutGap" step="1"></label>
+
+      <label><span>Μέγεθος κεφαλίδας σελίδας (px)</span><input type="number" id="ldHeaderFontSize" step="1"></label>
+      <label><span>Μέγεθος υποσέλιδου σελίδας (px)</span><input type="number" id="ldFooterFontSize" step="1"></label>
+
+      <label><span>Γραμματοσειρά βασικού κειμένου</span>
+        <select id="ldBodyFontFamily">
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλων</span>
+        <select id="ldHeadingFontFamily">
+          <option value="classic">Classic Sans</option>
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
     </div>
-    <div class="danger-note">Το νέο format είναι page-first. Το βιβλίο πρέπει να διαβάζει <code>pages[]</code> ως κύρια δομή.</div>
+    <div class="editor-help">Εδώ ρυθμίζεις την τυπογραφική βάση όλου του βιβλίου. Οι αλλαγές φαίνονται αμέσως στη μικρή προεπισκόπηση της σελίδας.</div>
   `;
   bindTextInput(document.getElementById('metaEyebrow'), data.meta, 'eyebrow');
   bindTextInput(document.getElementById('metaTitle'), data.meta, 'title');
   bindTextInput(document.getElementById('metaSubtitle'), data.meta, 'subtitle');
+  bindNumberInput(document.getElementById('ldBodyFontSize'), data.layoutDefaults, 'bodyFontSize');
   bindNumberInput(document.getElementById('ldLineHeight'), data.layoutDefaults, 'lineHeight');
   bindNumberInput(document.getElementById('ldParaGap'), data.layoutDefaults, 'paragraphGap');
   bindNumberInput(document.getElementById('ldSecGap'), data.layoutDefaults, 'sectionGap');
   bindNumberInput(document.getElementById('ldNoteGap'), data.layoutDefaults, 'noteGap');
   bindNumberInput(document.getElementById('ldCalloutGap'), data.layoutDefaults, 'calloutGap');
+  bindNumberInput(document.getElementById('ldHeaderFontSize'), data.layoutDefaults, 'headerFontSize');
+  bindNumberInput(document.getElementById('ldFooterFontSize'), data.layoutDefaults, 'footerFontSize');
+
+  const bodySel = document.getElementById('ldBodyFontFamily');
+  bodySel.value = data.layoutDefaults?.bodyFontFamily || 'serif';
+  bodySel.onchange = ()=>{ data.layoutDefaults.bodyFontFamily = bodySel.value; renderPreview(); };
+
+  const headSel = document.getElementById('ldHeadingFontFamily');
+  headSel.value = data.layoutDefaults?.headingFontFamily || 'classic';
+  headSel.onchange = ()=>{ data.layoutDefaults.headingFontFamily = headSel.value; renderPreview(); };
 }
 
 function renderPageEditor(page, pageIndex){
   editor.innerHTML = `
     <div class="grid">
-      <label><span>id</span><input type="text" id="pageId"></label>
-      <div></div>
-      <label><span>header.left</span><input type="text" id="hLeft"></label>
-      <label><span>header.center</span><input type="text" id="hCenter"></label>
-      <label><span>header.right</span><input type="text" id="hRight"></label>
-      <label><span>footer.left</span><input type="text" id="fLeft"></label>
-      <label><span>footer.center</span><input type="text" id="fCenter"></label>
-      <label><span>footer.right</span><input type="text" id="fRight"></label>
-      <label><span>sourcePdfPage</span><input type="number" id="pdfPage"></label>
+      <label><span>Αναγνωριστικό σελίδας</span><input type="text" id="pageId"></label>
+      <label><span>Σελίδα PDF αναφοράς</span><input type="number" id="pdfPage"></label>
+
+      <label><span>Κεφαλίδα · αριστερά</span><input type="text" id="hLeft"></label>
+      <label><span>Κεφαλίδα · κέντρο</span><input type="text" id="hCenter"></label>
+      <label><span>Κεφαλίδα · δεξιά</span><input type="text" id="hRight"></label>
+
+      <label><span>Υποσέλιδο · αριστερά</span><input type="text" id="fLeft"></label>
+      <label><span>Υποσέλιδο · κέντρο</span><input type="text" id="fCenter"></label>
+      <label><span>Υποσέλιδο · δεξιά</span><input type="text" id="fRight"></label>
     </div>
 
-    <div class="subhead"><span>Προσθήκη item στο τέλος της σελίδας</span></div>
+    <div class="subhead"><span>Προσθήκη αντικειμένου στο τέλος της σελίδας</span></div>
     <div class="row">
-      <button id="addHeroBtn">+ Hero</button>
-      <button id="addPartBtn">+ Part</button>
-      <button id="addSecBtn">+ Section heading</button>
-      <button id="addParaBtn">+ Paragraph</button>
-      <button id="addNoteBtn">+ Note</button>
-      <button id="addFigBtn">+ Figure</button>
-      <button id="addSceneBtn">+ Scene</button>
-      <button id="addCallBtn">+ Callout</button>
-      <button id="addClearBtn">+ Clear</button>
+      <button id="addHeroBtn">+ Μπλοκ τίτλου αρχής</button>
+      <button id="addPartBtn">+ Τίτλος μέρους</button>
+      <button id="addSecBtn">+ Τίτλος ενότητας</button>
+      <button id="addParaBtn">+ Παράγραφος</button>
+      <button id="addNoteBtn">+ Σημείωση</button>
+      <button id="addFigBtn">+ Εικόνα / σχήμα</button>
+      <button id="addSceneBtn">+ Σκηνή</button>
+      <button id="addCallBtn">+ Δοκίμασε / Παρατήρησε</button>
+      <button id="addClearBtn">+ Καθάρισμα ροής</button>
     </div>
 
+    <div class="subhead"><span>Χειρισμοί σελίδας</span></div>
     <div class="row">
-      <button id="pageUpBtn">↑ Page</button>
-      <button id="pageDownBtn">↓ Page</button>
-      <button id="clonePageBtn">Κλωνοποίηση page</button>
-      <button class="danger" id="deletePageBtn">Διαγραφή page</button>
+      <button id="insertPageBeforeBtn">+ Νέα κενή σελίδα πριν</button>
+      <button id="insertPageAfterBtn">+ Νέα κενή σελίδα μετά</button>
+      <button id="pageUpBtn">↑ Μετακίνηση σελίδας προς τα πάνω</button>
+      <button id="pageDownBtn">↓ Μετακίνηση σελίδας προς τα κάτω</button>
+      <button id="clonePageBtn">Κλωνοποίηση σελίδας</button>
+      <button class="danger" id="deletePageBtn">Διαγραφή σελίδας</button>
     </div>
 
-    <div class="editor-help">Η κεφαλίδα και το υποσέλιδο προβάλλονται πλέον όπως τα γράφεις — χωρίς αυτόματο μετασχηματισμό σε κεφαλαία.</div>
-    <div class="hint">Αρχικά μοίρασέ τα χοντρικά. Μετά θα τα ανακατανείμεις με το μάτι από το mini A4 preview.</div>
+    <div class="editor-help">Η κεφαλίδα και το υποσέλιδο προβάλλονται ακριβώς όπως τα γράφεις — χωρίς αυτόματο μετασχηματισμό σε κεφαλαία.</div>
+    <div class="hint">Χοντρικά μοίρασμα πρώτα, αισθητική ανακατανομή μετά.</div>
   `;
   bindTextInput(document.getElementById('pageId'), page, 'id');
   bindTextInput(document.getElementById('hLeft'), page.header, 'left');
@@ -485,11 +584,21 @@ function renderPageEditor(page, pageIndex){
   document.getElementById('addCallBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'interactive_callout');
   document.getElementById('addClearBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'clear');
 
+  document.getElementById('insertPageBeforeBtn').onclick = ()=>{
+    const idx = insertPageAt(pageIndex, createSiblingPageFrom(page, 'page'));
+    selection = {kind:'page', pageIndex:idx};
+    renderAll();
+  };
+  document.getElementById('insertPageAfterBtn').onclick = ()=>{
+    const idx = insertPageAt(pageIndex + 1, createSiblingPageFrom(page, 'page'));
+    selection = {kind:'page', pageIndex:idx};
+    renderAll();
+  };
   document.getElementById('pageUpBtn').onclick = ()=> movePage(pageIndex, -1);
   document.getElementById('pageDownBtn').onclick = ()=> movePage(pageIndex, 1);
   document.getElementById('clonePageBtn').onclick = ()=>{
     const cp = deepClone(page);
-    cp.id = cp.id + '-copy';
+    cp.id = nextPageId('page');
     data.pages.splice(pageIndex + 1, 0, cp);
     selection = {kind:'page', pageIndex:pageIndex + 1};
     renderAll();
@@ -505,46 +614,53 @@ function renderPageEditor(page, pageIndex){
 function renderItemEditor(item, pageIndex, itemIndex){
   editor.innerHTML = `
     <div class="grid">
-      <label><span>type</span>
+      <label><span>Είδος αντικειμένου</span>
         <select id="itemType">
-          <option value="hero">hero</option>
-          <option value="part_title">part_title</option>
-          <option value="section_heading">section_heading</option>
-          <option value="paragraph">paragraph</option>
-          <option value="note">note</option>
-          <option value="figure">figure</option>
-          <option value="scene">scene</option>
-          <option value="interactive_callout">interactive_callout</option>
-          <option value="clear">clear</option>
+          <option value="hero">hero · μπλοκ τίτλου αρχής</option>
+          <option value="part_title">part_title · τίτλος μέρους</option>
+          <option value="section_heading">section_heading · τίτλος ενότητας</option>
+          <option value="paragraph">paragraph · παράγραφος</option>
+          <option value="note">note · σημείωση</option>
+          <option value="figure">figure · εικόνα / σχήμα</option>
+          <option value="scene">scene · σκηνή</option>
+          <option value="interactive_callout">interactive_callout · δοκίμασε / παρατήρησε</option>
+          <option value="clear">clear · καθάρισμα ροής</option>
         </select>
       </label>
     </div>
 
-    <div class="subhead"><span>Εισαγωγή ΠΡΙΝ από αυτό το item</span></div>
+    <div class="subhead"><span>Εισαγωγή ΠΡΙΝ από αυτό το αντικείμενο</span></div>
     <div class="row">
-      <button id="addParaBeforeBtn">+ Paragraph πριν</button>
-      <button id="addNoteBeforeBtn">+ Note πριν</button>
-      <button id="addFigureBeforeBtn">+ Figure πριν</button>
-      <button id="addSceneBeforeBtn">+ Scene πριν</button>
+      <button id="addParaBeforeBtn">+ Παράγραφος πριν</button>
+      <button id="addNoteBeforeBtn">+ Σημείωση πριν</button>
+      <button id="addFigureBeforeBtn">+ Εικόνα πριν</button>
+      <button id="addSceneBeforeBtn">+ Σκηνή πριν</button>
       <button id="addCalloutBeforeBtn">+ Callout πριν</button>
     </div>
 
-    <div class="subhead"><span>Εισαγωγή ΜΕΤΑ από αυτό το item</span></div>
+    <div class="subhead"><span>Εισαγωγή ΜΕΤΑ από αυτό το αντικείμενο</span></div>
     <div class="row">
-      <button id="addParaAfterBtn">+ Paragraph μετά</button>
-      <button id="addNoteAfterBtn">+ Note μετά</button>
-      <button id="addFigureAfterBtn">+ Figure μετά</button>
-      <button id="addSceneAfterBtn">+ Scene μετά</button>
+      <button id="addParaAfterBtn">+ Παράγραφος μετά</button>
+      <button id="addNoteAfterBtn">+ Σημείωση μετά</button>
+      <button id="addFigureAfterBtn">+ Εικόνα μετά</button>
+      <button id="addSceneAfterBtn">+ Σκηνή μετά</button>
       <button id="addCalloutAfterBtn">+ Callout μετά</button>
+    </div>
+
+    <div class="subhead"><span>Χειρισμοί σελίδας από αυτό το σημείο</span></div>
+    <div class="row">
+      <button id="movePrevPageBtn">⇡ Στείλε το στην προηγούμενη σελίδα</button>
+      <button id="moveNextPageBtn">⇣ Στείλε το στην επόμενη σελίδα</button>
+      <button id="splitHereBtn">✂ Σπάσε τη σελίδα εδώ</button>
     </div>
 
     <div id="typeFields"></div>
 
     <div class="row">
-      <button id="moveUpBtn">↑ Πάνω</button>
-      <button id="moveDownBtn">↓ Κάτω</button>
-      <button id="cloneItemBtn">Κλωνοποίηση item</button>
-      <button class="danger" id="deleteItemBtn">Διαγραφή item</button>
+      <button id="moveUpBtn">↑ Πάνω μέσα στην ίδια σελίδα</button>
+      <button id="moveDownBtn">↓ Κάτω μέσα στην ίδια σελίδα</button>
+      <button id="cloneItemBtn">Κλωνοποίηση αντικειμένου</button>
+      <button class="danger" id="deleteItemBtn">Διαγραφή αντικειμένου</button>
     </div>
   `;
 
@@ -567,6 +683,11 @@ function renderItemEditor(item, pageIndex, itemIndex){
   document.getElementById('addFigureAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'figure');
   document.getElementById('addSceneAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'scene');
   document.getElementById('addCalloutAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'interactive_callout');
+
+  document.getElementById('movePrevPageBtn').onclick = ()=> moveItemToAdjacentPage(pageIndex, itemIndex, -1);
+  document.getElementById('moveNextPageBtn').onclick = ()=> moveItemToAdjacentPage(pageIndex, itemIndex, 1);
+  document.getElementById('splitHereBtn').onclick = ()=> splitPageAtItem(pageIndex, itemIndex);
+
   document.getElementById('moveUpBtn').onclick = ()=> moveItem(pageIndex, itemIndex, -1);
   document.getElementById('moveDownBtn').onclick = ()=> moveItem(pageIndex, itemIndex, 1);
   document.getElementById('cloneItemBtn').onclick = ()=>{
@@ -575,7 +696,7 @@ function renderItemEditor(item, pageIndex, itemIndex){
     renderAll();
   };
   document.getElementById('deleteItemBtn').onclick = ()=>{
-    if(!confirm('Διαγραφή item;')) return;
+    if(!confirm('Διαγραφή αντικειμένου;')) return;
     data.pages[pageIndex].items.splice(itemIndex, 1);
     selection = {kind:'page', pageIndex};
     renderAll();
@@ -771,10 +892,22 @@ function renderPreview(){
 function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   const page = document.createElement('div');
   page.className = 'page-preview';
-  page.style.lineHeight = String(data.layoutDefaults?.lineHeight || 1.34);
+
+  const bodyFontSize = Number(data.layoutDefaults?.bodyFontSize || 18);
+  const lineHeight = Number(data.layoutDefaults?.lineHeight || 1.34);
+  const headerFontSize = Number(data.layoutDefaults?.headerFontSize || 11);
+  const footerFontSize = Number(data.layoutDefaults?.footerFontSize || 11);
+  const bodyFamily = fontPresetValue(data.layoutDefaults?.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
+  const headingFamily = fontPresetValue(data.layoutDefaults?.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+
+  page.style.lineHeight = String(lineHeight);
+  page.style.fontSize = `${bodyFontSize}px`;
+  page.style.fontFamily = bodyFamily;
 
   const header = document.createElement('div');
   header.className = 'page-header';
+  header.style.fontSize = `${headerFontSize}px`;
+  header.style.textTransform = 'none';
   header.innerHTML = `<span>${esc(pageObj.header?.left || '')}</span><span>${esc(pageObj.header?.center || '')}</span><span>${esc(pageObj.header?.right || '')}</span>`;
   page.appendChild(header);
 
@@ -783,44 +916,115 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   const footerLeft = String(pageObj.footer?.left || '').replace('{page}', pageNumber);
   const footer = document.createElement('div');
   footer.className = 'page-footer';
+  footer.style.fontSize = `${footerFontSize}px`;
+  footer.style.textTransform = 'none';
   footer.innerHTML = `<span>${esc(footerLeft)}</span><span>${esc(footerCenter)}</span><span>${esc(footerRight)}</span>`;
   page.appendChild(footer);
 
   pageObj.items.forEach((item, idx) => {
     const node = renderStandaloneItem(item);
     if(idx === highlightedIndex) node.classList.add('item-highlight');
+    if(item?.type === 'part_title'){
+      node.querySelector('.part-main')?.style.setProperty('font-family', headingFamily);
+    }
+    if(item?.type === 'section_heading'){
+      node.style.fontFamily = headingFamily;
+    }
+    if(item?.type === 'hero'){
+      node.querySelector('.hero-title')?.style.setProperty('font-family', headingFamily);
+    }
     page.appendChild(node);
   });
 
   return page;
 }
 
+const SCENE_BASE_WIDTH = 340;
+const SCENE_GRAPH_HEIGHT = 146.2;
+const SCENE_ROD_HEIGHT = 219.3;
+const SCENE_CONTROLS_RESERVE = 98;
+const SCENE_MAX_ROD_GRAPH_COUNT = 3;
+
+function readUrlParams(url=''){
+  try{
+    return new URL(url, window.location.href).searchParams;
+  }catch(_e){
+    try{ return new URL(url, 'https://local.invalid/').searchParams; }
+    catch(_e2){ return new URLSearchParams(''); }
+  }
+}
+function sceneLayoutKey(item){
+  const params = readUrlParams(item?.singleSrc || '');
+  return String(item?.layout || params.get('layout') || '').toLowerCase();
+}
+function sceneNaturalMetrics(item){
+  const frameWidth = Math.max(120, Number(item?.frameWidth || SCENE_BASE_WIDTH) || SCENE_BASE_WIDTH);
+  const scale = frameWidth / SCENE_BASE_WIDTH;
+  const layout = sceneLayoutKey(item);
+  let graphCount = 0;
+  let hasRod = true;
+
+  if(layout === 'rod_only') graphCount = 0;
+  else if(layout === 'rod_1graph') graphCount = 1;
+  else if(layout === 'rod_2graphs') graphCount = 2;
+  else if(layout === 'rod_3graphs') graphCount = 3;
+  else if(layout === 'graphs_qieb'){ graphCount = 4; hasRod = false; }
+  else{
+    const params = readUrlParams(item?.singleSrc || '');
+    const graphsParam = (params.get('graphs') || '').split(',').map(s=>s.trim()).filter(Boolean);
+    graphCount = graphsParam.length || 2;
+    const layersParam = (params.get('layers') || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    hasRod = layersParam.includes('rod');
+    if(!layersParam.length) hasRod = true;
+  }
+
+  const naturalHeight = ((hasRod ? SCENE_ROD_HEIGHT : 0) + graphCount * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+  const reservedHeight = (SCENE_ROD_HEIGHT + SCENE_MAX_ROD_GRAPH_COUNT * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+
+  return {
+    frameWidth,
+    naturalHeight: Math.max(180, naturalHeight),
+    reservedHeight: Math.max(naturalHeight, reservedHeight)
+  };
+}
+
 function renderStandaloneItem(item){
   const wrap = document.createElement('div');
   const t = item?.type || 'paragraph';
+  const paraGap = Number(data.layoutDefaults?.paragraphGap ?? 7);
+  const sectionGap = Number(data.layoutDefaults?.sectionGap ?? 20);
+  const noteGap = Number(data.layoutDefaults?.noteGap ?? 10);
+  const calloutGap = Number(data.layoutDefaults?.calloutGap ?? 10);
 
   if(t === 'hero'){
     wrap.className = 'hero-block';
     wrap.innerHTML = `${item.eyebrow ? `<p class="hero-eyebrow">${esc(item.eyebrow)}</p>` : ''}${item.title ? `<h1 class="hero-title">${esc(item.title)}</h1>` : ''}${item.subtitle ? `<p class="hero-subtitle">${esc(item.subtitle)}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
     return wrap;
   }
   if(t === 'part_title'){
     wrap.className = 'part-title';
     wrap.innerHTML = `${item.label ? `<p class="part-kicker">${esc(item.label)}</p>` : ''}${item.title ? `<p class="part-main">${esc(item.title)}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
     return wrap;
   }
   if(t === 'section_heading'){
     wrap.className = 'section-heading';
     wrap.textContent = item.title || '';
+    wrap.style.marginTop = `${Math.max(8, sectionGap)}px`;
+    wrap.style.marginBottom = `${Math.max(6, Math.round(sectionGap * 0.4))}px`;
     return wrap;
   }
   if(t === 'paragraph'){
     wrap.className = 'page-paragraph';
+    wrap.style.marginBottom = `${paraGap}px`;
     wrap.innerHTML = item.html || '<em>(κενό)</em>';
     return wrap;
   }
   if(t === 'note'){
     wrap.className = 'page-note';
+    wrap.style.marginTop = `${Math.max(4, Math.round(noteGap * 0.6))}px`;
+    wrap.style.marginBottom = `${noteGap}px`;
     wrap.innerHTML = `${item.label ? `<span class="label">${esc(item.label)}</span>` : ''}${item.html || '<em>(κενό)</em>'}`;
     return wrap;
   }
@@ -839,11 +1043,19 @@ function renderStandaloneItem(item){
   if(t === 'scene'){
     wrap.className = `media ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
     wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    const metrics = sceneNaturalMetrics(item);
     const fig = document.createElement('figure');
     fig.className = wrap.className;
     fig.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+
+    const reserve = document.createElement('div');
+    reserve.className = 'scene-preview-reserve';
+    reserve.style.minHeight = `${Math.round(metrics.reservedHeight)}px`;
+
     const frame = document.createElement('div');
-    frame.className = 'media-frame';
+    frame.className = 'media-frame scene-media-frame';
+    frame.style.aspectRatio = `${metrics.frameWidth} / ${metrics.naturalHeight}`;
+
     if(item.singleSrc){
       const ifr = document.createElement('iframe');
       ifr.loading = 'lazy';
@@ -854,7 +1066,10 @@ function renderStandaloneItem(item){
     } else {
       frame.innerHTML = '<div class="media-placeholder" style="display:grid;place-items:center;padding:14px;color:#465666">Χωρίς singleSrc</div>';
     }
-    fig.appendChild(frame);
+
+    reserve.appendChild(frame);
+    fig.appendChild(reserve);
+
     if(!item.hideCaption){
       const cap = document.createElement('figcaption');
       cap.textContent = item.caption || item.title || 'Σκηνή';
@@ -864,6 +1079,8 @@ function renderStandaloneItem(item){
   }
   if(t === 'interactive_callout'){
     wrap.className = 'callout';
+    wrap.style.marginTop = `${Math.max(4, Math.round(calloutGap * 0.6))}px`;
+    wrap.style.marginBottom = `${calloutGap}px`;
     const setup = (item.setupChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
     const press = (item.pressChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
     const observe = (item.observeItems || []).map(ch => `<li>${esc(ch)}</li>`).join('');
@@ -883,6 +1100,7 @@ function renderStandaloneItem(item){
   }
 
   wrap.className = 'page-paragraph';
+  wrap.style.marginBottom = `${paraGap}px`;
   wrap.textContent = `[Άγνωστο item: ${t}]`;
   return wrap;
 }
