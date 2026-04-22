@@ -38,6 +38,7 @@ figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--l
 .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}.media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}.media-frame iframe,.media-frame img,.media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}.media-frame img{object-fit:contain;object-position:top center}.media-frame.natural img{position:static;inset:auto;width:100%;height:auto;object-fit:contain;display:block}.media-placeholder{display:grid;place-items:center;text-align:center;padding:22px;background:linear-gradient(135deg,#f7fbfd,#e1ebf1);color:#465666;font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}figcaption{padding:9px 11px 10px;font:500 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);border-top:1px solid rgba(0,0,0,.07)}.clear{clear:both}
 .page-measure{position:fixed;left:-99999px;top:0;width:var(--sheet-width);height:var(--sheet-height);visibility:hidden;pointer-events:none}.page-measure .sheet{position:relative;transform:none;left:auto;top:auto}.status{margin-top:12px;text-align:center;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
 .screen-only{display:block}
+.print-scene-snapshot{display:none!important;max-width:100%;max-height:100%;}
 @media (max-width:980px){.mega-nav{grid-template-columns:repeat(2,minmax(140px,1fr))}}
 @media print{
  @page{size:A4 portrait;margin:0}
@@ -49,9 +50,9 @@ figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--l
  .sheet-wrap{width:var(--sheet-width)!important;height:var(--sheet-height)!important;break-after:page;page-break-after:always}
  .sheet{position:relative!important;left:auto!important;top:auto!important;transform:none!important;box-shadow:none!important;border:none!important}
  .sheet:last-child{break-after:auto;page-break-after:auto}
- .media-frame.scene-frame iframe{display:none!important}
- .media-frame.scene-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
- .media-frame.scene-frame.print-ready::after{content:none!important}
+ .media-frame iframe{display:none!important}
+ .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
+ .media-frame.print-ready::after{content:none!important}
  .print-scene-snapshot{display:block!important;width:100%!important;height:100%!important;object-fit:contain;object-position:top center;background:transparent}.page-break-marker{display:block;height:0;clear:both}
 }
 </style>
@@ -86,7 +87,7 @@ function withCacheBust(url){try{const u=new URL(url,window.location.href);u.sear
 function normalizeAppSrc(url=''){
   if(typeof url!=='string' || !url) return url;
   const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
-  const appEntry=/\/book(\/|$)/.test(path)?'../index.html':'./index.html';
+  const appEntry=/\/book(\/|$)/.test(path)?'../index_printmatch.html':'./index_printmatch.html';
   return url
     .replace(/^\.\.\/index\.html/i,appEntry)
     .replace(/^\.\.\/app\/em_wave_app\.html/i,appEntry)
@@ -146,34 +147,9 @@ function sceneAspect(block){
   return 16/9;
 }
 function partMark(idx){const marks=['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄']; return marks[idx] || `${idx+1}` }
-
-function applyImageWithFallback(img, rawSrc=''){
-  const src=String(rawSrc||'').trim();
-  const fireFail=()=>img.dispatchEvent(new CustomEvent('imagefallbackfailed'));
-  if(!src){ fireFail(); return; }
-  const isDirect=/^(data:|blob:|https?:|\/)/i.test(src);
-  const clean=src.replace(/^\.\//,'');
-  const candidates=[];
-  const push=(u)=>{ if(u && !candidates.includes(u)) candidates.push(u); };
-  if(isDirect){ push(src); }
-  else {
-    push(src);
-    push(`./${clean}`);
-    push(`../${clean}`);
-    if(clean.startsWith('images/')) push(`./${clean}`);
-  }
-  let idx=0;
-  const tryNext=()=>{
-    if(idx>=candidates.length){ fireFail(); return; }
-    const candidate=candidates[idx++];
-    img.onerror=()=>tryNext();
-    img.src=withCacheBust(candidate);
-  };
-  tryNext();
-}
 function renderHero(meta={}){const wrap=document.createElement('section'); wrap.className='hero'; wrap.innerHTML=`${meta.eyebrow?`<p class="eyebrow">${meta.eyebrow}</p>`:''}${meta.title?`<h1>${meta.title}</h1>`:''}${meta.subtitle?`<p class="subtitle">${meta.subtitle}</p>`:''}${meta.notes?.length?`<div class="intro-note">${meta.notes[0]}</div>`:''}`; return wrap}
 function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
-function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame scene-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
+function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
 function renderParagraph(block){const p=document.createElement('p'); p.innerHTML=block.html||''; return p}
 function renderNote(block){const d=document.createElement('div'); d.className='note'; d.innerHTML=`${block.label?`<span class="label">${block.label}</span>`:''}${block.html||''}`; return d}
 function renderCallout(block){const d=document.createElement('div'); d.className='callout'; d.innerHTML=`<div class="callout-title">${block.title||'Δοκίμασε'}</div><div class="callout-row"><span class="callout-label">${block.setupLabel||'Ρύθμισε'}</span>${(block.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-row"><span class="callout-label">${block.pressLabel||'Πίεσε'}</span>${(block.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-observe"><span class="callout-observe-title">${block.observeTitle||'Παρατήρησε'}</span><ul>${(block.observeItems||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>`; return d}
