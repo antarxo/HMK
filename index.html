@@ -3677,8 +3677,31 @@ function inlineSnapshotStyles(sourceEl, targetEl){
     targetEl.value = sourceEl.value;
   }
 }
-function buildViewportSnapshotClone(sourceRoot, options={}){
-  const { omitVisuals=false } = options;
+function ensureSnapshotCanvasesReady(sourceRoot){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  sourceRoot.querySelectorAll('canvas').forEach(canvas => {
+    const box = canvas.getBoundingClientRect();
+    const pxW = Math.max(1, Math.round(box.width * dpr));
+    const pxH = Math.max(1, Math.round(box.height * dpr));
+    if(pxW > 0 && pxH > 0 && (canvas.width !== pxW || canvas.height !== pxH)){
+      canvas.width = pxW;
+      canvas.height = pxH;
+    }
+  });
+}
+async function waitAnimationFrames(count=1){
+  count = Math.max(1, count|0);
+  await new Promise(resolve => {
+    const step = () => {
+      count -= 1;
+      if(count <= 0) resolve();
+      else requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+function buildViewportSnapshotClone(sourceRoot){
   const clone = sourceRoot.cloneNode(true);
   const sourceEls = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
   const cloneEls = [clone, ...clone.querySelectorAll('*')];
@@ -3687,21 +3710,14 @@ function buildViewportSnapshotClone(sourceRoot, options={}){
     if(!targetEl) return;
     inlineSnapshotStyles(sourceEl, targetEl);
     if(sourceEl instanceof HTMLCanvasElement){
-      if(omitVisuals){
-        const ph = document.createElement('div');
-        ph.setAttribute('style', (targetEl.getAttribute('style') || '') + ';background:transparent!important;border-color:transparent!important;');
-        targetEl.replaceWith(ph);
-        cloneEls[idx] = ph;
-      }else{
-        const img = document.createElement('img');
-        img.alt = '';
-        img.width = sourceEl.width;
-        img.height = sourceEl.height;
-        img.src = sourceEl.toDataURL('image/png');
-        img.setAttribute('style', targetEl.getAttribute('style') || '');
-        targetEl.replaceWith(img);
-        cloneEls[idx] = img;
-      }
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = sourceEl.width;
+      img.height = sourceEl.height;
+      img.src = sourceEl.toDataURL('image/png');
+      img.setAttribute('style', targetEl.getAttribute('style') || '');
+      targetEl.replaceWith(img);
+      cloneEls[idx] = img;
     }
   });
   clone.querySelectorAll('.machineHud, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
@@ -3711,75 +3727,24 @@ function buildViewportSnapshotClone(sourceRoot, options={}){
   clone.style.overflow = 'hidden';
   return clone;
 }
-function elementIsSnapshotVisible(el){
-  if(!(el instanceof Element)) return false;
-  const cs = getComputedStyle(el);
-  if(cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') <= 0) return false;
-  const r = el.getBoundingClientRect();
-  return r.width > 0.5 && r.height > 0.5;
-}
-function drawSnapshotElement(ctx, el, rootRect){
-  const rect = el.getBoundingClientRect();
-  const interLeft = Math.max(rect.left, rootRect.left);
-  const interTop = Math.max(rect.top, rootRect.top);
-  const interRight = Math.min(rect.right, rootRect.right);
-  const interBottom = Math.min(rect.bottom, rootRect.bottom);
-  const iw = interRight - interLeft;
-  const ih = interBottom - interTop;
-  if(iw <= 0 || ih <= 0 || rect.width <= 0 || rect.height <= 0) return;
-  const srcW = (el instanceof HTMLCanvasElement) ? el.width : (el.naturalWidth || rect.width);
-  const srcH = (el instanceof HTMLCanvasElement) ? el.height : (el.naturalHeight || rect.height);
-  const sx = ((interLeft - rect.left) / rect.width) * srcW;
-  const sy = ((interTop - rect.top) / rect.height) * srcH;
-  const sw = (iw / rect.width) * srcW;
-  const sh = (ih / rect.height) * srcH;
-  const dx = interLeft - rootRect.left;
-  const dy = interTop - rootRect.top;
-  try{ ctx.drawImage(el, sx, sy, sw, sh, dx, dy, iw, ih); }catch(_e){}
-}
-async function buildViewportSnapshotCanvas(sourceRoot){
-  const rect = sourceRoot.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width));
-  const height = Math.max(1, Math.round(rect.height));
-  const shell = buildViewportSnapshotClone(sourceRoot, { omitVisuals:true });
-  shell.style.width = `${width}px`;
-  shell.style.height = `${height}px`;
-  const bg = getComputedStyle(sourceRoot).backgroundColor || '#0b0f14';
-  const serialized = new XMLSerializer().serializeToString(shell);
-  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
-  const shellUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  const shellImg = await new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = shellUrl;
-  });
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0,0,width,height);
-  if(shellImg) ctx.drawImage(shellImg, 0, 0, width, height);
-  const visuals = Array.from(sourceRoot.querySelectorAll('canvas,img')).filter(elementIsSnapshotVisible);
-  visuals.forEach(el => drawSnapshotElement(ctx, el, rect));
-  return canvas.toDataURL('image/png');
-}
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
-  try{ renderer.render(scene, camera); }catch(_e){}
-  try{ drawGraphs(true); }catch(_e){}
   const prevTheme = activeViewTheme;
   try{
     if(prevTheme !== 'screen') applyThemeMode('screen');
     applyUI();
-  }catch(_e){}
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  let dataUrl = null;
-  try{ dataUrl = await buildViewportSnapshotCanvas(sourceRoot); }catch(_e){}
-  if(!dataUrl){
+    ensureSnapshotCanvasesReady(sourceRoot);
+    for(let pass=0; pass<4; pass+=1){
+      try{ renderer.render(scene, camera); }catch(_e){}
+      try{ drawGraphs(true); }catch(_e){}
+      await waitAnimationFrames(1);
+      ensureSnapshotCanvasesReady(sourceRoot);
+    }
+    try{ drawGraphs(true); }catch(_e){}
+    try{ renderer.render(scene, camera); }catch(_e){}
+    await waitAnimationFrames(2);
+    ensureSnapshotCanvasesReady(sourceRoot);
     const rect = sourceRoot.getBoundingClientRect();
     const width = Math.max(1, Math.round(rect.width));
     const height = Math.max(1, Math.round(rect.height));
@@ -3790,13 +3755,13 @@ async function getBookPrintSnapshot(){
     const serialized = new XMLSerializer().serializeToString(clone);
     const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
-    dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  } finally {
+    try{
+      if(prevTheme !== 'screen') applyThemeMode(prevTheme);
+      applyUI();
+    }catch(_e){}
   }
-  try{
-    if(prevTheme !== 'screen') applyThemeMode(prevTheme);
-    applyUI();
-  }catch(_e){}
-  return dataUrl;
 }
 window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
