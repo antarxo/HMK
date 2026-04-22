@@ -227,13 +227,13 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
   figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
   .media-frame.print-ready iframe{display:none !important}
   .media-frame img{object-fit:contain !important; background:#fff !important}
-  .media-frame::after{
+  .media-frame.scene-frame::after{
     content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";
     position:absolute; inset:0; display:grid; place-items:center;
     padding:18px; color:#5e6d79; font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif; background:#f4f6f8;
   }
-  .media-frame.print-ready{background:#fff !important}
-  .media-frame.print-ready::after{content:none !important}
+  .media-frame.scene-frame.print-ready{background:#fff !important}
+  .media-frame.scene-frame.print-ready::after{content:none !important}
   .print-scene-snapshot{display:block !important; object-fit:contain !important; background:#fff !important}
 }
 </style>
@@ -249,12 +249,14 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     <div class="page-stack" id="pageStack"></div>
     <div class="status" id="status"></div>
   </main>
+  <div id="printSandbox" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1200px;height:1200px;overflow:hidden;pointer-events:none;opacity:0"></div>
 
 <script>
 'use strict';
 const pageStack=document.getElementById('pageStack');
 const megaNav=document.getElementById('megaNav');
 const statusEl=document.getElementById('status');
+const printSandbox=document.getElementById('printSandbox');
 const JSON_CANDIDATES=['chapter_content_pages_v1.json','chapter_content.json'];
 
 function setStatus(msg){ statusEl.textContent = msg || ''; }
@@ -343,6 +345,51 @@ function waitForImage(img){
     img.addEventListener('error', ()=>resolve(), {once:true});
   });
 }
+function wait(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+function waitForIframeLoad(iframe){
+  return new Promise(resolve=>{
+    if(!iframe) return resolve();
+    let done = false;
+    const finish = ()=>{ if(done) return; done = true; resolve(); };
+    try{
+      const doc = iframe.contentDocument;
+      if(doc && doc.readyState === 'complete') return resolve();
+    }catch(_e){}
+    iframe.addEventListener('load', finish, {once:true});
+    iframe.addEventListener('error', finish, {once:true});
+    setTimeout(finish, 3500);
+  });
+}
+async function waitForFigureImages(){
+  const imgs = Array.from(document.querySelectorAll('.media-frame img:not(.print-scene-snapshot)'));
+  for(const img of imgs) await waitForImage(img);
+}
+function cleanupPrintSandbox(){
+  if(printSandbox) printSandbox.innerHTML = '';
+}
+async function buildSceneSnapshotFromClone(src=''){
+  if(!printSandbox || !src) return null;
+  cleanupPrintSandbox();
+  const holder = document.createElement('div');
+  holder.style.cssText = 'width:1200px;height:1200px;overflow:hidden;background:#fff';
+  const iframe = document.createElement('iframe');
+  iframe.loading = 'eager';
+  iframe.referrerPolicy = 'no-referrer';
+  iframe.allow = 'fullscreen';
+  iframe.style.cssText = 'width:1200px;height:1200px;border:0;display:block;background:#fff';
+  iframe.src = withCacheBust(src);
+  holder.appendChild(iframe);
+  printSandbox.appendChild(holder);
+  await waitForIframeLoad(iframe);
+  await wait(500);
+  let shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
+  if(!shot){
+    await wait(350);
+    shot = await requestIframePrintSnapshotWithRetry(iframe, 2);
+  }
+  holder.remove();
+  return shot;
+}
 async function requestIframePrintSnapshot(iframe){
   if(!iframe) return null;
   try{
@@ -383,30 +430,35 @@ let printFlowRunning = false;
 function cleanupPrintSnapshots(){
   document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
   document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready'));
+  cleanupPrintSandbox();
   printSnapshotsPrepared = false;
   printFlowRunning = false;
 }
 async function preparePrintSnapshots(force=false){
-  if(printSnapshotsPrepared && !force) return;
+  if(printSnapshotsPrepared && !force) return 0;
   cleanupPrintSnapshots();
-  const iframes=Array.from(document.querySelectorAll('.media-frame iframe'));
+  await waitForFigureImages();
+
+  const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
   let readyCount = 0;
-  await Promise.all(iframes.map(async iframe=>{
-    const dataUrl=await requestIframePrintSnapshotWithRetry(iframe, 3);
-    if(!dataUrl) return;
-    const holder=iframe.parentElement;
-    if(!holder) return;
-    const img=document.createElement('img');
-    img.className='print-scene-snapshot';
-    img.alt='Στιγμιότυπο σκηνής';
-    img.src=dataUrl;
-    holder.appendChild(img);
+
+  for(const frame of frames){
+    const liveIframe = frame.querySelector('iframe');
+    if(!liveIframe) continue;
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''));
+    if(!dataUrl) continue;
+
+    const img = document.createElement('img');
+    img.className = 'print-scene-snapshot';
+    img.alt = 'Στιγμιότυπο σκηνής';
+    img.src = dataUrl;
+    frame.appendChild(img);
     await waitForImage(img);
-    holder.classList.add('print-ready');
+    frame.classList.add('print-ready');
     readyCount += 1;
-  }));
-  await new Promise(resolve => requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-  await new Promise(resolve => setTimeout(resolve, 180));
+  }
+
+  await wait(120);
   printSnapshotsPrepared = true;
   return readyCount;
 }
@@ -512,7 +564,7 @@ function renderScene(item){
   fig.className=`media ${placementClass(item)}`;
   if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
   const frame=document.createElement('div');
-  frame.className='media-frame';
+  frame.className='media-frame scene-frame';
   frame.style.aspectRatio=String(sceneAspect(item));
   const iframe=document.createElement('iframe');
   iframe.loading='lazy';
@@ -599,38 +651,69 @@ function renderPages(data){
 function deriveNav(data){
   const pages = Array.isArray(data.pages) ? data.pages : [];
   const groups = [];
-  let currentGroup = null;
   const pageToGroup = new Map();
+  let currentGroup = null;
+
+  const ignoredTitles = new Set([
+    'Δοκίμασε',
+    'Σχολική Περιγραφή',
+    'Ποια είναι η εικόνα των πεδίων;',
+    'Συμβάντα',
+    'Πώς εξελίσσεται η διάδοση των πεδίων;',
+    'Στιγμιότυπο',
+    'Σύμβαση',
+    'Πώς να το χρησιμοποιήσεις',
+    'Τι να περιμένεις',
+    'Εικόνα 1',
+    'Εικόνα 2',
+    'Πυρήνας'
+  ]);
+
+  function menuGroupTitle(groupIndex, page, partItem){
+    if(groupIndex === 0) return 'Εισαγωγή';
+    if(groupIndex === 1) return 'Σχολικά';
+    if(partItem && String(partItem.title || '').trim()) return String(partItem.title).trim();
+    const right = String(page?.header?.right || '').trim();
+    return right || `Σελίδα ${groupIndex+1}`;
+  }
 
   pages.forEach((page, idx) => {
     const pageId = page.id || `page-${idx+1}`;
     const partItem = (page.items || []).find(it => it.type === 'part_title');
-    const partKey = String(page.header?.left || '').trim() || `part-${idx+1}`;
+    const startsNewGroup = !currentGroup || !!partItem;
 
-    if(!currentGroup || partItem){
-      const title = String(partItem?.title || page.header?.right || page.header?.left || `Σελίδα ${idx+1}`).trim();
+    if(startsNewGroup){
       currentGroup = {
-        key: `${partKey}|${title}|${idx}`,
+        key: `group-${groups.length}`,
         id: pageId,
-        title,
-        entries: []
+        title: menuGroupTitle(groups.length, page, partItem),
+        entries: [],
+        seen: new Set()
       };
       groups.push(currentGroup);
     }
 
     pageToGroup.set(pageId, currentGroup.key);
 
-    const sectionItems = (page.items || []).filter(it => it.type === 'section_heading' && String(it.title || '').trim());
-    if(!sectionItems.length && !currentGroup.entries.length){
-      currentGroup.entries.push({ id: pageId, text: currentGroup.title });
-    }else{
-      sectionItems.forEach(sec => {
-        const text = String(sec.title || '').trim();
-        if(!text) return;
-        const exists = currentGroup.entries.some(entry => entry.id === pageId && entry.text === text);
-        if(!exists) currentGroup.entries.push({ id: pageId, text });
-      });
+    const candidates = [];
+    (page.items || []).forEach(it => {
+      const raw = String(it.title || '').trim();
+      if(!raw || ignoredTitles.has(raw)) return;
+      if(it.type === 'section_heading' || it.type === 'scene'){
+        candidates.push(raw);
+      }
+    });
+
+    if(!candidates.length && currentGroup.entries.length === 0){
+      candidates.push(currentGroup.title);
     }
+
+    candidates.forEach(text => {
+      const key = text.toLowerCase();
+      if(currentGroup.seen.has(key)) return;
+      currentGroup.seen.add(key);
+      currentGroup.entries.push({ id: pageId, text });
+    });
   });
 
   megaNav.innerHTML = '';
