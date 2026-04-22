@@ -3696,50 +3696,28 @@ function buildViewportSnapshotClone(sourceRoot){
       cloneEls[idx] = img;
     }
   });
-  clone.querySelectorAll('.machineHud, #hiddenSettings, .top').forEach(el => el.remove());
+  clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
   clone.style.margin = '0';
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.display = 'block';
-  clone.style.height = 'auto';
-  const main = clone.querySelector('.main');
-  if(main){
-    main.style.padding = '0';
-    main.style.margin = '0';
-    main.style.display = 'block';
-    main.style.overflow = 'hidden';
-  }
-  const viewport = clone.querySelector('.card.viewport');
-  if(viewport){
-    viewport.style.margin = '0';
-    viewport.style.border = '0';
-    viewport.style.borderRadius = '0';
-    viewport.style.boxShadow = 'none';
-    viewport.style.overflow = 'hidden';
-  }
+  clone.style.background = '#ffffff';
   return clone;
 }
 async function getBookPrintSnapshot(){
-  const sourceRoot = document.querySelector('.app');
+  const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
   try{ renderer.render(scene, camera); }catch(_e){}
   try{ drawGraphs(true); }catch(_e){}
-  try{ applyUI(); }catch(_e){}
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const rect = sourceRoot.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width));
   const height = Math.max(1, Math.round(rect.height));
   const clone = buildViewportSnapshotClone(sourceRoot);
   clone.style.width = `${width}px`;
-  clone.style.minWidth = `${width}px`;
-  clone.style.maxWidth = `${width}px`;
   clone.style.height = `${height}px`;
-  clone.style.minHeight = `${height}px`;
-  clone.style.maxHeight = `${height}px`;
-  const bg = getComputedStyle(document.body).backgroundColor || '#0b0f14';
   const serialized = new XMLSerializer().serializeToString(clone);
-  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
