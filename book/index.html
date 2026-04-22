@@ -249,7 +249,7 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     <div class="page-stack" id="pageStack"></div>
     <div class="status" id="status"></div>
   </main>
-  <div id="printSandbox" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1200px;height:1200px;overflow:hidden;pointer-events:none;opacity:0"></div>
+  <div id="printSandbox" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0"></div>
 
 <script>
 'use strict';
@@ -367,27 +367,59 @@ async function waitForFigureImages(){
 function cleanupPrintSandbox(){
   if(printSandbox) printSandbox.innerHTML = '';
 }
-async function buildSceneSnapshotFromClone(src=''){
+async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
   if(!printSandbox || !src) return null;
   cleanupPrintSandbox();
+
+  const liveRect = sourceFrame?.getBoundingClientRect ? sourceFrame.getBoundingClientRect() : null;
+  const liveW = Math.max(1, Math.round(liveRect?.width || 340));
+  const liveH = Math.max(1, Math.round(liveRect?.height || Math.round(liveW * 1.15)));
+
+  const maxSandboxW = 1600;
+  const maxSandboxH = 2200;
+  const scale = Math.max(2, Math.min(4, Math.floor(maxSandboxW / liveW) || 2));
+  let cloneW = Math.max(liveW * scale, liveW);
+  let cloneH = Math.max(liveH * scale, liveH);
+
+  if(cloneW > maxSandboxW){
+    const k = maxSandboxW / cloneW;
+    cloneW = Math.round(cloneW * k);
+    cloneH = Math.round(cloneH * k);
+  }
+  if(cloneH > maxSandboxH){
+    const k = maxSandboxH / cloneH;
+    cloneW = Math.round(cloneW * k);
+    cloneH = Math.round(cloneH * k);
+  }
+
+  printSandbox.style.width = `${cloneW}px`;
+  printSandbox.style.height = `${cloneH}px`;
+
   const holder = document.createElement('div');
-  holder.style.cssText = 'width:1200px;height:1200px;overflow:hidden;background:#fff';
+  holder.style.cssText = `width:${cloneW}px;height:${cloneH}px;overflow:hidden;background:#fff;display:block`;
+
   const iframe = document.createElement('iframe');
   iframe.loading = 'eager';
   iframe.referrerPolicy = 'no-referrer';
   iframe.allow = 'fullscreen';
-  iframe.style.cssText = 'width:1200px;height:1200px;border:0;display:block;background:#fff';
+  iframe.style.cssText = `width:${cloneW}px;height:${cloneH}px;border:0;display:block;background:#fff`;
   iframe.src = withCacheBust(src);
+
   holder.appendChild(iframe);
   printSandbox.appendChild(holder);
+
   await waitForIframeLoad(iframe);
-  await wait(500);
-  let shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
+  await wait(650);
+
+  let shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
   if(!shot){
-    await wait(350);
-    shot = await requestIframePrintSnapshotWithRetry(iframe, 2);
+    await wait(450);
+    shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
   }
+
   holder.remove();
+  printSandbox.style.width = '1px';
+  printSandbox.style.height = '1px';
   return shot;
 }
 async function requestIframePrintSnapshot(iframe){
@@ -445,7 +477,7 @@ async function preparePrintSnapshots(force=false){
   for(const frame of frames){
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
-    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''));
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
     if(!dataUrl) continue;
 
     const img = document.createElement('img');
