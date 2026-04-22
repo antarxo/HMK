@@ -3072,7 +3072,7 @@ function drawSingleGraph(canvas, row, opts={}){
   g.setTransform(dpr,0,0,dpr,0,0);
   const th = VIEW_THEMES[activeViewTheme] || VIEW_THEMES.screen;
   g.clearRect(0,0,w,h);
-  g.fillStyle = th.graphBg || '#0b0f14';
+  g.fillStyle = 'rgba(0,0,0,0)';
   g.fillRect(0,0,w,h);
   const axisX = 28;
   const right = 8;
@@ -3829,30 +3829,6 @@ function isVisibleSnapshotBackground(bg){
   if(!s || s === 'transparent') return false;
   return !(/^rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/.test(s));
 }
-function resolveOpaqueSnapshotBg(el, fallback='#0b0f14'){
-  const candidates = [];
-  try{
-    const rootVars = getComputedStyle(document.documentElement);
-    candidates.push(rootVars.getPropertyValue('--bg'));
-  }catch(_e){}
-  for(let cur = el; cur; cur = cur.parentElement){
-    try{
-      const cs = getComputedStyle(cur);
-      candidates.push(cs.backgroundColor);
-      candidates.push(cs.background);
-    }catch(_e){}
-  }
-  try{
-    candidates.push(getComputedStyle(document.body).backgroundColor);
-    candidates.push(getComputedStyle(document.documentElement).backgroundColor);
-  }catch(_e){}
-  for(const raw of candidates){
-    const value = String(raw || '').trim();
-    if(!value) continue;
-    if(isVisibleSnapshotBackground(value)) return value;
-  }
-  return fallback;
-}
 function drawSnapshotBackgroundBlock(ctx, el, rootRect){
   if(!(el instanceof Element) || !elementIsSnapshotVisible(el)) return;
   const rect = el.getBoundingClientRect();
@@ -3884,48 +3860,15 @@ function drawSnapshotBackgroundBlock(ctx, el, rootRect){
 }
 function drawSnapshotBackgroundBlocks(ctx, sourceRoot, controlsEl, rootRect){
   const seen = new Set();
-  const appBg = resolveOpaqueSnapshotBg(document.querySelector('.app') || sourceRoot, '#0b0f14');
-  const viewportBg = resolveOpaqueSnapshotBg(document.querySelector('.card.viewport') || sourceRoot, appBg);
-  const fillOpaque = (el, fillColor) => {
-    if(!(el instanceof Element) || !elementIsSnapshotVisible(el)) return;
-    const rect = el.getBoundingClientRect();
-    const x = rect.left - rootRect.left;
-    const y = rect.top - rootRect.top;
-    const w = rect.width;
-    const h = rect.height;
-    if(w <= 0 || h <= 0) return;
-    const cs = getComputedStyle(el);
-    const radii = parseSnapshotRadius(cs, w, h);
-    ctx.save();
-    roundedRectPath(ctx, x, y, w, h, radii);
-    ctx.fillStyle = fillColor;
-    ctx.fill();
-    ctx.restore();
-    const bw = parseFloat(cs.borderTopWidth || '0');
-    const bc = cs.borderTopColor;
-    if(bw > 0.1 && isVisibleSnapshotBackground(bc)){
-      ctx.save();
-      roundedRectPath(ctx, x + bw/2, y + bw/2, Math.max(0, w - bw), Math.max(0, h - bw), radii.map(r => Math.max(0, r - bw/2)));
-      ctx.lineWidth = bw;
-      ctx.strokeStyle = bc;
-      ctx.stroke();
-      ctx.restore();
-    }
-  };
-
-  sourceRoot.querySelectorAll('.graphPanel').forEach(el => {
-    if(seen.has(el)) return;
-    seen.add(el);
-    fillOpaque(el, appBg);
+  const selectors = ['.graphPanel', '.focusMiniControls'];
+  selectors.forEach(sel => {
+    sourceRoot.querySelectorAll(sel).forEach(el => {
+      if(seen.has(el)) return;
+      seen.add(el);
+      drawSnapshotBackgroundBlock(ctx, el, rootRect);
+    });
   });
-
-  sourceRoot.querySelectorAll('.focusMiniControls').forEach(el => {
-    if(seen.has(el)) return;
-    seen.add(el);
-    fillOpaque(el, viewportBg);
-  });
-
-  if(controlsEl && !seen.has(controlsEl)) fillOpaque(controlsEl, viewportBg);
+  if(controlsEl && !seen.has(controlsEl)) drawSnapshotBackgroundBlock(ctx, controlsEl, rootRect);
 }
 function drawSnapshotElement(ctx, el, rootRect){
   const rect = el.getBoundingClientRect();
