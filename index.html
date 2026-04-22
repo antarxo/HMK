@@ -846,7 +846,7 @@ function applyMainMode(mode, skipApply=false){
   if(!skipApply){ restartEvolutionForSelection(); }
 }
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp', preserveDrawingBuffer:true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
@@ -3677,102 +3677,49 @@ function inlineSnapshotStyles(sourceEl, targetEl){
     targetEl.value = sourceEl.value;
   }
 }
-function rgbaFromCssColor(value, fallback=[255,255,255,0]){
-  const v = String(value || '').trim();
-  if(!v || v === 'transparent') return fallback;
-  const m = v.match(/rgba?\(([^)]+)\)/i);
-  if(!m) return fallback;
-  const parts = m[1].split(',').map(s => s.trim());
-  const r = Math.max(0, Math.min(255, parseFloat(parts[0]) || 0));
-  const g = Math.max(0, Math.min(255, parseFloat(parts[1]) || 0));
-  const b = Math.max(0, Math.min(255, parseFloat(parts[2]) || 0));
-  const a = parts.length > 3 ? Math.max(0, Math.min(1, parseFloat(parts[3]) || 0)) : 1;
-  return [r,g,b,a];
-}
-function roundRectPath(ctx, x, y, w, h, r){
-  const rr = Math.max(0, Math.min(r, Math.min(w, h) * 0.5));
-  ctx.beginPath();
-  ctx.moveTo(x + rr, y);
-  ctx.arcTo(x + w, y, x + w, y + h, rr);
-  ctx.arcTo(x + w, y + h, x, y + h, rr);
-  ctx.arcTo(x, y + h, x, y, rr);
-  ctx.arcTo(x, y, x + w, y, rr);
-  ctx.closePath();
-}
-function isSnapshotVisible(el){
-  if(!(el instanceof Element)) return false;
-  const cs = getComputedStyle(el);
-  if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return false;
-  const rect = el.getBoundingClientRect();
-  return rect.width > 1 && rect.height > 1;
-}
-function drawBoxFromElement(ctx, el, rootRect, scale=1){
-  if(!(el instanceof Element) || !isSnapshotVisible(el)) return;
-  const rect = el.getBoundingClientRect();
-  const x = (rect.left - rootRect.left) * scale;
-  const y = (rect.top - rootRect.top) * scale;
-  const w = rect.width * scale;
-  const h = rect.height * scale;
-  if(w <= 0 || h <= 0) return;
-  const cs = getComputedStyle(el);
-  const radius = (parseFloat(cs.borderTopLeftRadius) || 0) * scale;
-  const [br,bg,bb,ba] = rgbaFromCssColor(cs.backgroundColor, [255,255,255,0]);
-  const borderWidth = (parseFloat(cs.borderTopWidth) || 0) * scale;
-  const [rr,rg,rb,ra] = rgbaFromCssColor(cs.borderTopColor, [0,0,0,0]);
-  if(ba > 0){
-    roundRectPath(ctx, x, y, w, h, radius);
-    ctx.fillStyle = `rgba(${br},${bg},${bb},${ba})`;
-    ctx.fill();
-  }
-  if(borderWidth > 0 && ra > 0){
-    roundRectPath(ctx, x + borderWidth * 0.5, y + borderWidth * 0.5, Math.max(0, w - borderWidth), Math.max(0, h - borderWidth), Math.max(0, radius - borderWidth * 0.5));
-    ctx.lineWidth = borderWidth;
-    ctx.strokeStyle = `rgba(${rr},${rg},${rb},${ra})`;
-    ctx.stroke();
-  }
+function buildViewportSnapshotClone(sourceRoot){
+  const clone = sourceRoot.cloneNode(true);
+  const sourceEls = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+  const cloneEls = [clone, ...clone.querySelectorAll('*')];
+  sourceEls.forEach((sourceEl, idx) => {
+    const targetEl = cloneEls[idx];
+    if(!targetEl) return;
+    inlineSnapshotStyles(sourceEl, targetEl);
+    if(sourceEl instanceof HTMLCanvasElement){
+      const img = document.createElement('img');
+      img.alt = '';
+      img.width = sourceEl.width;
+      img.height = sourceEl.height;
+      img.src = sourceEl.toDataURL('image/png');
+      img.setAttribute('style', targetEl.getAttribute('style') || '');
+      targetEl.replaceWith(img);
+      cloneEls[idx] = img;
+    }
+  });
+  clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
+  clone.style.margin = '0';
+  clone.style.boxShadow = 'none';
+  clone.style.border = '0';
+  clone.style.overflow = 'hidden';
+  clone.style.background = '#ffffff';
+  return clone;
 }
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120))));
+  try{ renderer.render(scene, camera); }catch(_e){}
+  try{ drawGraphs(true); }catch(_e){}
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const rect = sourceRoot.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width));
   const height = Math.max(1, Math.round(rect.height));
-  const scale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(width * scale));
-  canvas.height = Math.max(1, Math.round(height * scale));
-  const ctx = canvas.getContext('2d');
-  ctx.scale(scale, scale);
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-
-  const rootBg = getComputedStyle(sourceRoot).backgroundColor;
-  const [r,g,b,a] = rgbaFromCssColor(rootBg, [255,255,255,1]);
-  ctx.fillStyle = `rgba(${r},${g},${b},${a || 1})`;
-  ctx.fillRect(0, 0, width, height);
-
-  Array.from(sourceRoot.querySelectorAll('.graphPanel')).forEach(panel => drawBoxFromElement(ctx, panel, rect, 1));
-
-  const drawables = Array.from(sourceRoot.querySelectorAll('canvas, img'))
-    .filter(el => isSnapshotVisible(el))
-    .sort((a, b) => {
-      const za = parseInt(getComputedStyle(a).zIndex || '0', 10) || 0;
-      const zb = parseInt(getComputedStyle(b).zIndex || '0', 10) || 0;
-      if(za !== zb) return za - zb;
-      return 0;
-    });
-
-  for(const el of drawables){
-    const dRect = el.getBoundingClientRect();
-    const x = dRect.left - rect.left;
-    const y = dRect.top - rect.top;
-    const w = dRect.width;
-    const h = dRect.height;
-    if(w <= 0 || h <= 0) continue;
-    try{ ctx.drawImage(el, x, y, w, h); }catch(_e){}
-  }
-  return canvas.toDataURL('image/png');
+  const clone = buildViewportSnapshotClone(sourceRoot);
+  clone.style.width = `${width}px`;
+  clone.style.height = `${height}px`;
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
