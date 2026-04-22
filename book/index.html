@@ -49,9 +49,9 @@ figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--l
  .sheet-wrap{width:var(--sheet-width)!important;height:var(--sheet-height)!important;break-after:page;page-break-after:always}
  .sheet{position:relative!important;left:auto!important;top:auto!important;transform:none!important;box-shadow:none!important;border:none!important}
  .sheet:last-child{break-after:auto;page-break-after:auto}
- .scene-frame iframe{display:none!important}
- .scene-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
- .scene-frame.print-ready::after{content:none!important}
+ .media-frame iframe{display:none!important}
+ .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
+ .media-frame.print-ready::after{content:none!important}
  .print-scene-snapshot{display:block!important;width:100%!important;height:100%!important;object-fit:contain;object-position:top center;background:transparent}.page-break-marker{display:block;height:0;clear:both}
 }
 </style>
@@ -117,7 +117,7 @@ function imageSrcCandidates(src=''){
   }
   return list;
 }
-window.applyImageWithFallback = function(img, src=''){
+function applyImageWithFallback(img, src=''){
   const candidates=imageSrcCandidates(src);
   let i=0;
   const tryNext=()=>{
@@ -126,8 +126,7 @@ window.applyImageWithFallback = function(img, src=''){
   };
   img.addEventListener('error', tryNext);
   tryNext();
-};
-const applyImageWithFallback = window.applyImageWithFallback;
+}
 async function requestIframePrintSnapshot(iframe){
   if(!iframe) return null;
   try{
@@ -147,8 +146,8 @@ async function requestIframePrintSnapshot(iframe){
     try{iframe.contentWindow?.postMessage({type:'capturePrintSnapshot',requestId},'*')}catch(_e){cleanup(); resolve(null)}
   });
 }
-function cleanupPrintSnapshots(){document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove()); document.querySelectorAll('.scene-frame.print-ready').forEach(el=>el.classList.remove('print-ready')); document.querySelectorAll('[data-print-ready="1"]').forEach(el=>el.removeAttribute('data-print-ready'));}
-async function preparePrintSnapshots(){cleanupPrintSnapshots(); const iframes=Array.from(document.querySelectorAll('.scene-frame iframe')); await Promise.all(iframes.map(async iframe=>{const dataUrl=await requestIframePrintSnapshot(iframe); if(!dataUrl) return; const holder=iframe.parentElement; if(!holder) return; const img=document.createElement('img'); img.className='print-scene-snapshot'; img.alt='Στιγμιότυπο σκηνής'; img.src=dataUrl; holder.appendChild(img); holder.dataset.printReady='1'; await waitForImage(img)})); document.querySelectorAll('.scene-frame').forEach(frame=>{const iframeCount=frame.querySelectorAll('iframe').length; const snapCount=frame.querySelectorAll('.print-scene-snapshot').length; if(iframeCount>0&&snapCount>=iframeCount) frame.classList.add('print-ready')})}
+function cleanupPrintSnapshots(){document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove()); document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready')); document.querySelectorAll('[data-print-ready="1"]').forEach(el=>el.removeAttribute('data-print-ready'));}
+async function preparePrintSnapshots(){cleanupPrintSnapshots(); const iframes=Array.from(document.querySelectorAll('.media-frame iframe')); await Promise.all(iframes.map(async iframe=>{const dataUrl=await requestIframePrintSnapshot(iframe); if(!dataUrl) return; const holder=iframe.parentElement; if(!holder) return; const img=document.createElement('img'); img.className='print-scene-snapshot'; img.alt='Στιγμιότυπο σκηνής'; img.src=dataUrl; holder.appendChild(img); holder.dataset.printReady='1'; await waitForImage(img)})); document.querySelectorAll('.media-frame').forEach(frame=>{const iframeCount=frame.querySelectorAll('iframe').length; const snapCount=frame.querySelectorAll('.print-scene-snapshot').length; if(iframeCount>0&&snapCount>=iframeCount) frame.classList.add('print-ready')})}
 function safeStorage(){try{return window.localStorage}catch(_e){const mem={};return{getItem:k=>Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null,setItem:(k,v)=>mem[k]=String(v)}}}
 function applyScreenScale(){const avail=Math.max(320, window.innerWidth-48); const scale=Math.min(1, avail/794); document.documentElement.style.setProperty('--screen-scale', String(scale));}
 window.addEventListener('resize', applyScreenScale, {passive:true});
@@ -181,8 +180,8 @@ function sceneAspect(block){
 }
 function partMark(idx){const marks=['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄']; return marks[idx] || `${idx+1}` }
 function renderHero(meta={}){const wrap=document.createElement('section'); wrap.className='hero'; wrap.innerHTML=`${meta.eyebrow?`<p class="eyebrow">${meta.eyebrow}</p>`:''}${meta.title?`<h1>${meta.title}</h1>`:''}${meta.subtitle?`<p class="subtitle">${meta.subtitle}</p>`:''}${meta.notes?.length?`<div class="intro-note">${meta.notes[0]}</div>`:''}`; return wrap}
-function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); window.applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
-function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame scene-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
+function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
+function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
 function renderParagraph(block){const p=document.createElement('p'); p.innerHTML=block.html||''; return p}
 function renderNote(block){const d=document.createElement('div'); d.className='note'; d.innerHTML=`${block.label?`<span class="label">${block.label}</span>`:''}${block.html||''}`; return d}
 function renderCallout(block){const d=document.createElement('div'); d.className='callout'; d.innerHTML=`<div class="callout-title">${block.title||'Δοκίμασε'}</div><div class="callout-row"><span class="callout-label">${block.setupLabel||'Ρύθμισε'}</span>${(block.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-row"><span class="callout-label">${block.pressLabel||'Πίεσε'}</span>${(block.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-observe"><span class="callout-observe-title">${block.observeTitle||'Παρατήρησε'}</span><ul>${(block.observeItems||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>`; return d}
