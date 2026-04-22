@@ -3704,9 +3704,70 @@ function buildViewportSnapshotClone(sourceRoot){
   clone.style.background = '#ffffff';
   return clone;
 }
+function elementIsSnapshotVisible(el){
+  if(!(el instanceof Element)) return false;
+  const cs = getComputedStyle(el);
+  if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || '1') <= 0.001) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width > 1 && rect.height > 1;
+}
+function collectSnapshotVisuals(sourceRoot){
+  const nodes = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+  const visuals = [];
+  for(const el of nodes){
+    if(!elementIsSnapshotVisible(el)) continue;
+    if(el instanceof HTMLCanvasElement || el instanceof HTMLImageElement){
+      visuals.push(el);
+    }
+  }
+  return visuals;
+}
+function drawSnapshotElement(ctx, el, rootRect){
+  const rect = el.getBoundingClientRect();
+  const x = rect.left - rootRect.left;
+  const y = rect.top - rootRect.top;
+  const w = rect.width;
+  const h = rect.height;
+  if(w <= 0 || h <= 0) return;
+  try{
+    ctx.drawImage(el, x, y, w, h);
+  }catch(_e){}
+}
+async function buildViewportSnapshotCanvas(sourceRoot){
+  try{ renderer.render(scene, camera); }catch(_e){}
+  try{ drawGraphs(true); }catch(_e){}
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const rootRect = sourceRoot.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rootRect.width));
+  const height = Math.max(1, Math.round(rootRect.height));
+  const scale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  const bg = getComputedStyle(sourceRoot).backgroundColor;
+  if(bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent'){
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+  }
+  const visuals = collectSnapshotVisuals(sourceRoot);
+  visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
+  ctx.restore();
+  return canvas;
+}
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
+  try{
+    const canvas = await buildViewportSnapshotCanvas(sourceRoot);
+    return canvas.toDataURL('image/png');
+  }catch(err){
+    console.warn('print snapshot raster path failed, falling back', err);
+  }
   try{ renderer.render(scene, camera); }catch(_e){}
   try{ drawGraphs(true); }catch(_e){}
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
