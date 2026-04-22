@@ -30,7 +30,7 @@
       margin:0;
       background:linear-gradient(180deg,#efe9dc 0,#f3efe6 120px);
       color:var(--ink);
-      font:18px/1.56 Georgia,"Noto Serif",serif;
+      font:18px/1.72 Georgia,"Noto Serif",serif;
     }
     .topbar{
       position:sticky;
@@ -41,7 +41,7 @@
       border-bottom:1px solid rgba(0,0,0,.08);
     }
     .topbar-inner{max-width:var(--paper-width);margin:0 auto;padding:10px 18px 12px}
-    .topbar-main{display:block}
+    .topbar-main{display:flex;align-items:center;gap:10px;justify-content:space-between}
     button,a.action{
       appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 14px;border-radius:999px;
       font:600 14px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;
@@ -59,31 +59,23 @@
     .subtitle{margin:0;color:var(--muted);font-size:18px;line-height:1.5;max-width:56ch}
     .intro-note{margin-top:18px;padding:14px 16px;border-radius:16px;background:var(--accent-soft);border:1px solid #cddfea;font:500 16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#28485f}
 
-    .mega-nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:stretch;justify-content:center;width:100%;max-width:var(--paper-width);margin:0 auto}
+    .mega-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:stretch;justify-content:center;width:100%;max-width:var(--paper-width);margin:0 auto}
     .menu-item{position:relative;min-width:0}
-    .menu-item::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;background:transparent}
     .menu-trigger{appearance:none;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:18px;font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.04);white-space:nowrap;text-align:center}
-    .menu-item.active>.menu-trigger,.menu-item:hover>.menu-trigger,.menu-item:focus-within>.menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
-    .menu-dropdown{position:absolute;right:0;left:auto;top:calc(100% + 2px);min-width:220px;display:none;padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35}
-    .menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}
-    .menu-tools .menu-dropdown{width:240px}
-    .menu-tools-panel{display:grid;gap:10px}
-    .menu-tools-panel label{font:700 12px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);display:grid;gap:7px}
-    .menu-tools-panel select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-    .menu-tools-panel button{width:100%;justify-content:center}
+    .menu-item.active>.menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
 
     .part-shell{margin:0 0 42px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}
     .part-shell:last-child{border-bottom:0;margin-bottom:0}
     .part-kicker{margin:0 0 8px;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
     .part-title-main{margin:0 0 16px;font:780 clamp(24px,2.4vw,31px)/1.09 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;letter-spacing:-.022em;color:#2f627f}
 
-    .section{scroll-margin-top:82px;margin:0 0 28px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,.06)}
+    .section{scroll-margin-top:82px;margin:0 0 36px;padding-bottom:20px;border-bottom:1px solid rgba(0,0,0,.06)}
     .section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
     .section h2{margin:0 0 8px;font:690 clamp(17px,1.55vw,21px)/1.2 Georgia,"Noto Serif",serif;letter-spacing:-.008em;color:#5d7281}
     .article-body{max-width:var(--article-width);margin:0 auto;text-align:justify;text-justify:inter-word;hyphens:auto;overflow:visible}
-    .article-body p{margin:0 0 9px}
+    .article-body p{margin:0 0 15px}
 
-    .note{margin:12px 0;padding:12px 14px;border-radius:16px;background:var(--note);border:1px solid #e4d7ae;font:500 15px/1.46 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .note{margin:18px 0;padding:14px 16px;border-radius:16px;background:var(--note);border:1px solid #e4d7ae;font:500 16px/1.58 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
     .note .label{display:block;margin:0 0 6px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
 
     figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.04)}
@@ -103,7 +95,7 @@
     .clear{clear:both}
     .status{margin-top:14px;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif;max-width:var(--paper-width);margin-left:auto;margin-right:auto}
 
-    .callout{margin:11px 0;padding:8px 10px;border:1px solid #d6e2eb;border-radius:14px;background:#f8fbfd;font:500 12px/1.34 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
+    .callout{margin:16px 0;padding:10px 12px;border:1px solid #d6e2eb;border-radius:14px;background:#f8fbfd;font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
     .callout-title{margin:0 0 8px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
     .callout-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px}
     .callout-label{font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:4px 7px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
@@ -120,13 +112,13 @@
       figure.media.float-right,figure.media.float-left,figure.media.wide{float:none;width:100%;max-width:100%;margin:18px 0}
       .article-body{max-width:100%}
       .mega-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .menu-dropdown{position:static;display:block;min-width:0;width:100%;margin-top:8px}
+      .topbar-main{flex-direction:column;align-items:stretch}
     }
 
     @media print{
       @page{size:A4 portrait;margin:12mm}
       html,body{background:#fff !important;color:#000}
-      body{font:18px/1.56 Georgia,"Noto Serif",serif !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body{font:18px/1.72 Georgia,"Noto Serif",serif !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
       .topbar,.status,.screen-only{display:none !important}
       body.print-frozen{padding:0;margin:0}
       body.print-frozen .page{
@@ -158,6 +150,15 @@
     <div class="topbar-inner">
       <div class="topbar-main">
         <nav class="mega-nav" id="megaNav" aria-label="Κύρια πλοήγηση βιβλίου"></nav>
+        <div class="toolbar">
+          <label>Προσανατολισμός
+            <select id="printOrient">
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </label>
+          <button id="printBtn" type="button">Εκτύπωση / PDF</button>
+        </div>
       </div>
     </div>
   </div>
@@ -315,6 +316,7 @@
     function setupPrintTools(){
       const printBtn = document.getElementById('printBtn');
       const printOrient = document.getElementById('printOrient');
+      if(!printBtn || !printOrient) return;
       const storage = safeStorage();
       const saved = storage.getItem('hmBookPrintOrient');
       if(saved) printOrient.value = saved;
@@ -345,38 +347,21 @@
     }
 
     function renderNav(sections=[], parts=[]){
-      const entries = (parts?.length ? parts : sections.map(s => ({ id:s.id, title:s.title, sectionIds:[s.id] })));
-      const items = entries.map(part => {
+      const byId = Object.fromEntries(sections.map(sec => [sec.id, sec]));
+      const items = (parts?.length ? parts : sections.map(s => ({ id:s.id, title:s.title, sectionIds:[s.id] }))).map(part => {
         const href = part.id ? `#${part.id}` : '#';
         return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${href}">${part.title || ''}</a></div>`;
-      }).join('') + `
-        <div class="menu-item menu-tools" data-part-id="__print__">
-          <button class="menu-trigger" type="button" aria-haspopup="true" aria-expanded="false">Εκτύπωση ▾</button>
-          <div class="menu-dropdown">
-            <div class="menu-tools-panel">
-              <label>Προσανατολισμός
-                <select id="printOrient">
-                  <option value="portrait">Portrait</option>
-                  <option value="landscape">Landscape</option>
-                </select>
-              </label>
-              <button id="printBtn" type="button">Εκτύπωση / PDF</button>
-            </div>
-          </div>
-        </div>`;
+      }).join('');
       megaNavEl.innerHTML = items;
       const update = () => {
         const y = window.scrollY + 140;
         let current = null;
-        for(const part of entries){
+        for(const part of (parts?.length ? parts : sections.map(s => ({id:s.id, sectionIds:[s.id]})))){
           const firstId = part.id || part.sectionIds?.[0];
           const el = document.getElementById(firstId);
           if(el && el.offsetTop <= y) current = part.id;
         }
-        megaNavEl.querySelectorAll('.menu-item').forEach(node => {
-          const pid = node.dataset.partId;
-          node.classList.toggle('active', !!pid && pid !== '__print__' && pid === current);
-        });
+        megaNavEl.querySelectorAll('.menu-item').forEach(node => node.classList.toggle('active', node.dataset.partId === current));
       };
       window.addEventListener('scroll', update, { passive:true });
       window.addEventListener('resize', update, { passive:true });
