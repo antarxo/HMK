@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Εγκατάσταση ηλεκτροστατικού πεδίου</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#111822; --text:#e8eef7; --muted:#9aa8bc;
+    --cardBorder:rgba(255,255,255,.10); --active:rgba(79,168,216,.18);
+    --activeBorder:rgba(79,168,216,.42);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:14px/1.35 system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
+  .app{display:grid;grid-template-rows:auto 1fr;height:100dvh}
+  .top{position:relative;padding:6px 10px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--panel);border-bottom:1px solid var(--cardBorder);display:flex;justify-content:center;align-items:center;min-height:44px}
+  .langSwitch{position:absolute;left:10px;top:50%;transform:translateY(-50%);display:flex;gap:6px;z-index:2}
+  .langBtn{min-height:24px;padding:4px 8px;font-size:10px;line-height:1;border-radius:8px}
+  .title{font-size:19px;font-weight:700;display:flex;gap:10px;align-items:baseline;text-align:center}
+  .sub{color:var(--muted);font-size:11px;font-weight:500;white-space:nowrap}
+  .main{position:relative;min-height:0}
+  #stage{position:absolute;inset:0}
+  canvas{display:block}
+  .overlay{position:absolute;left:8px;top:8px;bottom:8px;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;width:min(332px,42vw);pointer-events:none}
+  .hud{background:rgba(10,14,20,.50);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(4px);border-radius:12px;padding:6px;pointer-events:auto}
+  .label{font-size:11px;color:var(--muted);margin:0 0 4px 2px}
+  .row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #modeRow{max-width:240px;margin:0 auto}
+  .row.transport{grid-template-columns:repeat(5,32px);justify-content:center}
+  .row.transport button{width:32px;height:30px;padding:0;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .navDock{display:flex;gap:6px;align-items:center;justify-content:center;width:100%}
+  .statPad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:42px;min-height:82px}
+  .statPad button{width:22px;height:16px;padding:0;font-size:11px;line-height:1;border-radius:7px}
+  .statReadout{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:40px;min-height:24px;padding:1px 2px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:rgba(255,255,255,.05);font-size:10px;font-weight:700;line-height:1.0}
+  .statReadout .mini{font-size:8px;color:var(--muted);font-weight:600}
+  .dpad{display:grid;grid-template-columns:repeat(3,26px);grid-template-rows:repeat(3,26px);gap:1px;justify-content:center;align-items:center}
+  .dpad button,.centerDot{padding:0;border-radius:7px;font-size:12px;font-weight:700}
+  .centerDot{display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
+  button{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);padding:6px 8px;border-radius:9px;cursor:pointer;font-size:11px;line-height:1.15;min-height:30px}
+  button:hover{background:rgba(255,255,255,.10)}
+  button.active{background:var(--active);border-color:var(--activeBorder);color:#e7f6ff}
+  input[type="range"]{width:120px}
+  .readout{font-size:11px;color:var(--muted);min-width:54px;text-align:right}
+  .note{position:absolute;right:8px;top:8px;z-index:20;max-width:min(430px,48vw);background:rgba(10,14,20,.50);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(4px);border-radius:12px;padding:8px 10px;color:var(--muted);font-size:12px;line-height:1.35}
+  .note b{color:var(--text)}
+  .hint{margin-top:4px;font-size:11px;color:#bcc8d8}
+  @media (max-width:860px){
+    .overlay{left:8px;right:8px;bottom:8px;top:auto;width:auto}
+    .note{left:8px;right:8px;top:8px;max-width:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="langSwitch">
+      <button id="langEl" class="langBtn active" title="Ελληνικά">GR</button>
+      <button id="langEn" class="langBtn" title="English">EN</button>
+    </div>
+    <div class="title" id="appTitle">Εγκατάσταση ηλεκτροστατικού πεδίου</div>
+  </div>
+  <div class="main">
+    <div id="stage"></div>
+    <div class="note" id="note"></div>
+    <div class="overlay">
+      <div class="hud">
+        <div class="label" id="labelControls">Χειρισμοί</div>
+        <div class="row transport">
+          <button id="btnStart" title="Αρχή">|◀</button>
+          <button id="btnBack" title="Βήμα πίσω">⏴</button>
+          <button id="btnPlay" title="Αναπαραγωγή / Παύση">▶</button>
+          <button id="btnFwd" title="Βήμα μπροστά">⏵</button>
+          <button id="btnEnd" title="Τέλος">▶|</button>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="label" id="labelSource">Πηγή του ηλεκτροστατικού πεδίου</div>
+        <div class="row" id="sourceRow">
+          <button data-source="plus">+q</button>
+          <button data-source="minus">-q</button>
+          <button data-source="dipole" id="sourceDipole">+ / -</button>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="label" id="labelMode">Κατάσταση φορτίων</div>
+        <div class="row two" id="modeRow">
+          <button data-mode="appear" id="modeAppear">Εμφάνιση</button>
+          <button data-mode="disappear" id="modeDisappear">Εξαφάνιση</button>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="navDock">
+          <div class="statPad">
+            <button id="zoomIn" title="Zoom in">▲</button>
+            <div class="statReadout"><span class="mini" id="zoomMini">Zoom</span><span class="val" id="zoomVal">100%</span></div>
+            <button id="zoomOut" title="Zoom out">▼</button>
+          </div>
+          <div class="statPad">
+            <button id="speedUp" title="Faster">▲</button>
+            <div class="statReadout"><span class="mini" id="speedMini">Ταχ/τα</span><span class="val" id="speedVal">0.0080×</span></div>
+            <button id="speedDown" title="Slower">▼</button>
+          </div>
+          <div class="dpad">
+            <div></div><button id="camUp">▲</button><div></div>
+            <button id="camLeft">◀</button><div class="centerDot" id="camReset">•</div><button id="camRight">▶</button>
+            <div></div><button id="camDown">▼</button><div></div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
+
+const stage = document.getElementById('stage');
+const note = document.getElementById('note');
+const ui = {
+  appTitle: document.getElementById('appTitle'),
+  labelControls: document.getElementById('labelControls'),
+  labelSource: document.getElementById('labelSource'),
+  labelMode: document.getElementById('labelMode'),
+  sourceRow: document.getElementById('sourceRow'),
+  modeRow: document.getElementById('modeRow'),
+  viewRow: document.getElementById('viewRow'),
+  btnPlay: document.getElementById('btnPlay'),
+  btnStart: document.getElementById('btnStart'),
+  btnEnd: document.getElementById('btnEnd'),
+  btnBack: document.getElementById('btnBack'),
+  btnFwd: document.getElementById('btnFwd'),
+  zoomIn: document.getElementById('zoomIn'),
+  zoomOut: document.getElementById('zoomOut'),
+  zoomVal: document.getElementById('zoomVal'),
+  zoomMini: document.getElementById('zoomMini'),
+  speedVal: document.getElementById('speedVal'),
+  speedMini: document.getElementById('speedMini'),
+  speedUp: document.getElementById('speedUp'),
+  speedDown: document.getElementById('speedDown'),
+  camLeft: document.getElementById('camLeft'),
+  camRight: document.getElementById('camRight'),
+  camUp: document.getElementById('camUp'),
+  camDown: document.getElementById('camDown'),
+  camReset: document.getElementById('camReset'),
+  sourceDipole: document.getElementById('sourceDipole'),
+  modeAppear: document.getElementById('modeAppear'),
+  modeDisappear: document.getElementById('modeDisappear'),
+  langEl: document.getElementById('langEl'),
+  langEn: document.getElementById('langEn'),
+};
+
+const I18N = {
+  el: {
+    htmlLang: 'el',
+    title: 'Εγκατάσταση ηλεκτροστατικού πεδίου',
+    controls: 'Χειρισμοί',
+    source: 'Πηγή του ηλεκτροστατικού πεδίου',
+    mode: 'Κατάσταση φορτίων',
+    appear: 'Εμφάνιση',
+    disappear: 'Εξαφάνιση',
+    dipole: '+ / -',
+    zoomMini: 'Zoom',
+    speedMini: 'Ταχ/τα',
+    startTitle: 'Αρχή',
+    backTitle: 'Βήμα πίσω',
+    playTitle: 'Αναπαραγωγή / Παύση',
+    fwdTitle: 'Βήμα μπροστά',
+    endTitle: 'Τέλος',
+    zoomInTitle: 'Μεγέθυνση',
+    zoomOutTitle: 'Σμίκρυνση',
+    speedUpTitle: 'Πιο γρήγορα',
+    speedDownTitle: 'Πιο αργά',
+    camUpTitle: 'Πάνω',
+    camDownTitle: 'Κάτω',
+    camLeftTitle: 'Αριστερά',
+    camRightTitle: 'Δεξιά',
+    camResetTitle: 'Επαναφορά',
+    langElTitle: 'Ελληνικά',
+    langEnTitle: 'Αγγλικά',
+    sourcePlus: 'θετικό φορτίο',
+    sourceMinus: 'αρνητικό φορτίο',
+    sourceDipoleText: 'δίπολο ίσων φορτίων',
+    modeAppearText: 'Εμφάνιση',
+    modeDisappearText: 'Εξαφάνιση',
+    disappearExtra: 'Η εξαφάνιση είναι ανεξάρτητη διάδοση δίσκου στο χρώμα του φόντου πάνω από ό,τι είχε προηγηθεί. Αν ξανακληθεί Εμφάνιση ή Εξαφάνιση, ξεκινά νέο γεγονός χωρίς να σταματούν τα προηγούμενα.',
+    appearDipoleExtra: 'Κάθε σημείο του χώρου ενημερώνεται μόνο όταν το φτάσει η πληροφορία από το αντίστοιχο φορτίο. Η παραμόρφωση γεννιέται μόνο μέσα στην επικάλυψη των δύο κύκλων διάδοσης. Νέα κλήση Εμφάνισης ξεκινά νέο κύμα από το μηδέν.',
+    appearMonoExtra: 'Η επικράτεια του πεδίου απλώνεται προοδευτικά από την πηγή προς τα έξω. Νέα κλήση Εμφάνισης ξεκινά νέο κύμα από το μηδέν.',
+    viewText: 'Μετωπική 2D τομή',
+    viewExtra: 'Στη 2D θέαση οι γραμμές αναπτύσσονται μόνο στο επίπεδο xy.',
+    noteTail: 'Στο δίπολο, το στιγμιαίο πεδίο υπολογίζεται ανά σημείο από τις δύο αιτιακές συνεισφορές και οι δυναμικές γραμμές χαράσσονται πάνω σε αυτό το πεδίο.'
+  },
+  en: {
+    htmlLang: 'en',
+    title: 'Establishment of Electrostatic Field',
+    controls: 'Controls',
+    source: 'Source of the Electrostatic Field',
+    mode: 'Charge State',
+    appear: 'Appearance',
+    disappear: 'Disappearance',
+    dipole: '+ / -',
+    zoomMini: 'Zoom',
+    speedMini: 'Speed',
+    startTitle: 'Start',
+    backTitle: 'Step back',
+    playTitle: 'Play / Pause',
+    fwdTitle: 'Step forward',
+    endTitle: 'End',
+    zoomInTitle: 'Zoom in',
+    zoomOutTitle: 'Zoom out',
+    speedUpTitle: 'Faster',
+    speedDownTitle: 'Slower',
+    camUpTitle: 'Up',
+    camDownTitle: 'Down',
+    camLeftTitle: 'Left',
+    camRightTitle: 'Right',
+    camResetTitle: 'Reset',
+    langElTitle: 'Greek',
+    langEnTitle: 'English',
+    sourcePlus: 'positive charge',
+    sourceMinus: 'negative charge',
+    sourceDipoleText: 'dipole of equal charges',
+    modeAppearText: 'Appearance',
+    modeDisappearText: 'Disappearance',
+    disappearExtra: 'Disappearance is modeled as an independent expanding disk in the background color layered over whatever already existed. If Appearance or Disappearance is triggered again, a new event starts without stopping the previous ones.',
+    appearDipoleExtra: 'Each point in space is updated only when the information from the corresponding charge reaches it. The distortion is created only inside the overlap of the two propagation circles. Triggering Appearance again starts a new wave from zero.',
+    appearMonoExtra: 'The field region spreads progressively outward from the source. Triggering Appearance again starts a new wave from zero.',
+    viewText: 'Front 2D section',
+    viewExtra: 'In the 2D view, the lines develop only in the xy plane.',
+    noteTail: 'In the dipole case, the instantaneous field is computed point by point from the two causal contributions, and the field lines are traced on that field.'
+  }
+};
+
+function applyLanguage(){
+  const t = I18N[state.lang] || I18N.el;
+  document.documentElement.lang = t.htmlLang;
+  ui.appTitle.textContent = t.title;
+  ui.labelControls.textContent = t.controls;
+  ui.labelSource.textContent = t.source;
+  ui.labelMode.textContent = t.mode;
+  ui.modeAppear.textContent = t.appear;
+  ui.modeDisappear.textContent = t.disappear;
+  ui.sourceDipole.textContent = t.dipole;
+  ui.zoomMini.textContent = t.zoomMini;
+  ui.speedMini.textContent = t.speedMini;
+  ui.btnStart.title = t.startTitle;
+  ui.btnBack.title = t.backTitle;
+  ui.btnPlay.title = t.playTitle;
+  ui.btnFwd.title = t.fwdTitle;
+  ui.btnEnd.title = t.endTitle;
+  ui.zoomIn.title = t.zoomInTitle;
+  ui.zoomOut.title = t.zoomOutTitle;
+  ui.speedUp.title = t.speedUpTitle;
+  ui.speedDown.title = t.speedDownTitle;
+  ui.camUp.title = t.camUpTitle;
+  ui.camDown.title = t.camDownTitle;
+  ui.camLeft.title = t.camLeftTitle;
+  ui.camRight.title = t.camRightTitle;
+  ui.camReset.title = t.camResetTitle;
+  ui.langEl.title = t.langElTitle;
+  ui.langEn.title = t.langEnTitle;
+  ui.langEl.classList.toggle('active', state.lang === 'el');
+  ui.langEn.classList.toggle('active', state.lang === 'en');
+}
+
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:'high-performance'});
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0x0b0f14, 1);
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
+const orthoCamera = new THREE.OrthographicCamera(-6, 6, 6, -6, 0.1, 200);
+const focus = new THREE.Vector3(0,0,0);
+const root = new THREE.Group();
+scene.add(root);
+scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+const key1 = new THREE.DirectionalLight(0xffffff, 0.9); key1.position.set(8,10,12); scene.add(key1);
+const key2 = new THREE.DirectionalLight(0x7fb0ff, 0.28); key2.position.set(-8,-5,9); scene.add(key2);
+
+const state = {
+  source:'plus',
+  mode:'appear',
+  view:'2d',
+  lang:'el',
+  playing:false,
+  speed:0.0080,
+  yaw:-0.72,
+  pitch:0.32,
+  distance:11.5,
+  clock:0,
+  events:[],
+  dragging:false,
+  dragX:0,
+  dragY:0,
+};
+
+
+const qs = new URLSearchParams(window.location.search);
+const qSource = qs.get('source') || qs.get('scene');
+const qMode = qs.get('mode');
+const qSpeed = parseFloat(qs.get('speed') || '');
+const qAutoplay = qs.get('autoplay');
+const qControls = qs.get('controls');
+const qLang = (qs.get('lang') || '').toLowerCase();
+if(qSource){
+  const sourceMap = {
+    plus:'plus', minus:'minus', dipole:'dipole',
+    plus_appear:'plus', plus_disappear:'plus',
+    minus_appear:'minus', minus_disappear:'minus',
+    dipole_appear:'dipole', dipole_disappear:'dipole'
+  };
+  const modeMap = {
+    plus_appear:'appear', plus_disappear:'disappear',
+    minus_appear:'appear', minus_disappear:'disappear',
+    dipole_appear:'appear', dipole_disappear:'disappear'
+  };
+  const mapped = sourceMap[qSource];
+  if(mapped) state.source = mapped;
+  if(!qMode && modeMap[qSource]) state.mode = modeMap[qSource];
+}
+if(qMode === 'appear' || qMode === 'disappear') state.mode = qMode;
+if(Number.isFinite(qSpeed)) state.speed = qSpeed;
+if(qAutoplay === '1') state.playing = true;
+if(qControls === 'none') document.querySelector('.overlay').style.display = 'none';
+if(qControls === 'minimal') {
+  const huds = document.querySelectorAll('.hud');
+  huds.forEach((el, idx) => { if(idx < 3) el.style.display = 'none'; });
+  const note = document.getElementById('note'); if(note) note.style.display = 'none';
+}
+if(qLang === 'en' || qLang === 'el' || qLang === 'gr') state.lang = qLang === 'en' ? 'en' : 'el';
+
+const DIPOLE_PLUS_X = -0.85;
+const DIPOLE_MINUS_X = 0.85;
+const DIPOLE_PLUS_CENTER = new THREE.Vector3(DIPOLE_PLUS_X, 0, 0);
+const DIPOLE_MINUS_CENTER = new THREE.Vector3(DIPOLE_MINUS_X, 0, 0);
+const maxRadius = 9.0;
+const monoDirs = fibonacciDirs(88);
+const monoDirs2D = circleDirs2D(64);
+const DIPOLE_TRACE_BOUNDS_X = 18.0;
+const DIPOLE_TRACE_BOUNDS_Y = 14.0;
+const DIPOLE_TRACE_STEP = 0.040;
+const DIPOLE_CAPTURE_RADIUS = 0.060;
+const DIPOLE_SEED_EPS = 0.003;
+const DIPOLE_SEED_COUNT = 32;
+const DIPOLE_SEED_ANGLES = Array.from({length:DIPOLE_SEED_COUNT}, (_, i) => (2 * Math.PI * i) / DIPOLE_SEED_COUNT);
+const DIPOLE_SEED_OFFSETS = DIPOLE_SEED_ANGLES.map(a => new THREE.Vector3(Math.cos(a), Math.sin(a), 0));
+const dipoleLines2D = buildDipoleStreamlines2D();
+const dipoleLines3D = buildDipoleLines3D();
+const dipoleMaxLen = Math.max(
+  ...dipoleLines2D.map(s=>s.totalLen),
+  ...dipoleLines3D.map(s=>s.totalLen),
+  maxRadius
+);
+const maxTravelDistance = Math.max(maxRadius, dipoleMaxLen);
+const colors = {
+  plus:0xff6666,
+  minus:0x55aaff,
+  overlap:0xe8eef7,
+  line:0xe8eef7,
+  bg:0x0b0f14,
+  guide:0x415166,
+  sensor:0xf2a31b
+};
+
+let renderFrontDist = 0;
+let renderEraseDist = 0;
+
+const guides = new THREE.Group();
+root.add(guides);
+const grid = makeGrid(); guides.add(grid);
+const axis = makeAxis(); guides.add(axis);
+const sensorLine = makeSensorLine(); root.add(sensorLine.group);
+const chargesGroup = new THREE.Group(); root.add(chargesGroup);
+const fieldGroup = new THREE.Group(); root.add(fieldGroup);
+
+const monoCharge = makeChargeSphere(colors.plus, 0.11);
+chargesGroup.add(monoCharge);
+const dipolePlus = makeChargeSphere(colors.plus, 0.048); dipolePlus.position.x = -0.85;
+const dipoleMinus = makeChargeSphere(colors.minus, 0.048); dipoleMinus.position.x = 0.85;
+chargesGroup.add(dipolePlus, dipoleMinus);
+
+function resize(){
+  const w = Math.max(100, stage.clientWidth || 100);
+  const h = Math.max(100, stage.clientHeight || 100);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(w, h, false);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+  const fr = 6.0;
+  const aspect = w / h;
+  orthoCamera.left = -fr * aspect;
+  orthoCamera.right = fr * aspect;
+  orthoCamera.top = fr;
+  orthoCamera.bottom = -fr;
+  orthoCamera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function circleDirs2D(n){
+  const dirs = [];
+  for(let i=0;i<n;i++){
+    const t = 2 * Math.PI * i / n;
+    dirs.push(new THREE.Vector3(Math.cos(t), Math.sin(t), 0));
+  }
+  return dirs;
+}
+function fibonacciDirs(n){
+  const pts = [];
+  const ga = Math.PI * (3 - Math.sqrt(5));
+  for(let i=0;i<n;i++){
+    const y = 1 - (i/(n-1))*2;
+    const r = Math.sqrt(Math.max(0, 1-y*y));
+    const t = ga * i;
+    pts.push(new THREE.Vector3(Math.cos(t)*r, y, Math.sin(t)*r));
+  }
+  return pts;
+}
+
+function fieldDipole2D(x,y){
+  const ax = -0.85, bx = 0.85;
+  const dxp = x - ax, dyp = y;
+  const dxn = x - bx, dyn = y;
+  const rp = Math.pow(Math.max(1e-6, dxp*dxp + dyp*dyp), 1.5);
+  const rn = Math.pow(Math.max(1e-6, dxn*dxn + dyn*dyn), 1.5);
+  return {
+    x: (dxp/rp) - (dxn/rn),
+    y: (dyp/rp) - (dyn/rn)
+  };
+}
+
+function withinSourceFront(rho){
+  return rho <= renderFrontDist + 1e-9;
+}
+function withinSourceErase(rho){
+  return rho <= Math.max(0, renderEraseDist) + 1e-9;
+}
+function dipoleFrontMask(center, x, y){
+  return withinSourceFront(Math.hypot(x - center.x, y - center.y)) ? 1 : 0;
+}
+function dipoleEraseMask(center, x, y){
+  return withinSourceErase(Math.hypot(x - center.x, y - center.y)) ? 1 : 0;
+}
+function fieldDipoleCausal2D(x, y){
+  const dxp = x - DIPOLE_PLUS_X, dyp = y;
+  const dxn = x - DIPOLE_MINUS_X, dyn = y;
+  const rp2 = Math.max(1e-6, dxp*dxp + dyp*dyp);
+  const rn2 = Math.max(1e-6, dxn*dxn + dyn*dyn);
+  const rp3 = Math.pow(rp2, 1.5);
+  const rn3 = Math.pow(rn2, 1.5);
+  const mp = dipoleFrontMask(DIPOLE_PLUS_CENTER, x, y);
+  const mn = dipoleFrontMask(DIPOLE_MINUS_CENTER, x, y);
+  return {
+    x: mp * (dxp / rp3) - mn * (dxn / rn3),
+    y: mp * (dyp / rp3) - mn * (dyn / rn3)
+  };
+}
+function clipStepToFrontRadius(curr, next, center, frontRadius){
+  const dc = curr.distanceTo(center);
+  const dn = next.distanceTo(center);
+  if(dn <= frontRadius + 1e-9) return next;
+  const t = THREE.MathUtils.clamp((frontRadius - dc) / Math.max(1e-9, dn - dc), 0, 1);
+  return curr.clone().lerp(next, t);
+}
+function rk2Step2D(p, step, sign){
+  const f0 = fieldDipoleCausal2D(p.x, p.y);
+  const m0 = Math.hypot(f0.x, f0.y);
+  if(m0 < 1e-12) return null;
+  const ux0 = sign * f0.x / m0, uy0 = sign * f0.y / m0;
+  const mid = new THREE.Vector3(p.x + 0.5 * step * ux0, p.y + 0.5 * step * uy0, 0);
+  const f1 = fieldDipoleCausal2D(mid.x, mid.y);
+  const m1 = Math.hypot(f1.x, f1.y);
+  if(m1 < 1e-12) return null;
+  const ux1 = sign * f1.x / m1, uy1 = sign * f1.y / m1;
+  return new THREE.Vector3(p.x + step * ux1, p.y + step * uy1, 0);
+}
+function traceDipoleVisibleBranch(center, seedUnit, sign, otherCenter){
+  const rStart = DIPOLE_SEED_EPS;
+  const rEnd = Math.max(0, renderFrontDist);
+  if(rEnd <= rStart + 1e-5) return null;
+  const start = center.clone().add(seedUnit.clone().multiplyScalar(rStart));
+  const pts = [center.clone(), start.clone()];
+  let p = start.clone();
+  for(let i=0;i<3200;i++){
+    if(Math.abs(p.x) > DIPOLE_TRACE_BOUNDS_X || Math.abs(p.y) > DIPOLE_TRACE_BOUNDS_Y) break;
+    const next = rk2Step2D(p, DIPOLE_TRACE_STEP, sign);
+    if(!next) break;
+    const dOwn = next.distanceTo(center);
+    if(dOwn > rEnd + 1e-9){
+      pts.push(clipStepToFrontRadius(p, next, center, rEnd));
+      break;
+    }
+    pts.push(next.clone());
+    p = next;
+    if(next.distanceTo(otherCenter) < DIPOLE_CAPTURE_RADIUS) break;
+  }
+  return pts.length > 1 ? simplifyPolyline(pts, 0.016) : null;
+}
+function mirrorYPath(points){
+  return points.map(p => new THREE.Vector3(-p.x, p.y, p.z || 0));
+}
+function addArrowAtPathFraction(points, t, color, scale=0.024, targetGroup=fieldGroup, reverseDir=false){
+  if(!points || points.length < 2) return;
+  addSmallArrowOnSegment(points, t, color, scale, targetGroup, reverseDir);
+}
+function simplifyPolyline(pts, minDist){
+  const out = [pts[0]];
+  let last = pts[0];
+  for(let i=1;i<pts.length;i++){
+    const p = pts[i];
+    const dx = (p.x ?? p.x) - (last.x ?? last.x);
+    const dy = (p.y ?? p.y) - (last.y ?? last.y);
+    const dz = ((p.z ?? 0) - (last.z ?? 0));
+    if(Math.hypot(dx, dy, dz) >= minDist || i===pts.length-1){
+      out.push(p.clone ? p.clone() : new THREE.Vector3(p.x, p.y, p.z || 0));
+      last = p;
+    }
+  }
+  return out;
+}
+function cubicBezier2D(p0, p1, p2, p3, steps=80){
+  const pts = [];
+  for(let i=0;i<=steps;i++) {
+    const t = i/steps, mt = 1 - t;
+    const x = mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x;
+    const y = mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y;
+    pts.push(new THREE.Vector3(x, y, 0));
+  }
+  return pts;
+}
+function buildStreamSpec(points, extra={}){
+  const lengths = arcLengths(points);
+  const revPoints = [...points].reverse().map(p => p.clone ? p.clone() : new THREE.Vector3(p.x,p.y,p.z||0));
+  const revLengths = arcLengths(revPoints);
+  return { points, lengths, totalLen:lengths[lengths.length-1], revPoints, revLengths, ...extra };
+}
+function integrateDipoleBranch(seed, directionSign){
+  const pts = [new THREE.Vector3(seed.x, seed.y, 0)];
+  let x = seed.x, y = seed.y;
+  for(let i=0;i<2400;i++){
+    if(Math.abs(x) > 5.6 || Math.abs(y) > 4.6) break;
+    const f = fieldDipole2D(x, y);
+    const m = Math.hypot(f.x, f.y);
+    if(m < 1e-9) break;
+    const step = 0.038;
+    x += directionSign * step * f.x / m;
+    y += directionSign * step * f.y / m;
+    pts.push(new THREE.Vector3(x, y, 0));
+    if(Math.abs(x) < 0.06 && Math.abs(y) < 0.02 && pts.length > 18) break;
+  }
+  return simplifyPolyline(pts, 0.022);
+}
+function closestJoinIndices(a, b){
+  let bestI = 0, bestJ = 0, bestD = Infinity;
+  for(let i=0;i<a.length;i++){
+    const pa = a[i];
+    for(let j=0;j<b.length;j++){
+      const pb = b[j];
+      const d = pa.distanceTo(pb);
+      if(d < bestD){
+        bestD = d; bestI = i; bestJ = j;
+      }
+    }
+  }
+  return { i:bestI, j:bestJ, d:bestD };
+}
+function buildDipoleStreamlines2D(){
+  const lines = [];
+  const plusX = DIPOLE_PLUS_X;
+  const plusCenter = DIPOLE_PLUS_CENTER.clone();
+  const minusCenter = DIPOLE_MINUS_CENTER.clone();
+  const r0 = 0.075;
+  const upperAngles = [18,30,42,54,66,78,90,102,114,126,138].map(d => d * Math.PI / 180);
+  const VIEW_EXT_X = 12.0;
+  const VIEW_EXT_Y = 10.0;
+  const STEP = 0.038;
+  const MINUS_CAPTURE = 0.082;
+
+  function integrateFromPlus(seedAngle){
+    const pts = [plusCenter.clone()];
+    let x = plusX + r0 * Math.cos(seedAngle);
+    let y = r0 * Math.sin(seedAngle);
+    pts.push(new THREE.Vector3(x, y, 0));
+    for(let i=0;i<4200;i++){
+      if(Math.abs(x) > VIEW_EXT_X || Math.abs(y) > VIEW_EXT_Y) break;
+      const dMinus = Math.hypot(x - DIPOLE_MINUS_X, y);
+      if(dMinus < MINUS_CAPTURE){
+        pts.push(minusCenter.clone());
+        break;
+      }
+      if(Math.hypot(x - DIPOLE_PLUS_X, y) < 0.055 && pts.length > 6) break;
+      const f = fieldDipole2D(x, y);
+      const m = Math.hypot(f.x, f.y);
+      if(m < 1e-9) break;
+      x += STEP * f.x / m;
+      y += STEP * f.y / m;
+      pts.push(new THREE.Vector3(x, y, 0));
+    }
+    const clean = simplifyPolyline(pts, 0.018);
+    clean[0] = plusCenter.clone();
+    return clean;
+  }
+
+  function mirrorX(points){ return points.map(p => new THREE.Vector3(p.x, -p.y, 0)); }
+
+  for(const ang of upperAngles){
+    const upperPts = integrateFromPlus(ang);
+    lines.push(buildStreamSpec(upperPts, { arrowFromPlus:true, arrowFromMinus:true, arrowT:0.12 }));
+    const lowerPts = mirrorX(upperPts);
+    lines.push(buildStreamSpec(lowerPts, { arrowFromPlus:true, arrowFromMinus:true, arrowT:0.12 }));
+  }
+  return lines;
+}
+
+function buildDipoleLines3D(){
+  const phis = [0, Math.PI/3, 2*Math.PI/3, Math.PI, 4*Math.PI/3, 5*Math.PI/3];
+  const chosen = dipoleLines2D.filter((_,i)=>i%2===0).slice(0,18);
+  const lines = [];
+  for(const spec of chosen){
+    for(const phi of phis){
+      const c = Math.cos(phi), s = Math.sin(phi);
+      const points = spec.points.map(p => new THREE.Vector3(p.x, p.y * c, p.y * s));
+      const showArrows = Math.abs(phi) < 1e-6;
+      lines.push(buildStreamSpec(points, { arrowFromPlus:showArrows, arrowFromMinus:showArrows, arrowT:spec.arrowT || 0.10 }));
+    }
+  }
+  return lines;
+}
+
+function makeGrid(){
+  const g = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({color:0x243244, transparent:true, opacity:0.42});
+  for(let i=-5;i<=5;i++){
+    const a = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-5, i, 0), new THREE.Vector3(5, i, 0)]);
+    const b = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i, -5, 0), new THREE.Vector3(i, 5, 0)]);
+    const la = new THREE.Line(a, material);
+    const lb = new THREE.Line(b, material);
+    g.add(la,lb);
+  }
+  return g;
+}
+function makeAxis(){
+  const g = new THREE.Group();
+  const mx = new THREE.LineBasicMaterial({color:0xe45a5a, transparent:true, opacity:0.65});
+  const my = new THREE.LineBasicMaterial({color:0x5fd36f, transparent:true, opacity:0.65});
+  const mz = new THREE.LineBasicMaterial({color:0x5f8dff, transparent:true, opacity:0.65});
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-5.5,0,0),new THREE.Vector3(5.5,0,0)]), mx));
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-5.5,0),new THREE.Vector3(0,5.5,0)]), my));
+  g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-5.5),new THREE.Vector3(0,0,5.5)]), mz));
+  return g;
+}
+function makeChargeSphere(color, r){
+  const g = new THREE.Group();
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 28), new THREE.MeshPhongMaterial({color, emissive:color, emissiveIntensity:0.8, shininess:140, transparent:true, opacity:1, depthWrite:false}));
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(r*1.8, 24, 24), new THREE.MeshBasicMaterial({color, transparent:true, opacity:0.16, depthWrite:false, blending:THREE.AdditiveBlending}));
+  g.add(halo, sphere);
+  g.userData = { sphere, halo, radius:r };
+  return g;
+}
+
+function makeEraseBubble(center, radius, renderOrder=0){
+  const r = Math.max(0, radius);
+  if(r <= 1e-6) return null;
+  const bubble = new THREE.Mesh(
+    new THREE.CircleGeometry(r, 96),
+    new THREE.MeshBasicMaterial({ color:colors.bg, transparent:true, opacity:1, depthWrite:false, depthTest:false, side:THREE.DoubleSide })
+  );
+  bubble.position.set(center.x, center.y, 0.02 + renderOrder * 1e-4);
+  bubble.renderOrder = renderOrder;
+  return bubble;
+}
+function makeSensorLine(){
+  const group = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({color:colors.sensor, transparent:true, opacity:0.35});
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(maxRadius,0,0)]), material);
+  group.add(line);
+  const activeMaterial = new THREE.LineBasicMaterial({color:0xf7df7a, transparent:true, opacity:0.95});
+  const active = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)]), activeMaterial);
+  group.add(active);
+  const frontMarker = new THREE.Mesh(new THREE.SphereGeometry(0.055, 18, 18), new THREE.MeshBasicMaterial({color:0xf7df7a, transparent:true, opacity:0.95, depthWrite:false}));
+  const backMarker = new THREE.Mesh(new THREE.SphereGeometry(0.045, 18, 18), new THREE.MeshBasicMaterial({color:0xc9a84a, transparent:true, opacity:0.85, depthWrite:false}));
+  group.add(frontMarker, backMarker);
+  const sensors = [];
+  for(const x of [0.8,1.5,2.4,3.4,4.4]){
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.05, 18, 18), new THREE.MeshBasicMaterial({color:colors.sensor, transparent:true, opacity:0.32, depthWrite:false}));
+    m.position.set(x,0,0);
+    sensors.push(m);
+    group.add(m);
+  }
+  return {group, sensors, active, frontMarker, backMarker};
+}
+function arcLengths(points){
+  const acc = [0];
+  for(let i=1;i<points.length;i++) acc[i] = acc[i-1] + points[i].distanceTo(points[i-1]);
+  return acc;
+}
+function pointAlongDistance(points, lengths, d){
+  if(d <= 0) return points[0].clone();
+  const total = lengths[lengths.length-1];
+  if(d >= total) return points[points.length-1].clone();
+  let i = 1;
+  while(i < lengths.length && lengths[i] < d) i++;
+  const l0 = lengths[i-1], l1 = lengths[i];
+  const a = (d - l0) / Math.max(1e-9, l1 - l0);
+  return points[i-1].clone().lerp(points[i], a);
+}
+function subPathDistance(points, lengths, d0, d1){
+  d0 = Math.max(0, d0);
+  d1 = Math.max(0, d1);
+  const total = lengths[lengths.length-1];
+  if(d0 >= total || d1 <= d0 + 1e-5) return null;
+  d1 = Math.min(total, d1);
+  const out = [pointAlongDistance(points, lengths, d0)];
+  for(let i=1;i<points.length-1;i++){
+    if(lengths[i] > d0 && lengths[i] < d1) out.push(points[i].clone());
+  }
+  out.push(pointAlongDistance(points, lengths, d1));
+  return out;
+}
+function makeLine(points, color=colors.line, opacity=0.95, renderOrder=0){
+  const geom = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity, depthWrite:false, depthTest:false});
+  const line = new THREE.Line(geom, mat);
+  line.renderOrder = renderOrder;
+  return line;
+}
+function classifyDipolePoint(p){
+  const mp = dipoleFrontMask(DIPOLE_PLUS_CENTER, p.x, p.y) ? 1 : 0;
+  const mn = dipoleFrontMask(DIPOLE_MINUS_CENTER, p.x, p.y) ? 1 : 0;
+  if(mp && mn) return 'overlap';
+  if(mp) return 'plus';
+  if(mn) return 'minus';
+  return 'none';
+}
+function classifyDipoleErasePoint(p){
+  const ep = dipoleEraseMask(DIPOLE_PLUS_CENTER, p.x, p.y) ? 1 : 0;
+  const em = dipoleEraseMask(DIPOLE_MINUS_CENTER, p.x, p.y) ? 1 : 0;
+  return (ep || em) ? 'erase' : 'keep';
+}
+function classColorDipole(cls){
+  if(cls === 'plus') return colors.plus;
+  if(cls === 'minus') return colors.minus;
+  return colors.overlap;
+}
+function splitPathByClassifier(points, classifier){
+  const segments = [];
+  if(!points || points.length < 2) return segments;
+  let run = [points[0].clone()];
+  let prevClass = classifier(points[0]);
+  for(let i=1;i<points.length;i++){
+    const p = points[i].clone();
+    const cls = classifier(p);
+    run.push(p);
+    if(cls !== prevClass){
+      if(run.length >= 2 && prevClass !== 'none') segments.push({ cls: prevClass, points: run.map(q => q.clone()) });
+      run = [points[i-1].clone(), p.clone()];
+      prevClass = cls;
+    }
+  }
+  if(run.length >= 2 && prevClass !== 'none') segments.push({ cls: prevClass, points: run.map(q => q.clone()) });
+  return segments;
+}
+function addColoredDipoleLine(points, opacity=0.94){
+  const segments = splitPathByClassifier(points, classifyDipolePoint);
+  for(const seg of segments){
+    if(seg.cls !== 'none') fieldGroup.add(makeLine(seg.points, classColorDipole(seg.cls), opacity));
+  }
+  return segments;
+}
+function addEraseDipoleOverlay(points, opacity=1.0){
+  return [];
+}
+function clearGroup(group){
+  while(group.children.length){
+    const child = group.children.pop();
+    group.remove(child);
+    child.traverse(obj => {
+      if(obj.geometry) obj.geometry.dispose();
+      if(obj.material){ if(Array.isArray(obj.material)) obj.material.forEach(m=>m.dispose()); else obj.material.dispose(); }
+    });
+  }
+}
+function setViewPreset(kind){
+  state.view = '2d';
+  state.distance = 9.8;
+  applyButtons();
+}
+function activeCamera(){
+  return orthoCamera;
+}
+function updateViewDecor(){
+  fieldGroup.visible = true;
+  sensorLine.group.visible = false;
+  grid.visible = true;
+  if(axis.children[0]) axis.children[0].visible = true;
+  if(axis.children[1]) axis.children[1].visible = true;
+  if(axis.children[2]) axis.children[2].visible = false;
+}
+function updateCamera(){
+  state.pitch = Math.max(-1.42, Math.min(1.42, state.pitch));
+  state.distance = Math.max(6.0, Math.min(18.0, state.distance));
+  const zoomPct = Math.round((18 - state.distance) / (18 - 6.0) * 100);
+  ui.zoomVal.textContent = `${zoomPct}%`;
+  const z = 12;
+  orthoCamera.position.set(0, 0, z);
+  orthoCamera.up.set(0, 1, 0);
+  orthoCamera.lookAt(focus);
+  orthoCamera.zoom = 1.00 + (18 - state.distance) * 0.11;
+  orthoCamera.updateProjectionMatrix();
+  updateViewDecor();
+}
+function applyButtons(){
+  [...ui.sourceRow.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.source === state.source));
+  [...ui.modeRow.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.mode === state.mode));
+  if(ui.viewRow) [...ui.viewRow.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.view === state.view));
+  ui.btnPlay.textContent = state.playing ? '❚❚' : '▶';
+  ui.speedVal.textContent = `${state.speed.toFixed(4)}×`;
+  applyLanguage();
+}
+function createModeEvent(type){
+  return { type, source: state.source, start: state.clock };
+}
+function resetTimelineForMode(mode=state.mode){
+  state.clock = 0;
+  state.events = [createModeEvent(mode)];
+}
+function switchSource(next){
+  state.source = next;
+  resetTimelineForMode(state.mode);
+  applyButtons();
+}
+function switchMode(next){
+  state.mode = next;
+  state.events.push(createModeEvent(next));
+  applyButtons();
+}
+function advanceTimeline(dt){
+  state.clock = Math.max(0, state.clock + dt);
+}
+function eventRadius(ev){
+  const v = Math.max(0.006, state.speed * 1.6) * maxRadius;
+  return Math.max(0, Math.min(maxTravelDistance + 0.8, (state.clock - ev.start) * v));
+}
+function latestEventOfCurrentSource(){
+  for(let i=state.events.length-1;i>=0;i--){
+    if(state.events[i].source === state.source) return state.events[i];
+  }
+  return null;
+}
+function chargeOpacity(){
+  const ev = latestEventOfCurrentSource();
+  if(!ev) return 0;
+  const r = eventRadius(ev);
+  if(ev.type === 'appear') return Math.min(1, 0.15 + 1.2 * (r / Math.max(1e-9, maxRadius)));
+  return 0;
+}
+
+function updateCharges(){
+  const op = chargeOpacity();
+  monoCharge.visible = state.source !== 'dipole';
+  dipolePlus.visible = dipoleMinus.visible = state.source === 'dipole';
+
+  monoCharge.userData.sphere.material.opacity = op;
+  monoCharge.userData.halo.material.opacity = 0.18 * op;
+  monoCharge.userData.sphere.material.color.setHex(state.source === 'minus' ? colors.minus : colors.plus);
+  monoCharge.userData.sphere.material.emissive.setHex(state.source === 'minus' ? colors.minus : colors.plus);
+  monoCharge.userData.halo.material.color.setHex(state.source === 'minus' ? colors.minus : colors.plus);
+
+  dipolePlus.userData.sphere.material.opacity = op;
+  dipolePlus.userData.halo.material.opacity = 0.18 * op;
+  dipoleMinus.userData.sphere.material.opacity = op;
+  dipoleMinus.userData.halo.material.opacity = 0.18 * op;
+}
+
+function updateSensors(){
+  sensorLine.group.visible = false;
+}
+function makeArrowHead(pos, dir, color, scale=0.06, renderOrder=0){
+  const cone = new THREE.Mesh(
+    new THREE.ConeGeometry(scale * 0.54, scale * 0.92, 16),
+    new THREE.MeshBasicMaterial({ color, transparent:true, opacity:1.0, depthWrite:false, depthTest:false })
+  );
+  cone.position.copy(pos);
+  cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+  cone.renderOrder = renderOrder;
+  return cone;
+}
+function getArrowDataOnSegment(points, t, reverseDir=false){
+  if(!points || points.length < 2) return null;
+  const lengths = arcLengths(points);
+  const total = lengths[lengths.length-1];
+  if(total <= 1e-6) return null;
+  const target = THREE.MathUtils.clamp(total * t, 0, total);
+  let i = 1;
+  while(i < lengths.length && lengths[i] < target) i++;
+  i = Math.min(points.length - 1, Math.max(1, i));
+  const p0 = points[i-1], p1 = points[i];
+  const pos = p0.clone().lerp(p1, 0.5);
+  const dir = p1.clone().sub(p0).normalize().multiplyScalar(reverseDir ? -1 : 1);
+  return { pos, dir };
+}
+function addSmallArrowOnSegment(points, t, color, scale=0.06, targetGroup=fieldGroup, reverseDir=false, renderOrder=0){
+  const data = getArrowDataOnSegment(points, t, reverseDir);
+  if(!data) return null;
+  const arrow = makeArrowHead(data.pos, data.dir, color, scale, renderOrder);
+  targetGroup.add(arrow);
+  arrow.userData.anchorPos = data.pos.clone();
+  return arrow;
+}
+function getArrowDataAtYAxisIntersection(points, reverseDir=false){
+  if(!points || points.length < 2) return null;
+  for(let i=1;i<points.length;i++){
+    const p0 = points[i-1], p1 = points[i];
+    const x0 = p0.x, x1 = p1.x;
+    const crosses = (x0 === 0) || (x1 === 0) || (x0 < 0 && x1 > 0) || (x0 > 0 && x1 < 0);
+    if(!crosses) continue;
+    const denom = x1 - x0;
+    const a = Math.abs(denom) < 1e-9 ? 0.5 : THREE.MathUtils.clamp((0 - x0) / denom, 0, 1);
+    const pos = p0.clone().lerp(p1, a);
+    const dir = p1.clone().sub(p0).normalize().multiplyScalar(reverseDir ? -1 : 1);
+    return { pos, dir };
+  }
+  return getArrowDataOnSegment(points, 0.5, reverseDir);
+}
+function addArrowAtYAxisIntersection(points, color, scale=0.06, targetGroup=fieldGroup, reverseDir=false, renderOrder=0){
+  const data = getArrowDataAtYAxisIntersection(points, reverseDir);
+  if(!data) return null;
+  const arrow = makeArrowHead(data.pos, data.dir, color, scale, renderOrder);
+  targetGroup.add(arrow);
+  arrow.userData.anchorPos = data.pos.clone();
+  return arrow;
+}
+function pointShouldBeErasedDipole(p){
+  return renderEraseDist > 0 && classifyDipoleErasePoint(p) === 'erase';
+}
+
+function prefixWithinRadius(points, center, radius){
+  if(!points || points.length < 2) return null;
+  const R = Math.max(0, radius);
+  if(R <= 1e-9) return null;
+  const out = [points[0].clone()];
+  for(let i=1;i<points.length;i++){
+    const a = points[i-1], b = points[i];
+    const da = a.distanceTo(center);
+    const db = b.distanceTo(center);
+    if(db <= R + 1e-9){
+      out.push(b.clone());
+      continue;
+    }
+    // first crossing out of the propagation circle
+    const ab = b.clone().sub(a);
+    const ac = a.clone().sub(center);
+    const A = ab.dot(ab);
+    const B = 2 * ac.dot(ab);
+    const C = ac.dot(ac) - R*R;
+    const disc = Math.max(0, B*B - 4*A*C);
+    let t = 0;
+    if(A > 1e-12){
+      const sdisc = Math.sqrt(disc);
+      const t1 = (-B - sdisc) / (2*A);
+      const t2 = (-B + sdisc) / (2*A);
+      const cand = [t1,t2].filter(v => v >= -1e-6 && v <= 1+1e-6).sort((x,y)=>x-y);
+      t = cand.length ? cand[cand.length-1] : THREE.MathUtils.clamp((R - da) / Math.max(1e-9, db - da), 0, 1);
+    }
+    out.push(a.clone().lerp(b, THREE.MathUtils.clamp(t,0,1)));
+    break;
+  }
+  return out.length > 1 ? out : null;
+}
+function segmentWithinRadiusBand(points, center, r0, r1){
+  const outer = prefixWithinRadius(points, center, r1);
+  if(!outer || outer.length < 2) return null;
+  if(r0 <= 1e-9) return outer;
+  const inner = prefixWithinRadius(points, center, r0);
+  if(!inner || inner.length < 2) return outer;
+  const d0 = arcLengths(inner);
+  const cut = d0[d0.length - 1];
+  const d1 = arcLengths(outer);
+  return subPathDistance(outer, d1, cut, d1[d1.length - 1]);
+}
+
+function rebuildField(){
+  clearGroup(fieldGroup);
+  const currentEvents = state.events.filter(ev => ev.source === state.source);
+  if(!currentEvents.length) return;
+
+  currentEvents.forEach((ev, idx) => {
+    const radius = eventRadius(ev);
+    if(radius <= 1e-5) return;
+    const baseOrder = idx * 10;
+
+    if(ev.type === 'disappear'){
+      if(state.source === 'dipole'){
+        const bubbleP = makeEraseBubble(DIPOLE_PLUS_CENTER, Math.min(maxTravelDistance, radius), baseOrder + 5);
+        const bubbleM = makeEraseBubble(DIPOLE_MINUS_CENTER, Math.min(maxTravelDistance, radius), baseOrder + 5);
+        if(bubbleP) fieldGroup.add(bubbleP);
+        if(bubbleM) fieldGroup.add(bubbleM);
+      } else {
+        const bubble = makeEraseBubble(new THREE.Vector3(0,0,0), Math.min(maxTravelDistance, radius), baseOrder + 5);
+        if(bubble) fieldGroup.add(bubble);
+      }
+      return;
+    }
+
+    // appear event
+    renderFrontDist = radius;
+    renderEraseDist = 0;
+
+    if(state.source === 'dipole'){
+      for(const seed of DIPOLE_SEED_OFFSETS){
+        const upperBranch = traceDipoleVisibleBranch(DIPOLE_PLUS_CENTER, seed, +1, DIPOLE_MINUS_CENTER);
+        if(!upperBranch || upperBranch.length < 2) continue;
+        const lowerBranch = mirrorYPath(upperBranch);
+
+        for(const [branch, reverseArrowDir] of [[upperBranch, false], [lowerBranch, true]]){
+          const coloredSegments = splitPathByClassifier(branch, classifyDipolePoint);
+          for(const seg of coloredSegments){
+            if(seg.cls === 'none' || !seg.points || seg.points.length < 2) continue;
+            const color = classColorDipole(seg.cls);
+            fieldGroup.add(makeLine(seg.points, color, 0.94, baseOrder + 1));
+            const arrowData = seg.cls === 'overlap'
+              ? getArrowDataAtYAxisIntersection(seg.points, reverseArrowDir)
+              : getArrowDataOnSegment(seg.points, 0.5, reverseArrowDir);
+            if(!arrowData) continue;
+            const arrow = makeArrowHead(arrowData.pos, arrowData.dir, color, 0.040, baseOrder + 2);
+            arrow.userData.anchorPos = arrowData.pos.clone();
+            fieldGroup.add(arrow);
+          }
+        }
+      }
+    } else {
+      const signColor = state.source === 'plus' ? colors.plus : colors.minus;
+      const dirs = state.view === '2d' ? monoDirs2D : monoDirs;
+      for(const dir of dirs){
+        const a = dir.clone().multiplyScalar(0);
+        const b = dir.clone().multiplyScalar(Math.min(maxRadius, radius));
+        if(b.length() > a.length() + 1e-5){
+          fieldGroup.add(makeLine([a,b], signColor, 0.95, baseOrder + 1));
+          addSmallArrowOnSegment([a,b], 0.5, signColor, 0.045, fieldGroup, state.source === 'minus', baseOrder + 2);
+        }
+      }
+    }
+  });
+}
+function updateNote(){
+  const t = I18N[state.lang] || I18N.el;
+  const sourceText = state.source === 'plus' ? t.sourcePlus : state.source === 'minus' ? t.sourceMinus : t.sourceDipoleText;
+  const modeText = state.mode === 'appear' ? t.modeAppearText : t.modeDisappearText;
+  let extra = '';
+  if(state.mode === 'disappear') extra = t.disappearExtra;
+  else if(state.mode === 'appear') extra = state.source === 'dipole' ? t.appearDipoleExtra : t.appearMonoExtra;
+  const viewText = t.viewText;
+  const viewExtra = t.viewExtra;
+  note.innerHTML = `<b>${modeText}</b> · ${sourceText}<br>${extra}<br><span style="color:#bcc8d8">${viewText}. ${viewExtra} ${t.noteTail}</span>`;
+}
+function animateFrame(dt){
+  if(state.playing) advanceTimeline(dt);
+  updateCharges();
+  updateSensors();
+  rebuildField();
+  updateCamera();
+  updateNote();
+  renderer.render(scene, activeCamera());
+}
+
+ui.sourceRow.addEventListener('click', e => { const b = e.target.closest('button[data-source]'); if(!b) return; switchSource(b.dataset.source); });
+ui.modeRow.addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if(!b) return; switchMode(b.dataset.mode); });
+if(ui.viewRow) ui.viewRow.addEventListener('click', e => { const b = e.target.closest('button[data-view]'); if(!b) return; setViewPreset(b.dataset.view); });
+ui.btnPlay.addEventListener('click', ()=>{ state.playing = !state.playing; applyButtons(); });
+ui.btnStart.addEventListener('click', ()=>{ state.playing = false; resetTimelineForMode(state.mode); applyButtons(); });
+ui.btnEnd.addEventListener('click', ()=>{ state.playing = false; state.clock = Math.max(state.clock, (maxTravelDistance + 0.8) / (Math.max(0.006, state.speed * 1.6) * maxRadius)); applyButtons(); });
+ui.btnBack.addEventListener('click', ()=>{ state.playing = false; advanceTimeline(-0.10); applyButtons(); });
+ui.btnFwd.addEventListener('click', ()=>{ state.playing = false; advanceTimeline(0.10); applyButtons(); });
+ui.zoomIn.addEventListener('click', ()=>{ state.distance -= 0.55; });
+ui.zoomOut.addEventListener('click', ()=>{ state.distance += 0.55; });
+ui.speedUp.addEventListener('click', ()=>{ state.speed = Math.min(0.010, +(state.speed + 0.0005).toFixed(4)); applyButtons(); });
+ui.speedDown.addEventListener('click', ()=>{ state.speed = Math.max(0.00025, +(state.speed - 0.0005).toFixed(4)); applyButtons(); });
+ui.camLeft.addEventListener('click', ()=>{ state.yaw -= 0.16; });
+ui.camRight.addEventListener('click', ()=>{ state.yaw += 0.16; });
+ui.camUp.addEventListener('click', ()=>{ state.pitch += 0.10; });
+ui.camDown.addEventListener('click', ()=>{ state.pitch -= 0.10; });
+ui.camReset.addEventListener('click', ()=> setViewPreset('2d'));
+ui.langEl.addEventListener('click', ()=>{ state.lang = 'el'; applyButtons(); updateNote(); });
+ui.langEn.addEventListener('click', ()=>{ state.lang = 'en'; applyButtons(); updateNote(); });
+
+stage.addEventListener('pointerdown', e => { state.dragging = true; state.dragX = e.clientX; state.dragY = e.clientY; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener('pointermove', e => {
+  if(!state.dragging) return;
+  const dx = e.clientX - state.dragX;
+  const dy = e.clientY - state.dragY;
+  state.dragX = e.clientX; state.dragY = e.clientY;
+  if(state.view === '3d'){
+    state.yaw += dx * 0.0065;
+    state.pitch += dy * -0.0065;
+  }
+});
+stage.addEventListener('pointerup', e => { state.dragging = false; try{ stage.releasePointerCapture(e.pointerId); }catch{} });
+stage.addEventListener('pointerleave', ()=>{ state.dragging = false; });
+stage.addEventListener('wheel', e => { e.preventDefault(); state.distance += Math.sign(e.deltaY) * 0.45; }, {passive:false});
+
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  animateFrame(dt);
+  requestAnimationFrame(loop);
+}
+
+resetTimelineForMode('appear');
+setViewPreset('2d');
+applyButtons();
+updateNote();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
