@@ -3696,52 +3696,132 @@ function buildViewportSnapshotClone(sourceRoot){
       cloneEls[idx] = img;
     }
   });
-  clone.querySelectorAll('.machineHud, #hiddenSettings, .top').forEach(el => el.remove());
+  clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
   clone.style.margin = '0';
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.display = 'block';
-  clone.style.height = 'auto';
-  const main = clone.querySelector('.main');
-  if(main){
-    main.style.padding = '0';
-    main.style.margin = '0';
-    main.style.display = 'block';
-    main.style.overflow = 'hidden';
-  }
-  const viewport = clone.querySelector('.card.viewport');
-  if(viewport){
-    viewport.style.margin = '0';
-    viewport.style.border = '0';
-    viewport.style.borderRadius = '0';
-    viewport.style.boxShadow = 'none';
-    viewport.style.overflow = 'hidden';
-  }
+  clone.style.background = '#ffffff';
   return clone;
 }
-async function getBookPrintSnapshot(){
-  const sourceRoot = document.querySelector('.app');
-  if(!sourceRoot) return null;
-  try{ renderer.render(scene, camera); }catch(_e){}
-  try{ drawGraphs(true); }catch(_e){}
-  try{ applyUI(); }catch(_e){}
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  const rect = sourceRoot.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width));
-  const height = Math.max(1, Math.round(rect.height));
-  const clone = buildViewportSnapshotClone(sourceRoot);
-  clone.style.width = `${width}px`;
-  clone.style.minWidth = `${width}px`;
-  clone.style.maxWidth = `${width}px`;
-  clone.style.height = `${height}px`;
-  clone.style.minHeight = `${height}px`;
-  clone.style.maxHeight = `${height}px`;
-  const bg = getComputedStyle(document.body).backgroundColor || '#0b0f14';
-  const serialized = new XMLSerializer().serializeToString(clone);
+
+function elementIsSnapshotVisible(el){
+  if(!(el instanceof Element)) return false;
+  const cs = getComputedStyle(el);
+  if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || '1') <= 0.001) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width > 1 && rect.height > 1;
+}
+function collectSnapshotVisuals(sourceRoot){
+  const nodes = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
+  const visuals = [];
+  for(const el of nodes){
+    if(!elementIsSnapshotVisible(el)) continue;
+    if(el instanceof HTMLCanvasElement || el instanceof HTMLImageElement){
+      visuals.push(el);
+    }
+  }
+  return visuals;
+}
+function drawSnapshotElement(ctx, el, rootRect){
+  const rect = el.getBoundingClientRect();
+  const x = rect.left - rootRect.left;
+  const y = rect.top - rootRect.top;
+  const w = rect.width;
+  const h = rect.height;
+  if(w <= 0 || h <= 0) return;
+  try{ ctx.drawImage(el, x, y, w, h); }catch(_e){}
+}
+async function renderSvgCloneToPngDataUrl(wrapper, width, height, bg){
+  const serialized = new XMLSerializer().serializeToString(wrapper);
   const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  const img = new Image();
+  img.decoding = 'sync';
+  await new Promise((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('snapshot shell render failed'));
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  });
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
+  try{ renderer.render(scene, camera); }catch(_e){}
+  try{ drawGraphs(true); }catch(_e){}
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const rects = [sourceRoot.getBoundingClientRect()];
+  const includeControls = controlsEl && elementIsSnapshotVisible(controlsEl);
+  if(includeControls) rects.push(controlsEl.getBoundingClientRect());
+  const rootRect = {
+    left: Math.min(...rects.map(r => r.left)),
+    top: Math.min(...rects.map(r => r.top)),
+    right: Math.max(...rects.map(r => r.right)),
+    bottom: Math.max(...rects.map(r => r.bottom))
+  };
+  rootRect.width = rootRect.right - rootRect.left;
+  rootRect.height = rootRect.bottom - rootRect.top;
+  const width = Math.max(1, Math.round(rootRect.width));
+  const height = Math.max(1, Math.round(rootRect.height));
+  const bg = getComputedStyle(document.querySelector('.app') || sourceRoot).backgroundColor || '#0b0f14';
+
+  const wrapper = document.createElement('div');
+  wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = `${width}px`;
+  wrapper.style.height = `${height}px`;
+  wrapper.style.overflow = 'hidden';
+  wrapper.style.background = bg;
+
+  const viewportClone = buildViewportSnapshotClone(sourceRoot);
+  const viewportRect = rects[0];
+  viewportClone.style.position = 'absolute';
+  viewportClone.style.left = `${Math.round(viewportRect.left - rootRect.left)}px`;
+  viewportClone.style.top = `${Math.round(viewportRect.top - rootRect.top)}px`;
+  viewportClone.style.width = `${Math.round(viewportRect.width)}px`;
+  viewportClone.style.height = `${Math.round(viewportRect.height)}px`;
+  wrapper.appendChild(viewportClone);
+
+  if(includeControls){
+    const controlsRect = controlsEl.getBoundingClientRect();
+    const controlsClone = buildViewportSnapshotClone(controlsEl);
+    controlsClone.style.position = 'absolute';
+    controlsClone.style.left = `${Math.round(controlsRect.left - rootRect.left)}px`;
+    controlsClone.style.top = `${Math.round(controlsRect.top - rootRect.top)}px`;
+    controlsClone.style.width = `${Math.round(controlsRect.width)}px`;
+    controlsClone.style.height = `${Math.round(controlsRect.height)}px`;
+    wrapper.appendChild(controlsClone);
+  }
+
+  try{
+    return await renderSvgCloneToPngDataUrl(wrapper, width, height, bg);
+  }catch(_e){
+    const scale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(scale, scale);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+    const visuals = collectSnapshotVisuals(includeControls ? document.querySelector('.app') || sourceRoot : sourceRoot);
+    visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
+    ctx.restore();
+    return canvas.toDataURL('image/png');
+  }
+}
+async function getBookPrintSnapshot(){
+  const sourceRoot = document.querySelector('.card.viewport');
+  const controlsEl = document.getElementById('focusMiniControls');
+  if(!sourceRoot) return null;
+  return await buildViewportSnapshotCanvas(sourceRoot, controlsEl);
 }
 window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
