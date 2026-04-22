@@ -3746,10 +3746,46 @@ function canvasHasVisiblePixels(canvas){
   }catch(_e){}
   return false;
 }
+function countVisibleFieldPoolEntries(pool){
+  if(!pool) return 0;
+  let n = 0;
+  try{
+    (pool.arrows || []).forEach(o => { if(o?.group?.visible) n++; });
+    (pool.quads || []).forEach(o => { if(o?.visible) n++; });
+    (pool.segs || []).forEach(o => { if(o?.visible) n++; });
+  }catch(_e){}
+  return n;
+}
+function countVisibleGroupChildren(group){
+  if(!group) return 0;
+  let n = 0;
+  try{ group.traverse(obj => { if(obj !== group && obj.visible) n++; }); }catch(_e){}
+  return n;
+}
+function snapshotFieldArtifactsReady(){
+  const layers = activeBookSceneState?.layers || new Set();
+  const arrowMode = appModes.main === 'arrows' || appModes.main === 'receiveArrows';
+  if(arrowMode && layers.has('linearPropagation')){
+    const needE = !!bookLinearState.showE;
+    const needB = !!bookLinearState.showB;
+    const eReady = !needE || countVisibleFieldPoolEntries(directFieldPools.e) > 2;
+    const bReady = !needB || (countVisibleFieldPoolEntries(directFieldPools.bFront) + countVisibleFieldPoolEntries(directFieldPools.bBack)) > 2;
+    return eReady && bReady;
+  }
+  const needE = layers.has('eFieldLines');
+  const needB = layers.has('bFieldLines');
+  const eReady = !needE || (countVisibleGroupChildren(eFieldGroup) + countVisibleGroupChildren(eUpperGroup) + countVisibleGroupChildren(eLowerGroup) + countVisibleGroupChildren(eArrowGroup)) > 2;
+  const bReady = !needB || (countVisibleGroupChildren(bFieldBackGroup) + countVisibleGroupChildren(bFieldFrontGroup) + countVisibleGroupChildren(bBackGroup) + countVisibleGroupChildren(bFrontGroup) + countVisibleGroupChildren(bArrowGroup)) > 2;
+  return eReady && bReady;
+}
 async function waitForSnapshotCanvases(){
-  for(let attempt=0; attempt<8; attempt++){
+  for(let attempt=0; attempt<14; attempt++){
+    try{ syncPhase(); }catch(_e){}
+    try{ applyUI(); }catch(_e){}
     try{ renderer.render(scene, camera); }catch(_e){}
     try{ drawGraphs(true); }catch(_e){}
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    try{ renderer.render(scene, camera); }catch(_e){}
     await new Promise(resolve => requestAnimationFrame(resolve));
     const needsGraphs = (activeBookSceneState?.graphs || []).filter(Boolean);
     const graphReady = !needsGraphs.length || needsGraphs.every(key => {
@@ -3759,8 +3795,80 @@ async function waitForSnapshotCanvases(){
       return canvasHasVisiblePixels(canvas);
     });
     const stageReady = !renderer?.domElement || !elementIsSnapshotVisible(renderer.domElement) || canvasHasVisiblePixels(renderer.domElement);
-    if(graphReady && stageReady) break;
+    const fieldReady = snapshotFieldArtifactsReady();
+    if(graphReady && stageReady && fieldReady) break;
   }
+}
+
+function parseSnapshotRadius(cs, w, h){
+  const vals = [cs.borderTopLeftRadius, cs.borderTopRightRadius, cs.borderBottomRightRadius, cs.borderBottomLeftRadius]
+    .map(v => {
+      const n = parseFloat(String(v || '0'));
+      return Number.isFinite(n) ? n : 0;
+    });
+  const maxR = Math.max(0, Math.min(w, h) / 2);
+  return vals.map(v => Math.max(0, Math.min(maxR, v)));
+}
+function roundedRectPath(ctx, x, y, w, h, radii){
+  const [rtl, rtr, rbr, rbl] = radii;
+  ctx.beginPath();
+  ctx.moveTo(x + rtl, y);
+  ctx.lineTo(x + w - rtr, y);
+  if(rtr) ctx.quadraticCurveTo(x + w, y, x + w, y + rtr); else ctx.lineTo(x + w, y);
+  ctx.lineTo(x + w, y + h - rbr);
+  if(rbr) ctx.quadraticCurveTo(x + w, y + h, x + w - rbr, y + h); else ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x + rbl, y + h);
+  if(rbl) ctx.quadraticCurveTo(x, y + h, x, y + h - rbl); else ctx.lineTo(x, y + h);
+  ctx.lineTo(x, y + rtl);
+  if(rtl) ctx.quadraticCurveTo(x, y, x + rtl, y); else ctx.lineTo(x, y);
+  ctx.closePath();
+}
+function isVisibleSnapshotBackground(bg){
+  if(!bg) return false;
+  const s = String(bg).trim().toLowerCase();
+  if(!s || s === 'transparent') return false;
+  return !(/^rgba\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/.test(s));
+}
+function drawSnapshotBackgroundBlock(ctx, el, rootRect){
+  if(!(el instanceof Element) || !elementIsSnapshotVisible(el)) return;
+  const rect = el.getBoundingClientRect();
+  const x = rect.left - rootRect.left;
+  const y = rect.top - rootRect.top;
+  const w = rect.width;
+  const h = rect.height;
+  if(w <= 0 || h <= 0) return;
+  const cs = getComputedStyle(el);
+  const bg = cs.backgroundColor;
+  const radii = parseSnapshotRadius(cs, w, h);
+  if(isVisibleSnapshotBackground(bg)){
+    ctx.save();
+    roundedRectPath(ctx, x, y, w, h, radii);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.restore();
+  }
+  const bw = parseFloat(cs.borderTopWidth || '0');
+  const bc = cs.borderTopColor;
+  if(bw > 0.1 && isVisibleSnapshotBackground(bc)){
+    ctx.save();
+    roundedRectPath(ctx, x + bw/2, y + bw/2, Math.max(0, w - bw), Math.max(0, h - bw), radii.map(r => Math.max(0, r - bw/2)));
+    ctx.lineWidth = bw;
+    ctx.strokeStyle = bc;
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+function drawSnapshotBackgroundBlocks(ctx, sourceRoot, controlsEl, rootRect){
+  const seen = new Set();
+  const selectors = ['.graphPanel', '.focusMiniControls'];
+  selectors.forEach(sel => {
+    sourceRoot.querySelectorAll(sel).forEach(el => {
+      if(seen.has(el)) return;
+      seen.add(el);
+      drawSnapshotBackgroundBlock(ctx, el, rootRect);
+    });
+  });
+  if(controlsEl && !seen.has(controlsEl)) drawSnapshotBackgroundBlock(ctx, controlsEl, rootRect);
 }
 function drawSnapshotElement(ctx, el, rootRect){
   const rect = el.getBoundingClientRect();
@@ -3874,6 +3982,7 @@ async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
     ctx.drawImage(shellImg, 0, 0, width, height);
   }catch(_e){}
 
+  drawSnapshotBackgroundBlocks(ctx, sourceRoot, controlsEl, rootRect);
   const visuals = orderedSnapshotVisuals(sourceRoot, includeControls, controlsEl);
   visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
   ctx.restore();
