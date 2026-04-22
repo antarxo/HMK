@@ -29,7 +29,15 @@
     .badge{font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#020617;color:var(--soft)}
     .scroll{overflow:auto;min-height:0;padding-right:4px}
     .hint{font-size:11px;color:var(--soft)}
+    .tree-sticky-nav{margin:0 auto 10px;padding:10px 10px 12px;border:1px solid #31506d;border-radius:14px;background:linear-gradient(180deg,rgba(8,18,32,.98),rgba(2,6,23,.98));box-shadow:0 12px 22px rgba(0,0,0,.24);max-width:100%}
+    .tree-sticky-nav .nav-title{display:block;margin:0 0 8px;font:900 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:none;color:#bae6fd;text-align:center}
+    .page-picker{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+    .page-picker select{min-width:0;height:38px;padding:8px 10px;border:1px solid #3b82f6;border-radius:10px;background:#07101d;color:#e5e7eb;font:700 13px/1.1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-picker button{min-width:34px;height:38px;padding:6px 10px;border-radius:10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    #treeQuickNav{position:sticky;top:0;z-index:6;margin:0 0 4px;padding:0 0 6px;background:var(--panel)}
     .tree-section{margin-bottom:8px;padding:6px;border:1px solid #182132;border-radius:10px;background:#020617}
+    .tree-page-wrap{margin-bottom:4px;padding:4px;border-radius:12px}
+    .tree-page-wrap.active{background:rgba(56,189,248,.08);outline:1px solid rgba(56,189,248,.22)}
     .tree-head{display:flex;justify-content:space-between;gap:6px;align-items:center;margin-bottom:6px}
     .tree-title{font-size:12px;font-weight:600;color:#cbd5e1}
     .tree-block{display:flex;align-items:center;gap:8px;padding:5px 7px;margin-bottom:4px;border:1px solid #1e293b;border-radius:999px;background:#07101d;cursor:pointer}
@@ -37,6 +45,12 @@
     .tree-block .type{font-size:10px;color:#7dd3fc;border:1px solid rgba(56,189,248,.25);padding:1px 6px;border-radius:999px;white-space:nowrap}
     .tree-block .info{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
     .tree-block .idx{font-size:10px;color:#64748b}
+    .chip-palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chip-btn{padding:4px 8px;border-radius:999px;font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .chip-btn.add{background:#082032;border-color:#1d4ed8;color:#bfdbfe}
+    .chip-btn.remove{background:#2a0c12;border-color:#ef4444;color:#fecaca}
+    .chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;min-height:28px}
+    .chip-empty{font-size:11px;color:var(--soft);font-style:italic}
     .subhead{font-size:11px;color:var(--soft);margin:8px 0 4px;display:flex;justify-content:space-between;align-items:center;gap:6px}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
     @media (max-width:700px){.grid{grid-template-columns:1fr}}
@@ -80,6 +94,8 @@
     .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
     .media-frame img,.media-frame iframe,.media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
     .media-frame img{object-fit:cover}
+    .media-frame.natural{aspect-ratio:auto;overflow:visible;background:#fff}
+    .media-frame.natural img{position:static;inset:auto;width:100%;height:auto;display:block;object-fit:contain}
     figcaption{padding:10px 12px;font:500 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5e6d79;border-top:1px solid rgba(0,0,0,.07)}
     .callout{margin:8px 0;padding:8px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 12px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
     .callout-title{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
@@ -123,6 +139,7 @@
 <main>
   <section class="panel">
     <h2>Δομή <span class="badge" id="treeBadge">0 pages</span></h2>
+    <div id="treeQuickNav"></div>
     <div class="scroll" id="tree"></div>
     <div class="hint">Η βασική μονάδα τώρα είναι η σελίδα. Τα items είναι πλήρως ενσωματωμένα μέσα σε αυτήν, όχι refs.</div>
   </section>
@@ -147,6 +164,7 @@ const jsonInput = document.getElementById('jsonInput');
 const loadDefaultBtn = document.getElementById('loadDefaultBtn');
 const exportBtn = document.getElementById('exportBtn');
 const tree = document.getElementById('tree');
+const treeQuickNav = document.getElementById('treeQuickNav');
 const editor = document.getElementById('editor');
 const preview = document.getElementById('preview');
 const treeBadge = document.getElementById('treeBadge');
@@ -204,6 +222,9 @@ function normalizeData(raw){
 
 function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+const COMMON_SETUP_BUTTONS = ['I↓','V-t','q-t','i-t','E-t','B-t','Εδ','Βδ','E→','B→'];
+const COMMON_PRESS_BUTTONS = ['|◀','◀','▶','▶|','|◀ ◀','▶ ▶|'];
+
 
 function nextPageId(base='page'){
   const used = new Set((data?.pages || []).map(p => String(p.id || '')));
@@ -302,9 +323,53 @@ function currentItem(){
 
 function renderAll(){ renderTree(); renderEditor(); renderPreview(); }
 
+function ensureElementVisibleInList(container, el){
+  if(!container || !el) return;
+  const cRect = container.getBoundingClientRect();
+  const eRect = el.getBoundingClientRect();
+  const currentTop = container.scrollTop;
+  const pad = 12;
+
+  const topInside = eRect.top - cRect.top + currentTop;
+  const bottomInside = eRect.bottom - cRect.top + currentTop;
+  const viewTop = currentTop;
+  const viewBottom = currentTop + container.clientHeight;
+
+  let targetTop = currentTop;
+
+  if(topInside < viewTop + pad || bottomInside > viewBottom - pad){
+    const centered = topInside - Math.max(pad, Math.round((container.clientHeight - el.offsetHeight) / 2));
+    const maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+    targetTop = Math.max(0, Math.min(centered, maxScroll));
+  }
+
+  container.scrollTop = targetTop;
+}
+function jumpToPageInTree(pageIndex){
+  requestAnimationFrame(()=>{
+    const anchorEl = tree.querySelector(`[data-page-anchor="${pageIndex}"]`);
+    if(!anchorEl) return;
+    ensureElementVisibleInList(tree, anchorEl);
+    requestAnimationFrame(()=>{
+      ensureElementVisibleInList(tree, anchorEl);
+    });
+  });
+}
+function selectPage(pageIndex){
+  selection = {kind:'page', pageIndex};
+  renderAll();
+  jumpToPageInTree(pageIndex);
+}
+
 function renderTree(){
   tree.innerHTML = '';
-  if(!data){ tree.innerHTML = '<div class="hint">Φόρτωσε pages JSON.</div>'; treeBadge.textContent='0 pages'; return; }
+  if(treeQuickNav) treeQuickNav.innerHTML = '';
+  if(!data){
+    if(treeQuickNav) treeQuickNav.innerHTML = '';
+    tree.innerHTML = '<div class="hint">Φόρτωσε pages JSON.</div>';
+    treeBadge.textContent='0 pages';
+    return;
+  }
   treeBadge.textContent = data.pages.length + ' pages';
 
   const metaBox = document.createElement('div');
@@ -316,6 +381,48 @@ function renderTree(){
   metaBtn.onclick = ()=>{ selection={kind:'meta'}; renderAll(); };
   metaBox.appendChild(metaBtn);
   tree.appendChild(metaBox);
+
+  const stickyNav = document.createElement('div');
+  stickyNav.className = 'tree-sticky-nav';
+  stickyNav.innerHTML = '<span class="nav-title">Επιλογή σελίδας</span>';
+
+  const picker = document.createElement('div');
+  picker.className = 'page-picker';
+
+  const select = document.createElement('select');
+  data.pages.forEach((p, pIdx) => {
+    const opt = document.createElement('option');
+    opt.value = String(pIdx);
+    const label = (p.header?.left || p.header?.right || p.id || '').trim();
+    opt.textContent = label ? `Σελίδα ${pIdx+1} — ${label}` : `Σελίδα ${pIdx+1}`;
+    if((selection?.pageIndex === pIdx) || (selection?.kind === 'item' && selection?.pageIndex === pIdx)) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.onchange = ()=> selectPage(Number(select.value));
+
+  const prevBtn = document.createElement('button');
+  prevBtn.type = 'button';
+  prevBtn.textContent = '↑';
+  prevBtn.title = 'Προηγούμενη σελίδα';
+  prevBtn.onclick = ()=>{
+    const cur = Number(select.value || 0);
+    if(cur > 0) selectPage(cur - 1);
+  };
+
+  const nextBtn = document.createElement('button');
+  nextBtn.type = 'button';
+  nextBtn.textContent = '↓';
+  nextBtn.title = 'Επόμενη σελίδα';
+  nextBtn.onclick = ()=>{
+    const cur = Number(select.value || 0);
+    if(cur < data.pages.length - 1) selectPage(cur + 1);
+  };
+
+  picker.appendChild(select);
+  picker.appendChild(prevBtn);
+  picker.appendChild(nextBtn);
+  stickyNav.appendChild(picker);
+  if(treeQuickNav) treeQuickNav.appendChild(stickyNav);
 
   const pagesBox = document.createElement('div');
   pagesBox.className = 'tree-section';
@@ -329,25 +436,32 @@ function renderTree(){
     data.pages.push(p);
     selection = {kind:'page', pageIndex:data.pages.length - 1};
     renderAll();
+    jumpToPageInTree(data.pages.length - 1);
   };
   head.appendChild(addPageBtn);
   pagesBox.appendChild(head);
 
   data.pages.forEach((p, pIdx) => {
+    const pageWrap = document.createElement('div');
+    pageWrap.dataset.pageAnchor = String(pIdx);
+    pageWrap.className = 'tree-page-wrap' + ((((selection?.kind==='page' && selection.pageIndex===pIdx) || (selection?.kind==='item' && selection.pageIndex===pIdx))) ? ' active' : '');
+
     const pill = document.createElement('div');
-    pill.className = 'tree-block' + (selection?.kind==='page' && selection.pageIndex===pIdx ? ' active' : '');
+    pill.className = 'tree-block' + (((selection?.kind==='page' && selection.pageIndex===pIdx) || (selection?.kind==='item' && selection.pageIndex===pIdx)) ? ' active' : '');
     pill.innerHTML = `<span class="type">page</span><span class="info">${esc(p.id)} — ${esc(p.header?.left || '')} / ${esc(p.header?.right || '')}</span><span class="idx">#${pIdx+1}</span>`;
-    pill.onclick = ()=>{ selection = {kind:'page', pageIndex:pIdx}; renderAll(); };
-    pagesBox.appendChild(pill);
+    pill.onclick = ()=> selectPage(pIdx);
+    pageWrap.appendChild(pill);
 
     p.items.forEach((item, iIdx) => {
       const ipill = document.createElement('div');
       ipill.className = 'tree-block' + (selection?.kind==='item' && selection.pageIndex===pIdx && selection.itemIndex===iIdx ? ' active' : '');
       ipill.style.marginLeft = '14px';
       ipill.innerHTML = `<span class="type">${esc(item.type || '?')}</span><span class="info">${esc(summarizeItem(item))}</span><span class="idx">${iIdx+1}</span>`;
-      ipill.onclick = ()=>{ selection = {kind:'item', pageIndex:pIdx, itemIndex:iIdx}; renderAll(); };
-      pagesBox.appendChild(ipill);
+      ipill.onclick = ()=>{ selection = {kind:'item', pageIndex:pIdx, itemIndex:iIdx}; renderAll(); jumpToPageInTree(pIdx); };
+      pageWrap.appendChild(ipill);
     });
+
+    pagesBox.appendChild(pageWrap);
   });
   tree.appendChild(pagesBox);
 }
@@ -429,6 +543,72 @@ function updateImageThumb(container, src, alt=''){
     container.innerHTML = 'Δεν έχει οριστεί εικόνα ακόμη';
   }
 }
+function setCommaFieldFromArray(input, arr){
+  input.value = (arr || []).join(', ');
+}
+function normalizeChipArrayFromInput(value){
+  return String(value || '').split(',').map(s=>s.trim()).filter(Boolean);
+}
+function renderChipList(host, values, onRemove){
+  if(!host) return;
+  host.innerHTML = '';
+  if(!values || !values.length){
+    const empty = document.createElement('div');
+    empty.className = 'chip-empty';
+    empty.textContent = 'Δεν έχουν δηλωθεί κουμπιά ακόμη.';
+    host.appendChild(empty);
+    return;
+  }
+  values.forEach((value, idx)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn remove';
+    btn.textContent = `✕ ${value}`;
+    btn.onclick = ()=> onRemove(idx);
+    host.appendChild(btn);
+  });
+}
+function renderSuggestionPalette(host, suggestions, onAdd){
+  if(!host) return;
+  host.innerHTML = '';
+  suggestions.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn add';
+    btn.textContent = label;
+    btn.onclick = ()=> onAdd(label);
+    host.appendChild(btn);
+  });
+}
+function wireCalloutChipEditor(inputEl, listHost, paletteHost, item, key, suggestions){
+  const syncInputToItem = ()=>{
+    item[key] = normalizeChipArrayFromInput(inputEl.value);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  const removeAt = (idx)=>{
+    item[key].splice(idx, 1);
+    setCommaFieldFromArray(inputEl, item[key]);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  const addChip = (label)=>{
+    const curr = normalizeChipArrayFromInput(inputEl.value);
+    curr.push(label);
+    item[key] = curr;
+    setCommaFieldFromArray(inputEl, item[key]);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  setCommaFieldFromArray(inputEl, item[key] || []);
+  inputEl.oninput = syncInputToItem;
+  renderChipList(listHost, item[key] || [], removeAt);
+  renderSuggestionPalette(paletteHost, suggestions || [], addChip);
+}
+
 function wireFigureImageControls(item){
   const srcInput = document.getElementById('figSrc');
   const altInput = document.getElementById('figAlt');
@@ -755,7 +935,7 @@ function renderTypeFields(item){
         <label><span>src</span><input type="text" id="figSrc"></label>
         <label><span>alt</span><input type="text" id="figAlt"></label>
         <label><span>title</span><input type="text" id="figTitle"></label>
-        <label><span>placement</span>
+        <label><span>Τοποθέτηση</span>
           <select id="figPlacement">
             <option value="right">right</option>
             <option value="left">left</option>
@@ -763,8 +943,9 @@ function renderTypeFields(item){
           </select>
         </label>
         <label><span>caption</span><textarea id="figCaption"></textarea></label>
-        <label><span>frameWidth</span><input type="number" id="figWidth"></label>
+        <label><span>Προεπιλεγμένο πλάτος (px)</span><input type="number" id="figWidth"></label>
       </div>
+      <div class="editor-help">Το ύψος της εικόνας προσαρμόζεται αυτόματα από το φυσικό aspect ratio της εικόνας. Επεμβαίνεις μόνο στο πλάτος.</div>
       <div class="image-tools">
         <div>
           <div class="subhead"><span>Χειρισμός εικόνας</span></div>
@@ -821,24 +1002,30 @@ function renderTypeFields(item){
   if(item.type === 'interactive_callout'){
     box.innerHTML = `
       <div class="grid">
-        <label><span>title</span><input type="text" id="coTitle"></label>
-        <label><span>setupLabel</span><input type="text" id="coSetupLabel"></label>
-        <label><span>pressLabel</span><input type="text" id="coPressLabel"></label>
-        <label><span>observeTitle</span><input type="text" id="coObserveTitle"></label>
+        <label><span>Τίτλος callout</span><input type="text" id="coTitle"></label>
+        <label><span>Ετικέτα «Ρύθμισε»</span><input type="text" id="coSetupLabel"></label>
+        <label><span>Ετικέτα «Πίεσε»</span><input type="text" id="coPressLabel"></label>
+        <label><span>Ετικέτα «Παρατήρησε»</span><input type="text" id="coObserveTitle"></label>
       </div>
-      <label><span>setupChips (comma separated)</span><input type="text" id="coSetup"></label>
-      <label><span>pressChips (comma separated)</span><input type="text" id="coPress"></label>
-      <label><span>observeItems (μία γραμμή ανά bullet)</span><textarea id="coObs" class="big"></textarea></label>`;
+      <label><span>Κουμπιά στο «Ρύθμισε» (comma separated)</span><input type="text" id="coSetup"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Ρύθμισε» — πάτα ✕ για αφαίρεση ή διάλεξε βοηθητικά από κάτω.</div>
+      <div id="coSetupList" class="chip-list"></div>
+      <div id="coSetupPalette" class="chip-palette"></div>
+
+      <label><span>Κουμπιά στο «Πίεσε» (comma separated)</span><input type="text" id="coPress"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Πίεσε» — όλα μαζεμένα για αντιγραφή/διαγραφή χωρίς ψάξιμο.</div>
+      <div id="coPressList" class="chip-list"></div>
+      <div id="coPressPalette" class="chip-palette"></div>
+
+      <label><span>Σημεία στο «Παρατήρησε» (μία γραμμή ανά bullet)</span><textarea id="coObs" class="big"></textarea></label>`;
     bindTextInput(document.getElementById('coTitle'), item, 'title');
     bindTextInput(document.getElementById('coSetupLabel'), item, 'setupLabel');
     bindTextInput(document.getElementById('coPressLabel'), item, 'pressLabel');
     bindTextInput(document.getElementById('coObserveTitle'), item, 'observeTitle');
     const setInp = document.getElementById('coSetup');
-    setInp.value = (item.setupChips || []).join(', ');
-    setInp.oninput = ()=>{ item.setupChips = setInp.value.split(',').map(s=>s.trim()).filter(Boolean); renderTree(); renderPreview(); };
     const pressInp = document.getElementById('coPress');
-    pressInp.value = (item.pressChips || []).join(', ');
-    pressInp.oninput = ()=>{ item.pressChips = pressInp.value.split(',').map(s=>s.trim()).filter(Boolean); renderTree(); renderPreview(); };
+    wireCalloutChipEditor(setInp, document.getElementById('coSetupList'), document.getElementById('coSetupPalette'), item, 'setupChips', COMMON_SETUP_BUTTONS);
+    wireCalloutChipEditor(pressInp, document.getElementById('coPressList'), document.getElementById('coPressPalette'), item, 'pressChips', COMMON_PRESS_BUTTONS);
     const obs = document.getElementById('coObs');
     obs.value = (item.observeItems || []).join('\n');
     obs.oninput = ()=>{ item.observeItems = obs.value.split(/\n+/).map(s=>s.trim()).filter(Boolean); renderTree(); renderPreview(); };
@@ -1033,8 +1220,8 @@ function renderStandaloneItem(item){
     wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
     wrap.innerHTML = `
       <figure class="${wrap.className}" style="--figure-width:${item.frameWidth || 340}px">
-        <div class="media-frame">
-          ${item.src ? `<img src="${item.src}" alt="${esc(item.alt || '')}">` : `<div class="media-placeholder" style="display:grid;place-items:center;padding:14px;color:#465666">Χωρίς src</div>`}
+        <div class="media-frame natural">
+          ${item.src ? `<img src="${item.src}" alt="${esc(item.alt || '')}">` : `<div class="media-placeholder" style="position:static;display:grid;place-items:center;padding:14px;color:#465666;min-height:140px">Χωρίς src</div>`}
         </div>
         ${item.hideCaption ? '' : `<figcaption>${esc(item.caption || item.title || '')}</figcaption>`}
       </figure>`;

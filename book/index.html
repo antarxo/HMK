@@ -180,6 +180,7 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
 @media print{
   @page{size:A4 portrait; margin:0}
   html,body{background:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  body{font:15px/var(--body-leading) Georgia,"Noto Serif",serif !important}
   .topbar,.status{display:none !important}
   .viewport{padding:0 !important; max-width:none !important}
   .page-stack{gap:0 !important}
@@ -188,6 +189,7 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     min-height:297mm !important;
     page-break-after:always;
     break-after:page;
+    overflow:hidden !important;
   }
   .sheet-wrap:last-child{page-break-after:auto;break-after:auto}
   .sheet{
@@ -199,18 +201,23 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     top:auto !important;
     border:0 !important;
     box-shadow:none !important;
+    overflow:hidden !important;
   }
   .sheet-inner{padding:14mm !important}
   .sheet-header{margin-bottom:14px}
   .sheet-footer{left:14mm !important; right:14mm !important; bottom:10mm !important}
+  .sheet-body{min-height:calc(297mm - 28mm - var(--header-h) - var(--footer-h) - 22px) !important}
+  figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
   .media-frame iframe{display:none !important}
+  .media-frame img{object-fit:contain !important; background:#fff !important}
   .media-frame::after{
     content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";
     position:absolute; inset:0; display:grid; place-items:center;
     padding:18px; color:#5e6d79; font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif; background:#f4f6f8;
   }
+  .media-frame.print-ready{background:#fff !important}
   .media-frame.print-ready::after{content:none !important}
-  .print-scene-snapshot{display:block !important}
+  .print-scene-snapshot{display:block !important; object-fit:contain !important; background:#fff !important}
 }
 </style>
 </head>
@@ -345,11 +352,17 @@ async function requestIframePrintSnapshot(iframe){
     catch(_e){ cleanup(); resolve(null); }
   });
 }
+let printSnapshotsPrepared = false;
+let printFlowRunning = false;
+
 function cleanupPrintSnapshots(){
   document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
   document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready'));
+  printSnapshotsPrepared = false;
+  printFlowRunning = false;
 }
-async function preparePrintSnapshots(){
+async function preparePrintSnapshots(force=false){
+  if(printSnapshotsPrepared && !force) return;
   cleanupPrintSnapshots();
   const iframes=Array.from(document.querySelectorAll('.media-frame iframe'));
   await Promise.all(iframes.map(async iframe=>{
@@ -365,8 +378,29 @@ async function preparePrintSnapshots(){
     await waitForImage(img);
     holder.classList.add('print-ready');
   }));
+  printSnapshotsPrepared = true;
 }
-window.addEventListener('afterprint', ()=>cleanupPrintSnapshots());
+async function beginPrintFlow(){
+  if(printFlowRunning) return;
+  printFlowRunning = true;
+  setStatus('Ετοιμάζονται στατικά στιγμιότυπα για την εκτύπωση…');
+  try{
+    await preparePrintSnapshots(true);
+  }catch(err){
+    console.warn(err);
+  }
+  setStatus('');
+  window.print();
+}
+window.addEventListener('beforeprint', ()=>{
+  if(!printSnapshotsPrepared){
+    try{ preparePrintSnapshots(false); }catch(_e){}
+  }
+});
+window.addEventListener('afterprint', ()=>{
+  cleanupPrintSnapshots();
+  setStatus('');
+});
 
 function sceneAspect(item){
   const src=String(item.singleSrc||'');
@@ -556,12 +590,7 @@ function deriveNav(data){
   btn.className='menu-btn';
   btn.id='printBtn';
   btn.textContent='Εκτύπωση';
-  btn.addEventListener('click', async ()=>{
-    setStatus('Ετοιμάζονται στατικά στιγμιότυπα…');
-    try{ await preparePrintSnapshots(); }catch(err){ console.warn(err); }
-    setStatus('');
-    window.print();
-  });
+  btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
   printNode.appendChild(btn);
   megaNav.appendChild(printNode);
 }
