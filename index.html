@@ -3677,23 +3677,32 @@ function inlineSnapshotStyles(sourceEl, targetEl){
     targetEl.value = sourceEl.value;
   }
 }
-function buildViewportSnapshotClone(sourceRoot){
+function buildViewportSnapshotClone(sourceRoot, options={}){
   const clone = sourceRoot.cloneNode(true);
   const sourceEls = [sourceRoot, ...sourceRoot.querySelectorAll('*')];
   const cloneEls = [clone, ...clone.querySelectorAll('*')];
+  const omitVisuals = options.omitVisuals !== false;
   sourceEls.forEach((sourceEl, idx) => {
     const targetEl = cloneEls[idx];
     if(!targetEl) return;
     inlineSnapshotStyles(sourceEl, targetEl);
     if(sourceEl instanceof HTMLCanvasElement){
-      const img = document.createElement('img');
-      img.alt = '';
-      img.width = sourceEl.width;
-      img.height = sourceEl.height;
-      img.src = sourceEl.toDataURL('image/png');
-      img.setAttribute('style', targetEl.getAttribute('style') || '');
-      targetEl.replaceWith(img);
-      cloneEls[idx] = img;
+      if(omitVisuals){
+        const ph = document.createElement('div');
+        ph.setAttribute('style', (targetEl.getAttribute('style') || '') + ';background:transparent !important;');
+        ph.setAttribute('data-snapshot-canvas-placeholder','1');
+        targetEl.replaceWith(ph);
+        cloneEls[idx] = ph;
+      }else{
+        const img = document.createElement('img');
+        img.alt = '';
+        img.width = sourceEl.width;
+        img.height = sourceEl.height;
+        img.src = sourceEl.toDataURL('image/png');
+        img.setAttribute('style', targetEl.getAttribute('style') || '');
+        targetEl.replaceWith(img);
+        cloneEls[idx] = img;
+      }
     }
   });
   clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
@@ -3701,7 +3710,7 @@ function buildViewportSnapshotClone(sourceRoot){
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.background = '#ffffff';
+  clone.style.background = 'transparent';
   return clone;
 }
 
@@ -3779,7 +3788,7 @@ async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
   wrapper.style.overflow = 'hidden';
   wrapper.style.background = bg;
 
-  const viewportClone = buildViewportSnapshotClone(sourceRoot);
+  const viewportClone = buildViewportSnapshotClone(sourceRoot, { omitVisuals:true });
   const viewportRect = rects[0];
   viewportClone.style.position = 'absolute';
   viewportClone.style.left = `${Math.round(viewportRect.left - rootRect.left)}px`;
@@ -3790,7 +3799,7 @@ async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
 
   if(includeControls){
     const controlsRect = controlsEl.getBoundingClientRect();
-    const controlsClone = buildViewportSnapshotClone(controlsEl);
+    const controlsClone = buildViewportSnapshotClone(controlsEl, { omitVisuals:true });
     controlsClone.style.position = 'absolute';
     controlsClone.style.left = `${Math.round(controlsRect.left - rootRect.left)}px`;
     controlsClone.style.top = `${Math.round(controlsRect.top - rootRect.top)}px`;
@@ -3799,23 +3808,41 @@ async function buildViewportSnapshotCanvas(sourceRoot, controlsEl=null){
     wrapper.appendChild(controlsClone);
   }
 
+  const scale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.scale(scale, scale);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
   try{
-    return await renderSvgCloneToPngDataUrl(wrapper, width, height, bg);
-  }catch(_e){
-    const scale = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(width * scale));
-    canvas.height = Math.max(1, Math.round(height * scale));
-    const ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.scale(scale, scale);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, width, height);
-    const visuals = collectSnapshotVisuals(includeControls ? document.querySelector('.app') || sourceRoot : sourceRoot);
-    visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
-    ctx.restore();
-    return canvas.toDataURL('image/png');
-  }
+    const shellDataUrl = await renderSvgCloneToPngDataUrl(wrapper, width, height, bg);
+    const shellImg = new Image();
+    shellImg.decoding = 'sync';
+    await new Promise((resolve, reject) => {
+      shellImg.onload = () => resolve();
+      shellImg.onerror = () => reject(new Error('snapshot shell load failed'));
+      shellImg.src = shellDataUrl;
+    });
+    ctx.drawImage(shellImg, 0, 0, width, height);
+  }catch(_e){}
+
+  const visualRoots = includeControls ? [sourceRoot, controlsEl] : [sourceRoot];
+  const seen = new Set();
+  const visuals = [];
+  visualRoots.filter(Boolean).forEach(root => {
+    collectSnapshotVisuals(root).forEach(el => {
+      if(seen.has(el)) return;
+      seen.add(el);
+      visuals.push(el);
+    });
+  });
+  visuals.forEach(el => drawSnapshotElement(ctx, el, rootRect));
+  ctx.restore();
+  return canvas.toDataURL('image/png');
 }
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
