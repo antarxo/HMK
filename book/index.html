@@ -1,314 +1,516 @@
 <!doctype html>
 <html lang="el">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Η/Μ κύμα · σελιδοποιημένο βιβλίο</title>
-<style>
-:root{
-  --bg:#ece6d9; --paper:#fffdf9; --ink:#1d2730; --muted:#5e6d79; --line:#ddd3c3; --accent:#1f5f8b; --accent-soft:#e7f0f6; --note:#f6efdc; --figure:#f6f8fa;
-  --sheet-width:794px; --sheet-height:1123px; --sheet-pad-x:48px; --sheet-pad-y:46px; --screen-scale:1;
-  --shadow:0 18px 36px rgba(0,0,0,.10); --shape-width:340px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:linear-gradient(180deg,#efe9dc 0,#ece6d9 120px);color:var(--ink);font:15px/1.50 Georgia,"Noto Serif",serif}
-.topbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);background:rgba(236,230,217,.88);border-bottom:1px solid rgba(0,0,0,.08)}
-.topbar-inner{max-width:1200px;margin:0 auto;padding:10px 18px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-button,a.action{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 14px;border-radius:999px;font:600 14px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer}
-.toolbar label{font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);display:flex;align-items:center;gap:8px}
-.toolbar select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-.mega-nav{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:10px;align-items:stretch;justify-content:center;width:100%;max-width:var(--sheet-width)}
-.menu-item{position:relative;min-width:0}.menu-item::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;background:transparent}.menu-trigger{display:flex;width:100%;min-width:0;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:18px;font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;white-space:nowrap;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.04)}.menu-item.active .menu-trigger,.menu-item:hover>.menu-trigger,.menu-item:focus-within>.menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}.menu-trigger .caret{font-size:11px;color:var(--muted)}.menu-dropdown{position:absolute;left:0;top:calc(100% + 2px);min-width:100%;width:max-content;display:none;padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35}.menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}.menu-dropdown .menu-section-link,.menu-dropdown .menu-planned{display:block;text-decoration:none;color:var(--ink);background:#faf8f3;border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:10px 12px;font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:0 0 8px}.menu-dropdown .menu-planned{color:var(--muted);background:#fcfbf8}.menu-dropdown .menu-section-link:last-child,.menu-dropdown .menu-planned:last-child{margin-bottom:0}
-.viewport{max-width:1200px;margin:0 auto;padding:24px 18px 60px}
-.page-stack{display:flex;flex-direction:column;align-items:center;gap:26px}
-.sheet-wrap{width:calc(var(--sheet-width) * var(--screen-scale));height:calc(var(--sheet-height) * var(--screen-scale));position:relative}
-.sheet{width:var(--sheet-width);height:var(--sheet-height);transform:scale(var(--screen-scale));transform-origin:top left;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;position:absolute;left:0;top:0}
-.sheet-header{position:absolute;left:var(--sheet-pad-x);right:var(--sheet-pad-x);top:16px;height:22px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding-bottom:5px;border-bottom:1px solid rgba(0,0,0,.06);font:700 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#6a7680;letter-spacing:.05em;text-transform:uppercase}.sheet-header[hidden]{display:none}.sheet-header-part{max-width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sheet-header-section{flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sheet-inner{padding:78px var(--sheet-pad-x) var(--sheet-pad-y);height:100%;overflow:hidden;position:relative}
-.sheet-number{position:absolute;right:32px;bottom:20px;font:600 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b8791}
-.hero{margin:0 0 20px}.eyebrow{margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
-h1{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:31px;line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}.subtitle{margin:0;color:var(--muted);font-size:15px;line-height:1.42;max-width:56ch}.intro-note{margin-top:14px;padding:11px 13px;border-radius:14px;background:var(--accent-soft);border:1px solid #cddfea;font:500 13.5px/1.46 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#28485f}
-.part-head{margin:0 0 16px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}.part-kicker{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}.part-title-main{margin:0;font:780 24px/1.08 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;letter-spacing:-.022em;color:#2f627f}
-.section{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.06)}.section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}.section h2{margin:0 0 5px;font:690 18px/1.18 Georgia,"Noto Serif",serif;letter-spacing:-.008em;color:#5d7281}
-.article-body{display:flow-root;text-align:justify;text-justify:inter-word;hyphens:auto;overflow:visible}.article-body p{margin:0 0 8px}.section{display:flow-root}
-.note{margin:10px 0;padding:9px 11px;border-radius:14px;background:var(--note);border:1px solid #e4d7ae;font:500 13px/1.40 system-ui,-apple-system,Segoe UI,Arial,sans-serif}.note .label{display:block;margin:0 0 4px;font:800 10.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
-.callout{margin:9px 0;padding:7px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 11.5px/1.32 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}.callout-title{margin:0 0 5px;font:800 10.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}.callout-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 3px}.callout-label{font:700 9.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:3px 6px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}.callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 9.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}.callout-observe{margin-top:2px;padding-top:4px;border-top:1px dashed #cfdbe3}.callout-observe-title{font:700 9.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:5px}.callout-observe ul{margin:4px 0 0 15px;padding:0}.callout-observe li{margin:2px 0;font-style:italic}
-figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.04)}figure.media.float-right,figure.media.float-left{width:min(var(--figure-width, var(--shape-width)), 40vw);margin-top:4px}figure.media.float-right{float:right;margin:4px 0 10px 20px}figure.media.float-left{float:left;margin:4px 20px 10px 0}figure.media.wide{clear:both;width:100%;max-width:100%;margin:22px 0}
-.media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}.media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}.media-frame iframe,.media-frame img,.media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}.media-frame img{object-fit:contain;object-position:top center}.media-frame.natural img{position:static;inset:auto;width:100%;height:auto;object-fit:contain;display:block}.media-placeholder{display:grid;place-items:center;text-align:center;padding:22px;background:linear-gradient(135deg,#f7fbfd,#e1ebf1);color:#465666;font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}figcaption{padding:9px 11px 10px;font:500 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);border-top:1px solid rgba(0,0,0,.07)}.clear{clear:both}
-.page-measure{position:fixed;left:-99999px;top:0;width:var(--sheet-width);height:var(--sheet-height);visibility:hidden;pointer-events:none}.page-measure .sheet{position:relative;transform:none;left:auto;top:auto}.status{margin-top:12px;text-align:center;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}.print-scene-snapshot{display:none;max-width:100%;max-height:100%}
-.screen-only{display:block}
-@media (max-width:980px){.mega-nav{grid-template-columns:repeat(2,minmax(140px,1fr))}}
-@media print{
- @page{size:A4 portrait;margin:0}
- html,body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
- body{font:15px/1.50 Georgia,"Noto Serif",serif!important}
- .topbar,.status,.screen-only{display:none!important}
- .viewport{max-width:none;margin:0;padding:0}
- .page-stack{gap:0}
- .sheet-wrap{width:var(--sheet-width)!important;height:var(--sheet-height)!important;break-after:page;page-break-after:always}
- .sheet{position:relative!important;left:auto!important;top:auto!important;transform:none!important;box-shadow:none!important;border:none!important}
- .sheet:last-child{break-after:auto;page-break-after:auto}
- .scene-frame iframe{display:none!important}
- .scene-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
- .scene-frame.print-ready::after{content:none!important}
- .print-scene-snapshot{display:block!important;width:100%!important;height:100%!important;object-fit:contain;object-position:top center;background:transparent}.page-break-marker{display:block;height:0;clear:both}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Η/Μ κύμα · ηλεκτρονικό βιβλίο</title>
+  <style>
+    :root{
+      --bg:#f3efe6;
+      --paper:#fffdf9;
+      --ink:#1d2730;
+      --muted:#5e6d79;
+      --line:#ddd3c3;
+      --accent:#1f5f8b;
+      --accent-soft:#e7f0f6;
+      --note:#f6efdc;
+      --figure:#f6f8fa;
+      --max-page:1180px;
+      --paper-width:980px;
+      --article-width:860px;
+      --shape-width:340px;
+      --shadow:0 12px 32px rgba(0,0,0,.08);
+      --radius:22px;
+      --print-freeze-width:980px;
+      --print-freeze-scale:1;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#efe9dc 0,#f3efe6 120px);
+      color:var(--ink);
+      font:18px/1.56 Georgia,"Noto Serif",serif;
+    }
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(10px);
+      background:rgba(243,239,230,.88);
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .topbar-inner{max-width:var(--paper-width);margin:0 auto;padding:10px 18px 12px}
+    .topbar-main{display:block}
+    button,a.action{
+      appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 14px;border-radius:999px;
+      font:600 14px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;
+    }
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .toolbar label{font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);display:flex;align-items:center;gap:8px}
+    .toolbar select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+
+    .page{max-width:var(--max-page);margin:0 auto;padding:22px 18px 80px}
+    .hero,.chapter{max-width:var(--paper-width);margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
+    .hero{margin-bottom:20px;padding:30px 28px 24px}
+    .chapter{padding:34px 28px 38px;overflow:hidden}
+    .eyebrow{margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+    h1{margin:0 0 10px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,3.25vw,42px);line-height:1.08;letter-spacing:-.016em;font-weight:760;color:#1b506f}
+    .subtitle{margin:0;color:var(--muted);font-size:18px;line-height:1.5;max-width:56ch}
+    .intro-note{margin-top:18px;padding:14px 16px;border-radius:16px;background:var(--accent-soft);border:1px solid #cddfea;font:500 16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#28485f}
+
+    .mega-nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:stretch;justify-content:center;width:100%;max-width:var(--paper-width);margin:0 auto}
+    .menu-item{position:relative;min-width:0}
+    .menu-item::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;background:transparent}
+    .menu-trigger{appearance:none;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:18px;font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.04);white-space:nowrap;text-align:center}
+    .menu-item.active>.menu-trigger,.menu-item:hover>.menu-trigger,.menu-item:focus-within>.menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+    .menu-dropdown{position:absolute;right:0;left:auto;top:calc(100% + 2px);min-width:220px;display:none;padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35}
+    .menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}
+    .menu-tools .menu-dropdown{width:240px}
+    .menu-tools-panel{display:grid;gap:10px}
+    .menu-tools-panel label{font:700 12px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);display:grid;gap:7px}
+    .menu-tools-panel select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .menu-tools-panel button{width:100%;justify-content:center}
+
+    .part-shell{margin:0 0 42px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}
+    .part-shell:last-child{border-bottom:0;margin-bottom:0}
+    .part-kicker{margin:0 0 8px;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
+    .part-title-main{margin:0 0 16px;font:780 clamp(24px,2.4vw,31px)/1.09 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;letter-spacing:-.022em;color:#2f627f}
+
+    .section{scroll-margin-top:82px;margin:0 0 28px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,.06)}
+    .section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+    .section h2{margin:0 0 8px;font:690 clamp(17px,1.55vw,21px)/1.2 Georgia,"Noto Serif",serif;letter-spacing:-.008em;color:#5d7281}
+    .article-body{max-width:var(--article-width);margin:0 auto;text-align:justify;text-justify:inter-word;hyphens:auto;overflow:visible}
+    .article-body p{margin:0 0 9px}
+
+    .note{margin:12px 0;padding:12px 14px;border-radius:16px;background:var(--note);border:1px solid #e4d7ae;font:500 15px/1.46 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .note .label{display:block;margin:0 0 6px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+
+    figure.media{margin:6px 0 16px;background:var(--figure);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+    figure.media.float-right,figure.media.float-left{width:min(var(--figure-width, var(--shape-width)), 42vw);margin-top:4px}
+    figure.media.float-right{float:right;margin:4px 0 10px 20px}
+    figure.media.float-right + figure.media.float-right{clear:right;margin-top:0}
+    figure.media.float-left{float:left;margin:4px 20px 10px 0}
+    figure.media.float-left + figure.media.float-left{clear:left;margin-top:0}
+    figure.media.wide{clear:both;width:100%;max-width:100%;margin:22px 0}
+    .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
+    .media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}
+    .media-frame iframe,.media-frame img,.media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+    .media-frame img{object-fit:cover}
+    .media-frame.natural img{position:static;inset:auto;width:100%;height:auto;object-fit:contain;display:block}
+    .media-placeholder{display:grid;place-items:center;text-align:center;padding:22px;background:linear-gradient(135deg,#f7fbfd,#e1ebf1);color:#465666;font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);border-top:1px solid rgba(0,0,0,.07)}
+    .clear{clear:both}
+    .status{margin-top:14px;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif;max-width:var(--paper-width);margin-left:auto;margin-right:auto}
+
+    .callout{margin:11px 0;padding:8px 10px;border:1px solid #d6e2eb;border-radius:14px;background:#f8fbfd;font:500 12px/1.34 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
+    .callout-title{margin:0 0 8px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
+    .callout-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px}
+    .callout-label{font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:4px 7px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
+    .callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}
+    .callout-observe{margin-top:4px;padding-top:6px;border-top:1px dashed #cfdbe3}
+    .callout-observe-title{font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
+    .callout-observe ul{margin:6px 0 0 18px;padding:0}
+    .callout-observe li{margin:4px 0;font-style:italic}
+
+    .print-scene-snapshot{display:none}
+
+    @media (max-width: 900px){
+      .chapter{padding:26px 18px 30px}
+      figure.media.float-right,figure.media.float-left,figure.media.wide{float:none;width:100%;max-width:100%;margin:18px 0}
+      .article-body{max-width:100%}
+      .mega-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .menu-dropdown{position:static;display:block;min-width:0;width:100%;margin-top:8px}
+    }
+
+    @media print{
+      @page{size:A4 portrait;margin:12mm}
+      html,body{background:#fff !important;color:#000}
+      body{font:18px/1.56 Georgia,"Noto Serif",serif !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .topbar,.status,.screen-only{display:none !important}
+      body.print-frozen{padding:0;margin:0}
+      body.print-frozen .page{
+        width:var(--print-freeze-width) !important;
+        max-width:none !important;
+        margin:0 !important;
+        padding:22px 18px 80px !important;
+        zoom:var(--print-freeze-scale);
+      }
+      body.print-frozen .hero,body.print-frozen .chapter{box-shadow:none !important}
+      body.print-frozen .hero,body.print-frozen .chapter{max-width:none !important}
+      body.print-frozen figure.media{box-shadow:none !important}
+      body.print-frozen figure.media[data-print-float="right"]{float:right !important;width:var(--print-figure-width) !important;margin:var(--print-figure-margin) !important}
+      body.print-frozen figure.media[data-print-float="left"]{float:left !important;width:var(--print-figure-width) !important;margin:var(--print-figure-margin) !important}
+      body.print-frozen figure.media[data-print-float="wide"]{float:none !important;width:var(--print-figure-width) !important;max-width:none !important;margin:var(--print-figure-margin) !important}
+      body.print-frozen .media-frame{width:var(--print-frame-width) !important;height:var(--print-frame-height) !important;aspect-ratio:auto !important}
+      body.print-frozen .media-frame iframe{display:none !important}
+      body.print-frozen .media-frame::after{content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";position:absolute;inset:0;display:grid;place-items:center;padding:18px;color:#5e6d79;font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#f4f6f8}
+      body.print-frozen .media-frame.print-ready::after{content:none !important}
+      body.print-frozen .print-scene-snapshot{display:block !important;width:100% !important;height:100% !important;object-fit:contain;background:#fff}
+      body.print-frozen .note,body.print-frozen .callout,body.print-frozen figure.media,body.print-frozen .section h2{break-inside:avoid;page-break-inside:avoid}
+      body.print-frozen .part-shell{break-before:page;page-break-before:always}
+      body.print-frozen .part-shell:first-child{break-before:auto;page-break-before:auto}
+    }
+  </style>
 </head>
 <body>
-<div class="topbar screen-only">
-  <div class="topbar-inner">
-    <nav class="mega-nav" id="megaNav"></nav>
-    <div class="toolbar">
-      <label>Προσανατολισμός
-        <select id="printOrient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
-      </label>
-      <button id="printBtn" type="button">Εκτύπωση / PDF</button>
+  <div class="topbar screen-only">
+    <div class="topbar-inner">
+      <div class="topbar-main">
+        <nav class="mega-nav" id="megaNav" aria-label="Κύρια πλοήγηση βιβλίου"></nav>
+      </div>
     </div>
   </div>
-</div>
-<main class="viewport">
-  <div id="pageStack" class="page-stack"></div>
-  <div id="status" class="status"></div>
-</main>
-<div id="measureRoot" class="page-measure"></div>
-<script>
-const DEFAULT_JSON='chapter_content.json';
-const pageStack=document.getElementById('pageStack');
-const measureRoot=document.getElementById('measureRoot');
-const statusEl=document.getElementById('status');
-const megaNavEl=document.getElementById('megaNav');
-let currentData=null;
-function setStatus(msg){statusEl.textContent=msg||''}
-function escapeHtml(text=''){return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
-function withCacheBust(url){try{const u=new URL(url,window.location.href);u.searchParams.set('_cb',String(Date.now()));return u.toString()}catch(_e){return url}}
-function normalizeAppSrc(url=''){
-  if(typeof url!=='string' || !url) return url;
-  const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
-  const appEntry=/\/book(\/|$)/.test(path)?'../index.html':'./index.html';
-  return url
-    .replace(/^\.\.\/index\.html/i,appEntry)
-    .replace(/^\.\.\/app\/em_wave_app\.html/i,appEntry)
-    .replace(/\.\.\/index\.html/g,appEntry)
-    .replace(/\.\.\/app\/em_wave_app\.html/g,appEntry);
-}
-function waitForImage(img){return new Promise(resolve=>{if(!img || img.complete) return resolve(); img.addEventListener('load',()=>resolve(),{once:true}); img.addEventListener('error',()=>resolve(),{once:true});});}
-function imageSrcCandidates(src=''){
-  const raw=String(src||'').trim();
-  if(!raw) return [];
-  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
-  const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
-  const inBook=/\/book(\/|$)/.test(path);
-  const list=[];
-  const push=v=>{ if(v && !list.includes(v)) list.push(v); };
-  push(raw);
-  if(inBook){
-    if(raw.startsWith('images/')) push(`./${raw}`);
-    if(raw.startsWith('./images/')) push(raw.slice(2));
-    if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
-    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
-  }else{
-    if(raw.startsWith('images/')) push(`./book/${raw}`);
-    if(raw.startsWith('./images/')) push(`./book/${raw.slice(2)}`);
-    if(raw.startsWith('/images/')) push(`./book${raw}`);
-    if(raw.startsWith('book/images/')) push(`./${raw}`);
-    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\//,''));
-  }
-  return list;
-}
-window.applyImageWithFallback = function(img, src=''){
-  const candidates=imageSrcCandidates(src);
-  let i=0;
-  const tryNext=()=>{
-    if(i>=candidates.length){ img.dispatchEvent(new CustomEvent('imagefallbackfailed')); return; }
-    img.src=candidates[i++];
-  };
-  img.addEventListener('error', tryNext);
-  tryNext();
-};
-const applyImageWithFallback = window.applyImageWithFallback;
-async function requestIframePrintSnapshot(iframe){
-  if(!iframe) return null;
-  try{
-    const direct=iframe.contentWindow?.getBookPrintSnapshot || iframe.contentWindow?.EMWaveApp?.getPrintSnapshot;
-    if(typeof direct==='function'){
-      const r=await Promise.resolve(direct.call(iframe.contentWindow));
-      if(r) return r;
+
+  <main class="page" id="pageRoot">
+    <section class="hero" id="hero"></section>
+    <article class="chapter" id="chapter"></article>
+  </main>
+  <div class="status" id="status"></div>
+
+  <script>
+    const heroEl = document.getElementById('hero');
+    const chapterEl = document.getElementById('chapter');
+    const megaNavEl = document.getElementById('megaNav');
+    const statusEl = document.getElementById('status');
+    const pageRoot = document.getElementById('pageRoot');
+    const DEFAULT_JSON = 'chapter_content.json';
+    let printSnapshotsPrepared = false;
+    const frozenNodes = [];
+
+    function setStatus(msg){ statusEl.textContent = msg || ''; }
+    function normalizeMainTitle(title=''){ return String(title || '').replace('Γέννηση και διάδοση του ηλεκτρομαγνητικού κύματος','Γέννηση και διάδοση του ΗΜ κύματος'); }
+    function escapeHtml(text=''){ return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function normalizeAppSrc(url=''){ return String(url || '').replace(/\.\.\/app\/em_wave_app\.html/g,'../index.html').replace(/\.\/app\/em_wave_app\.html/g,'../index.html'); }
+    function withCacheBust(url){ try{ const u=new URL(url, window.location.href); u.searchParams.set('_cb', Date.now()); return u.toString(); }catch(e){ return url; } }
+    function waitForImage(img){ return new Promise(resolve => { if(!img || img.complete) return resolve(); img.addEventListener('load', resolve, {once:true}); img.addEventListener('error', resolve, {once:true}); }); }
+
+    async function requestIframePrintSnapshot(iframe){
+      if(!iframe) return null;
+      try{
+        const direct = iframe.contentWindow?.getBookPrintSnapshot || iframe.contentWindow?.EMWaveApp?.getPrintSnapshot;
+        if(typeof direct === 'function'){
+          const out = await Promise.resolve(direct.call(iframe.contentWindow));
+          if(out) return out;
+        }
+      }catch(_e){}
+      return await new Promise(resolve => {
+        const requestId = `snap_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        let done = false;
+        const cleanup = () => { if(done) return; done = true; window.removeEventListener('message', onMessage); clearTimeout(timer); };
+        const onMessage = (event) => {
+          if(event.source !== iframe.contentWindow) return;
+          const data = event.data;
+          if(!data || data.type !== 'hm_print_snapshot' || data.requestId !== requestId) return;
+          cleanup();
+          resolve(data.dataUrl || null);
+        };
+        const timer = setTimeout(() => { cleanup(); resolve(null); }, 4500);
+        window.addEventListener('message', onMessage);
+        try{ iframe.contentWindow?.postMessage({ type:'capturePrintSnapshot', requestId }, '*'); }
+        catch(_e){ cleanup(); resolve(null); }
+      });
     }
-  }catch(_e){}
-  return await new Promise(resolve=>{
-    const requestId=`snap_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    let settled=false;
-    const cleanup=()=>{if(settled) return; settled=true; window.removeEventListener('message',onMessage); clearTimeout(timer)};
-    const onMessage=(event)=>{if(event.source!==iframe.contentWindow) return; const data=event.data; if(!data || data.type!=='hm_print_snapshot' || data.requestId!==requestId) return; cleanup(); resolve(data.dataUrl||null)};
-    const timer=setTimeout(()=>{cleanup(); resolve(null)},3500);
-    window.addEventListener('message',onMessage);
-    try{iframe.contentWindow?.postMessage({type:'capturePrintSnapshot',requestId},'*')}catch(_e){cleanup(); resolve(null)}
-  });
-}
-function cleanupPrintSnapshots(){document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove()); document.querySelectorAll('.scene-frame.print-ready').forEach(el=>el.classList.remove('print-ready')); document.querySelectorAll('[data-print-ready="1"]').forEach(el=>el.removeAttribute('data-print-ready'));}
-async function preparePrintSnapshots(){cleanupPrintSnapshots(); const iframes=Array.from(document.querySelectorAll('.scene-frame iframe')); await Promise.all(iframes.map(async iframe=>{const dataUrl=await requestIframePrintSnapshot(iframe); if(!dataUrl) return; const holder=iframe.parentElement; if(!holder) return; const img=document.createElement('img'); img.className='print-scene-snapshot'; img.alt='Στιγμιότυπο σκηνής'; img.src=dataUrl; holder.appendChild(img); holder.dataset.printReady='1'; await waitForImage(img)})); document.querySelectorAll('.scene-frame').forEach(frame=>{const iframeCount=frame.querySelectorAll('iframe').length; const snapCount=frame.querySelectorAll('.print-scene-snapshot').length; if(iframeCount>0&&snapCount>=iframeCount) frame.classList.add('print-ready')})}
-function safeStorage(){try{return window.localStorage}catch(_e){const mem={};return{getItem:k=>Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null,setItem:(k,v)=>mem[k]=String(v)}}}
-function applyScreenScale(){const avail=Math.max(320, window.innerWidth-48); const scale=Math.min(1, avail/794); document.documentElement.style.setProperty('--screen-scale', String(scale));}
-window.addEventListener('resize', applyScreenScale, {passive:true});
-function renderNav(sections=[], parts=[]){
-  if(!megaNavEl) return;
-  const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
-  const partItems = (Array.isArray(parts) && parts.length) ? parts.map((part, idx) => {
-    const directHref = part.id ? `#${part.id}` : '#';
-    const links = (part.sectionIds || []).map(id => {
-      const sec = byId[id];
-      if(!sec) return '';
-      return `<a class="menu-section-link" data-section-id="${id}" href="#${id}">${sec.navLabel || sec.title || id}</a>`;
-    }).join('');
-    const planned = (part.plannedTitles || []).map(t => `<span class="menu-planned">${t}</span>`).join('');
-    const label = part.title || `Μέρος ${partMark(idx)}`;
-    return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${directHref}">${label}<span class="caret">▾</span></a><div class="menu-dropdown">${links}${planned}</div></div>`;
-  }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
-  megaNavEl.innerHTML = `${partItems}`;
-}
-function placementClass(block){const p=String(block?.placement||'').toLowerCase(); if(p==='left') return 'float-left'; if(p==='right') return 'float-right'; return 'wide'}
-function sceneAspect(block){
-  const src=String(block.singleSrc||''); let layout='';
-  try{const u=new URL(normalizeAppSrc(src), window.location.href); layout=(u.searchParams.get('layout')||'').toLowerCase()}catch(_e){}
-  const g=146.2,r=219.3,c=34;
-  if(layout==='rod_only') return 340/(r+c);
-  if(layout==='rod_1graph') return 340/(r+g+c);
-  if(layout==='rod_2graphs') return 340/(r+g*2+c);
-  if(layout==='rod_3graphs') return 340/(r+g*3+c);
-  return 16/9;
-}
-function partMark(idx){const marks=['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄']; return marks[idx] || `${idx+1}` }
-function renderHero(meta={}){const wrap=document.createElement('section'); wrap.className='hero'; wrap.innerHTML=`${meta.eyebrow?`<p class="eyebrow">${meta.eyebrow}</p>`:''}${meta.title?`<h1>${meta.title}</h1>`:''}${meta.subtitle?`<p class="subtitle">${meta.subtitle}</p>`:''}${meta.notes?.length?`<div class="intro-note">${meta.notes[0]}</div>`:''}`; return wrap}
-function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); window.applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
-function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame scene-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
-function renderParagraph(block){const p=document.createElement('p'); p.innerHTML=block.html||''; return p}
-function renderNote(block){const d=document.createElement('div'); d.className='note'; d.innerHTML=`${block.label?`<span class="label">${block.label}</span>`:''}${block.html||''}`; return d}
-function renderCallout(block){const d=document.createElement('div'); d.className='callout'; d.innerHTML=`<div class="callout-title">${block.title||'Δοκίμασε'}</div><div class="callout-row"><span class="callout-label">${block.setupLabel||'Ρύθμισε'}</span>${(block.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-row"><span class="callout-label">${block.pressLabel||'Πίεσε'}</span>${(block.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div><div class="callout-observe"><span class="callout-observe-title">${block.observeTitle||'Παρατήρησε'}</span><ul>${(block.observeItems||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>`; return d}
-function renderBlock(block){if(block.type==='paragraph') return renderParagraph(block); if(block.type==='note') return renderNote(block); if(block.type==='figure') return renderFigure(block); if(block.type==='scene') return renderScene(block); if(block.type==='interactive_callout') return renderCallout(block); if(block.type==='clear'){const d=document.createElement('div'); d.className='clear'; return d} const d=document.createElement('div'); d.textContent=`Άγνωστο block: ${block.type}`; return d}
-function blockStartsNewPage(block){return !!(block && (block.pageBreakBefore===true || block.type==='page_break' || block.breakBefore==='page'));}
-function blockEndsPage(block){return !!(block && (block.pageBreakAfter===true || block.breakAfter==='page'));}
-function makePageBreakMarker(){const d=document.createElement('div'); d.className='page-break-marker'; return d}
-function createSheet(pageNo){const wrap=document.createElement('div'); wrap.className='sheet-wrap'; const sheet=document.createElement('section'); sheet.className='sheet'; const header=document.createElement('div'); header.className='sheet-header'; header.hidden=true; const headerPart=document.createElement('div'); headerPart.className='sheet-header-part'; const headerSection=document.createElement('div'); headerSection.className='sheet-header-section'; header.append(headerPart,headerSection); const inner=document.createElement('div'); inner.className='sheet-inner'; const num=document.createElement('div'); num.className='sheet-number'; num.textContent=String(pageNo); sheet.append(header,inner,num); wrap.appendChild(sheet); return {wrap,sheet,inner,num,header,headerPart,headerSection}}
-function setSheetHeader(sheetObj, partTitle='', sectionTitle=''){if(!sheetObj) return; const p=String(partTitle||'').trim(); const s=String(sectionTitle||'').trim(); sheetObj.headerPart.textContent=p; sheetObj.headerSection.textContent=s; sheetObj.header.hidden=!(p||s);}
-function measureOverflow(inner){return inner.scrollHeight > inner.clientHeight + 1}
-function cloneNodeDeep(node){return node.cloneNode(true)}
-function makePartHead(part, idx){const d=document.createElement('div'); d.className='part-head'; d.id=part.id||''; d.innerHTML=`<p class="part-kicker">ΜΕΡΟΣ ${partMark(idx)}</p><h2 class="part-title-main">${part.title||''}</h2>`; return d}
-function makeSectionShell(sec){const s=document.createElement('section'); s.className='section'; s.id=sec.id||''; s.innerHTML=`<h2>${sec.title||''}</h2>`; const body=document.createElement('div'); body.className='article-body'; s.appendChild(body); return {section:s, body}}
-function paginate(data){
-  pageStack.innerHTML=''; measureRoot.innerHTML='';
-  const measureSheet=createSheet(1); measureRoot.appendChild(measureSheet.wrap); const measureInner=measureSheet.inner;
-  const parts=(data.parts&&data.parts.length)?data.parts:[{id:'all',title:'Περιεχόμενο',sectionIds:(data.sections||[]).map(s=>s.id)}];
-  const byId=Object.fromEntries((data.sections||[]).map(sec=>[sec.id,sec]));
-  const pages=[]; let current=createSheet(1); pageStack.appendChild(current.wrap); pages.push(current);
-  const startNewPage=()=>{current=createSheet(pages.length+1); pageStack.appendChild(current.wrap); pages.push(current); return current};
-  const placeNode=(node, keepTogether=true)=>{
-    current.inner.appendChild(node);
-    if(measureOverflow(current.inner)){
-      node.remove();
-      if(!current.inner.children.length){
-        current.inner.appendChild(node); return;
-      }
-      startNewPage();
-      current.inner.appendChild(node);
+
+    function cleanupPrintSnapshots(){
+      document.querySelectorAll('.print-scene-snapshot').forEach(img => img.remove());
+      document.querySelectorAll('.media-frame.print-ready').forEach(el => el.classList.remove('print-ready'));
+      document.querySelectorAll('[data-print-ready="1"]').forEach(el => el.removeAttribute('data-print-ready'));
+      printSnapshotsPrepared = false;
     }
-  };
-  placeNode(renderHero(data.meta||{}));
-  for(const part of parts){
-    placeNode(makePartHead(part, parts.indexOf(part)));
-    for(const secId of (part.sectionIds||[])){
-      const sec=byId[secId]; if(!sec) continue;
-      const {section, body}=makeSectionShell(sec);
-      current.inner.appendChild(section);
-      if(measureOverflow(current.inner)){
-        section.remove(); startNewPage(); current.inner.appendChild(section);
-      }
-      for(const block of (sec.blocks||[])){
-        const el=renderBlock(block);
-        body.appendChild(el);
-        if(measureOverflow(current.inner)){
-          el.remove();
-          if(!body.children.length){ body.appendChild(el); continue; }
-          section.remove();
-          const {section:newSec, body:newBody}=makeSectionShell(sec);
-          startNewPage(); current.inner.appendChild(newSec); newBody.appendChild(el);
-          for(const old of Array.from(body.children)){ /* leave old page intact */ }
-          // continue subsequent blocks into the new section
-          current.__continuationTarget = {sec, section:newSec, body:newBody};
-          break;
-        }
-      }
-      if(current.__continuationTarget && current.__continuationTarget.sec.id===sec.id){
-        const target=current.__continuationTarget.body;
-        const startIndex=Array.from(sec.blocks||[]).findIndex((b,idx)=> !document.querySelector(`#${sec.id}`) );
-      }
-      if(current.__continuationTarget && current.__continuationTarget.sec.id===sec.id){ delete current.__continuationTarget }
+
+    async function preparePrintSnapshots(){
+      cleanupPrintSnapshots();
+      const iframes = Array.from(document.querySelectorAll('.media-frame iframe'));
+      await Promise.all(iframes.map(async iframe => {
+        const dataUrl = await requestIframePrintSnapshot(iframe);
+        if(!dataUrl) return;
+        const holder = iframe.parentElement;
+        if(!holder) return;
+        const img = document.createElement('img');
+        img.className = 'print-scene-snapshot';
+        img.alt = 'Στιγμιότυπο σκηνής';
+        img.src = dataUrl;
+        holder.appendChild(img);
+        holder.dataset.printReady = '1';
+        await waitForImage(img);
+      }));
+      document.querySelectorAll('.media-frame').forEach(frame => {
+        const iframeCount = frame.querySelectorAll('iframe').length;
+        const snapCount = frame.querySelectorAll('.print-scene-snapshot').length;
+        if(iframeCount > 0 && snapCount >= iframeCount) frame.classList.add('print-ready');
+      });
+      printSnapshotsPrepared = true;
     }
-  }
-}
-// Better structured pagination with block granularity and automatic section continuation
-function paginateStructured(data){
-  pageStack.innerHTML='';
-  const parts=(data.parts&&data.parts.length)?data.parts:[{id:'all',title:'Περιεχόμενο',sectionIds:(data.sections||[]).map(s=>s.id)}];
-  const byId=Object.fromEntries((data.sections||[]).map(sec=>[sec.id,sec]));
-  let currentPartHeader='';
-  let currentSectionHeader='';
-  const pages=[]; let current=createSheet(1); setSheetHeader(current,currentPartHeader,currentSectionHeader); pageStack.appendChild(current.wrap); pages.push(current);
-  const newPage=()=>{current=createSheet(pages.length+1); setSheetHeader(current,currentPartHeader,currentSectionHeader); pageStack.appendChild(current.wrap); pages.push(current); return current};
-  const appendOrNext=(node)=>{current.inner.appendChild(node); if(measureOverflow(current.inner)){node.remove(); if(!current.inner.children.length){current.inner.appendChild(node); return;} newPage(); current.inner.appendChild(node);} };
-  const forceNewPageIfNeeded=(reason='manual')=>{if(current.inner.children.length) newPage();};
-  appendOrNext(renderHero(data.meta||{}));
-  for(const part of parts){
-    const partIdx = parts.indexOf(part);
-    currentPartHeader = `Μέρος ${partMark(partIdx)}`;
-    currentSectionHeader = part.title || '';
-    setSheetHeader(current,currentPartHeader,currentSectionHeader);
-    if(part.pageBreakBefore===true || part.breakBefore==='page') forceNewPageIfNeeded('part');
-    setSheetHeader(current,currentPartHeader,currentSectionHeader);
-    appendOrNext(makePartHead(part, partIdx));
-    for(const secId of (part.sectionIds||[])){
-      const sec=byId[secId]; if(!sec) continue;
-      currentSectionHeader = sec.title || part.title || '';
-      setSheetHeader(current,currentPartHeader,currentSectionHeader);
-      if(sec.pageBreakBefore===true || sec.breakBefore==='page') forceNewPageIfNeeded('section');
-      setSheetHeader(current,currentPartHeader,currentSectionHeader);
-      let sectionWrap=makeSectionShell(sec); appendOrNext(sectionWrap.section);
-      for(let i=0;i<(sec.blocks||[]).length;i++){
-        const block=sec.blocks[i]||{};
-        if(blockStartsNewPage(block)){
-          if(block.type!=='page_break') forceNewPageIfNeeded('block-before');
-          if(block.type==='page_break'){ continue; }
-          setSheetHeader(current,currentPartHeader,currentSectionHeader);
-          sectionWrap=makeSectionShell(sec); current.inner.appendChild(sectionWrap.section);
-        }
-        const blockNode=renderBlock(block);
-        sectionWrap.body.appendChild(blockNode);
-        if(measureOverflow(current.inner)){
-          blockNode.remove();
-          if(!sectionWrap.body.children.length){ sectionWrap.body.appendChild(blockNode); }
-          else {
-            sectionWrap=makeSectionShell(sec); newPage(); setSheetHeader(current,currentPartHeader,currentSectionHeader); current.inner.appendChild(sectionWrap.section); sectionWrap.body.appendChild(blockNode);
-          }
-        }
-        if(blockEndsPage(block)){
-          sectionWrap.body.appendChild(makePageBreakMarker());
-          forceNewPageIfNeeded('block-after');
-          if(i < (sec.blocks||[]).length - 1){
-            setSheetHeader(current,currentPartHeader,currentSectionHeader);
-            sectionWrap=makeSectionShell(sec); current.inner.appendChild(sectionWrap.section);
-          }
-        }
+
+    function clearPrintFreeze(){
+      while(frozenNodes.length){
+        const { node, style } = frozenNodes.pop();
+        if(node) node.setAttribute('style', style);
+      }
+      document.body.classList.remove('print-frozen');
+      document.documentElement.style.removeProperty('--print-freeze-width');
+      document.documentElement.style.removeProperty('--print-freeze-scale');
+    }
+
+    function freezeNode(node, mutator){
+      frozenNodes.push({ node, style: node.getAttribute('style') || '' });
+      mutator(node);
+    }
+
+    function printableWidthPx(orientation='portrait'){
+      const mm = orientation === 'landscape' ? (297 - 24) : (210 - 24);
+      return (mm / 25.4) * 96;
+    }
+
+    function freezeLayoutForPrint(orientation='portrait'){
+      clearPrintFreeze();
+      const pageRect = pageRoot.getBoundingClientRect();
+      const printable = printableWidthPx(orientation);
+      const scale = Math.min(1, printable / pageRect.width);
+      document.documentElement.style.setProperty('--print-freeze-width', `${pageRect.width}px`);
+      document.documentElement.style.setProperty('--print-freeze-scale', String(scale));
+
+      document.querySelectorAll('figure.media').forEach(fig => {
+        const rect = fig.getBoundingClientRect();
+        const cs = getComputedStyle(fig);
+        freezeNode(fig, node => {
+          node.dataset.printFloat = node.classList.contains('float-right') ? 'right' : node.classList.contains('float-left') ? 'left' : 'wide';
+          node.style.setProperty('--print-figure-width', `${rect.width}px`);
+          node.style.setProperty('--print-figure-margin', `${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft}`);
+        });
+      });
+
+      document.querySelectorAll('.media-frame').forEach(frame => {
+        const rect = frame.getBoundingClientRect();
+        freezeNode(frame, node => {
+          node.style.setProperty('--print-frame-width', `${rect.width}px`);
+          node.style.setProperty('--print-frame-height', `${rect.height}px`);
+        });
+      });
+
+      document.body.classList.add('print-frozen');
+    }
+
+    function applyPrintPageStyle(orientation='portrait'){
+      let styleEl = document.getElementById('printPageStyle');
+      if(!styleEl){ styleEl = document.createElement('style'); styleEl.id = 'printPageStyle'; document.head.appendChild(styleEl); }
+      const size = orientation === 'landscape' ? 'A4 landscape' : 'A4 portrait';
+      styleEl.textContent = `@page{ size:${size}; margin:12mm; }`;
+    }
+
+    function safeStorage(){
+      try{ return window.localStorage; }
+      catch(_e){
+        const mem = {};
+        return {
+          getItem:k => Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null,
+          setItem:(k,v) => { mem[k] = String(v); },
+          removeItem:k => { delete mem[k]; },
+          clear:() => { Object.keys(mem).forEach(k => delete mem[k]); }
+        };
       }
     }
-  }
-  return pages;
-}
-function highlightPartFromScroll(){const sheets=Array.from(document.querySelectorAll('.sheet')); const partEls=(currentData?.parts||[]).map(p=>({id:p.id, el:document.getElementById(p.id)})).filter(x=>x.el); const y=window.scrollY+140; let active=''; for(const p of partEls){ if(p.el.getBoundingClientRect().top + window.scrollY <= y) active=p.id; } megaNavEl.querySelectorAll('.menu-item').forEach(n=>n.classList.toggle('active', n.dataset.partId===active)); }
-window.addEventListener('scroll', highlightPartFromScroll, {passive:true});
-function setupPrintTools(){const btn=document.getElementById('printBtn'); const orient=document.getElementById('printOrient'); const storage=safeStorage(); const saved=storage.getItem('hmBookPrintOrient'); if(saved) orient.value=saved; orient.addEventListener('change',()=>storage.setItem('hmBookPrintOrient',orient.value)); btn.addEventListener('click', async()=>{storage.setItem('hmBookPrintOrient', orient.value||'portrait'); setStatus('Ετοιμάζονται στατικά στιγμιότυπα…'); await preparePrintSnapshots(); setStatus(''); window.print();}); window.addEventListener('afterprint',()=>{cleanupPrintSnapshots(); setStatus('')})}
-async function loadData(){const res=await fetch(DEFAULT_JSON,{cache:'no-store'}); if(!res.ok) throw new Error(`Αποτυχία φόρτωσης ${DEFAULT_JSON}`); return await res.json()}
-setupPrintTools(); applyScreenScale(); loadData().then(data=>{currentData=data; renderNav(data.sections||[], data.parts||[]); paginateStructured(data); highlightPartFromScroll(); setStatus(`Σελίδες: ${document.querySelectorAll('.sheet').length}`)}).catch(err=>{console.error(err); setStatus(`Σφάλμα φόρτωσης: ${err.message}`)})
-</script>
+
+    function setupPrintTools(){
+      const printBtn = document.getElementById('printBtn');
+      const printOrient = document.getElementById('printOrient');
+      const storage = safeStorage();
+      const saved = storage.getItem('hmBookPrintOrient');
+      if(saved) printOrient.value = saved;
+      printOrient.addEventListener('change', () => storage.setItem('hmBookPrintOrient', printOrient.value));
+      printBtn.addEventListener('click', async () => {
+        const orientation = printOrient.value || 'portrait';
+        storage.setItem('hmBookPrintOrient', orientation);
+        applyPrintPageStyle(orientation);
+        setStatus('Ετοιμάζονται στατικά στιγμιότυπα και παγώνει η σελιδοποίηση…');
+        try{
+          await preparePrintSnapshots();
+          freezeLayoutForPrint(orientation);
+        }catch(err){ console.warn(err); }
+        setStatus('');
+        window.print();
+      });
+      window.addEventListener('afterprint', () => {
+        clearPrintFreeze();
+        cleanupPrintSnapshots();
+        setStatus('');
+      });
+    }
+
+    function renderHero(meta={}){
+      const mainTitle = normalizeMainTitle(meta.title || '');
+      heroEl.innerHTML = `${meta.eyebrow ? `<p class="eyebrow">${meta.eyebrow}</p>` : ''}${mainTitle ? `<h1>${mainTitle}</h1>` : ''}${meta.subtitle ? `<p class="subtitle">${meta.subtitle}</p>` : ''}${meta.notes?.length ? `<div class="intro-note">${meta.notes[0]}</div>` : ''}`;
+      document.title = mainTitle || 'Ανάγνωσμα Η/Μ κύματος';
+    }
+
+    function renderNav(sections=[], parts=[]){
+      const entries = (parts?.length ? parts : sections.map(s => ({ id:s.id, title:s.title, sectionIds:[s.id] })));
+      const items = entries.map(part => {
+        const href = part.id ? `#${part.id}` : '#';
+        return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${href}">${part.title || ''}</a></div>`;
+      }).join('') + `
+        <div class="menu-item menu-tools" data-part-id="__print__">
+          <button class="menu-trigger" type="button" aria-haspopup="true" aria-expanded="false">Εκτύπωση ▾</button>
+          <div class="menu-dropdown">
+            <div class="menu-tools-panel">
+              <label>Προσανατολισμός
+                <select id="printOrient">
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </label>
+              <button id="printBtn" type="button">Εκτύπωση / PDF</button>
+            </div>
+          </div>
+        </div>`;
+      megaNavEl.innerHTML = items;
+      const update = () => {
+        const y = window.scrollY + 140;
+        let current = null;
+        for(const part of entries){
+          const firstId = part.id || part.sectionIds?.[0];
+          const el = document.getElementById(firstId);
+          if(el && el.offsetTop <= y) current = part.id;
+        }
+        megaNavEl.querySelectorAll('.menu-item').forEach(node => {
+          const pid = node.dataset.partId;
+          node.classList.toggle('active', !!pid && pid !== '__print__' && pid === current);
+        });
+      };
+      window.addEventListener('scroll', update, { passive:true });
+      window.addEventListener('resize', update, { passive:true });
+      update();
+    }
+
+    function placementClass(block){ const p = String(block?.placement || '').toLowerCase(); return p === 'left' ? 'float-left' : p === 'right' ? 'float-right' : 'wide'; }
+
+    function sceneAspect(block){
+      const src = String(block.singleSrc || '');
+      let layout = '';
+      try{
+        const u = new URL(src, window.location.href || 'http://local.invalid/');
+        layout = (u.searchParams.get('layout') || '').toLowerCase();
+      }catch(_e){
+        const m = src.match(/[?&]layout=([^&]+)/i);
+        layout = m ? decodeURIComponent(m[1]).toLowerCase() : '';
+      }
+      const graphHeight = 146.2, rodHeight = 219.3, controlsHeight = 34;
+      if(layout === 'rod_only') return 340 / (rodHeight + controlsHeight);
+      if(layout === 'rod_1graph') return 340 / (rodHeight + graphHeight + controlsHeight);
+      if(layout === 'rod_2graphs') return 340 / (rodHeight + graphHeight*2 + controlsHeight);
+      if(layout === 'rod_3graphs') return 340 / (rodHeight + graphHeight*3 + controlsHeight);
+      return 16/9;
+    }
+
+    function renderScene(block){
+      const fig = document.createElement('figure');
+      fig.className = `media ${placementClass(block)}`;
+      const frameWidth = block.frameWidth || 340;
+      fig.style.setProperty('--figure-width', `${frameWidth}px`);
+      const frame = document.createElement('div');
+      frame.className = 'media-frame';
+      frame.style.aspectRatio = String(sceneAspect(block));
+      const iframe = document.createElement('iframe');
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer';
+      iframe.allow = 'fullscreen';
+      iframe.src = withCacheBust(normalizeAppSrc(block.singleSrc || ''));
+      frame.appendChild(iframe);
+      fig.appendChild(frame);
+      if(!block.hideCaption){ const cap = document.createElement('figcaption'); cap.textContent = block.caption || block.title || 'Σκηνή'; fig.appendChild(cap); }
+      return fig;
+    }
+
+    function renderFigure(block){
+      const fig = document.createElement('figure');
+      fig.className = `media ${placementClass(block)}`;
+      const frameWidth = block.frameWidth || 340;
+      fig.style.setProperty('--figure-width', `${frameWidth}px`);
+      const frame = document.createElement('div');
+      frame.className = `media-frame ${block.aspect === 'natural' ? 'natural' : ''}`.trim();
+      const img = document.createElement('img');
+      img.alt = block.alt || block.title || 'Εικόνα';
+      img.src = block.src && !/^https?:/i.test(block.src) ? `../${block.src.replace(/^\.\//,'')}` : block.src;
+      img.onerror = () => {
+        img.remove();
+        const ph = document.createElement('div');
+        ph.className = 'media-placeholder';
+        ph.innerHTML = `<div><strong>${escapeHtml(block.title || 'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε στο test bundle.</div>`;
+        frame.appendChild(ph);
+      };
+      frame.appendChild(img);
+      fig.appendChild(frame);
+      if(!block.hideCaption){ const cap = document.createElement('figcaption'); cap.textContent = block.caption || block.title || 'Εικόνα'; fig.appendChild(cap); }
+      return fig;
+    }
+
+    function renderNote(block){
+      const div = document.createElement('div');
+      div.className = 'note';
+      div.innerHTML = `${block.label ? `<span class="label">${block.label}</span>` : ''}${block.html || ''}`;
+      return div;
+    }
+
+    function renderParagraph(block){ const p = document.createElement('p'); p.innerHTML = block.html || ''; return p; }
+
+    function renderCallout(block){
+      const div = document.createElement('div');
+      div.className = 'callout';
+      div.innerHTML = `
+        <div class="callout-title">${block.title || 'Δοκίμασε'}</div>
+        <div class="callout-row"><span class="callout-label">${block.setupLabel || 'Ρύθμισε'}</span>${(block.setupChips || []).map(t => `<span class="callout-chip">${t}</span>`).join('')}</div>
+        <div class="callout-row"><span class="callout-label">${block.pressLabel || 'Πίεσε'}</span>${(block.pressChips || []).map(t => `<span class="callout-chip">${t}</span>`).join('')}</div>
+        <div class="callout-observe"><span class="callout-observe-title">${block.observeTitle || 'Παρατήρησε'}</span><ul>${(block.observeItems || []).map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+      return div;
+    }
+
+    function renderBlock(block){
+      if(block.type === 'paragraph') return renderParagraph(block);
+      if(block.type === 'note') return renderNote(block);
+      if(block.type === 'figure') return renderFigure(block);
+      if(block.type === 'scene') return renderScene(block);
+      if(block.type === 'interactive_callout') return renderCallout(block);
+      if(block.type === 'clear'){ const d = document.createElement('div'); d.className = 'clear'; return d; }
+      const d = document.createElement('div'); d.textContent = `Άγνωστο block: ${block.type}`; return d;
+    }
+
+    function renderContent(data){
+      renderHero(data.meta || {});
+      renderNav(data.sections || [], data.parts || []);
+      const byId = Object.fromEntries((data.sections || []).map(sec => [sec.id, sec]));
+      const parts = data.parts?.length ? data.parts : [{ id:'all', title:'Περιεχόμενο', sectionIds:(data.sections || []).map(s => s.id) }];
+      chapterEl.innerHTML = '';
+      for(const part of parts){
+        const shell = document.createElement('section');
+        shell.className = 'part-shell';
+        shell.id = part.id || '';
+        shell.innerHTML = `<p class="part-kicker">Μέρος</p><h2 class="part-title-main">${part.title || ''}</h2>`;
+        for(const secId of (part.sectionIds || [])){
+          const sec = byId[secId];
+          if(!sec) continue;
+          const secEl = document.createElement('section');
+          secEl.className = 'section';
+          secEl.id = sec.id;
+          secEl.innerHTML = `<h2>${sec.title || ''}</h2>`;
+          const body = document.createElement('div');
+          body.className = 'article-body';
+          for(const block of (sec.blocks || [])) body.appendChild(renderBlock(block));
+          secEl.appendChild(body);
+          shell.appendChild(secEl);
+        }
+        chapterEl.appendChild(shell);
+      }
+    }
+
+    async function loadData(){
+      const res = await fetch(DEFAULT_JSON, { cache:'no-store' });
+      if(!res.ok) throw new Error(`Αποτυχία φόρτωσης ${DEFAULT_JSON}`);
+      return await res.json();
+    }
+
+    setupPrintTools();
+    loadData().then(data => { renderContent(data); setStatus(''); }).catch(err => { console.error(err); setStatus(`Σφάλμα φόρτωσης: ${err.message}`); });
+  </script>
 </body>
 </html>
