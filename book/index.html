@@ -94,6 +94,40 @@ function normalizeAppSrc(url=''){
     .replace(/\.\.\/app\/em_wave_app\.html/g,appEntry);
 }
 function waitForImage(img){return new Promise(resolve=>{if(!img || img.complete) return resolve(); img.addEventListener('load',()=>resolve(),{once:true}); img.addEventListener('error',()=>resolve(),{once:true});});}
+function imageSrcCandidates(src=''){
+  const raw=String(src||'').trim();
+  if(!raw) return [];
+  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
+  const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
+  const inBook=/\/book(\/|$)/.test(path);
+  const list=[];
+  const push=v=>{ if(v && !list.includes(v)) list.push(v); };
+  push(raw);
+  if(inBook){
+    if(raw.startsWith('images/')) push(`./${raw}`);
+    if(raw.startsWith('./images/')) push(raw.slice(2));
+    if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
+    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
+  }else{
+    if(raw.startsWith('images/')) push(`./book/${raw}`);
+    if(raw.startsWith('./images/')) push(`./book/${raw.slice(2)}`);
+    if(raw.startsWith('/images/')) push(`./book${raw}`);
+    if(raw.startsWith('book/images/')) push(`./${raw}`);
+    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\//,''));
+  }
+  return list;
+}
+window.applyImageWithFallback = function(img, src=''){
+  const candidates=imageSrcCandidates(src);
+  let i=0;
+  const tryNext=()=>{
+    if(i>=candidates.length){ img.dispatchEvent(new CustomEvent('imagefallbackfailed')); return; }
+    img.src=candidates[i++];
+  };
+  img.addEventListener('error', tryNext);
+  tryNext();
+};
+const applyImageWithFallback = window.applyImageWithFallback;
 async function requestIframePrintSnapshot(iframe){
   if(!iframe) return null;
   try{
@@ -147,7 +181,7 @@ function sceneAspect(block){
 }
 function partMark(idx){const marks=['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄']; return marks[idx] || `${idx+1}` }
 function renderHero(meta={}){const wrap=document.createElement('section'); wrap.className='hero'; wrap.innerHTML=`${meta.eyebrow?`<p class="eyebrow">${meta.eyebrow}</p>`:''}${meta.title?`<h1>${meta.title}</h1>`:''}${meta.subtitle?`<p class="subtitle">${meta.subtitle}</p>`:''}${meta.notes?.length?`<div class="intro-note">${meta.notes[0]}</div>`:''}`; return wrap}
-function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
+function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); window.applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
 function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
 function renderParagraph(block){const p=document.createElement('p'); p.innerHTML=block.html||''; return p}
 function renderNote(block){const d=document.createElement('div'); d.className='note'; d.innerHTML=`${block.label?`<span class="label">${block.label}</span>`:''}${block.html||''}`; return d}
