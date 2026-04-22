@@ -41,15 +41,12 @@
       border-bottom:1px solid rgba(0,0,0,.08);
     }
     .topbar-inner{max-width:var(--paper-width);margin:0 auto;padding:10px 18px 12px}
-    .topbar-main{display:flex;align-items:center;gap:10px;justify-content:space-between}
+    .topbar-main{display:block;width:100%}
     button,a.action{
       appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 14px;border-radius:999px;
       font:600 14px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;
     }
-    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .toolbar label{font:600 13px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);display:flex;align-items:center;gap:8px}
-    .toolbar select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-
+    
     .page{max-width:var(--max-page);margin:0 auto;padding:22px 18px 80px}
     .hero,.chapter{max-width:var(--paper-width);margin:0 auto;background:var(--paper);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
     .hero{margin-bottom:20px;padding:30px 28px 24px}
@@ -59,10 +56,23 @@
     .subtitle{margin:0;color:var(--muted);font-size:18px;line-height:1.5;max-width:56ch}
     .intro-note{margin-top:18px;padding:14px 16px;border-radius:16px;background:var(--accent-soft);border:1px solid #cddfea;font:500 16px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#28485f}
 
-    .mega-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:stretch;justify-content:center;width:100%;max-width:var(--paper-width);margin:0 auto}
-    .menu-item{position:relative;min-width:0}
+    .mega-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-items:stretch;justify-content:center;position:relative;z-index:30;width:100%;min-width:0;max-width:var(--paper-width);margin:0 auto}
+    .menu-item{position:relative; min-width:0}
+    .menu-item::after{content:""; position:absolute; left:0; right:0; top:100%; height:12px; background:transparent}
     .menu-trigger{appearance:none;display:flex;width:100%;min-width:0;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:18px;font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.04);white-space:nowrap;text-align:center}
-    .menu-item.active>.menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+    .menu-item:hover > .menu-trigger,.menu-item:focus-within > .menu-trigger,.menu-item.active > .menu-trigger{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+    .menu-trigger .caret{font-size:11px; color:var(--muted)}
+    .menu-dropdown{position:absolute;left:0;top:calc(100% + 2px);min-width:100%;width:max-content;display:none;padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12)}
+    .menu-item:hover > .menu-dropdown,.menu-item:focus-within > .menu-dropdown{display:block}
+    .menu-dropdown .menu-section-link,.menu-dropdown .menu-part-link,.menu-dropdown .menu-planned{display:block;text-decoration:none;color:var(--ink);background:#faf8f3;border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:10px 12px;font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:0 0 8px}
+    .menu-dropdown .menu-part-link{background:var(--accent-soft); border-color:#cddfea; color:#204863}
+    .menu-dropdown .menu-planned{color:var(--muted); background:#fcfbf8}
+    .menu-dropdown .menu-section-link:last-child,.menu-dropdown .menu-part-link:last-child,.menu-dropdown .menu-planned:last-child{margin-bottom:0}
+    .menu-dropdown .menu-section-link.active{background:var(--accent-soft); border-color:#cddfea; color:#204863}
+    .menu-print-panel{display:grid; gap:10px; min-width:250px}
+    .menu-print-panel label{display:grid; gap:6px; font:650 13px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:var(--muted)}
+    .menu-print-panel select{appearance:none;border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:10px 12px;border-radius:12px;font:600 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .menu-print-panel .menu-print-btn{justify-content:center}
 
     .part-shell{margin:0 0 42px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}
     .part-shell:last-child{border-bottom:0;margin-bottom:0}
@@ -106,16 +116,23 @@
     .callout-observe li{margin:4px 0;font-style:italic}
 
     .print-scene-snapshot{display:none}
-    .page-break-marker{height:0;clear:both}
     .page-break-before{break-before:page;page-break-before:always}
     .page-break-after{break-after:page;page-break-after:always}
 
+    @media (max-width:1100px){
+      .mega-nav{grid-template-columns:repeat(6,minmax(150px,1fr)); overflow-x:auto; padding-bottom:2px}
+      .mega-nav::-webkit-scrollbar{height:6px}
+    }
     @media (max-width: 900px){
       .chapter{padding:26px 18px 30px}
       figure.media.float-right,figure.media.float-left,figure.media.wide{float:none;width:100%;max-width:100%;margin:18px 0}
       .article-body{max-width:100%}
-      .mega-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .topbar-main{flex-direction:column;align-items:stretch}
+    }
+    @media (max-width:720px){
+      .topbar-inner{padding:8px 10px 10px}
+      .mega-nav{grid-template-columns:repeat(6,minmax(140px,1fr)); gap:8px}
+      .menu-trigger{padding:10px 10px; font-size:12px}
+      .menu-dropdown{min-width:100%}
     }
 
     @media print{
@@ -155,15 +172,6 @@
     <div class="topbar-inner">
       <div class="topbar-main">
         <nav class="mega-nav" id="megaNav" aria-label="Κύρια πλοήγηση βιβλίου"></nav>
-        <div class="toolbar">
-          <label>Προσανατολισμός
-            <select id="printOrient">
-              <option value="portrait">Portrait</option>
-              <option value="landscape">Landscape</option>
-            </select>
-          </label>
-          <button id="printBtn" type="button">Εκτύπωση / PDF</button>
-        </div>
       </div>
     </div>
   </div>
@@ -190,10 +198,7 @@
     function normalizeAppSrc(url=''){ return String(url || '').replace(/\.\.\/app\/em_wave_app\.html/g,'../index.html').replace(/\.\/app\/em_wave_app\.html/g,'../index.html'); }
     function withCacheBust(url){ try{ const u=new URL(url, window.location.href); u.searchParams.set('_cb', Date.now()); return u.toString(); }catch(e){ return url; } }
     function waitForImage(img){ return new Promise(resolve => { if(!img || img.complete) return resolve(); img.addEventListener('load', resolve, {once:true}); img.addEventListener('error', resolve, {once:true}); }); }
-    const PART_ORDINALS = ['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄'];
-    function greekPartOrdinal(index){ return PART_ORDINALS[index] || `${index+1}`; }
-    function partDisplayLabel(part, index){ return part?.displayLabel || greekPartOrdinal(index); }
-    function pageBreakNode(extraClass=''){ const d=document.createElement('div'); d.className=`page-break-marker ${extraClass}`.trim(); return d; }
+    function pageBreakNode(extraClass=''){ const d=document.createElement('div'); d.className = `clear ${extraClass}`.trim(); return d; }
 
     async function requestIframePrintSnapshot(iframe){
       if(!iframe) return null;
@@ -325,10 +330,15 @@
     function setupPrintTools(){
       const printBtn = document.getElementById('printBtn');
       const printOrient = document.getElementById('printOrient');
+      if(!printBtn || !printOrient) return;
       const storage = safeStorage();
       const saved = storage.getItem('hmBookPrintOrient');
       if(saved) printOrient.value = saved;
-      printOrient.addEventListener('change', () => storage.setItem('hmBookPrintOrient', printOrient.value));
+      if(!printOrient.dataset.bound){
+        printOrient.addEventListener('change', () => storage.setItem('hmBookPrintOrient', printOrient.value));
+        printOrient.dataset.bound = '1';
+      }
+      if(printBtn.dataset.bound) return;
       printBtn.addEventListener('click', async () => {
         const orientation = printOrient.value || 'portrait';
         storage.setItem('hmBookPrintOrient', orientation);
@@ -341,11 +351,15 @@
         setStatus('');
         window.print();
       });
-      window.addEventListener('afterprint', () => {
-        clearPrintFreeze();
-        cleanupPrintSnapshots();
-        setStatus('');
-      });
+      printBtn.dataset.bound = '1';
+      if(!window.__hmBookAfterPrintBound){
+        window.addEventListener('afterprint', () => {
+          clearPrintFreeze();
+          cleanupPrintSnapshots();
+          setStatus('');
+        });
+        window.__hmBookAfterPrintBound = true;
+      }
     }
 
     function renderHero(meta={}){
@@ -355,22 +369,81 @@
     }
 
     function renderNav(sections=[], parts=[]){
-      const byId = Object.fromEntries(sections.map(sec => [sec.id, sec]));
-      const items = (parts?.length ? parts : sections.map(s => ({ id:s.id, title:s.title, sectionIds:[s.id] }))).map(part => {
-        const href = part.id ? `#${part.id}` : '#';
-        return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${href}">${part.title || ''}</a></div>`;
-      }).join('');
-      megaNavEl.innerHTML = items;
+      if(!megaNavEl) return;
+      const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+      const partItems = (Array.isArray(parts) && parts.length) ? parts.map(part => {
+        const directHref = part.id ? `#${part.id}` : '#';
+        const links = (part.sectionIds || []).map(id => {
+          const sec = byId[id];
+          if(!sec) return '';
+          return `<a class="menu-section-link" data-section-id="${id}" href="#${id}">${sec.navLabel || sec.title || id}</a>`;
+        }).join('');
+        const planned = (part.plannedTitles || []).map(t => `<span class="menu-planned">${t}</span>`).join('');
+        return `<div class="menu-item" data-part-id="${part.id || ''}"><a class="menu-trigger" href="${directHref}">${part.title || ''}<span class="caret">▾</span></a><div class="menu-dropdown">${links}${planned}</div></div>`;
+      }).join('') : (sections || []).map(sec => `<div class="menu-item"><a class="menu-trigger" href="#${sec.id}">${sec.navLabel || sec.title || sec.id}</a></div>`).join('');
+
+      megaNavEl.innerHTML = `${partItems}
+        <div class="menu-item" data-part-id="app">
+          <a class="menu-trigger" href="../index.html">Εφαρμογή</a>
+        </div>
+        <div class="menu-item" data-part-id="print">
+          <button class="menu-trigger" type="button">Εκτύπωση<span class="caret">▾</span></button>
+          <div class="menu-dropdown">
+            <div class="menu-print-panel">
+              <label>Προσανατολισμός
+                <select id="printOrient">
+                  <option value="portrait">Portrait</option>
+                  <option value="landscape">Landscape</option>
+                </select>
+              </label>
+              <button id="printBtn" class="menu-trigger menu-print-btn" type="button">Εκτύπωση / PDF</button>
+            </div>
+          </div>
+        </div>`;
+      setupPrintTools();
+    }
+
+    function setupScrollSpy(sections=[], parts=[]){
+      if(!megaNavEl) return;
+      const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+      const entries = [];
+      const sectionToPart = new Map();
+      (parts || []).forEach(part => {
+        (part.sectionIds || []).forEach(id => {
+          sectionToPart.set(id, part);
+          const el = document.getElementById(id);
+          if(el) entries.push({ el, section: byId[id], part });
+        });
+      });
+      (sections || []).forEach(sec => {
+        if(sectionToPart.has(sec.id)) return;
+        const el = document.getElementById(sec.id);
+        if(el) entries.push({ el, section: sec, part: null });
+      });
+      entries.sort((a,b) => a.el.offsetTop - b.el.offsetTop);
+      const partNodes = Array.from(megaNavEl.querySelectorAll('.menu-item[data-part-id]'));
+      const linkNodes = Array.from(megaNavEl.querySelectorAll('.menu-section-link[data-section-id]'));
       const update = () => {
-        const y = window.scrollY + 140;
-        let current = null;
-        for(const part of (parts?.length ? parts : sections.map(s => ({id:s.id, sectionIds:[s.id]})))){
-          const firstId = part.id || part.sectionIds?.[0];
-          const el = document.getElementById(firstId);
-          if(el && el.offsetTop <= y) current = part.id;
+        const y = window.scrollY + 150;
+        let current = entries[0] || null;
+        for(const item of entries){
+          if(item.el.offsetTop <= y) current = item;
+          else break;
         }
-        megaNavEl.querySelectorAll('.menu-item').forEach(node => node.classList.toggle('active', node.dataset.partId === current));
+        partNodes.forEach(n => n.classList.remove('active'));
+        linkNodes.forEach(n => n.classList.remove('active'));
+        if(!current) return;
+        if(current.part?.id){
+          const node = megaNavEl.querySelector(`.menu-item[data-part-id="${current.part.id}"]`);
+          if(node) node.classList.add('active');
+        }
+        if(current.section?.id){
+          const link = megaNavEl.querySelector(`.menu-section-link[data-section-id="${current.section.id}"]`);
+          if(link) link.classList.add('active');
+        }
       };
+      window.removeEventListener('scroll', window.__hmBookScrollSpy || (()=>{}));
+      window.__hmBookScrollSpy = update;
       window.addEventListener('scroll', update, { passive:true });
       window.addEventListener('resize', update, { passive:true });
       update();
@@ -424,7 +497,7 @@
       frame.className = `media-frame ${block.aspect === 'natural' ? 'natural' : ''}`.trim();
       const img = document.createElement('img');
       img.alt = block.alt || block.title || 'Εικόνα';
-      img.src = block.src && !/^https?:/i.test(block.src) ? `../${block.src.replace(/^\.\//,'')}` : block.src;
+      img.src = block.src || '';
       img.onerror = () => {
         img.remove();
         const ph = document.createElement('div');
@@ -476,34 +549,83 @@
     function renderContent(data){
       renderHero(data.meta || {});
       renderNav(data.sections || [], data.parts || []);
-      const byId = Object.fromEntries((data.sections || []).map(sec => [sec.id, sec]));
-      const parts = data.parts?.length ? data.parts : [{ id:'all', title:'Περιεχόμενο', sectionIds:(data.sections || []).map(s => s.id) }];
+      const sections = data.sections || [];
+      const parts = data.parts || [];
+      const byId = Object.fromEntries((sections || []).map(sec => [sec.id, sec]));
+      const used = new Set();
       chapterEl.innerHTML = '';
-      parts.forEach((part, partIndex) => {
-        const shell = document.createElement('section');
-        shell.className = 'part-shell';
-        shell.id = part.id || '';
-        if(part.pageBreakBefore) shell.classList.add('page-break-before');
-        if(part.pageBreakAfter) shell.classList.add('page-break-after');
-        const label = partDisplayLabel(part, partIndex);
-        shell.innerHTML = `<p class="part-kicker">ΜΕΡΟΣ ${label}</p><h2 class="part-title-main">${part.title || ''}</h2>`;
-        for(const secId of (part.sectionIds || [])){
-          const sec = byId[secId];
-          if(!sec) continue;
+      if(Array.isArray(parts) && parts.length){
+        const partMarks = ['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄'];
+        parts.forEach((part, idx) => {
+          const shell = document.createElement('section');
+          shell.className = 'part-shell';
+          shell.id = part.id || '';
+          if(part.pageBreakBefore) shell.classList.add('page-break-before');
+          if(part.pageBreakAfter) shell.classList.add('page-break-after');
+          const mark = part.displayLabel || partMarks[idx] || `${idx + 1}`;
+          shell.innerHTML = `<div class="part-kicker">Μέρος ${mark}</div><h2 class="part-title-main">${part.title || ''}</h2>`;
+          const ids = Array.isArray(part.sectionIds) ? part.sectionIds : [];
+          ids.forEach(id => {
+            const sec = byId[id];
+            if(!sec) return;
+            const secEl = document.createElement('section');
+            secEl.className = 'section';
+            secEl.id = sec.id || '';
+            if(sec.pageBreakBefore) secEl.classList.add('page-break-before');
+            if(sec.pageBreakAfter) secEl.classList.add('page-break-after');
+            if(sec.pageBreakBefore) secEl.classList.add('page-break-before');
+            if(sec.pageBreakAfter) secEl.classList.add('page-break-after');
+            secEl.innerHTML = `${sec.title ? `<h2>${sec.title}</h2>` : ''}${sec.lead ? `<p class="lead">${sec.lead}</p>` : ''}`;
+            const body = document.createElement('div');
+            body.className = 'article-body';
+            (sec.blocks || []).forEach(block => body.appendChild(renderBlock(block)));
+            const clear = document.createElement('div');
+            clear.className = 'clear';
+            body.appendChild(clear);
+            secEl.appendChild(body);
+            shell.appendChild(secEl);
+            used.add(id);
+          });
+          if(Array.isArray(part.plannedTitles) && part.plannedTitles.length){
+            const planned = document.createElement('div');
+            planned.className = 'part-planned article-body';
+            planned.innerHTML = `<p><strong>Προβλεπόμενες ενότητες</strong></p><ul>${part.plannedTitles.map(t => `<li>${t}</li>`).join('')}</ul>`;
+            shell.appendChild(planned);
+          }
+          chapterEl.appendChild(shell);
+        });
+        sections.forEach(sec => {
+          if(!used.has(sec.id)){
+            const secEl = document.createElement('section');
+            secEl.className = 'section';
+            secEl.id = sec.id || '';
+            if(sec.pageBreakBefore) secEl.classList.add('page-break-before');
+            if(sec.pageBreakAfter) secEl.classList.add('page-break-after');
+            secEl.innerHTML = `${sec.title ? `<h2>${sec.title}</h2>` : ''}${sec.lead ? `<p class="lead">${sec.lead}</p>` : ''}`;
+            const body = document.createElement('div');
+            body.className = 'article-body';
+            (sec.blocks || []).forEach(block => body.appendChild(renderBlock(block)));
+            const clear = document.createElement('div'); clear.className = 'clear'; body.appendChild(clear);
+            secEl.appendChild(body);
+            chapterEl.appendChild(secEl);
+          }
+        });
+      } else {
+        sections.forEach(sec => {
           const secEl = document.createElement('section');
           secEl.className = 'section';
-          secEl.id = sec.id;
+          secEl.id = sec.id || '';
           if(sec.pageBreakBefore) secEl.classList.add('page-break-before');
           if(sec.pageBreakAfter) secEl.classList.add('page-break-after');
-          secEl.innerHTML = `<h2>${sec.title || ''}</h2>`;
-          const body = document.createElement('div');
-          body.className = 'article-body';
-          for(const block of (sec.blocks || [])) body.appendChild(renderBlock(block));
+          secEl.innerHTML = `${sec.title ? `<h2>${sec.title}</h2>` : ''}${sec.lead ? `<p class="lead">${sec.lead}</p>` : ''}`;
+          const body = document.createElement('div'); body.className = 'article-body';
+          (sec.blocks || []).forEach(block => body.appendChild(renderBlock(block)));
+          const clear = document.createElement('div'); clear.className = 'clear'; body.appendChild(clear);
           secEl.appendChild(body);
-          shell.appendChild(secEl);
-        }
-        chapterEl.appendChild(shell);
-      });
+          chapterEl.appendChild(secEl);
+        });
+      }
+      setupScrollSpy(data.sections || [], data.parts || []);
     }
 
     async function loadData(){
@@ -512,7 +634,6 @@
       return await res.json();
     }
 
-    setupPrintTools();
     loadData().then(data => { renderContent(data); setStatus(''); }).catch(err => { console.error(err); setStatus(`Σφάλμα φόρτωσης: ${err.message}`); });
   </script>
 </body>
