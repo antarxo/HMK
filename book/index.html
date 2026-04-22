@@ -146,6 +146,31 @@ function sceneAspect(block){
   return 16/9;
 }
 function partMark(idx){const marks=['Α΄','Β΄','Γ΄','Δ΄','Ε΄','ΣΤ΄','Ζ΄','Η΄','Θ΄','Ι΄']; return marks[idx] || `${idx+1}` }
+
+function applyImageWithFallback(img, rawSrc=''){
+  const src=String(rawSrc||'').trim();
+  const fireFail=()=>img.dispatchEvent(new CustomEvent('imagefallbackfailed'));
+  if(!src){ fireFail(); return; }
+  const isDirect=/^(data:|blob:|https?:|\/)/i.test(src);
+  const clean=src.replace(/^\.\//,'');
+  const candidates=[];
+  const push=(u)=>{ if(u && !candidates.includes(u)) candidates.push(u); };
+  if(isDirect){ push(src); }
+  else {
+    push(src);
+    push(`./${clean}`);
+    push(`../${clean}`);
+    if(clean.startsWith('images/')) push(`./${clean}`);
+  }
+  let idx=0;
+  const tryNext=()=>{
+    if(idx>=candidates.length){ fireFail(); return; }
+    const candidate=candidates[idx++];
+    img.onerror=()=>tryNext();
+    img.src=withCacheBust(candidate);
+  };
+  tryNext();
+}
 function renderHero(meta={}){const wrap=document.createElement('section'); wrap.className='hero'; wrap.innerHTML=`${meta.eyebrow?`<p class="eyebrow">${meta.eyebrow}</p>`:''}${meta.title?`<h1>${meta.title}</h1>`:''}${meta.subtitle?`<p class="subtitle">${meta.subtitle}</p>`:''}${meta.notes?.length?`<div class="intro-note">${meta.notes[0]}</div>`:''}`; return wrap}
 function renderFigure(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className=`media-frame ${block.aspect==='natural'?'natural':''}`.trim(); const img=document.createElement('img'); img.alt=block.alt||block.title||'Εικόνα'; img.addEventListener('imagefallbackfailed',()=>{img.remove(); const ph=document.createElement('div'); ph.className='media-placeholder'; ph.innerHTML=`<div><strong>${escapeHtml(block.title||'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`; frame.appendChild(ph)},{once:true}); applyImageWithFallback(img, block.src||''); frame.appendChild(img); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Εικόνα'; fig.appendChild(cap)} return fig}
 function renderScene(block){const fig=document.createElement('figure'); fig.className=`media ${placementClass(block)}`; if(block.frameWidth) fig.style.setProperty('--figure-width', `${block.frameWidth}px`); const frame=document.createElement('div'); frame.className='media-frame'; frame.style.aspectRatio=String(sceneAspect(block)); const iframe=document.createElement('iframe'); iframe.loading='lazy'; iframe.referrerPolicy='no-referrer'; iframe.allow='fullscreen'; iframe.src=withCacheBust(normalizeAppSrc(block.singleSrc||'')); frame.appendChild(iframe); fig.appendChild(frame); if(!block.hideCaption){const cap=document.createElement('figcaption'); cap.textContent=block.caption||block.title||'Σκηνή'; fig.appendChild(cap)} return fig}
