@@ -86,7 +86,7 @@ function withCacheBust(url){try{const u=new URL(url,window.location.href);u.sear
 function normalizeAppSrc(url=''){
   if(typeof url!=='string' || !url) return url;
   const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
-  const appEntry=/\/book(\/|$)/.test(path)?'../index_printmatch.html':'./index_printmatch.html';
+  const appEntry=/\/book(\/|$)/.test(path)?'../index.html':'./index.html';
   return url
     .replace(/^\.\.\/index\.html/i,appEntry)
     .replace(/^\.\.\/app\/em_wave_app\.html/i,appEntry)
