@@ -49,7 +49,7 @@ body{
 }
 .mega-nav{
   display:grid;
-  grid-template-columns:repeat(5,minmax(120px,1fr));
+  grid-template-columns:repeat(6,minmax(0,1fr));
   gap:10px;
   align-items:stretch;
   justify-content:center;
@@ -57,14 +57,29 @@ body{
   max-width:var(--sheet-width);
   margin:0 auto;
 }
-.menu-item{min-width:0}
+.menu-item{position:relative;min-width:0}
+.menu-item::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;background:transparent}
 .menu-trigger,.menu-btn{
-  display:flex; width:100%; min-width:0; align-items:center; justify-content:center;
+  display:flex; width:100%; min-width:0; align-items:center; justify-content:center; gap:7px;
   border:1px solid rgba(0,0,0,.12); background:#fff; color:var(--ink);
   padding:10px 12px; border-radius:18px; font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
   text-decoration:none; white-space:nowrap; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.04); cursor:pointer;
 }
-.menu-item.active .menu-trigger,.menu-btn:hover{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+.menu-trigger .caret{font-size:11px;color:var(--muted)}
+.menu-item.active .menu-trigger,.menu-item:hover>.menu-trigger,.menu-item:focus-within>.menu-trigger,.menu-btn:hover{
+  background:#f7fafc;border-color:#cfd8e0;color:#173f5b
+}
+.menu-dropdown{
+  position:absolute;left:0;top:calc(100% + 2px);min-width:100%;width:max-content;display:none;
+  padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35
+}
+.menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}
+.menu-dropdown .menu-section-link{
+  display:block;text-decoration:none;color:var(--ink);background:#faf8f3;border:1px solid rgba(0,0,0,.06);
+  border-radius:12px;padding:10px 12px;font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:0 0 8px
+}
+.menu-dropdown .menu-section-link:last-child{margin-bottom:0}
+.menu-item.menu-tool::after{display:none}
 .viewport{max-width:1200px; margin:0 auto; padding:24px 18px 60px}
 .page-stack{display:flex; flex-direction:column; align-items:center; gap:26px}
 .sheet-wrap{
@@ -176,6 +191,7 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
 }
 @media (max-width:760px){
   .mega-nav{grid-template-columns:repeat(2,minmax(120px,1fr))}
+  .menu-dropdown{position:static;display:block;min-width:0;width:100%;margin-top:8px}
 }
 @media print{
   @page{size:A4 portrait; margin:0}
@@ -189,7 +205,8 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     min-height:297mm !important;
     page-break-after:always;
     break-after:page;
-    overflow:hidden !important;
+    break-inside:avoid;
+    overflow:visible !important;
   }
   .sheet-wrap:last-child{page-break-after:auto;break-after:auto}
   .sheet{
@@ -201,14 +218,14 @@ figcaption{padding:12px 14px 14px;font:500 14px/1.55 system-ui,-apple-system,Seg
     top:auto !important;
     border:0 !important;
     box-shadow:none !important;
-    overflow:hidden !important;
+    overflow:visible !important;
   }
   .sheet-inner{padding:14mm !important}
   .sheet-header{margin-bottom:14px}
   .sheet-footer{left:14mm !important; right:14mm !important; bottom:10mm !important}
   .sheet-body{min-height:calc(297mm - 28mm - var(--header-h) - var(--footer-h) - 22px) !important}
   figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
-  .media-frame iframe{display:none !important}
+  .media-frame.print-ready iframe{display:none !important}
   .media-frame img{object-fit:contain !important; background:#fff !important}
   .media-frame::after{
     content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";
@@ -346,11 +363,19 @@ async function requestIframePrintSnapshot(iframe){
       cleanup();
       resolve(data.dataUrl || null);
     };
-    const timer=setTimeout(()=>{ cleanup(); resolve(null); }, 4000);
+    const timer=setTimeout(()=>{ cleanup(); resolve(null); }, 4800);
     window.addEventListener('message', onMessage);
     try{ iframe.contentWindow?.postMessage({type:'capturePrintSnapshot', requestId}, '*'); }
     catch(_e){ cleanup(); resolve(null); }
   });
+}
+async function requestIframePrintSnapshotWithRetry(iframe, attempts=3){
+  for(let i=0;i<attempts;i++){
+    const shot = await requestIframePrintSnapshot(iframe);
+    if(shot) return shot;
+    await new Promise(resolve => setTimeout(resolve, 220));
+  }
+  return null;
 }
 let printSnapshotsPrepared = false;
 let printFlowRunning = false;
@@ -365,8 +390,9 @@ async function preparePrintSnapshots(force=false){
   if(printSnapshotsPrepared && !force) return;
   cleanupPrintSnapshots();
   const iframes=Array.from(document.querySelectorAll('.media-frame iframe'));
+  let readyCount = 0;
   await Promise.all(iframes.map(async iframe=>{
-    const dataUrl=await requestIframePrintSnapshot(iframe);
+    const dataUrl=await requestIframePrintSnapshotWithRetry(iframe, 3);
     if(!dataUrl) return;
     const holder=iframe.parentElement;
     if(!holder) return;
@@ -377,8 +403,12 @@ async function preparePrintSnapshots(force=false){
     holder.appendChild(img);
     await waitForImage(img);
     holder.classList.add('print-ready');
+    readyCount += 1;
   }));
+  await new Promise(resolve => requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  await new Promise(resolve => setTimeout(resolve, 180));
   printSnapshotsPrepared = true;
+  return readyCount;
 }
 async function beginPrintFlow(){
   if(printFlowRunning) return;
@@ -391,6 +421,11 @@ async function beginPrintFlow(){
   }
   setStatus('');
   window.print();
+}
+function resolveAppHref(){
+  const path = (window.location.pathname || '').replace(/\\/g,'/');
+  if(/\/book(\/|$)/i.test(path)) return '../index.html';
+  return 'index.html';
 }
 window.addEventListener('beforeprint', ()=>{
   if(!printSnapshotsPrepared){
@@ -562,37 +597,73 @@ function renderPages(data){
   });
 }
 function deriveNav(data){
-  const partFirstPages=new Map();
-  (data.pages || []).forEach((page, idx)=>{
-    const item=(page.items||[]).find(it => it.type==='part_title');
-    if(item){
-      const key=(item.label||'') + '|' + (item.title||'');
-      if(!partFirstPages.has(key)){
-        partFirstPages.set(key, {
-          id: page.id || `page-${idx+1}`,
-          text: item.title || item.label || `Σελίδα ${idx+1}`
-        });
-      }
+  const pages = Array.isArray(data.pages) ? data.pages : [];
+  const groups = [];
+  let currentGroup = null;
+  const pageToGroup = new Map();
+
+  pages.forEach((page, idx) => {
+    const pageId = page.id || `page-${idx+1}`;
+    const partItem = (page.items || []).find(it => it.type === 'part_title');
+    const partKey = String(page.header?.left || '').trim() || `part-${idx+1}`;
+
+    if(!currentGroup || partItem){
+      const title = String(partItem?.title || page.header?.right || page.header?.left || `Σελίδα ${idx+1}`).trim();
+      currentGroup = {
+        key: `${partKey}|${title}|${idx}`,
+        id: pageId,
+        title,
+        entries: []
+      };
+      groups.push(currentGroup);
+    }
+
+    pageToGroup.set(pageId, currentGroup.key);
+
+    const sectionItems = (page.items || []).filter(it => it.type === 'section_heading' && String(it.title || '').trim());
+    if(!sectionItems.length && !currentGroup.entries.length){
+      currentGroup.entries.push({ id: pageId, text: currentGroup.title });
+    }else{
+      sectionItems.forEach(sec => {
+        const text = String(sec.title || '').trim();
+        if(!text) return;
+        const exists = currentGroup.entries.some(entry => entry.id === pageId && entry.text === text);
+        if(!exists) currentGroup.entries.push({ id: pageId, text });
+      });
     }
   });
-  const items=[...partFirstPages.values()];
-  megaNav.innerHTML='';
-  items.forEach(entry=>{
-    const node=document.createElement('div');
-    node.className='menu-item';
-    node.innerHTML=`<a class="menu-trigger" href="#${entry.id}">${esc(entry.text)}</a>`;
+
+  megaNav.innerHTML = '';
+  groups.forEach(group => {
+    const node = document.createElement('div');
+    node.className = 'menu-item';
+    node.dataset.groupKey = group.key;
+    const links = group.entries.map(entry => `<a class="menu-section-link" href="#${entry.id}">${esc(entry.text)}</a>`).join('');
+    node.innerHTML = `<a class="menu-trigger" href="#${group.id}">${esc(group.title)}<span class="caret">▾</span></a><div class="menu-dropdown">${links}</div>`;
     megaNav.appendChild(node);
   });
-  const printNode=document.createElement('div');
-  printNode.className='menu-item';
-  const btn=document.createElement('button');
-  btn.type='button';
-  btn.className='menu-btn';
-  btn.id='printBtn';
-  btn.textContent='Εκτύπωση';
+
+  const appNode = document.createElement('div');
+  appNode.className = 'menu-item menu-tool';
+  const appLink = document.createElement('a');
+  appLink.className = 'menu-btn';
+  appLink.href = resolveAppHref();
+  appLink.textContent = 'Στην εφαρμογή';
+  appNode.appendChild(appLink);
+  megaNav.appendChild(appNode);
+
+  const printNode = document.createElement('div');
+  printNode.className = 'menu-item menu-tool';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'menu-btn';
+  btn.id = 'printBtn';
+  btn.textContent = 'Εκτύπωση';
   btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
   printNode.appendChild(btn);
   megaNav.appendChild(printNode);
+
+  megaNav.dataset.pageGroupMap = JSON.stringify(Object.fromEntries(pageToGroup));
 }
 function updateActiveNav(){
   const pageEls=Array.from(document.querySelectorAll('.sheet-wrap[id]'));
@@ -601,9 +672,13 @@ function updateActiveNav(){
   for(const el of pageEls){
     if(el.getBoundingClientRect().top + window.scrollY <= y) activeId=el.id;
   }
+  let pageToGroup = {};
+  try{ pageToGroup = JSON.parse(megaNav.dataset.pageGroupMap || '{}'); }catch(_e){}
+  const activeGroupKey = pageToGroup[activeId] || '';
   megaNav.querySelectorAll('.menu-item').forEach(node=>{
-    const a=node.querySelector('a.menu-trigger');
-    node.classList.toggle('active', !!(a && a.getAttribute('href') === `#${activeId}`));
+    if(node.dataset.groupKey){
+      node.classList.toggle('active', node.dataset.groupKey === activeGroupKey);
+    }
   });
 }
 window.addEventListener('scroll', updateActiveNav, {passive:true});
