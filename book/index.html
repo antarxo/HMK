@@ -352,7 +352,6 @@ function rerenderBook(){
   deriveNav(bookData);
   updateActiveNav();
   setStatus(`${contentLang==='en' ? 'Pages' : 'Σελίδες'}: ${(bookData.pages||[]).length}`);
-  scheduleSceneSnapshotWarmup({onlyVisible:true, delay:320});
 }
 langElBtn?.addEventListener('click', ()=>{ contentLang='el'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
 langEnBtn?.addEventListener('click', ()=>{ contentLang='en'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
@@ -477,6 +476,89 @@ async function waitForFigureImages(){
 function cleanupPrintSandbox(){
   if(printSandbox) printSandbox.innerHTML = '';
 }
+async function injectIframeSnapshotPatch(iframe){
+  if(!iframe) return false;
+  try{
+    const win = iframe.contentWindow;
+    const doc = iframe.contentDocument || win?.document;
+    if(!win || !doc || !doc.documentElement) return false;
+    if(win.__hmSnapshotPatchApplied) return true;
+    const script = doc.createElement('script');
+    script.type = 'text/javascript';
+    script.textContent = `(function(){
+  if(window.__hmSnapshotPatchApplied) return;
+  window.__hmSnapshotPatchApplied = true;
+  const originalSnapshot = typeof window.getBookPrintSnapshot === 'function' ? window.getBookPrintSnapshot.bind(window) : (window.EMWaveApp && typeof window.EMWaveApp.getPrintSnapshot === 'function' ? window.EMWaveApp.getPrintSnapshot.bind(window.EMWaveApp) : null);
+  function decodeSvgDataUrl(dataUrl){
+    if(typeof dataUrl !== 'string') return null;
+    const comma = dataUrl.indexOf(',');
+    if(comma < 0) return null;
+    const meta = dataUrl.slice(0, comma);
+    const payload = dataUrl.slice(comma + 1);
+    try{
+      if(/;base64/i.test(meta)) return atob(payload);
+      return decodeURIComponent(payload);
+    }catch(_e){ return null; }
+  }
+  function encodeSvgData(svgText){
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+  }
+  function canvasToDataUrl(canvas){
+    if(!canvas) return null;
+    try{ return canvas.toDataURL('image/png'); }catch(_e){}
+    try{
+      const tmp = document.createElement('canvas');
+      tmp.width = canvas.width || Math.max(1, Math.round(canvas.getBoundingClientRect().width));
+      tmp.height = canvas.height || Math.max(1, Math.round(canvas.getBoundingClientRect().height));
+      const ctx = tmp.getContext('2d');
+      if(ctx){
+        ctx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
+        return tmp.toDataURL('image/png');
+      }
+    }catch(_e){}
+    return null;
+  }
+  async function patchedSnapshot(){
+    if(!originalSnapshot) return null;
+    const raw = await Promise.resolve(originalSnapshot());
+    const svgText = decodeSvgDataUrl(raw);
+    if(!svgText) return raw;
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+    const viewport = document.querySelector('.card.viewport');
+    if(!viewport) return raw;
+    const liveCanvases = Array.from(viewport.querySelectorAll('canvas'));
+    const serializedCanvases = Array.from(svgDoc.getElementsByTagName('canvas'));
+    serializedCanvases.forEach((node, idx) => {
+      const live = liveCanvases[idx];
+      const src = canvasToDataUrl(live);
+      if(!src) return;
+      const img = svgDoc.createElementNS('http://www.w3.org/1999/xhtml', 'img');
+      img.setAttribute('src', src);
+      img.setAttribute('alt', '');
+      const style = (node.getAttribute('style') || '') + ';object-fit:fill;display:block;';
+      img.setAttribute('style', style);
+      const cls = node.getAttribute('class');
+      if(cls) img.setAttribute('class', cls);
+      const width = node.getAttribute('width');
+      const height = node.getAttribute('height');
+      if(width) img.setAttribute('width', width);
+      if(height) img.setAttribute('height', height);
+      node.parentNode && node.parentNode.replaceChild(img, node);
+    });
+    const out = new XMLSerializer().serializeToString(svgDoc.documentElement);
+    return encodeSvgData(out);
+  }
+  window.getBookPrintSnapshot = patchedSnapshot;
+  if(window.EMWaveApp){ window.EMWaveApp.getPrintSnapshot = patchedSnapshot; }
+})();`;
+    (doc.head || doc.documentElement).appendChild(script);
+    script.remove();
+    return true;
+  }catch(_e){
+    return false;
+  }
+}
 async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
   if(!printSandbox || !src) return null;
   cleanupPrintSandbox();
@@ -519,6 +601,7 @@ async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
   printSandbox.appendChild(holder);
 
   await waitForIframeLoad(iframe);
+  await injectIframeSnapshotPatch(iframe);
   await wait(650);
 
   let shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
@@ -568,95 +651,48 @@ async function requestIframePrintSnapshotWithRetry(iframe, attempts=3){
 }
 let printSnapshotsPrepared = false;
 let printFlowRunning = false;
-let snapshotWarmupPromise = null;
-let snapshotWarmupTimer = null;
 let bookData = null;
 
-
-function sceneFrameHasSnapshot(frame){
-  return !!frame?.querySelector('.print-scene-snapshot');
-}
-function removeSceneSnapshot(frame){
-  frame?.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
-  frame?.classList.remove('print-ready');
-}
-function collectSceneFrames({onlyVisible=false} = {}){
-  const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
-  if(!onlyVisible) return frames;
-  const margin = Math.max(window.innerHeight || 0, 900) * 0.75;
-  return frames.filter(frame=>{
-    const r = frame.getBoundingClientRect();
-    return r.bottom >= -margin && r.top <= (window.innerHeight || 0) + margin;
-  });
-}
-async function ensureSceneSnapshot(frame, {force=false} = {}){
-  if(!frame) return false;
-  if(force) removeSceneSnapshot(frame);
-  if(sceneFrameHasSnapshot(frame)){
-    frame.classList.add('print-ready');
-    return true;
-  }
-  const liveIframe = frame.querySelector('iframe');
-  if(!liveIframe) return false;
-  const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
-  if(!dataUrl) return false;
-  const img = document.createElement('img');
-  img.className = 'print-scene-snapshot';
-  img.alt = contentLang==='en' ? 'Scene snapshot' : 'Στιγμιότυπο σκηνής';
-  img.src = dataUrl;
-  frame.appendChild(img);
-  await waitForImage(img);
-  frame.classList.add('print-ready');
-  return true;
-}
-async function warmSceneSnapshots({force=false, onlyVisible=true} = {}){
-  const frames = collectSceneFrames({onlyVisible});
-  let readyCount = 0;
-  for(const frame of frames){
-    if(await ensureSceneSnapshot(frame, {force})) readyCount += 1;
-  }
-  const allFrames = collectSceneFrames({onlyVisible:false});
-  printSnapshotsPrepared = !!allFrames.length && allFrames.every(sceneFrameHasSnapshot);
-  return readyCount;
-}
-function scheduleSceneSnapshotWarmup({force=false, onlyVisible=true, delay=260} = {}){
-  if(snapshotWarmupTimer){
-    clearTimeout(snapshotWarmupTimer);
-    snapshotWarmupTimer = null;
-  }
-  snapshotWarmupTimer = setTimeout(()=>{
-    snapshotWarmupTimer = null;
-    if(snapshotWarmupPromise) return;
-    snapshotWarmupPromise = warmSceneSnapshots({force, onlyVisible})
-      .catch(err=>console.warn(err))
-      .finally(()=>{ snapshotWarmupPromise = null; });
-  }, Math.max(0, delay));
-}
-
 function cleanupPrintSnapshots(){
-  document.querySelectorAll('.media-frame.scene-frame').forEach(removeSceneSnapshot);
+  document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
+  document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready'));
   cleanupPrintSandbox();
-  if(snapshotWarmupTimer){
-    clearTimeout(snapshotWarmupTimer);
-    snapshotWarmupTimer = null;
-  }
   printSnapshotsPrepared = false;
   printFlowRunning = false;
 }
 async function preparePrintSnapshots(force=false){
-  if(printSnapshotsPrepared && !force) return collectSceneFrames({onlyVisible:false}).length;
-  if(force) cleanupPrintSnapshots();
+  if(printSnapshotsPrepared && !force) return 0;
+  cleanupPrintSnapshots();
   await waitForFigureImages();
-  const readyCount = await warmSceneSnapshots({force:false, onlyVisible:false});
+
+  const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
+  let readyCount = 0;
+
+  for(const frame of frames){
+    const liveIframe = frame.querySelector('iframe');
+    if(!liveIframe) continue;
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
+    if(!dataUrl) continue;
+
+    const img = document.createElement('img');
+    img.className = 'print-scene-snapshot';
+    img.alt = 'Στιγμιότυπο σκηνής';
+    img.src = dataUrl;
+    frame.appendChild(img);
+    await waitForImage(img);
+    frame.classList.add('print-ready');
+    readyCount += 1;
+  }
+
   await wait(120);
+  printSnapshotsPrepared = true;
   return readyCount;
 }
 async function beginPrintFlow(){
   if(printFlowRunning) return;
   printFlowRunning = true;
-  setStatus(contentLang==='en' ? 'Preparing static scene snapshots for printing…' : 'Ετοιμάζονται στατικά στιγμιότυπα για την εκτύπωση…');
+  setStatus('Ετοιμάζονται στατικά στιγμιότυπα για την εκτύπωση…');
   try{
-    if(snapshotWarmupPromise) await snapshotWarmupPromise.catch(()=>{});
     await preparePrintSnapshots(true);
   }catch(err){
     console.warn(err);
@@ -671,26 +707,13 @@ function resolveAppHref(){
 }
 window.addEventListener('beforeprint', ()=>{
   if(!printSnapshotsPrepared){
-    try{ scheduleSceneSnapshotWarmup({onlyVisible:false, delay:0}); }catch(_e){}
+    try{ preparePrintSnapshots(false); }catch(_e){}
   }
 });
 window.addEventListener('afterprint', ()=>{
   cleanupPrintSnapshots();
   setStatus('');
-  scheduleSceneSnapshotWarmup({onlyVisible:true, delay:500});
 });
-window.addEventListener('keydown', async (event)=>{
-  const key = String(event.key || '').toLowerCase();
-  if(key !== 'p') return;
-  const wantsPrint = event.ctrlKey || event.metaKey;
-  if(!wantsPrint) return;
-  event.preventDefault();
-  await beginPrintFlow();
-});
-window.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'visible') scheduleSceneSnapshotWarmup({onlyVisible:true, delay:420});
-});
-window.addEventListener('resize', ()=> scheduleSceneSnapshotWarmup({onlyVisible:true, delay:420}), {passive:true});
 
 function sceneAspect(item){
   const src=String(item.singleSrc||'');
@@ -970,7 +993,6 @@ function updateActiveNav(){
   });
 }
 window.addEventListener('scroll', updateActiveNav, {passive:true});
-window.addEventListener('scroll', ()=> scheduleSceneSnapshotWarmup({onlyVisible:true, delay:180}), {passive:true});
 
 async function loadData(){
   let lastErr=null;
