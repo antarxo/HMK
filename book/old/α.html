@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Η/Μ κύμα · βιβλίο σελίδων</title>
+  <link rel="icon" href="data:,">
+<style>
+:root{
+  --bg:#ece6d9;
+  --paper:#fffdf9;
+  --ink:#1d2730;
+  --muted:#5e6d79;
+  --line:#ddd3c3;
+  --accent:#1f5f8b;
+  --accent-soft:#e7f0f6;
+  --note:#f6efdc;
+  --figure:#f6f8fa;
+  --sheet-width:794px;
+  --sheet-height:1123px;
+  --sheet-pad-top:54px;
+  --sheet-pad-right:44px;
+  --sheet-pad-bottom:54px;
+  --sheet-pad-left:44px;
+  --screen-scale:1;
+  --shadow:0 18px 36px rgba(0,0,0,.10);
+  --shape-width:340px;
+  --body-font-size:18px;
+  --body-leading:1.3;
+  --para-gap:6px;
+  --section-gap:14px;
+  --note-gap:8px;
+  --callout-gap:7px;
+  --header-top:20px;
+  --header-h:16px;
+  --footer-bottom:18px;
+  --footer-h:16px;
+  --header-font-size:0px;
+  --footer-font-size:0px;
+  --body-font-family:Georgia,"Noto Serif",serif;
+  --heading-font-family:Georgia,"Noto Serif",serif;
+  --hero-eyebrow-font-size:13px;
+  --hero-title-font-size:28px;
+  --hero-subtitle-font-size:16px;
+  --hero-title-font-family:Georgia,"Times New Roman",serif;
+  --part-kicker-font-size:10px;
+  --part-title-font-size:24px;
+  --part-title-font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  --section-heading-font-size:18px;
+  --section-heading-font-family:Georgia,"Noto Serif",serif;
+  --note-font-size:14px;
+  --note-line-height:1.42;
+  --note-label-font-size:10.5px;
+  --caption-font-size:12px;
+  --callout-font-size:11.5px;
+  --callout-title-font-size:10.5px;
+  --callout-label-font-size:10px;
+  --callout-chip-font-size:10px;
+  --callout-observe-title-font-size:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#efe9dc 0,#ece6d9 120px);
+  color:var(--ink);
+  font-size:var(--body-font-size);
+  line-height:var(--body-leading);
+  font-family:var(--body-font-family);
+}
+.topbar{
+  position:sticky; top:0; z-index:30;
+  backdrop-filter:blur(10px);
+  background:rgba(236,230,217,.88);
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+.topbar-inner{
+  max-width:1200px; margin:0 auto; padding:10px 18px;
+}
+.lang-tools{display:flex;justify-content:flex-end;gap:8px;max-width:var(--sheet-width);margin:0 auto 8px}
+.lang-btn{border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:8px 12px;border-radius:14px;font:700 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;cursor:pointer}
+.lang-btn.active{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
+.mega-nav{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+  align-items:stretch;
+  justify-content:center;
+  width:100%;
+  max-width:var(--sheet-width);
+  margin:0 auto;
+}
+.menu-item{position:relative;min-width:0}
+.menu-item::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;background:transparent}
+.menu-trigger,.menu-btn{
+  display:flex; width:100%; min-width:0; align-items:center; justify-content:center; gap:7px;
+  border:1px solid rgba(0,0,0,.12); background:#fff; color:var(--ink);
+  padding:10px 12px; border-radius:18px; font:700 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  text-decoration:none; white-space:nowrap; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.04); cursor:pointer;
+}
+.menu-trigger .caret{font-size:11px;color:var(--muted)}
+.menu-item.active .menu-trigger,.menu-item:hover>.menu-trigger,.menu-item:focus-within>.menu-trigger,.menu-btn:hover{
+  background:#f7fafc;border-color:#cfd8e0;color:#173f5b
+}
+.menu-dropdown{
+  position:absolute;left:0;top:calc(100% + 2px);min-width:100%;width:max-content;display:none;
+  padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35
+}
+.menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}
+.menu-dropdown .menu-section-link{
+  display:block;text-decoration:none;color:var(--ink);background:#faf8f3;border:1px solid rgba(0,0,0,.06);
+  border-radius:12px;padding:10px 12px;font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:0 0 8px
+}
+.menu-dropdown .menu-section-link:last-child{margin-bottom:0}
+.menu-item.menu-tool::after{display:none}
+.viewport{max-width:1200px; margin:0 auto; padding:24px 18px 60px}
+.page-stack{display:flex; flex-direction:column; align-items:center; gap:26px}
+.sheet-wrap{
+  width:calc(var(--sheet-width) * var(--screen-scale));
+  min-height:calc(var(--sheet-height) * var(--screen-scale));
+  position:relative;
+}
+.sheet{
+  width:var(--sheet-width);
+  height:var(--sheet-height);
+  min-height:var(--sheet-height);
+  transform:scale(var(--screen-scale));
+  transform-origin:top left;
+  background:var(--paper);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  position:absolute; left:0; top:0;
+  overflow:hidden;
+}
+.sheet-inner{
+  position:relative;
+  height:100%;
+  min-height:100%;
+  padding:var(--sheet-pad-top) var(--sheet-pad-right) var(--sheet-pad-bottom) var(--sheet-pad-left);
+}
+.sheet-header{
+  position:absolute;
+  left:var(--sheet-pad-left);
+  right:var(--sheet-pad-right);
+  top:var(--header-top);
+  height:var(--header-h);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:center;
+  border-bottom:1px solid rgba(0,0,0,.08);
+  padding-bottom:8px;
+  font:700 var(--header-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  letter-spacing:.04em;
+  text-transform:none;
+  color:#7f8890;
+}
+.sheet-header .c{text-align:center}
+.sheet-header .r{text-align:right}
+.sheet-header.hidden{display:none}
+.sheet-body{
+  display:flow-root;
+}
+.sheet-footer{
+  position:absolute;
+  left:var(--sheet-pad-left);
+  right:var(--sheet-pad-right);
+  bottom:var(--footer-bottom);
+  height:var(--footer-h);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:center;
+  padding-top:8px;
+  border-top:1px solid rgba(0,0,0,.08);
+  font:600 var(--footer-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  color:#7b8791;
+}
+.sheet-footer .c{text-align:center}
+.sheet-footer .r{text-align:right}
+.sheet-footer.hidden{display:none}
+
+.hero{margin:0 0 var(--section-gap)}
+.eyebrow{margin:0 0 10px;font:800 var(--hero-eyebrow-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+h1{margin:0 0 10px;font-family:var(--hero-title-font-family);font-size:var(--hero-title-font-size);line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
+.subtitle{margin:0;color:var(--muted);font-size:var(--hero-subtitle-font-size);line-height:1.35;max-width:56ch}
+
+.part-head{margin:18px 0 14px;padding-top:2px}
+.part-kicker{margin:0 0 5px;font:800 var(--part-kicker-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
+.part-title-main{margin:0;font:780 var(--part-title-font-size)/1.08 var(--part-title-font-family);letter-spacing:-.022em;color:#2f627f}
+
+.section-heading{margin:20px 0 8px;padding-top:6px;border-top:1px solid rgba(0,0,0,.06);font:700 var(--section-heading-font-size)/1.18 var(--section-heading-font-family);letter-spacing:-.008em;color:#5d7281}
+.paragraph{margin:0 0 var(--para-gap);text-align:justify;text-justify:inter-word;hyphens:auto}
+.note{
+  margin:var(--note-gap) 0; padding:10px 12px; border-radius:14px; background:var(--note); border:1px solid #e4d7ae;
+  font:500 var(--note-font-size)/var(--note-line-height) system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+}
+.note .label{display:block;margin:0 0 5px;font:800 var(--note-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+
+figure.media{
+  margin:4px 0 12px; background:var(--figure); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+}
+figure.media.float-right,figure.media.float-left{width:min(var(--figure-width, var(--shape-width)), 42%)}
+figure.media.float-right{float:right;margin:4px 0 10px 18px}
+figure.media.float-left{float:left;margin:4px 18px 10px 0}
+figure.media.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
+.media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
+.media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}
+.media-frame iframe,.media-frame img,.media-placeholder,.print-scene-snapshot{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.media-frame img{object-fit:cover}
+.media-frame.natural img{position:static;inset:auto;width:100%;height:auto;object-fit:contain;display:block}
+.media-placeholder{display:grid;place-items:center;text-align:center;padding:22px;background:linear-gradient(135deg,#f7fbfd,#e1ebf1);color:#465666;font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+.print-scene-snapshot{display:none;object-fit:contain;background:#fff}
+figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--muted);border-top:1px solid rgba(0,0,0,.07)}
+
+.callout{
+  margin:var(--callout-gap) 0; padding:8px 9px; border:1px solid #d6e2eb; border-radius:12px; background:#f8fbfd;
+  font:500 var(--callout-font-size)/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:#29414f;
+}
+.callout-title{margin:0 0 6px;font:800 var(--callout-title-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
+.callout-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px}
+.callout-label{font:700 var(--callout-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:3px 6px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
+.callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 var(--callout-chip-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}
+.callout-observe{margin-top:4px;padding-top:5px;border-top:1px dashed #cfdbe3}
+.callout-observe-title{font:700 var(--callout-observe-title-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
+.callout-observe ul{margin:6px 0 0 18px;padding:0}
+.callout-observe li{margin:4px 0;font-style:italic}
+.clear{clear:both}
+.status{max-width:var(--sheet-width);margin:16px auto 0;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+
+.math-inline math{font-size:1em}
+@media (max-width:980px){
+  .mega-nav{grid-template-columns:repeat(3,minmax(120px,1fr))}
+}
+@media (max-width:760px){
+  .mega-nav{grid-template-columns:repeat(2,minmax(120px,1fr))}
+  .menu-dropdown{position:static;display:block;min-width:0;width:100%;margin-top:8px}
+}
+@media print{
+  @page{size:A4 portrait; margin:0}
+  html,body{background:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  body{
+    font-size:var(--body-font-size) !important;
+    line-height:var(--body-leading) !important;
+    font-family:var(--body-font-family) !important;
+  }
+  .topbar,.status{display:none !important}
+  .viewport{padding:0 !important; max-width:none !important}
+  .page-stack{gap:0 !important}
+  .sheet-wrap{
+    width:var(--sheet-width) !important;
+    min-height:var(--sheet-height) !important;
+    page-break-after:always;
+    break-after:page;
+    break-inside:avoid;
+    overflow:visible !important;
+  }
+  .sheet-wrap:last-child{page-break-after:auto;break-after:auto}
+  .sheet{
+    width:var(--sheet-width) !important;
+    height:var(--sheet-height) !important;
+    min-height:var(--sheet-height) !important;
+    transform:none !important;
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    border:0 !important;
+    box-shadow:none !important;
+    overflow:hidden !important;
+  }
+  .sheet-inner{
+    height:100% !important;
+    min-height:100% !important;
+    padding:var(--sheet-pad-top) var(--sheet-pad-right) var(--sheet-pad-bottom) var(--sheet-pad-left) !important;
+  }
+  .sheet-header{
+    left:var(--sheet-pad-left) !important;
+    right:var(--sheet-pad-right) !important;
+    top:var(--header-top) !important;
+    height:var(--header-h) !important;
+    font-size:var(--header-font-size) !important;
+  }
+  .sheet-footer{
+    left:var(--sheet-pad-left) !important;
+    right:var(--sheet-pad-right) !important;
+    bottom:var(--footer-bottom) !important;
+    height:var(--footer-h) !important;
+    font-size:var(--footer-font-size) !important;
+  }
+  figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
+  .media-frame.print-ready iframe{display:none !important}
+  .media-frame img{object-fit:contain !important; background:#fff !important}
+  .media-frame.scene-frame::after{
+    content:"[Η διαδραστική σκηνή εμφανίζεται στην ψηφιακή έκδοση]";
+    position:absolute; inset:0; display:grid; place-items:center;
+    padding:18px; color:#5e6d79; font:600 13px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif; background:#f4f6f8;
+  }
+  .media-frame.scene-frame.print-ready{background:#fff !important}
+  .media-frame.scene-frame.print-ready::after{content:none !important}
+  .print-scene-snapshot{display:block !important; object-fit:contain !important; background:#fff !important}
+}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="lang-tools">
+        <button type="button" class="lang-btn" id="langElBtn">Ελληνικά</button>
+        <button type="button" class="lang-btn" id="langEnBtn">English</button>
+      </div>
+      <nav class="mega-nav" id="megaNav" aria-label="Μενού βιβλίου"></nav>
+    </div>
+  </div>
+
+  <main class="viewport">
+    <div class="page-stack" id="pageStack"></div>
+    <div class="status" id="status"></div>
+  </main>
+  <div id="printSandbox" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0"></div>
+
+<script>
+'use strict';
+const pageStack=document.getElementById('pageStack');
+const megaNav=document.getElementById('megaNav');
+const statusEl=document.getElementById('status');
+const printSandbox=document.getElementById('printSandbox');
+const langElBtn=document.getElementById('langElBtn');
+const langEnBtn=document.getElementById('langEnBtn');
+let printPageStyleEl = null;
+const JSON_CANDIDATES=['chapter_content_bilingual.json','chapter_content.json'];
+let contentLang = localStorage.getItem('hmkContentLang') || 'el';
+function locKey(key){ return contentLang === 'en' ? `${key}_en` : key; }
+function getLoc(obj,key,fallback=''){
+  if(!obj) return fallback;
+  const v = obj[locKey(key)];
+  if(v != null && v !== '') return v;
+  const base = obj[key];
+  return base != null ? base : fallback;
+}
+function getLocArray(obj,key){
+  if(!obj) return [];
+  const v = obj[locKey(key)];
+  if(Array.isArray(v)) return v;
+  return Array.isArray(obj[key]) ? obj[key] : [];
+}
+function updateLangButtons(){
+  document.documentElement.lang = contentLang;
+  langElBtn?.classList.toggle('active', contentLang==='el');
+  langEnBtn?.classList.toggle('active', contentLang==='en');
+}
+function rerenderBook(){
+  if(!bookData) return;
+  renderPages(bookData);
+  deriveNav(bookData);
+  updateActiveNav();
+  setStatus(`${contentLang==='en' ? 'Pages' : 'Σελίδες'}: ${(bookData.pages||[]).length}`);
+}
+langElBtn?.addEventListener('click', ()=>{ contentLang='el'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
+langEnBtn?.addEventListener('click', ()=>{ contentLang='en'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
+updateLangButtons();
+
+function applyPrintPageSettings(defs){
+  if(!printPageStyleEl){
+    printPageStyleEl = document.createElement('style');
+    printPageStyleEl.id = 'dynamic-print-page-style';
+    document.head.appendChild(printPageStyleEl);
+  }
+  const size = String(defs?.pageSize || 'A4').trim() || 'A4';
+  const orientation = String(defs?.orientation || 'portrait').trim() || 'portrait';
+  printPageStyleEl.textContent = `@media print{ @page{ size:${size} ${orientation}; margin:0 } }`;
+}
+
+function setStatus(msg){ statusEl.textContent = msg || ''; }
+function esc(s=''){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function applyScreenScale(){
+  const avail=Math.max(320, window.innerWidth - 48);
+  const scale=Math.min(1, avail / 794);
+  document.documentElement.style.setProperty('--screen-scale', String(scale));
+}
+window.addEventListener('resize', applyScreenScale, {passive:true});
+
+function replaceTokens(value, ctx){
+  return String(value || '')
+    .replace(/\{page\}/g, String(ctx.page || ''))
+    .replace(/\{pages\}/g, String(ctx.pages || ''));
+}
+function placementClass(item){
+  const p=String(item?.placement || '').toLowerCase();
+  if(p==='left') return 'float-left';
+  if(p==='right') return 'float-right';
+  return 'wide';
+}
+function withCacheBust(url){
+  try{
+    const u=new URL(url, window.location.href);
+    u.searchParams.set('_cb', String(Date.now()));
+    return u.toString();
+  }catch(_e){ return url; }
+}
+function normalizeAppSrc(url=''){
+  const raw=String(url || '').trim();
+  if(!raw) return raw;
+  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return raw;
+  const path=(window.location.pathname || '').replace(/\\/g,'/').toLowerCase();
+  const inBook=/\/book(\/|$)/.test(path);
+  const appEntry=inBook ? '../index.html' : './index.html';
+  return raw
+    .replace(/^\.\.\/index_printmatch\.html/i, appEntry)
+    .replace(/^\.\.\/index\.html/i, appEntry)
+    .replace(/^\.\.\/app\/em_wave_app\.html/i, appEntry)
+    .replace(/^\.\//, './')
+    .replace(/\.\.\/index_printmatch\.html/g, appEntry)
+    .replace(/\.\.\/index\.html/g, appEntry)
+    .replace(/\.\.\/app\/em_wave_app\.html/g, appEntry);
+}
+function imageSrcCandidates(src=''){
+  const raw=String(src||'').trim();
+  if(!raw) return [];
+  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
+  const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
+  const inBook=/\/book(\/|$)/.test(path);
+  const list=[];
+  const push=v=>{ if(v && !list.includes(v)) list.push(v); };
+  push(raw);
+  if(inBook){
+    if(raw.startsWith('images/')) push(`./${raw}`);
+    if(raw.startsWith('./images/')) push(raw.slice(2));
+    if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
+    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
+  }else{
+    if(raw.startsWith('images/')) push(`./book/${raw}`);
+    if(raw.startsWith('./images/')) push(`./book/${raw.slice(2)}`);
+    if(raw.startsWith('/images/')) push(`./book${raw}`);
+    if(raw.startsWith('book/images/')) push(`./${raw}`);
+    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\//,'./'));
+  }
+  return list;
+}
+function applyImageWithFallback(img, rawSrc=''){
+  const candidates=imageSrcCandidates(rawSrc);
+  let i=0;
+  const tryNext=()=>{
+    if(i>=candidates.length){
+      img.dispatchEvent(new CustomEvent('imagefallbackfailed'));
+      return;
+    }
+    img.src=candidates[i++];
+  };
+  img.addEventListener('error', tryNext);
+  tryNext();
+}
+function waitForImage(img){
+  return new Promise(resolve=>{
+    if(!img || img.complete) return resolve();
+    img.addEventListener('load', ()=>resolve(), {once:true});
+    img.addEventListener('error', ()=>resolve(), {once:true});
+  });
+}
+function wait(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+function waitForIframeLoad(iframe){
+  return new Promise(resolve=>{
+    if(!iframe) return resolve();
+    let done = false;
+    const finish = ()=>{ if(done) return; done = true; resolve(); };
+    try{
+      const doc = iframe.contentDocument;
+      if(doc && doc.readyState === 'complete') return resolve();
+    }catch(_e){}
+    iframe.addEventListener('load', finish, {once:true});
+    iframe.addEventListener('error', finish, {once:true});
+    setTimeout(finish, 3500);
+  });
+}
+async function waitForFigureImages(){
+  const imgs = Array.from(document.querySelectorAll('.media-frame img:not(.print-scene-snapshot)'));
+  for(const img of imgs) await waitForImage(img);
+}
+function cleanupPrintSandbox(){
+  if(printSandbox) printSandbox.innerHTML = '';
+}
+async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
+  if(!printSandbox || !src) return null;
+  cleanupPrintSandbox();
+
+  const liveRect = sourceFrame?.getBoundingClientRect ? sourceFrame.getBoundingClientRect() : null;
+  const liveW = Math.max(1, Math.round(liveRect?.width || 340));
+  const liveH = Math.max(1, Math.round(liveRect?.height || Math.round(liveW * 1.15)));
+
+  const maxSandboxW = 1600;
+  const maxSandboxH = 2200;
+  const scale = Math.max(2, Math.min(4, Math.floor(maxSandboxW / liveW) || 2));
+  let cloneW = Math.max(liveW * scale, liveW);
+  let cloneH = Math.max(liveH * scale, liveH);
+
+  if(cloneW > maxSandboxW){
+    const k = maxSandboxW / cloneW;
+    cloneW = Math.round(cloneW * k);
+    cloneH = Math.round(cloneH * k);
+  }
+  if(cloneH > maxSandboxH){
+    const k = maxSandboxH / cloneH;
+    cloneW = Math.round(cloneW * k);
+    cloneH = Math.round(cloneH * k);
+  }
+
+  printSandbox.style.width = `${cloneW}px`;
+  printSandbox.style.height = `${cloneH}px`;
+
+  const holder = document.createElement('div');
+  holder.style.cssText = `width:${cloneW}px;height:${cloneH}px;overflow:hidden;background:#fff;display:block`;
+
+  const iframe = document.createElement('iframe');
+  iframe.loading = 'eager';
+  iframe.referrerPolicy = 'no-referrer';
+  iframe.allow = 'fullscreen';
+  iframe.style.cssText = `width:${cloneW}px;height:${cloneH}px;border:0;display:block;background:#fff`;
+  iframe.src = withCacheBust(src);
+
+  holder.appendChild(iframe);
+  printSandbox.appendChild(holder);
+
+  await waitForIframeLoad(iframe);
+  await wait(650);
+
+  let shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
+  if(!shot){
+    await wait(450);
+    shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
+  }
+
+  holder.remove();
+  printSandbox.style.width = '1px';
+  printSandbox.style.height = '1px';
+  return shot;
+}
+async function requestIframePrintSnapshot(iframe){
+  if(!iframe) return null;
+  try{
+    const direct=iframe.contentWindow?.getBookPrintSnapshot || iframe.contentWindow?.EMWaveApp?.getPrintSnapshot;
+    if(typeof direct==='function'){
+      const r=await Promise.resolve(direct.call(iframe.contentWindow));
+      if(r) return r;
+    }
+  }catch(_e){}
+  return await new Promise(resolve=>{
+    const requestId=`snap_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    let settled=false;
+    const cleanup=()=>{ if(settled) return; settled=true; window.removeEventListener('message', onMessage); clearTimeout(timer); };
+    const onMessage=(event)=>{
+      if(event.source!==iframe.contentWindow) return;
+      const data=event.data;
+      if(!data || data.type!=='hm_print_snapshot' || data.requestId!==requestId) return;
+      cleanup();
+      resolve(data.dataUrl || null);
+    };
+    const timer=setTimeout(()=>{ cleanup(); resolve(null); }, 4800);
+    window.addEventListener('message', onMessage);
+    try{ iframe.contentWindow?.postMessage({type:'capturePrintSnapshot', requestId}, '*'); }
+    catch(_e){ cleanup(); resolve(null); }
+  });
+}
+async function requestIframePrintSnapshotWithRetry(iframe, attempts=3){
+  for(let i=0;i<attempts;i++){
+    const shot = await requestIframePrintSnapshot(iframe);
+    if(shot) return shot;
+    await new Promise(resolve => setTimeout(resolve, 220));
+  }
+  return null;
+}
+let printSnapshotsPrepared = false;
+let printFlowRunning = false;
+let bookData = null;
+
+function cleanupPrintSnapshots(){
+  document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
+  document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready'));
+  cleanupPrintSandbox();
+  printSnapshotsPrepared = false;
+  printFlowRunning = false;
+}
+async function preparePrintSnapshots(force=false){
+  if(printSnapshotsPrepared && !force) return 0;
+  cleanupPrintSnapshots();
+  await waitForFigureImages();
+
+  const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
+  let readyCount = 0;
+
+  for(const frame of frames){
+    const liveIframe = frame.querySelector('iframe');
+    if(!liveIframe) continue;
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
+    if(!dataUrl) continue;
+
+    const img = document.createElement('img');
+    img.className = 'print-scene-snapshot';
+    img.alt = 'Στιγμιότυπο σκηνής';
+    img.src = dataUrl;
+    frame.appendChild(img);
+    await waitForImage(img);
+    frame.classList.add('print-ready');
+    readyCount += 1;
+  }
+
+  await wait(120);
+  printSnapshotsPrepared = true;
+  return readyCount;
+}
+async function beginPrintFlow(){
+  if(printFlowRunning) return;
+  printFlowRunning = true;
+  setStatus('Ετοιμάζονται στατικά στιγμιότυπα για την εκτύπωση…');
+  try{
+    await preparePrintSnapshots(true);
+  }catch(err){
+    console.warn(err);
+  }
+  setStatus('');
+  window.print();
+}
+function resolveAppHref(){
+  const path = (window.location.pathname || '').replace(/\\/g,'/');
+  if(/\/book(\/|$)/i.test(path)) return '../index.html';
+  return 'index.html';
+}
+window.addEventListener('beforeprint', ()=>{
+  if(!printSnapshotsPrepared){
+    try{ preparePrintSnapshots(false); }catch(_e){}
+  }
+});
+window.addEventListener('afterprint', ()=>{
+  cleanupPrintSnapshots();
+  setStatus('');
+});
+
+function sceneAspect(item){
+  const src=String(item.singleSrc||'');
+  let layout='';
+  try{
+    const u=new URL(normalizeAppSrc(src), window.location.href);
+    layout=(u.searchParams.get('layout')||'').toLowerCase();
+  }catch(_e){}
+  const g=146.2, r=219.3, c=34;
+  if(layout==='rod_only') return 340/(r+c);
+  if(layout==='rod_1graph') return 340/(r+g+c);
+  if(layout==='rod_2graphs') return 340/(r+g*2+c);
+  if(layout==='rod_3graphs') return 340/(r+g*3+c);
+  return 16/9;
+}
+
+function renderHero(item){
+  const wrap=document.createElement('section');
+  wrap.className='hero';
+  wrap.innerHTML=`${getLoc(item,'eyebrow','')?`<p class="eyebrow">${getLoc(item,'eyebrow','')}</p>`:''}${getLoc(item,'title','')?`<h1>${getLoc(item,'title','')}</h1>`:''}${getLoc(item,'subtitle','')?`<p class="subtitle">${getLoc(item,'subtitle','')}</p>`:''}`;
+  return wrap;
+}
+function renderPartTitle(item){
+  const d=document.createElement('section');
+  d.className='part-head';
+  d.innerHTML=`${getLoc(item,'label','')?`<p class="part-kicker">${getLoc(item,'label','')}</p>`:''}${getLoc(item,'title','')?`<h2 class="part-title-main">${getLoc(item,'title','')}</h2>`:''}`;
+  return d;
+}
+function renderSectionHeading(item){
+  const h=document.createElement('h2');
+  h.className='section-heading';
+  h.textContent=getLoc(item,'title','');
+  return h;
+}
+function renderParagraph(item){
+  const p=document.createElement('p');
+  p.className='paragraph';
+  p.innerHTML=getLoc(item,'html','');
+  return p;
+}
+function renderNote(item){
+  const d=document.createElement('div');
+  d.className='note';
+  d.innerHTML=`${getLoc(item,'label','')?`<span class="label">${getLoc(item,'label','')}</span>`:''}${getLoc(item,'html','')||''}`;
+  return d;
+}
+function renderFigure(item){
+  const fig=document.createElement('figure');
+  fig.className=`media ${placementClass(item)}`;
+  if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
+  const frame=document.createElement('div');
+  frame.className=`media-frame ${item.aspect==='natural'?'natural':''}`.trim();
+  const img=document.createElement('img');
+  img.alt=getLoc(item,'alt','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
+  img.addEventListener('imagefallbackfailed', ()=>{
+    img.remove();
+    const ph=document.createElement('div');
+    ph.className='media-placeholder';
+    ph.innerHTML=`<div><strong>${esc(getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα'))}</strong><br>${contentLang==='en' ? 'Image file not found.' : 'Το αρχείο εικόνας δεν βρέθηκε.'}</div>`;
+    frame.appendChild(ph);
+  }, {once:true});
+  applyImageWithFallback(img, item.src || '');
+  frame.appendChild(img);
+  fig.appendChild(frame);
+  if(!item.hideCaption){
+    const cap=document.createElement('figcaption');
+    cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
+    fig.appendChild(cap);
+  }
+  return fig;
+}
+function renderScene(item){
+  const fig=document.createElement('figure');
+  fig.className=`media ${placementClass(item)}`;
+  if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
+  const frame=document.createElement('div');
+  frame.className='media-frame scene-frame';
+  frame.style.aspectRatio=String(sceneAspect(item));
+  const iframe=document.createElement('iframe');
+  iframe.loading='lazy';
+  iframe.referrerPolicy='no-referrer';
+  iframe.allow='fullscreen';
+  iframe.src=withCacheBust(normalizeAppSrc(item.singleSrc || ''));
+  frame.appendChild(iframe);
+  fig.appendChild(frame);
+  if(!item.hideCaption){
+    const cap=document.createElement('figcaption');
+    cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Scene' : 'Σκηνή');
+    fig.appendChild(cap);
+  }
+  return fig;
+}
+function renderCallout(item){
+  const d=document.createElement('div');
+  d.className='callout';
+  const setup=(item.setupChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'setupLabel', contentLang==='en' ? 'Set' : 'Ρύθμισε')}</span>${(item.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
+  const press=(item.pressChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'pressLabel', contentLang==='en' ? 'Press' : 'Πίεσε')}</span>${(item.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
+  const observe=getLocArray(item,'observeItems').length ? `<div class="callout-observe"><span class="callout-observe-title">${getLoc(item,'observeTitle', contentLang==='en' ? 'Observe' : 'Παρατήρησε')}</span><ul>${getLocArray(item,'observeItems').map(t=>`<li>${t}</li>`).join('')}</ul></div>` : '';
+  d.innerHTML=`<div class="callout-title">${getLoc(item,'title', contentLang==='en' ? 'Try' : 'Δοκίμασε')}</div>${setup}${press}${observe}`;
+  return d;
+}
+function renderItem(item){
+  if(!item || typeof item!=='object'){
+    const d=document.createElement('div');
+    d.textContent='Άκυρο item';
+    return d;
+  }
+  switch(item.type){
+    case 'hero': return renderHero(item);
+    case 'part_title': return renderPartTitle(item);
+    case 'section_heading': return renderSectionHeading(item);
+    case 'paragraph': return renderParagraph(item);
+    case 'note': return renderNote(item);
+    case 'figure': return renderFigure(item);
+    case 'scene': return renderScene(item);
+    case 'interactive_callout': return renderCallout(item);
+    case 'clear': { const d=document.createElement('div'); d.className='clear'; return d; }
+    default: {
+      const d=document.createElement('div');
+      d.textContent=`Άγνωστο block: ${item.type}`;
+      return d;
+    }
+  }
+}
+function buildHeader(page, pageNo, total){
+  const h=document.createElement('div');
+  h.className='sheet-header';
+  if(Number((bookData?.layoutDefaults || {}).headerFontSize) <= 0) h.classList.add('hidden');
+  h.innerHTML=`<div class="l">${replaceTokens(getLoc(page.header,'left',''), {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(getLoc(page.header,'center',''), {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(getLoc(page.header,'right',''), {page:pageNo,pages:total})}</div>`;
+  return h;
+}
+function buildFooter(page, pageNo, total, showNumbers=true){
+  const f=document.createElement('div');
+  f.className='sheet-footer';
+  if(Number((bookData?.layoutDefaults || {}).footerFontSize) <= 0) f.classList.add('hidden');
+  const rightValue = showNumbers === false ? '' : getLoc(page.footer,'right','');
+  f.innerHTML=`<div class="l">${replaceTokens(getLoc(page.footer,'left',''), {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(getLoc(page.footer,'center',''), {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(rightValue, {page:pageNo,pages:total})}</div>`;
+  return f;
+}
+function renderPages(data){
+  const pages=Array.isArray(data.pages) ? data.pages : [];
+  const total=pages.length;
+  pageStack.innerHTML='';
+  pages.forEach((page, idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='sheet-wrap';
+    wrap.id=page.id || `page-${idx+1}`;
+    const sheet=document.createElement('section');
+    sheet.className='sheet';
+    const inner=document.createElement('div');
+    inner.className='sheet-inner';
+    inner.appendChild(buildHeader(page, idx+1, total));
+    const body=document.createElement('div');
+    body.className='sheet-body';
+    (page.items || []).forEach(item => body.appendChild(renderItem(item)));
+    inner.appendChild(body);
+    inner.appendChild(buildFooter(page, idx+1, total, data.layoutDefaults?.showPageNumbers));
+    sheet.appendChild(inner);
+    wrap.appendChild(sheet);
+    pageStack.appendChild(wrap);
+  });
+}
+function deriveNav(data){
+  const pages = Array.isArray(data.pages) ? data.pages : [];
+  const groups = [];
+  const pageToGroup = new Map();
+  let currentGroup = null;
+
+  const ignoredTitles = new Set([
+    'Δοκίμασε',
+    'Σχολική Περιγραφή',
+    'Ποια είναι η εικόνα των πεδίων;',
+    'Συμβάντα',
+    'Πώς εξελίσσεται η διάδοση των πεδίων;',
+    'Στιγμιότυπο',
+    'Σύμβαση',
+    'Πώς να το χρησιμοποιήσεις',
+    'Τι να περιμένεις',
+    'Εικόνα 1',
+    'Εικόνα 2',
+    'Πυρήνας','Try','School description','What is the picture of the fields?','Events','How does the propagation of the fields evolve?','Snapshot','Convention','How to use it','What to expect','Figure 1','Figure 2','Core'
+  ]);
+
+  function menuGroupTitle(groupIndex, page, partItem){
+    if(groupIndex === 0) return contentLang==='en' ? 'Introduction' : 'Εισαγωγή';
+    if(groupIndex === 1) return contentLang==='en' ? 'School version' : 'Σχολικά';
+    if(partItem && String(getLoc(partItem,'title','')).trim()) return String(getLoc(partItem,'title','')).trim();
+    const right = String(getLoc(page?.header,'right','')).trim();
+    return right || (contentLang==='en' ? `Page ${groupIndex+1}` : `Σελίδα ${groupIndex+1}`);
+  }
+
+  pages.forEach((page, idx) => {
+    const pageId = page.id || `page-${idx+1}`;
+    const partItem = (page.items || []).find(it => it.type === 'part_title');
+    const startsNewGroup = !currentGroup || !!partItem;
+
+    if(startsNewGroup){
+      currentGroup = {
+        key: `group-${groups.length}`,
+        id: pageId,
+        title: menuGroupTitle(groups.length, page, partItem),
+        entries: [],
+        seen: new Set()
+      };
+      groups.push(currentGroup);
+    }
+
+    pageToGroup.set(pageId, currentGroup.key);
+
+    const candidates = [];
+    (page.items || []).forEach(it => {
+      const raw = String(getLoc(it,'title','')).trim();
+      if(!raw || ignoredTitles.has(raw)) return;
+      if(it.type === 'section_heading' || it.type === 'scene'){
+        candidates.push(raw);
+      }
+    });
+
+    if(!candidates.length && currentGroup.entries.length === 0){
+      candidates.push(currentGroup.title);
+    }
+
+    candidates.forEach(text => {
+      const key = text.toLowerCase();
+      if(currentGroup.seen.has(key)) return;
+      currentGroup.seen.add(key);
+      currentGroup.entries.push({ id: pageId, text });
+    });
+  });
+
+  megaNav.innerHTML = '';
+  groups.forEach(group => {
+    const node = document.createElement('div');
+    node.className = 'menu-item';
+    node.dataset.groupKey = group.key;
+    const links = group.entries.map(entry => `<a class="menu-section-link" href="#${entry.id}">${esc(entry.text)}</a>`).join('');
+    node.innerHTML = `<a class="menu-trigger" href="#${group.id}">${esc(group.title)}<span class="caret">▾</span></a><div class="menu-dropdown">${links}</div>`;
+    megaNav.appendChild(node);
+  });
+
+  const appNode = document.createElement('div');
+  appNode.className = 'menu-item menu-tool';
+  const appLink = document.createElement('a');
+  appLink.className = 'menu-btn';
+  appLink.href = resolveAppHref();
+  appLink.textContent = contentLang==='en' ? 'Open app' : 'Στην εφαρμογή';
+  appNode.appendChild(appLink);
+  megaNav.appendChild(appNode);
+
+  const printNode = document.createElement('div');
+  printNode.className = 'menu-item menu-tool';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'menu-btn';
+  btn.id = 'printBtn';
+  btn.textContent = contentLang==='en' ? 'Print' : 'Εκτύπωση';
+  btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
+  printNode.appendChild(btn);
+  megaNav.appendChild(printNode);
+
+  megaNav.dataset.pageGroupMap = JSON.stringify(Object.fromEntries(pageToGroup));
+}
+function updateActiveNav(){
+  const pageEls=Array.from(document.querySelectorAll('.sheet-wrap[id]'));
+  const y=window.scrollY + 140;
+  let activeId='';
+  for(const el of pageEls){
+    if(el.getBoundingClientRect().top + window.scrollY <= y) activeId=el.id;
+  }
+  let pageToGroup = {};
+  try{ pageToGroup = JSON.parse(megaNav.dataset.pageGroupMap || '{}'); }catch(_e){}
+  const activeGroupKey = pageToGroup[activeId] || '';
+  megaNav.querySelectorAll('.menu-item').forEach(node=>{
+    if(node.dataset.groupKey){
+      node.classList.toggle('active', node.dataset.groupKey === activeGroupKey);
+    }
+  });
+}
+window.addEventListener('scroll', updateActiveNav, {passive:true});
+
+async function loadData(){
+  let lastErr=null;
+  for(const name of JSON_CANDIDATES){
+    try{
+      const res=await fetch(name, {cache:'no-store'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }catch(err){
+      lastErr=err;
+    }
+  }
+  throw lastErr || new Error('Δεν βρέθηκε JSON');
+}
+function fontPresetValue(key, fallback){
+  const presets = {
+    serif: 'Georgia,"Noto Serif","Times New Roman",serif',
+    sans: 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif',
+    classic: '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif'
+  };
+  return presets[key] || fallback;
+}
+function applyLayoutDefaults(defs){
+  const root = document.documentElement;
+  if(!defs || typeof defs !== 'object') return;
+  if(defs.pageWidthPx != null) root.style.setProperty('--sheet-width', `${Number(defs.pageWidthPx)}px`);
+  if(defs.pageHeightPx != null) root.style.setProperty('--sheet-height', `${Number(defs.pageHeightPx)}px`);
+  if(defs.pagePaddingTopPx != null) root.style.setProperty('--sheet-pad-top', `${Number(defs.pagePaddingTopPx)}px`);
+  if(defs.pagePaddingRightPx != null) root.style.setProperty('--sheet-pad-right', `${Number(defs.pagePaddingRightPx)}px`);
+  if(defs.pagePaddingBottomPx != null) root.style.setProperty('--sheet-pad-bottom', `${Number(defs.pagePaddingBottomPx)}px`);
+  if(defs.pagePaddingLeftPx != null) root.style.setProperty('--sheet-pad-left', `${Number(defs.pagePaddingLeftPx)}px`);
+  if(defs.bodyFontSize != null) root.style.setProperty('--body-font-size', `${Number(defs.bodyFontSize)}px`);
+  if(defs.lineHeight != null) root.style.setProperty('--body-leading', String(defs.lineHeight));
+  if(defs.paragraphGap != null) root.style.setProperty('--para-gap', `${Number(defs.paragraphGap)}px`);
+  if(defs.sectionGap != null) root.style.setProperty('--section-gap', `${Number(defs.sectionGap)}px`);
+  if(defs.noteGap != null) root.style.setProperty('--note-gap', `${Number(defs.noteGap)}px`);
+  if(defs.calloutGap != null) root.style.setProperty('--callout-gap', `${Number(defs.calloutGap)}px`);
+  if(defs.headerTopPx != null) root.style.setProperty('--header-top', `${Number(defs.headerTopPx)}px`);
+  if(defs.headerHeightPx != null) root.style.setProperty('--header-h', `${Number(defs.headerHeightPx)}px`);
+  if(defs.footerBottomPx != null) root.style.setProperty('--footer-bottom', `${Number(defs.footerBottomPx)}px`);
+  if(defs.footerHeightPx != null) root.style.setProperty('--footer-h', `${Number(defs.footerHeightPx)}px`);
+  if(defs.headerFontSize != null) root.style.setProperty('--header-font-size', `${Number(defs.headerFontSize)}px`);
+  if(defs.footerFontSize != null) root.style.setProperty('--footer-font-size', `${Number(defs.footerFontSize)}px`);
+  if(defs.bodyFontFamily != null) root.style.setProperty('--body-font-family', fontPresetValue(defs.bodyFontFamily, defs.bodyFontFamily));
+  if(defs.headingFontFamily != null) root.style.setProperty('--heading-font-family', fontPresetValue(defs.headingFontFamily, defs.headingFontFamily));
+  if(defs.heroEyebrowFontSize != null) root.style.setProperty('--hero-eyebrow-font-size', `${Number(defs.heroEyebrowFontSize)}px`);
+  if(defs.heroTitleFontSize != null) root.style.setProperty('--hero-title-font-size', `${Number(defs.heroTitleFontSize)}px`);
+  if(defs.heroSubtitleFontSize != null) root.style.setProperty('--hero-subtitle-font-size', `${Number(defs.heroSubtitleFontSize)}px`);
+  if(defs.heroTitleFontFamily != null) root.style.setProperty('--hero-title-font-family', fontPresetValue(defs.heroTitleFontFamily, defs.heroTitleFontFamily));
+  if(defs.partKickerFontSize != null) root.style.setProperty('--part-kicker-font-size', `${Number(defs.partKickerFontSize)}px`);
+  if(defs.partTitleFontSize != null) root.style.setProperty('--part-title-font-size', `${Number(defs.partTitleFontSize)}px`);
+  if(defs.partTitleFontFamily != null) root.style.setProperty('--part-title-font-family', fontPresetValue(defs.partTitleFontFamily, defs.partTitleFontFamily));
+  if(defs.sectionHeadingFontSize != null) root.style.setProperty('--section-heading-font-size', `${Number(defs.sectionHeadingFontSize)}px`);
+  if(defs.sectionHeadingFontFamily != null) root.style.setProperty('--section-heading-font-family', fontPresetValue(defs.sectionHeadingFontFamily, defs.sectionHeadingFontFamily));
+  if(defs.noteFontSize != null) root.style.setProperty('--note-font-size', `${Number(defs.noteFontSize)}px`);
+  if(defs.noteLineHeight != null) root.style.setProperty('--note-line-height', String(defs.noteLineHeight));
+  if(defs.noteLabelFontSize != null) root.style.setProperty('--note-label-font-size', `${Number(defs.noteLabelFontSize)}px`);
+  if(defs.captionFontSize != null) root.style.setProperty('--caption-font-size', `${Number(defs.captionFontSize)}px`);
+  if(defs.calloutFontSize != null) root.style.setProperty('--callout-font-size', `${Number(defs.calloutFontSize)}px`);
+  if(defs.calloutTitleFontSize != null) root.style.setProperty('--callout-title-font-size', `${Number(defs.calloutTitleFontSize)}px`);
+  if(defs.calloutLabelFontSize != null) root.style.setProperty('--callout-label-font-size', `${Number(defs.calloutLabelFontSize)}px`);
+  if(defs.calloutChipFontSize != null) root.style.setProperty('--callout-chip-font-size', `${Number(defs.calloutChipFontSize)}px`);
+  if(defs.calloutObserveTitleFontSize != null) root.style.setProperty('--callout-observe-title-font-size', `${Number(defs.calloutObserveTitleFontSize)}px`);
+}
+async function boot(){
+  applyScreenScale();
+  const data=await loadData();
+  bookData = data;
+  if(data?.schemaVersion !== 'pages-v1' && !Array.isArray(data?.pages)){
+    throw new Error('Το βιβλίο περιμένει page-first JSON (pages-v1).');
+  }
+  const defs=data.layoutDefaults || {};
+  applyLayoutDefaults(defs);
+  applyPrintPageSettings(defs);
+  renderPages(data);
+  deriveNav(data);
+  updateActiveNav();
+  setStatus(`${contentLang==='en' ? 'Pages' : 'Σελίδες'}: ${(data.pages||[]).length}`);
+}
+boot().catch(err=>{
+  console.error(err);
+  setStatus(`Σφάλμα φόρτωσης: ${err.message}`);
+});
+</script>
+</body>
+</html>

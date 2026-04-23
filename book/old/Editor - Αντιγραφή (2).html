@@ -1,0 +1,1418 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Η/Μ Book Editor — Pages</title>
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#020617;--panel:#0b1220;--line:#1f2937;--soft:#94a3b8;--text:#e5e7eb;
+      --accent:#38bdf8;--accent2:#f97316;--ok:#22c55e;--paper:#fffdf9;--paperText:#1d2730;
+      --paperLine:#ddd3c3;--note:#f6efdc;--figure:#f6f8fa;--header:#5d7281;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid #111827;background:radial-gradient(circle at top left,#0f172a,#020617 58%)}
+    h1{margin:0;font-size:18px}
+    small{display:block;color:var(--soft)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    button,input,select,textarea{font:12px system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    button{border:1px solid #334155;background:#020617;color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer}
+    button.primary{background:#075985;border-color:#0ea5e9}
+    button.good{background:#14532d;border-color:#22c55e}
+    button.danger{background:#7f1d1d;border-color:#ef4444}
+    main{display:grid;grid-template-columns:320px minmax(560px,1.42fr) minmax(420px,.92fr);gap:10px;padding:10px;height:calc(100vh - 64px)}
+    @media (max-width:1200px){main{grid-template-columns:1fr;grid-template-rows:auto auto auto;height:auto}}
+    .panel{display:flex;flex-direction:column;gap:8px;min-height:0;border:1px solid #111827;border-radius:12px;background:var(--panel);padding:10px}
+    .panel h2{margin:0;padding-bottom:6px;border-bottom:1px solid var(--line);font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .badge{font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#020617;color:var(--soft)}
+    .scroll{overflow:auto;min-height:0;padding-right:4px}
+    .hint{font-size:11px;color:var(--soft)}
+    .tree-sticky-nav{margin:0 auto 10px;padding:10px 10px 12px;border:1px solid #31506d;border-radius:14px;background:linear-gradient(180deg,rgba(8,18,32,.98),rgba(2,6,23,.98));box-shadow:0 12px 22px rgba(0,0,0,.24);max-width:100%}
+    .tree-sticky-nav .nav-title{display:block;margin:0 0 8px;font:900 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:none;color:#bae6fd;text-align:center}
+    .page-picker{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+    .page-picker select{min-width:0;height:38px;padding:8px 10px;border:1px solid #3b82f6;border-radius:10px;background:#07101d;color:#e5e7eb;font:700 13px/1.1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-picker button{min-width:34px;height:38px;padding:6px 10px;border-radius:10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    #treeQuickNav{position:sticky;top:0;z-index:6;margin:0 0 4px;padding:0 0 6px;background:var(--panel)}
+    .tree-section{margin-bottom:8px;padding:6px;border:1px solid #182132;border-radius:10px;background:#020617}
+    .tree-page-wrap{margin-bottom:4px;padding:4px;border-radius:12px}
+    .tree-page-wrap.active{background:rgba(56,189,248,.08);outline:1px solid rgba(56,189,248,.22)}
+    .tree-head{display:flex;justify-content:space-between;gap:6px;align-items:center;margin-bottom:6px}
+    .tree-title{font-size:12px;font-weight:600;color:#cbd5e1}
+    .tree-block{display:flex;align-items:center;gap:8px;padding:5px 7px;margin-bottom:4px;border:1px solid #1e293b;border-radius:999px;background:#07101d;cursor:pointer}
+    .tree-block.active{border-color:var(--accent2);background:rgba(249,115,22,.12)}
+    .tree-block .type{font-size:10px;color:#7dd3fc;border:1px solid rgba(56,189,248,.25);padding:1px 6px;border-radius:999px;white-space:nowrap}
+    .tree-block .info{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+    .tree-block .idx{font-size:10px;color:#64748b}
+    .chip-palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chip-btn{padding:4px 8px;border-radius:999px;font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .chip-btn.add{background:#082032;border-color:#1d4ed8;color:#bfdbfe}
+    .chip-btn.remove{background:#2a0c12;border-color:#ef4444;color:#fecaca}
+    .chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;min-height:28px}
+    .chip-empty{font-size:11px;color:var(--soft);font-style:italic}
+    .subhead{font-size:11px;color:var(--soft);margin:8px 0 4px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
+    @media (max-width:700px){.grid{grid-template-columns:1fr}}
+    label{display:flex;flex-direction:column;gap:3px;font-size:12px}
+    label span{font-size:11px;color:var(--soft)}
+    input[type=text],input[type=number],textarea,select{width:100%;border:1px solid #1f2937;border-radius:8px;background:#020617;color:var(--text);padding:6px 8px;outline:none}
+    textarea{min-height:96px;resize:vertical;font-family:inherit}
+    textarea.big{min-height:180px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;line-height:1.45}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 1px rgba(56,189,248,.55)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .preview-card{border:1px solid var(--line);border-radius:12px;background:#020617;padding:10px;margin-bottom:10px}
+    .preview-title{font-size:11px;color:var(--soft);margin-bottom:6px}
+    .preview-main{font-size:13px;line-height:1.6}
+    .preview-note{margin-top:8px;padding:10px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2)}
+    .page-preview-wrap{display:flex;justify-content:center}
+    .page-preview-scale{transform-origin:top center}
+    .page-preview{
+      width:794px; min-height:1123px; background:var(--paper); color:var(--paperText); border:1px solid #d9cfbf;
+      box-shadow:0 10px 26px rgba(0,0,0,.25); position:relative; padding:54px 44px 54px; overflow:hidden;
+      font:18px/1.34 Georgia,"Noto Serif",serif;
+    }
+    .page-header,.page-footer{position:absolute;left:44px;right:44px;display:flex;justify-content:space-between;align-items:center;color:var(--header);font:700 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.04em;text-transform:none}
+    .page-header{top:20px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.08)}
+    .page-footer{bottom:18px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08)}
+    .hero-block{margin:0 0 22px}
+    .hero-eyebrow{margin:0 0 10px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#1f5f8b}
+    .hero-title{margin:0 0 10px;font:760 28px/1.06 Georgia,"Times New Roman",serif;color:#1b506f}
+    .hero-subtitle{margin:0;color:#5e6d79;font-size:16px;line-height:1.35}
+    .part-title{margin:18px 0 14px;padding-top:2px}
+    .part-kicker{margin:0 0 5px;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;color:#8a6a32}
+    .part-main{margin:0;font:780 24px/1.08 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;color:#2f627f}
+    .section-heading{margin:20px 0 8px;padding-top:6px;border-top:1px solid rgba(0,0,0,.06);font:700 18px/1.18 Georgia,"Noto Serif",serif;color:#5d7281}
+    .page-paragraph{margin:0 0 7px;text-align:justify}
+    .page-note{margin:10px 0;padding:10px 12px;border-radius:14px;background:var(--note);border:1px solid #e4d7ae;font:500 14px/1.42 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-note .label{display:block;margin:0 0 5px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+    figure.media{margin:4px 0 12px;background:var(--figure);border:1px solid var(--paperLine);border-radius:16px;overflow:hidden}
+    figure.media.float-right,figure.media.float-left{width:min(var(--figure-width,340px),42%)}
+    figure.media.float-right{float:right;margin:4px 0 10px 18px}
+    figure.media.float-left{float:left;margin:4px 18px 10px 0}
+    figure.media.wide{clear:both;width:100%;margin:14px 0}
+    .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
+    .media-frame img,.media-frame iframe,.media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+    .media-frame img{object-fit:cover}
+    .media-frame.natural{aspect-ratio:auto;overflow:visible;background:#fff}
+    .media-frame.natural img{position:static;inset:auto;width:100%;height:auto;display:block;object-fit:contain}
+    figcaption{padding:10px 12px;font:500 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5e6d79;border-top:1px solid rgba(0,0,0,.07)}
+    .callout{margin:8px 0;padding:8px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 12px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
+    .callout-title{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
+    .callout-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+    .callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}
+    .callout-label{font:700 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:3px 6px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
+    .callout-observe{margin-top:4px;padding-top:5px;border-top:1px dashed #cfdbe3}
+    .callout-observe-title{font:700 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
+    .callout-observe ul{margin:6px 0 0 16px;padding:0}
+    .callout-observe li{margin:4px 0;font-style:italic}
+    .item-highlight{outline:3px solid rgba(249,115,22,.45);outline-offset:3px}
+    .meta-line{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a3b1c2}
+    .scene-frame{margin-top:8px;border:1px solid #243244;border-radius:12px;overflow:hidden;background:#fff;color:#111}
+    .scene-frame.float{width:min(var(--fw,340px),100%)}
+    .scene-preview-reserve{position:relative;width:100%}
+    .scene-media-frame{background:#fff;overflow:hidden}
+    .scene-media-frame iframe{background:#fff}
+    .danger-note{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);color:#fecaca;font-size:11px}
+    .editor-help{padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#bae6fd;font-size:11px}
+    .image-tools{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:start;margin-top:8px}
+    .image-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .image-thumb{border:1px solid #243244;border-radius:12px;background:#020617;overflow:hidden;min-height:140px;display:grid;place-items:center}
+    .image-thumb.empty{color:var(--soft);font-size:11px;padding:10px;text-align:center}
+    .image-thumb img{display:block;max-width:100%;max-height:220px;width:100%;height:auto;object-fit:contain;background:#fff}
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Η/Μ Book Editor — σελίδες</h1>
+    <small>Page-first editor. Κάθε σελίδα έχει δικά της header / footer / items και ζωντανή mini-A4 προεπισκόπηση.</small>
+  </div>
+  <div class="controls">
+    <span>JSON:</span>
+    <input type="file" id="jsonInput" accept="application/json,.json">
+    <button id="loadDefaultBtn">Φόρτωση default</button>
+    <button id="exportBtn" class="good" disabled>Export JSON</button>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Δομή <span class="badge" id="treeBadge">0 pages</span></h2>
+    <div id="treeQuickNav"></div>
+    <div class="scroll" id="tree"></div>
+    <div class="hint">Η βασική μονάδα τώρα είναι η σελίδα. Τα items είναι πλήρως ενσωματωμένα μέσα σε αυτήν, όχι refs.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Editor <span class="badge" id="editorBadge">καμία επιλογή</span></h2>
+    <div class="scroll" id="editor"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Preview <span class="badge">mini A4 + item preview</span></h2>
+    <div class="scroll" id="preview"></div>
+  </section>
+</main>
+
+<script>
+'use strict';
+let data = null;
+let selection = null;
+
+const jsonInput = document.getElementById('jsonInput');
+const loadDefaultBtn = document.getElementById('loadDefaultBtn');
+const exportBtn = document.getElementById('exportBtn');
+const tree = document.getElementById('tree');
+const treeQuickNav = document.getElementById('treeQuickNav');
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+const treeBadge = document.getElementById('treeBadge');
+const editorBadge = document.getElementById('editorBadge');
+
+jsonInput.addEventListener('change', async e => {
+  const file = e.target.files?.[0]; if(!file) return;
+  const text = await file.text();
+  try{
+    const parsed = JSON.parse(text);
+    data = normalizeData(parsed);
+    selection = {kind:'meta'};
+    renderAll();
+  }catch(err){ alert('Σφάλμα στο JSON'); console.error(err); }
+});
+
+loadDefaultBtn.addEventListener('click', async ()=>{
+  try{
+    const res = await fetch('chapter_content_pages_v1.json?ts='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const parsed = await res.json();
+    data = normalizeData(parsed);
+    selection = {kind:'meta'};
+    renderAll();
+  }catch(err){
+    alert('Δεν φορτώθηκε το default JSON. Άνοιξέ το μέσω local server ή φόρτωσέ το χειροκίνητα.');
+  }
+});
+
+exportBtn.addEventListener('click', ()=>{
+  if(!data) return;
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'chapter_content_pages_edited.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
+});
+
+function normalizeData(raw){
+  const out = JSON.parse(JSON.stringify(raw || {}));
+  if(!out.schemaVersion) out.schemaVersion = 'pages-v1';
+  if(!out.meta) out.meta = {};
+  if(!out.layoutDefaults) out.layoutDefaults = {};
+  if(!Array.isArray(out.pages)) out.pages = [];
+  out.pages.forEach((p, i) => {
+    if(!p.id) p.id = `page-${i+1}`;
+    if(!p.header) p.header = {left:'', center:'', right:''};
+    if(!p.footer) p.footer = {left:'', center:'', right:'{page}'};
+    if(!Array.isArray(p.items)) p.items = [];
+  });
+  exportBtn.disabled = false;
+  return out;
+}
+
+function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+const COMMON_SETUP_BUTTONS = ['I↓','V-t','q-t','i-t','E-t','B-t','Εδ','Βδ','E→','B→'];
+const COMMON_PRESS_BUTTONS = ['|◀','◀','▶','▶|','|◀ ◀','▶ ▶|'];
+
+
+function nextPageId(base='page'){
+  const used = new Set((data?.pages || []).map(p => String(p.id || '')));
+  let i = 1;
+  let id = `${base}-${i}`;
+  while(used.has(id)){ i += 1; id = `${base}-${i}`; }
+  return id;
+}
+function createSiblingPageFrom(page, base='page'){
+  return {
+    id: nextPageId(base),
+    header: deepClone(page?.header || {left:'', center:'', right:''}),
+    footer: deepClone(page?.footer || {left:'', center:'', right:'{page}'}),
+    items: []
+  };
+}
+function insertPageAt(index, pageData=null, base='page'){
+  const page = pageData ? deepClone(pageData) : createSiblingPageFrom({}, base);
+  if(!page.id) page.id = nextPageId(base);
+  if(!page.header) page.header = {left:'', center:'', right:''};
+  if(!page.footer) page.footer = {left:'', center:'', right:'{page}'};
+  if(!Array.isArray(page.items)) page.items = [];
+  const idx = Math.max(0, Math.min(index, data.pages.length));
+  data.pages.splice(idx, 0, page);
+  return idx;
+}
+function moveItemToAdjacentPage(pageIndex, itemIndex, delta){
+  const page = data.pages?.[pageIndex];
+  if(!page || !page.items?.[itemIndex]) return;
+  const [item] = page.items.splice(itemIndex, 1);
+  let targetPageIndex = pageIndex + delta;
+  if(targetPageIndex < 0){
+    targetPageIndex = insertPageAt(0, createSiblingPageFrom(page, 'page'));
+    pageIndex += 1;
+  }else if(targetPageIndex >= data.pages.length){
+    targetPageIndex = insertPageAt(data.pages.length, createSiblingPageFrom(page, 'page'));
+  }
+  const targetPage = data.pages[targetPageIndex];
+  const targetItemIndex = delta < 0 ? targetPage.items.length : 0;
+  targetPage.items.splice(targetItemIndex, 0, item);
+  selection = {kind:'item', pageIndex:targetPageIndex, itemIndex:targetItemIndex};
+  renderAll();
+}
+function splitPageAtItem(pageIndex, itemIndex){
+  const page = data.pages?.[pageIndex];
+  if(!page) return;
+  const moved = page.items.splice(itemIndex);
+  const newPage = createSiblingPageFrom(page, 'page');
+  newPage.items = moved;
+  const newIndex = insertPageAt(pageIndex + 1, newPage, 'page');
+  selection = {kind:'page', pageIndex:newIndex};
+  renderAll();
+}
+function fontPresetValue(key, fallback){
+  const presets = {
+    serif: 'Georgia,"Noto Serif","Times New Roman",serif',
+    sans: 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif',
+    classic: '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif'
+  };
+  return presets[key] || fallback;
+}
+
+function summarizeItem(item){
+  const t = item?.type || 'unknown';
+  if(t==='hero') return (item.title || '').slice(0,72);
+  if(t==='part_title') return `${item.label || ''} — ${item.title || ''}`.slice(0,72);
+  if(t==='section_heading') return item.title || '(χωρίς τίτλο)';
+  if(t==='paragraph') return stripHtml(item.html || '').slice(0,72) || '(κενό)';
+  if(t==='note') return ((item.label || '') + ' · ' + stripHtml(item.html || '')).slice(0,72);
+  if(t==='figure') return (item.title || item.caption || item.src || 'figure').slice(0,72);
+  if(t==='scene') return (item.title || item.caption || item.singleSrc || 'scene').slice(0,72);
+  if(t==='interactive_callout') return ((item.title || 'Δοκίμασε') + ' · ' + (item.observeItems?.[0] || '')).slice(0,72);
+  if(t==='clear') return 'clear';
+  return JSON.stringify(item).slice(0,72);
+}
+function stripHtml(html=''){
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || '').replace(/\s+/g,' ').trim();
+}
+
+function currentPageIndex(){
+  if(!selection) return null;
+  if(selection.kind==='page') return selection.pageIndex;
+  if(selection.kind==='item') return selection.pageIndex;
+  return null;
+}
+function currentPage(){
+  const idx = currentPageIndex();
+  return idx==null ? null : data?.pages?.[idx] || null;
+}
+function currentItem(){
+  if(selection?.kind !== 'item') return null;
+  return data?.pages?.[selection.pageIndex]?.items?.[selection.itemIndex] || null;
+}
+
+function renderAll(){ renderTree(); renderEditor(); renderPreview(); }
+
+function ensureElementVisibleInList(container, el){
+  if(!container || !el) return;
+  const cRect = container.getBoundingClientRect();
+  const eRect = el.getBoundingClientRect();
+  const currentTop = container.scrollTop;
+  const pad = 12;
+
+  const topInside = eRect.top - cRect.top + currentTop;
+  const bottomInside = eRect.bottom - cRect.top + currentTop;
+  const viewTop = currentTop;
+  const viewBottom = currentTop + container.clientHeight;
+
+  let targetTop = currentTop;
+
+  if(topInside < viewTop + pad || bottomInside > viewBottom - pad){
+    const centered = topInside - Math.max(pad, Math.round((container.clientHeight - el.offsetHeight) / 2));
+    const maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+    targetTop = Math.max(0, Math.min(centered, maxScroll));
+  }
+
+  container.scrollTop = targetTop;
+}
+function jumpToPageInTree(pageIndex){
+  requestAnimationFrame(()=>{
+    const anchorEl = tree.querySelector(`[data-page-anchor="${pageIndex}"]`);
+    if(!anchorEl) return;
+    ensureElementVisibleInList(tree, anchorEl);
+    requestAnimationFrame(()=>{
+      ensureElementVisibleInList(tree, anchorEl);
+    });
+  });
+}
+function selectPage(pageIndex){
+  selection = {kind:'page', pageIndex};
+  renderAll();
+  jumpToPageInTree(pageIndex);
+}
+
+function renderTree(){
+  tree.innerHTML = '';
+  if(treeQuickNav) treeQuickNav.innerHTML = '';
+  if(!data){
+    if(treeQuickNav) treeQuickNav.innerHTML = '';
+    tree.innerHTML = '<div class="hint">Φόρτωσε pages JSON.</div>';
+    treeBadge.textContent='0 pages';
+    return;
+  }
+  treeBadge.textContent = data.pages.length + ' pages';
+
+  const metaBox = document.createElement('div');
+  metaBox.className = 'tree-section';
+  metaBox.innerHTML = '<div class="tree-head"><div class="tree-title">Meta / defaults</div></div>';
+  const metaBtn = document.createElement('div');
+  metaBtn.className = 'tree-block' + (selection?.kind==='meta' ? ' active' : '');
+  metaBtn.innerHTML = '<span class="type">meta</span><span class="info">τίτλος / subtitle / layoutDefaults</span>';
+  metaBtn.onclick = ()=>{ selection={kind:'meta'}; renderAll(); };
+  metaBox.appendChild(metaBtn);
+  tree.appendChild(metaBox);
+
+  const stickyNav = document.createElement('div');
+  stickyNav.className = 'tree-sticky-nav';
+  stickyNav.innerHTML = '<span class="nav-title">Επιλογή σελίδας</span>';
+
+  const picker = document.createElement('div');
+  picker.className = 'page-picker';
+
+  const select = document.createElement('select');
+  data.pages.forEach((p, pIdx) => {
+    const opt = document.createElement('option');
+    opt.value = String(pIdx);
+    const label = (p.header?.left || p.header?.right || p.id || '').trim();
+    opt.textContent = label ? `Σελίδα ${pIdx+1} — ${label}` : `Σελίδα ${pIdx+1}`;
+    if((selection?.pageIndex === pIdx) || (selection?.kind === 'item' && selection?.pageIndex === pIdx)) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.onchange = ()=> selectPage(Number(select.value));
+
+  const prevBtn = document.createElement('button');
+  prevBtn.type = 'button';
+  prevBtn.textContent = '↑';
+  prevBtn.title = 'Προηγούμενη σελίδα';
+  prevBtn.onclick = ()=>{
+    const cur = Number(select.value || 0);
+    if(cur > 0) selectPage(cur - 1);
+  };
+
+  const nextBtn = document.createElement('button');
+  nextBtn.type = 'button';
+  nextBtn.textContent = '↓';
+  nextBtn.title = 'Επόμενη σελίδα';
+  nextBtn.onclick = ()=>{
+    const cur = Number(select.value || 0);
+    if(cur < data.pages.length - 1) selectPage(cur + 1);
+  };
+
+  picker.appendChild(select);
+  picker.appendChild(prevBtn);
+  picker.appendChild(nextBtn);
+  stickyNav.appendChild(picker);
+  if(treeQuickNav) treeQuickNav.appendChild(stickyNav);
+
+  const pagesBox = document.createElement('div');
+  pagesBox.className = 'tree-section';
+  const head = document.createElement('div');
+  head.className = 'tree-head';
+  head.innerHTML = '<div class="tree-title">Σελίδες</div>';
+  const addPageBtn = document.createElement('button');
+  addPageBtn.textContent = '+ Νέα σελίδα';
+  addPageBtn.onclick = ()=> {
+    const p = createEmptyPage(data.pages.length + 1);
+    data.pages.push(p);
+    selection = {kind:'page', pageIndex:data.pages.length - 1};
+    renderAll();
+    jumpToPageInTree(data.pages.length - 1);
+  };
+  head.appendChild(addPageBtn);
+  pagesBox.appendChild(head);
+
+  data.pages.forEach((p, pIdx) => {
+    const pageWrap = document.createElement('div');
+    pageWrap.dataset.pageAnchor = String(pIdx);
+    pageWrap.className = 'tree-page-wrap' + ((((selection?.kind==='page' && selection.pageIndex===pIdx) || (selection?.kind==='item' && selection.pageIndex===pIdx))) ? ' active' : '');
+
+    const pill = document.createElement('div');
+    pill.className = 'tree-block' + (((selection?.kind==='page' && selection.pageIndex===pIdx) || (selection?.kind==='item' && selection.pageIndex===pIdx)) ? ' active' : '');
+    pill.innerHTML = `<span class="type">page</span><span class="info">${esc(p.id)} — ${esc(p.header?.left || '')} / ${esc(p.header?.right || '')}</span><span class="idx">#${pIdx+1}</span>`;
+    pill.onclick = ()=> selectPage(pIdx);
+    pageWrap.appendChild(pill);
+
+    p.items.forEach((item, iIdx) => {
+      const ipill = document.createElement('div');
+      ipill.className = 'tree-block' + (selection?.kind==='item' && selection.pageIndex===pIdx && selection.itemIndex===iIdx ? ' active' : '');
+      ipill.style.marginLeft = '14px';
+      ipill.innerHTML = `<span class="type">${esc(item.type || '?')}</span><span class="info">${esc(summarizeItem(item))}</span><span class="idx">${iIdx+1}</span>`;
+      ipill.onclick = ()=>{ selection = {kind:'item', pageIndex:pIdx, itemIndex:iIdx}; renderAll(); jumpToPageInTree(pIdx); };
+      pageWrap.appendChild(ipill);
+    });
+
+    pagesBox.appendChild(pageWrap);
+  });
+  tree.appendChild(pagesBox);
+}
+
+function createEmptyPage(n){
+  return {
+    id: `page-${n}`,
+    header: {left:'', center:'', right:''},
+    footer: {left:'', center:'', right:'{page}'},
+    items: []
+  };
+}
+function createItemByType(type='paragraph'){
+  if(type==='hero') return {type:'hero', eyebrow:'', title:'', subtitle:''};
+  if(type==='part_title') return {type:'part_title', label:'ΜΕΡΟΣ', title:''};
+  if(type==='section_heading') return {type:'section_heading', title:''};
+  if(type==='paragraph') return {type:'paragraph', html:''};
+  if(type==='note') return {type:'note', label:'', html:''};
+  if(type==='figure') return {type:'figure', src:'', alt:'', title:'', caption:'', placement:'right', frameWidth:340};
+  if(type==='scene') return {type:'scene', title:'', caption:'', placement:'right', frameWidth:340, wrapTight:true, hideCaption:false, singleSrc:''};
+  if(type==='interactive_callout') return {type:'interactive_callout', title:'Δοκίμασε', setupLabel:'Ρύθμισε', setupChips:[], pressLabel:'Πίεσε', pressChips:[], observeTitle:'Παρατήρησε', observeItems:[]};
+  if(type==='clear') return {type:'clear'};
+  return {type:'paragraph', html:''};
+}
+function insertItemAt(pageIndex, insertIndex, type='paragraph'){
+  const page = data.pages?.[pageIndex]; if(!page) return;
+  const item = createItemByType(type);
+  const idx = Math.max(0, Math.min(insertIndex, page.items.length));
+  page.items.splice(idx, 0, item);
+  selection = {kind:'item', pageIndex, itemIndex:idx};
+  renderAll();
+}
+function movePage(pageIndex, delta){
+  const next = pageIndex + delta;
+  if(next < 0 || next >= data.pages.length) return;
+  const [p] = data.pages.splice(pageIndex, 1);
+  data.pages.splice(next, 0, p);
+  selection = {kind:'page', pageIndex:next};
+  renderAll();
+}
+function moveItem(pageIndex, itemIndex, delta){
+  const page = data.pages?.[pageIndex]; if(!page) return;
+  const next = itemIndex + delta;
+  if(next < 0 || next >= page.items.length) return;
+  const [it] = page.items.splice(itemIndex, 1);
+  page.items.splice(next, 0, it);
+  selection = {kind:'item', pageIndex, itemIndex:next};
+  renderAll();
+}
+
+function renderEditor(){
+  editor.innerHTML = '';
+  if(!data){ editor.innerHTML = '<div class="hint">Καμία φόρτωση ακόμη.</div>'; editorBadge.textContent = 'καμία επιλογή'; return; }
+  if(!selection){ editor.innerHTML = '<div class="hint">Διάλεξε κάτι αριστερά.</div>'; editorBadge.textContent = 'καμία επιλογή'; return; }
+
+  if(selection.kind === 'meta'){ editorBadge.textContent = 'meta'; renderMetaEditor(); return; }
+  if(selection.kind === 'page'){ editorBadge.textContent = 'page'; renderPageEditor(currentPage(), selection.pageIndex); return; }
+  if(selection.kind === 'item'){ editorBadge.textContent = 'item'; renderItemEditor(currentItem(), selection.pageIndex, selection.itemIndex); return; }
+}
+
+function bindTextInput(el, obj, key){ el.value = obj[key] ?? ''; el.oninput = ()=>{ obj[key] = el.value; renderTree(); renderPreview(); }; }
+function bindTextarea(el, obj, key){ el.value = obj[key] ?? ''; el.oninput = ()=>{ obj[key] = el.value; renderTree(); renderPreview(); }; }
+function bindNumberInput(el, obj, key){
+  el.value = obj[key] ?? '';
+  el.oninput = ()=>{ const v = el.value.trim(); if(v==='') delete obj[key]; else obj[key] = Number(v); renderTree(); renderPreview(); };
+}
+function bindCheckbox(el, obj, key){
+  el.checked = !!obj[key];
+  el.onchange = ()=>{ obj[key] = !!el.checked; renderTree(); renderPreview(); };
+}
+
+function updateImageThumb(container, src, alt=''){
+  if(!container) return;
+  if(src){
+    container.classList.remove('empty');
+    container.innerHTML = `<img src="${esc(src)}" alt="${esc(alt || '')}">`;
+  }else{
+    container.classList.add('empty');
+    container.innerHTML = 'Δεν έχει οριστεί εικόνα ακόμη';
+  }
+}
+function setCommaFieldFromArray(input, arr){
+  input.value = (arr || []).join(', ');
+}
+function normalizeChipArrayFromInput(value){
+  return String(value || '').split(',').map(s=>s.trim()).filter(Boolean);
+}
+function renderChipList(host, values, onRemove){
+  if(!host) return;
+  host.innerHTML = '';
+  if(!values || !values.length){
+    const empty = document.createElement('div');
+    empty.className = 'chip-empty';
+    empty.textContent = 'Δεν έχουν δηλωθεί κουμπιά ακόμη.';
+    host.appendChild(empty);
+    return;
+  }
+  values.forEach((value, idx)=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn remove';
+    btn.textContent = `✕ ${value}`;
+    btn.onclick = ()=> onRemove(idx);
+    host.appendChild(btn);
+  });
+}
+function renderSuggestionPalette(host, suggestions, onAdd){
+  if(!host) return;
+  host.innerHTML = '';
+  suggestions.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn add';
+    btn.textContent = label;
+    btn.onclick = ()=> onAdd(label);
+    host.appendChild(btn);
+  });
+}
+function wireCalloutChipEditor(inputEl, listHost, paletteHost, item, key, suggestions){
+  const syncInputToItem = ()=>{
+    item[key] = normalizeChipArrayFromInput(inputEl.value);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  const removeAt = (idx)=>{
+    item[key].splice(idx, 1);
+    setCommaFieldFromArray(inputEl, item[key]);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  const addChip = (label)=>{
+    const curr = normalizeChipArrayFromInput(inputEl.value);
+    curr.push(label);
+    item[key] = curr;
+    setCommaFieldFromArray(inputEl, item[key]);
+    renderChipList(listHost, item[key], removeAt);
+    renderTree();
+    renderPreview();
+  };
+  setCommaFieldFromArray(inputEl, item[key] || []);
+  inputEl.oninput = syncInputToItem;
+  renderChipList(listHost, item[key] || [], removeAt);
+  renderSuggestionPalette(paletteHost, suggestions || [], addChip);
+}
+
+function wireFigureImageControls(item){
+  const srcInput = document.getElementById('figSrc');
+  const altInput = document.getElementById('figAlt');
+  const fileInput = document.getElementById('figFile');
+  const thumb = document.getElementById('figThumb');
+  const clearBtn = document.getElementById('figClear');
+  const openBtn = document.getElementById('figOpen');
+  if(!srcInput || !thumb) return;
+  const sync = ()=> updateImageThumb(thumb, srcInput.value || item.src || '', altInput?.value || item.alt || '');
+  sync();
+  srcInput.addEventListener('input', sync);
+  altInput?.addEventListener('input', sync);
+  if(fileInput){
+    fileInput.addEventListener('change', ()=>{
+      const file = fileInput.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        item.src = String(reader.result || '');
+        srcInput.value = item.src;
+        renderTree();
+        renderPreview();
+        sync();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  clearBtn?.addEventListener('click', ()=>{
+    delete item.src;
+    srcInput.value = '';
+    renderTree();
+    renderPreview();
+    sync();
+  });
+  openBtn?.addEventListener('click', ()=>{
+    const src = srcInput.value || item.src || '';
+    if(src) window.open(src, '_blank', 'noopener,noreferrer');
+  });
+}
+
+function renderMetaEditor(){
+  editor.innerHTML = `
+    <div class="grid">
+      <label><span>Υπέρτιτλος βιβλίου</span><input type="text" id="metaEyebrow"></label>
+      <label><span>Κύριος τίτλος βιβλίου</span><input type="text" id="metaTitle"></label>
+      <label><span>Υπότιτλος βιβλίου</span><input type="text" id="metaSubtitle"></label>
+
+      <label><span>Μέγεθος βασικού κειμένου (px)</span><input type="number" id="ldBodyFontSize" step="1"></label>
+      <label><span>Διάστιχο βασικού κειμένου</span><input type="number" id="ldLineHeight" step="0.01"></label>
+      <label><span>Κενό ανάμεσα σε παραγράφους (px)</span><input type="number" id="ldParaGap" step="1"></label>
+
+      <label><span>Κενό ανάμεσα σε ενότητες (px)</span><input type="number" id="ldSecGap" step="1"></label>
+      <label><span>Κενό γύρω από notes (px)</span><input type="number" id="ldNoteGap" step="1"></label>
+      <label><span>Κενό γύρω από callouts (px)</span><input type="number" id="ldCalloutGap" step="1"></label>
+
+      <label><span>Μέγεθος κεφαλίδας σελίδας (px)</span><input type="number" id="ldHeaderFontSize" step="1"></label>
+      <label><span>Μέγεθος υποσέλιδου σελίδας (px)</span><input type="number" id="ldFooterFontSize" step="1"></label>
+
+      <label><span>Γραμματοσειρά βασικού κειμένου</span>
+        <select id="ldBodyFontFamily">
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλων</span>
+        <select id="ldHeadingFontFamily">
+          <option value="classic">Classic Sans</option>
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+
+      <label><span>Πλάτος σελίδας (px)</span><input type="number" id="ldPageWidthPx" step="1"></label>
+      <label><span>Ύψος σελίδας (px)</span><input type="number" id="ldPageHeightPx" step="1"></label>
+      <label><span>Πάνω περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingTopPx" step="1"></label>
+      <label><span>Δεξί περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingRightPx" step="1"></label>
+      <label><span>Κάτω περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingBottomPx" step="1"></label>
+      <label><span>Αριστερό περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingLeftPx" step="1"></label>
+
+      <label><span>Απόσταση κεφαλίδας από πάνω (px)</span><input type="number" id="ldHeaderTopPx" step="1"></label>
+      <label><span>Ύψος κεφαλίδας (px)</span><input type="number" id="ldHeaderHeightPx" step="1"></label>
+      <label><span>Απόσταση υποσέλιδου από κάτω (px)</span><input type="number" id="ldFooterBottomPx" step="1"></label>
+      <label><span>Ύψος υποσέλιδου (px)</span><input type="number" id="ldFooterHeightPx" step="1"></label>
+
+      <label><span>Μέγεθος τίτλου αρχής (px)</span><input type="number" id="ldHeroTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος υπότιτλου αρχής (px)</span><input type="number" id="ldHeroSubtitleFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου μέρους (px)</span><input type="number" id="ldPartTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου ενότητας (px)</span><input type="number" id="ldSectionHeadingFontSize" step="1"></label>
+      <label><span>Μέγεθος note (px)</span><input type="number" id="ldNoteFontSize" step="1"></label>
+      <label><span>Διάστιχο note</span><input type="number" id="ldNoteLineHeight" step="0.01"></label>
+      <label><span>Μέγεθος λεζάντας (px)</span><input type="number" id="ldCaptionFontSize" step="1"></label>
+
+      <label><span>Γραμματοσειρά τίτλου αρχής</span>
+        <select id="ldHeroTitleFontFamily">
+          <option value="serif">Serif</option>
+          <option value="classic">Classic Sans</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλου μέρους</span>
+        <select id="ldPartTitleFontFamily">
+          <option value="classic">Classic Sans</option>
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλου ενότητας</span>
+        <select id="ldSectionHeadingFontFamily">
+          <option value="serif">Serif</option>
+          <option value="classic">Classic Sans</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+    </div>
+    <div class="editor-help">Εδώ ρυθμίζεις την τυπογραφική βάση όλου του βιβλίου. Οι αλλαγές φαίνονται αμέσως στη μικρή προεπισκόπηση της σελίδας.</div>
+  `;
+  bindTextInput(document.getElementById('metaEyebrow'), data.meta, 'eyebrow');
+  bindTextInput(document.getElementById('metaTitle'), data.meta, 'title');
+  bindTextInput(document.getElementById('metaSubtitle'), data.meta, 'subtitle');
+  bindNumberInput(document.getElementById('ldBodyFontSize'), data.layoutDefaults, 'bodyFontSize');
+  bindNumberInput(document.getElementById('ldLineHeight'), data.layoutDefaults, 'lineHeight');
+  bindNumberInput(document.getElementById('ldParaGap'), data.layoutDefaults, 'paragraphGap');
+  bindNumberInput(document.getElementById('ldSecGap'), data.layoutDefaults, 'sectionGap');
+  bindNumberInput(document.getElementById('ldNoteGap'), data.layoutDefaults, 'noteGap');
+  bindNumberInput(document.getElementById('ldCalloutGap'), data.layoutDefaults, 'calloutGap');
+  bindNumberInput(document.getElementById('ldHeaderFontSize'), data.layoutDefaults, 'headerFontSize');
+  bindNumberInput(document.getElementById('ldFooterFontSize'), data.layoutDefaults, 'footerFontSize');
+
+  bindNumberInput(document.getElementById('ldPageWidthPx'), data.layoutDefaults, 'pageWidthPx');
+  bindNumberInput(document.getElementById('ldPageHeightPx'), data.layoutDefaults, 'pageHeightPx');
+  bindNumberInput(document.getElementById('ldPagePaddingTopPx'), data.layoutDefaults, 'pagePaddingTopPx');
+  bindNumberInput(document.getElementById('ldPagePaddingRightPx'), data.layoutDefaults, 'pagePaddingRightPx');
+  bindNumberInput(document.getElementById('ldPagePaddingBottomPx'), data.layoutDefaults, 'pagePaddingBottomPx');
+  bindNumberInput(document.getElementById('ldPagePaddingLeftPx'), data.layoutDefaults, 'pagePaddingLeftPx');
+  bindNumberInput(document.getElementById('ldHeaderTopPx'), data.layoutDefaults, 'headerTopPx');
+  bindNumberInput(document.getElementById('ldHeaderHeightPx'), data.layoutDefaults, 'headerHeightPx');
+  bindNumberInput(document.getElementById('ldFooterBottomPx'), data.layoutDefaults, 'footerBottomPx');
+  bindNumberInput(document.getElementById('ldFooterHeightPx'), data.layoutDefaults, 'footerHeightPx');
+  bindNumberInput(document.getElementById('ldHeroTitleFontSize'), data.layoutDefaults, 'heroTitleFontSize');
+  bindNumberInput(document.getElementById('ldHeroSubtitleFontSize'), data.layoutDefaults, 'heroSubtitleFontSize');
+  bindNumberInput(document.getElementById('ldPartTitleFontSize'), data.layoutDefaults, 'partTitleFontSize');
+  bindNumberInput(document.getElementById('ldSectionHeadingFontSize'), data.layoutDefaults, 'sectionHeadingFontSize');
+  bindNumberInput(document.getElementById('ldNoteFontSize'), data.layoutDefaults, 'noteFontSize');
+  bindNumberInput(document.getElementById('ldNoteLineHeight'), data.layoutDefaults, 'noteLineHeight');
+  bindNumberInput(document.getElementById('ldCaptionFontSize'), data.layoutDefaults, 'captionFontSize');
+
+  const bodySel = document.getElementById('ldBodyFontFamily');
+  bodySel.value = data.layoutDefaults?.bodyFontFamily || 'serif';
+  bodySel.onchange = ()=>{ data.layoutDefaults.bodyFontFamily = bodySel.value; renderPreview(); };
+
+  const headSel = document.getElementById('ldHeadingFontFamily');
+  headSel.value = data.layoutDefaults?.headingFontFamily || 'classic';
+  headSel.onchange = ()=>{ data.layoutDefaults.headingFontFamily = headSel.value; renderPreview(); };
+
+  const heroSel = document.getElementById('ldHeroTitleFontFamily');
+  heroSel.value = data.layoutDefaults?.heroTitleFontFamily || 'serif';
+  heroSel.onchange = ()=>{ data.layoutDefaults.heroTitleFontFamily = heroSel.value; renderPreview(); };
+
+  const partSel = document.getElementById('ldPartTitleFontFamily');
+  partSel.value = data.layoutDefaults?.partTitleFontFamily || 'classic';
+  partSel.onchange = ()=>{ data.layoutDefaults.partTitleFontFamily = partSel.value; renderPreview(); };
+
+  const sectionSel = document.getElementById('ldSectionHeadingFontFamily');
+  sectionSel.value = data.layoutDefaults?.sectionHeadingFontFamily || 'serif';
+  sectionSel.onchange = ()=>{ data.layoutDefaults.sectionHeadingFontFamily = sectionSel.value; renderPreview(); };
+}
+
+function renderPageEditor(page, pageIndex){
+  editor.innerHTML = `
+    <div class="grid">
+      <label><span>Αναγνωριστικό σελίδας</span><input type="text" id="pageId"></label>
+      <label><span>Σελίδα PDF αναφοράς</span><input type="number" id="pdfPage"></label>
+
+      <label><span>Κεφαλίδα · αριστερά</span><input type="text" id="hLeft"></label>
+      <label><span>Κεφαλίδα · κέντρο</span><input type="text" id="hCenter"></label>
+      <label><span>Κεφαλίδα · δεξιά</span><input type="text" id="hRight"></label>
+
+      <label><span>Υποσέλιδο · αριστερά</span><input type="text" id="fLeft"></label>
+      <label><span>Υποσέλιδο · κέντρο</span><input type="text" id="fCenter"></label>
+      <label><span>Υποσέλιδο · δεξιά</span><input type="text" id="fRight"></label>
+    </div>
+
+    <div class="subhead"><span>Προσθήκη αντικειμένου στο τέλος της σελίδας</span></div>
+    <div class="row">
+      <button id="addHeroBtn">+ Μπλοκ τίτλου αρχής</button>
+      <button id="addPartBtn">+ Τίτλος μέρους</button>
+      <button id="addSecBtn">+ Τίτλος ενότητας</button>
+      <button id="addParaBtn">+ Παράγραφος</button>
+      <button id="addNoteBtn">+ Σημείωση</button>
+      <button id="addFigBtn">+ Εικόνα / σχήμα</button>
+      <button id="addSceneBtn">+ Σκηνή</button>
+      <button id="addCallBtn">+ Δοκίμασε / Παρατήρησε</button>
+      <button id="addClearBtn">+ Καθάρισμα ροής</button>
+    </div>
+
+    <div class="subhead"><span>Χειρισμοί σελίδας</span></div>
+    <div class="row">
+      <button id="insertPageBeforeBtn">+ Νέα κενή σελίδα πριν</button>
+      <button id="insertPageAfterBtn">+ Νέα κενή σελίδα μετά</button>
+      <button id="pageUpBtn">↑ Μετακίνηση σελίδας προς τα πάνω</button>
+      <button id="pageDownBtn">↓ Μετακίνηση σελίδας προς τα κάτω</button>
+      <button id="clonePageBtn">Κλωνοποίηση σελίδας</button>
+      <button class="danger" id="deletePageBtn">Διαγραφή σελίδας</button>
+    </div>
+
+    <div class="editor-help">Η κεφαλίδα και το υποσέλιδο προβάλλονται ακριβώς όπως τα γράφεις — χωρίς αυτόματο μετασχηματισμό σε κεφαλαία.</div>
+    <div class="hint">Χοντρικά μοίρασμα πρώτα, αισθητική ανακατανομή μετά.</div>
+  `;
+  bindTextInput(document.getElementById('pageId'), page, 'id');
+  bindTextInput(document.getElementById('hLeft'), page.header, 'left');
+  bindTextInput(document.getElementById('hCenter'), page.header, 'center');
+  bindTextInput(document.getElementById('hRight'), page.header, 'right');
+  bindTextInput(document.getElementById('fLeft'), page.footer, 'left');
+  bindTextInput(document.getElementById('fCenter'), page.footer, 'center');
+  bindTextInput(document.getElementById('fRight'), page.footer, 'right');
+  bindNumberInput(document.getElementById('pdfPage'), page, 'sourcePdfPage');
+
+  document.getElementById('addHeroBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'hero');
+  document.getElementById('addPartBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'part_title');
+  document.getElementById('addSecBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'section_heading');
+  document.getElementById('addParaBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'paragraph');
+  document.getElementById('addNoteBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'note');
+  document.getElementById('addFigBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'figure');
+  document.getElementById('addSceneBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'scene');
+  document.getElementById('addCallBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'interactive_callout');
+  document.getElementById('addClearBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'clear');
+
+  document.getElementById('insertPageBeforeBtn').onclick = ()=>{
+    const idx = insertPageAt(pageIndex, createSiblingPageFrom(page, 'page'));
+    selection = {kind:'page', pageIndex:idx};
+    renderAll();
+  };
+  document.getElementById('insertPageAfterBtn').onclick = ()=>{
+    const idx = insertPageAt(pageIndex + 1, createSiblingPageFrom(page, 'page'));
+    selection = {kind:'page', pageIndex:idx};
+    renderAll();
+  };
+  document.getElementById('pageUpBtn').onclick = ()=> movePage(pageIndex, -1);
+  document.getElementById('pageDownBtn').onclick = ()=> movePage(pageIndex, 1);
+  document.getElementById('clonePageBtn').onclick = ()=>{
+    const cp = deepClone(page);
+    cp.id = nextPageId('page');
+    data.pages.splice(pageIndex + 1, 0, cp);
+    selection = {kind:'page', pageIndex:pageIndex + 1};
+    renderAll();
+  };
+  document.getElementById('deletePageBtn').onclick = ()=>{
+    if(!confirm('Διαγραφή σελίδας;')) return;
+    data.pages.splice(pageIndex, 1);
+    selection = data.pages.length ? {kind:'page', pageIndex:Math.max(0,pageIndex-1)} : {kind:'meta'};
+    renderAll();
+  };
+}
+
+function renderItemEditor(item, pageIndex, itemIndex){
+  editor.innerHTML = `
+    <div class="grid">
+      <label><span>Είδος αντικειμένου</span>
+        <select id="itemType">
+          <option value="hero">hero · μπλοκ τίτλου αρχής</option>
+          <option value="part_title">part_title · τίτλος μέρους</option>
+          <option value="section_heading">section_heading · τίτλος ενότητας</option>
+          <option value="paragraph">paragraph · παράγραφος</option>
+          <option value="note">note · σημείωση</option>
+          <option value="figure">figure · εικόνα / σχήμα</option>
+          <option value="scene">scene · σκηνή</option>
+          <option value="interactive_callout">interactive_callout · δοκίμασε / παρατήρησε</option>
+          <option value="clear">clear · καθάρισμα ροής</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="subhead"><span>Εισαγωγή ΠΡΙΝ από αυτό το αντικείμενο</span></div>
+    <div class="row">
+      <button id="addParaBeforeBtn">+ Παράγραφος πριν</button>
+      <button id="addNoteBeforeBtn">+ Σημείωση πριν</button>
+      <button id="addFigureBeforeBtn">+ Εικόνα πριν</button>
+      <button id="addSceneBeforeBtn">+ Σκηνή πριν</button>
+      <button id="addCalloutBeforeBtn">+ Callout πριν</button>
+    </div>
+
+    <div class="subhead"><span>Εισαγωγή ΜΕΤΑ από αυτό το αντικείμενο</span></div>
+    <div class="row">
+      <button id="addParaAfterBtn">+ Παράγραφος μετά</button>
+      <button id="addNoteAfterBtn">+ Σημείωση μετά</button>
+      <button id="addFigureAfterBtn">+ Εικόνα μετά</button>
+      <button id="addSceneAfterBtn">+ Σκηνή μετά</button>
+      <button id="addCalloutAfterBtn">+ Callout μετά</button>
+    </div>
+
+    <div class="subhead"><span>Χειρισμοί σελίδας από αυτό το σημείο</span></div>
+    <div class="row">
+      <button id="movePrevPageBtn">⇡ Στείλε το στην προηγούμενη σελίδα</button>
+      <button id="moveNextPageBtn">⇣ Στείλε το στην επόμενη σελίδα</button>
+      <button id="splitHereBtn">✂ Σπάσε τη σελίδα εδώ</button>
+    </div>
+
+    <div id="typeFields"></div>
+
+    <div class="row">
+      <button id="moveUpBtn">↑ Πάνω μέσα στην ίδια σελίδα</button>
+      <button id="moveDownBtn">↓ Κάτω μέσα στην ίδια σελίδα</button>
+      <button id="cloneItemBtn">Κλωνοποίηση αντικειμένου</button>
+      <button class="danger" id="deleteItemBtn">Διαγραφή αντικειμένου</button>
+    </div>
+  `;
+
+  const typeSel = document.getElementById('itemType');
+  typeSel.value = item.type || 'paragraph';
+  typeSel.onchange = ()=>{
+    const fresh = createItemByType(typeSel.value);
+    Object.keys(item).forEach(k => delete item[k]);
+    Object.assign(item, fresh);
+    renderAll();
+  };
+
+  document.getElementById('addParaBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'paragraph');
+  document.getElementById('addNoteBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'note');
+  document.getElementById('addFigureBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'figure');
+  document.getElementById('addSceneBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'scene');
+  document.getElementById('addCalloutBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'interactive_callout');
+  document.getElementById('addParaAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'paragraph');
+  document.getElementById('addNoteAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'note');
+  document.getElementById('addFigureAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'figure');
+  document.getElementById('addSceneAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'scene');
+  document.getElementById('addCalloutAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'interactive_callout');
+
+  document.getElementById('movePrevPageBtn').onclick = ()=> moveItemToAdjacentPage(pageIndex, itemIndex, -1);
+  document.getElementById('moveNextPageBtn').onclick = ()=> moveItemToAdjacentPage(pageIndex, itemIndex, 1);
+  document.getElementById('splitHereBtn').onclick = ()=> splitPageAtItem(pageIndex, itemIndex);
+
+  document.getElementById('moveUpBtn').onclick = ()=> moveItem(pageIndex, itemIndex, -1);
+  document.getElementById('moveDownBtn').onclick = ()=> moveItem(pageIndex, itemIndex, 1);
+  document.getElementById('cloneItemBtn').onclick = ()=>{
+    data.pages[pageIndex].items.splice(itemIndex + 1, 0, deepClone(item));
+    selection = {kind:'item', pageIndex, itemIndex:itemIndex+1};
+    renderAll();
+  };
+  document.getElementById('deleteItemBtn').onclick = ()=>{
+    if(!confirm('Διαγραφή αντικειμένου;')) return;
+    data.pages[pageIndex].items.splice(itemIndex, 1);
+    selection = {kind:'page', pageIndex};
+    renderAll();
+  };
+
+  renderTypeFields(item);
+}
+
+function renderTypeFields(item){
+  const box = document.getElementById('typeFields');
+  if(item.type === 'hero'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>eyebrow</span><input type="text" id="heroEyebrow"></label>
+        <label><span>title</span><input type="text" id="heroTitle"></label>
+        <label><span>subtitle</span><textarea id="heroSubtitle"></textarea></label>
+      </div>`;
+    bindTextInput(document.getElementById('heroEyebrow'), item, 'eyebrow');
+    bindTextInput(document.getElementById('heroTitle'), item, 'title');
+    bindTextarea(document.getElementById('heroSubtitle'), item, 'subtitle');
+    return;
+  }
+  if(item.type === 'part_title'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>label</span><input type="text" id="partLabel"></label>
+        <label><span>title</span><input type="text" id="partTitle"></label>
+      </div>`;
+    bindTextInput(document.getElementById('partLabel'), item, 'label');
+    bindTextInput(document.getElementById('partTitle'), item, 'title');
+    return;
+  }
+  if(item.type === 'section_heading'){
+    box.innerHTML = `<label><span>title</span><input type="text" id="shTitle"></label>`;
+    bindTextInput(document.getElementById('shTitle'), item, 'title');
+    return;
+  }
+  if(item.type === 'paragraph'){
+    box.innerHTML = `<label><span>html</span><textarea id="pHtml" class="big"></textarea></label>`;
+    bindTextarea(document.getElementById('pHtml'), item, 'html');
+    return;
+  }
+  if(item.type === 'note'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>label</span><input type="text" id="nLabel"></label>
+      </div>
+      <label><span>html</span><textarea id="nHtml" class="big"></textarea></label>`;
+    bindTextInput(document.getElementById('nLabel'), item, 'label');
+    bindTextarea(document.getElementById('nHtml'), item, 'html');
+    return;
+  }
+  if(item.type === 'figure'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>src</span><input type="text" id="figSrc"></label>
+        <label><span>alt</span><input type="text" id="figAlt"></label>
+        <label><span>title</span><input type="text" id="figTitle"></label>
+        <label><span>Τοποθέτηση</span>
+          <select id="figPlacement">
+            <option value="right">right</option>
+            <option value="left">left</option>
+            <option value="wide">wide</option>
+          </select>
+        </label>
+        <label><span>caption</span><textarea id="figCaption"></textarea></label>
+        <label><span>Προεπιλεγμένο πλάτος (px)</span><input type="number" id="figWidth"></label>
+      </div>
+      <div class="editor-help">Το ύψος της εικόνας προσαρμόζεται αυτόματα από το φυσικό aspect ratio της εικόνας. Επεμβαίνεις μόνο στο πλάτος.</div>
+      <div class="image-tools">
+        <div>
+          <div class="subhead"><span>Χειρισμός εικόνας</span></div>
+          <div class="row">
+            <input type="file" id="figFile" accept="image/*">
+            <div class="image-actions">
+              <button type="button" id="figOpen">Άνοιγμα</button>
+              <button type="button" id="figClear" class="danger">Καθάρισμα src</button>
+            </div>
+          </div>
+          <div class="hint">Μπορείς είτε να δώσεις src/URL χειροκίνητα είτε να φορτώσεις εικόνα και να περάσει ως data URL μέσα στο JSON.</div>
+        </div>
+        <div id="figThumb" class="image-thumb empty">Δεν έχει οριστεί εικόνα ακόμη</div>
+      </div>`;
+    bindTextInput(document.getElementById('figSrc'), item, 'src');
+    bindTextInput(document.getElementById('figAlt'), item, 'alt');
+    bindTextInput(document.getElementById('figTitle'), item, 'title');
+    bindTextarea(document.getElementById('figCaption'), item, 'caption');
+    bindNumberInput(document.getElementById('figWidth'), item, 'frameWidth');
+    const pl = document.getElementById('figPlacement');
+    pl.value = item.placement || 'right';
+    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
+    wireFigureImageControls(item);
+    return;
+  }
+  if(item.type === 'scene'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>title</span><input type="text" id="scTitle"></label>
+        <label><span>caption</span><textarea id="scCaption"></textarea></label>
+        <label><span>singleSrc</span><textarea id="scSrc" class="big"></textarea></label>
+        <label><span>placement</span>
+          <select id="scPlacement">
+            <option value="right">right</option>
+            <option value="left">left</option>
+            <option value="wide">wide</option>
+          </select>
+        </label>
+        <label><span>frameWidth</span><input type="number" id="scWidth"></label>
+        <label><span>hideCaption</span><select id="scHide"><option value="0">false</option><option value="1">true</option></select></label>
+      </div>`;
+    bindTextInput(document.getElementById('scTitle'), item, 'title');
+    bindTextarea(document.getElementById('scCaption'), item, 'caption');
+    bindTextarea(document.getElementById('scSrc'), item, 'singleSrc');
+    bindNumberInput(document.getElementById('scWidth'), item, 'frameWidth');
+    const pl = document.getElementById('scPlacement');
+    pl.value = item.placement || 'right';
+    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
+    const hideSel = document.getElementById('scHide');
+    hideSel.value = item.hideCaption ? '1' : '0';
+    hideSel.onchange = ()=>{ item.hideCaption = hideSel.value === '1'; renderTree(); renderPreview(); };
+    return;
+  }
+  if(item.type === 'interactive_callout'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>Τίτλος callout</span><input type="text" id="coTitle"></label>
+        <label><span>Ετικέτα «Ρύθμισε»</span><input type="text" id="coSetupLabel"></label>
+        <label><span>Ετικέτα «Πίεσε»</span><input type="text" id="coPressLabel"></label>
+        <label><span>Ετικέτα «Παρατήρησε»</span><input type="text" id="coObserveTitle"></label>
+      </div>
+      <label><span>Κουμπιά στο «Ρύθμισε» (comma separated)</span><input type="text" id="coSetup"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Ρύθμισε» — πάτα ✕ για αφαίρεση ή διάλεξε βοηθητικά από κάτω.</div>
+      <div id="coSetupList" class="chip-list"></div>
+      <div id="coSetupPalette" class="chip-palette"></div>
+
+      <label><span>Κουμπιά στο «Πίεσε» (comma separated)</span><input type="text" id="coPress"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Πίεσε» — όλα μαζεμένα για αντιγραφή/διαγραφή χωρίς ψάξιμο.</div>
+      <div id="coPressList" class="chip-list"></div>
+      <div id="coPressPalette" class="chip-palette"></div>
+
+      <label><span>Σημεία στο «Παρατήρησε» (μία γραμμή ανά bullet)</span><textarea id="coObs" class="big"></textarea></label>`;
+    bindTextInput(document.getElementById('coTitle'), item, 'title');
+    bindTextInput(document.getElementById('coSetupLabel'), item, 'setupLabel');
+    bindTextInput(document.getElementById('coPressLabel'), item, 'pressLabel');
+    bindTextInput(document.getElementById('coObserveTitle'), item, 'observeTitle');
+    const setInp = document.getElementById('coSetup');
+    const pressInp = document.getElementById('coPress');
+    wireCalloutChipEditor(setInp, document.getElementById('coSetupList'), document.getElementById('coSetupPalette'), item, 'setupChips', COMMON_SETUP_BUTTONS);
+    wireCalloutChipEditor(pressInp, document.getElementById('coPressList'), document.getElementById('coPressPalette'), item, 'pressChips', COMMON_PRESS_BUTTONS);
+    const obs = document.getElementById('coObs');
+    obs.value = (item.observeItems || []).join('\n');
+    obs.oninput = ()=>{ item.observeItems = obs.value.split(/\n+/).map(s=>s.trim()).filter(Boolean); renderTree(); renderPreview(); };
+    return;
+  }
+  if(item.type === 'clear'){
+    box.innerHTML = '<div class="hint">Clear item. Χρήσιμο όταν θες να καθαρίσει wrap πριν από επόμενο block.</div>';
+    return;
+  }
+  box.innerHTML = '<div class="hint">Άγνωστος τύπος item.</div>';
+}
+
+function renderPreview(){
+  preview.innerHTML = '';
+  if(!data){ preview.innerHTML='<div class="hint">Καμία φόρτωση ακόμη.</div>'; return; }
+
+  const p = currentPage();
+  if(p){
+    const card = document.createElement('div');
+    card.className = 'preview-card';
+    card.innerHTML = `<div class="preview-title">Mini A4 — ${esc(p.id)}</div>`;
+    const wrap = document.createElement('div');
+    wrap.className = 'page-preview-wrap';
+    const scale = document.createElement('div');
+    scale.className = 'page-preview-scale';
+    scale.style.transform = 'scale(0.42)';
+    const page = renderPageNode(p, selection?.kind==='item' ? selection.itemIndex : -1, currentPageIndex()+1);
+    scale.appendChild(page);
+    wrap.appendChild(scale);
+    card.appendChild(wrap);
+    preview.appendChild(card);
+  }
+
+  if(selection?.kind === 'item'){
+    const itemCard = document.createElement('div');
+    itemCard.className = 'preview-card';
+    itemCard.innerHTML = `<div class="preview-title">Item preview</div>`;
+    const body = document.createElement('div');
+    body.className = 'preview-main';
+    body.appendChild(renderStandaloneItem(currentItem()));
+    itemCard.appendChild(body);
+    preview.appendChild(itemCard);
+  } else if(selection?.kind === 'meta'){
+    const c = document.createElement('div');
+    c.className = 'preview-card';
+    c.innerHTML = `<div class="preview-title">Meta</div><div class="preview-main"><strong>${esc(data.meta.title || '')}</strong><div>${esc(data.meta.subtitle || '')}</div><div class="meta-line">${esc(JSON.stringify(data.layoutDefaults,null,2))}</div></div>`;
+    preview.appendChild(c);
+  }
+}
+
+function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
+  const page = document.createElement('div');
+  page.className = 'page-preview';
+
+  const defs = data.layoutDefaults || {};
+  const bodyFontSize = Number(defs.bodyFontSize || 18);
+  const lineHeight = Number(defs.lineHeight || 1.34);
+  const headerFontSize = Number(defs.headerFontSize ?? 11);
+  const footerFontSize = Number(defs.footerFontSize ?? 11);
+  const bodyFamily = fontPresetValue(defs.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
+  const headingFamily = fontPresetValue(defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+  const heroFamily = fontPresetValue(defs.heroTitleFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Times New Roman",serif');
+  const partFamily = fontPresetValue(defs.partTitleFontFamily || defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+  const sectionFamily = fontPresetValue(defs.sectionHeadingFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
+
+  const pageWidthPx = Number(defs.pageWidthPx || 794);
+  const pageHeightPx = Number(defs.pageHeightPx || 1123);
+  const pagePaddingTopPx = Number(defs.pagePaddingTopPx || 54);
+  const pagePaddingRightPx = Number(defs.pagePaddingRightPx || 44);
+  const pagePaddingBottomPx = Number(defs.pagePaddingBottomPx || 54);
+  const pagePaddingLeftPx = Number(defs.pagePaddingLeftPx || 44);
+  const headerTopPx = Number(defs.headerTopPx || 20);
+  const headerHeightPx = Number(defs.headerHeightPx || 16);
+  const footerBottomPx = Number(defs.footerBottomPx || 18);
+  const footerHeightPx = Number(defs.footerHeightPx || 16);
+
+  page.style.width = `${pageWidthPx}px`;
+  page.style.minHeight = `${pageHeightPx}px`;
+  page.style.padding = `${pagePaddingTopPx}px ${pagePaddingRightPx}px ${pagePaddingBottomPx}px ${pagePaddingLeftPx}px`;
+  page.style.lineHeight = String(lineHeight);
+  page.style.fontSize = `${bodyFontSize}px`;
+  page.style.fontFamily = bodyFamily;
+
+  const header = document.createElement('div');
+  header.className = 'page-header';
+  header.style.left = `${pagePaddingLeftPx}px`;
+  header.style.right = `${pagePaddingRightPx}px`;
+  header.style.top = `${headerTopPx}px`;
+  header.style.height = `${headerHeightPx}px`;
+  header.style.fontSize = `${headerFontSize}px`;
+  header.style.textTransform = 'none';
+  if(headerFontSize <= 0) header.style.display = 'none';
+  header.innerHTML = `<span>${esc(pageObj.header?.left || '')}</span><span>${esc(pageObj.header?.center || '')}</span><span>${esc(pageObj.header?.right || '')}</span>`;
+  page.appendChild(header);
+
+  const footerRight = String(pageObj.footer?.right || '').replace('{page}', pageNumber);
+  const footerCenter = String(pageObj.footer?.center || '').replace('{page}', pageNumber);
+  const footerLeft = String(pageObj.footer?.left || '').replace('{page}', pageNumber);
+  const footer = document.createElement('div');
+  footer.className = 'page-footer';
+  footer.style.left = `${pagePaddingLeftPx}px`;
+  footer.style.right = `${pagePaddingRightPx}px`;
+  footer.style.bottom = `${footerBottomPx}px`;
+  footer.style.height = `${footerHeightPx}px`;
+  footer.style.fontSize = `${footerFontSize}px`;
+  footer.style.textTransform = 'none';
+  if(footerFontSize <= 0) footer.style.display = 'none';
+  footer.innerHTML = `<span>${esc(footerLeft)}</span><span>${esc(footerCenter)}</span><span>${esc(footerRight)}</span>`;
+  page.appendChild(footer);
+
+  pageObj.items.forEach((item, idx) => {
+    const node = renderStandaloneItem(item);
+    if(idx === highlightedIndex) node.classList.add('item-highlight');
+
+    if(item?.type === 'part_title'){
+      const el = node.querySelector('.part-main');
+      if(el){
+        el.style.setProperty('font-family', partFamily);
+        if(defs.partTitleFontSize) el.style.setProperty('font-size', `${Number(defs.partTitleFontSize)}px`);
+      }
+    }
+    if(item?.type === 'section_heading'){
+      node.style.fontFamily = sectionFamily;
+      if(defs.sectionHeadingFontSize) node.style.fontSize = `${Number(defs.sectionHeadingFontSize)}px`;
+    }
+    if(item?.type === 'hero'){
+      const titleEl = node.querySelector('.hero-title');
+      const subtitleEl = node.querySelector('.hero-subtitle');
+      if(titleEl){
+        titleEl.style.setProperty('font-family', heroFamily);
+        if(defs.heroTitleFontSize) titleEl.style.setProperty('font-size', `${Number(defs.heroTitleFontSize)}px`);
+      }
+      if(subtitleEl && defs.heroSubtitleFontSize){
+        subtitleEl.style.setProperty('font-size', `${Number(defs.heroSubtitleFontSize)}px`);
+      }
+    }
+    if(item?.type === 'note'){
+      if(defs.noteFontSize) node.style.setProperty('font-size', `${Number(defs.noteFontSize)}px`);
+      if(defs.noteLineHeight) node.style.setProperty('line-height', String(defs.noteLineHeight));
+    }
+    if((item?.type === 'figure' || item?.type === 'scene') && defs.captionFontSize){
+      node.querySelector('figcaption')?.style.setProperty('font-size', `${Number(defs.captionFontSize)}px`);
+    }
+
+    page.appendChild(node);
+  });
+
+  return page;
+}
+
+const SCENE_BASE_WIDTH = 340;
+const SCENE_GRAPH_HEIGHT = 146.2;
+const SCENE_ROD_HEIGHT = 219.3;
+const SCENE_CONTROLS_RESERVE = 98;
+const SCENE_MAX_ROD_GRAPH_COUNT = 3;
+
+function readUrlParams(url=''){
+  try{
+    return new URL(url, window.location.href).searchParams;
+  }catch(_e){
+    try{ return new URL(url, 'https://local.invalid/').searchParams; }
+    catch(_e2){ return new URLSearchParams(''); }
+  }
+}
+function sceneLayoutKey(item){
+  const params = readUrlParams(item?.singleSrc || '');
+  return String(item?.layout || params.get('layout') || '').toLowerCase();
+}
+function sceneNaturalMetrics(item){
+  const frameWidth = Math.max(120, Number(item?.frameWidth || SCENE_BASE_WIDTH) || SCENE_BASE_WIDTH);
+  const scale = frameWidth / SCENE_BASE_WIDTH;
+  const layout = sceneLayoutKey(item);
+  let graphCount = 0;
+  let hasRod = true;
+
+  if(layout === 'rod_only') graphCount = 0;
+  else if(layout === 'rod_1graph') graphCount = 1;
+  else if(layout === 'rod_2graphs') graphCount = 2;
+  else if(layout === 'rod_3graphs') graphCount = 3;
+  else if(layout === 'graphs_qieb'){ graphCount = 4; hasRod = false; }
+  else{
+    const params = readUrlParams(item?.singleSrc || '');
+    const graphsParam = (params.get('graphs') || '').split(',').map(s=>s.trim()).filter(Boolean);
+    graphCount = graphsParam.length || 2;
+    const layersParam = (params.get('layers') || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    hasRod = layersParam.includes('rod');
+    if(!layersParam.length) hasRod = true;
+  }
+
+  const naturalHeight = ((hasRod ? SCENE_ROD_HEIGHT : 0) + graphCount * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+  const reservedHeight = (SCENE_ROD_HEIGHT + SCENE_MAX_ROD_GRAPH_COUNT * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+
+  return {
+    frameWidth,
+    naturalHeight: Math.max(180, naturalHeight),
+    reservedHeight: Math.max(naturalHeight, reservedHeight)
+  };
+}
+
+function renderStandaloneItem(item){
+  const wrap = document.createElement('div');
+  const t = item?.type || 'paragraph';
+  const paraGap = Number(data.layoutDefaults?.paragraphGap ?? 7);
+  const sectionGap = Number(data.layoutDefaults?.sectionGap ?? 20);
+  const noteGap = Number(data.layoutDefaults?.noteGap ?? 10);
+  const calloutGap = Number(data.layoutDefaults?.calloutGap ?? 10);
+
+  if(t === 'hero'){
+    wrap.className = 'hero-block';
+    wrap.innerHTML = `${item.eyebrow ? `<p class="hero-eyebrow">${esc(item.eyebrow)}</p>` : ''}${item.title ? `<h1 class="hero-title">${esc(item.title)}</h1>` : ''}${item.subtitle ? `<p class="hero-subtitle">${esc(item.subtitle)}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
+    return wrap;
+  }
+  if(t === 'part_title'){
+    wrap.className = 'part-title';
+    wrap.innerHTML = `${item.label ? `<p class="part-kicker">${esc(item.label)}</p>` : ''}${item.title ? `<p class="part-main">${esc(item.title)}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
+    return wrap;
+  }
+  if(t === 'section_heading'){
+    wrap.className = 'section-heading';
+    wrap.textContent = item.title || '';
+    wrap.style.marginTop = `${Math.max(8, sectionGap)}px`;
+    wrap.style.marginBottom = `${Math.max(6, Math.round(sectionGap * 0.4))}px`;
+    return wrap;
+  }
+  if(t === 'paragraph'){
+    wrap.className = 'page-paragraph';
+    wrap.style.marginBottom = `${paraGap}px`;
+    wrap.innerHTML = item.html || '<em>(κενό)</em>';
+    return wrap;
+  }
+  if(t === 'note'){
+    wrap.className = 'page-note';
+    wrap.style.marginTop = `${Math.max(4, Math.round(noteGap * 0.6))}px`;
+    wrap.style.marginBottom = `${noteGap}px`;
+    wrap.innerHTML = `${item.label ? `<span class="label">${esc(item.label)}</span>` : ''}${item.html || '<em>(κενό)</em>'}`;
+    return wrap;
+  }
+  if(t === 'figure'){
+    wrap.className = `media ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    wrap.innerHTML = `
+      <figure class="${wrap.className}" style="--figure-width:${item.frameWidth || 340}px">
+        <div class="media-frame natural">
+          ${item.src ? `<img src="${item.src}" alt="${esc(item.alt || '')}">` : `<div class="media-placeholder" style="position:static;display:grid;place-items:center;padding:14px;color:#465666;min-height:140px">Χωρίς src</div>`}
+        </div>
+        ${item.hideCaption ? '' : `<figcaption>${esc(item.caption || item.title || '')}</figcaption>`}
+      </figure>`;
+    return wrap.firstElementChild;
+  }
+  if(t === 'scene'){
+    wrap.className = `media ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    const metrics = sceneNaturalMetrics(item);
+    const fig = document.createElement('figure');
+    fig.className = wrap.className;
+    fig.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+
+    const reserve = document.createElement('div');
+    reserve.className = 'scene-preview-reserve';
+    reserve.style.minHeight = `${Math.round(metrics.reservedHeight)}px`;
+
+    const frame = document.createElement('div');
+    frame.className = 'media-frame scene-media-frame';
+    frame.style.aspectRatio = `${metrics.frameWidth} / ${metrics.naturalHeight}`;
+
+    if(item.singleSrc){
+      const ifr = document.createElement('iframe');
+      ifr.loading = 'lazy';
+      ifr.referrerPolicy = 'no-referrer';
+      ifr.allow = 'fullscreen';
+      ifr.src = item.singleSrc;
+      frame.appendChild(ifr);
+    } else {
+      frame.innerHTML = '<div class="media-placeholder" style="display:grid;place-items:center;padding:14px;color:#465666">Χωρίς singleSrc</div>';
+    }
+
+    reserve.appendChild(frame);
+    fig.appendChild(reserve);
+
+    if(!item.hideCaption){
+      const cap = document.createElement('figcaption');
+      cap.textContent = item.caption || item.title || 'Σκηνή';
+      fig.appendChild(cap);
+    }
+    return fig;
+  }
+  if(t === 'interactive_callout'){
+    wrap.className = 'callout';
+    wrap.style.marginTop = `${Math.max(4, Math.round(calloutGap * 0.6))}px`;
+    wrap.style.marginBottom = `${calloutGap}px`;
+    const setup = (item.setupChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
+    const press = (item.pressChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
+    const observe = (item.observeItems || []).map(ch => `<li>${esc(ch)}</li>`).join('');
+    wrap.innerHTML = `
+      <div class="callout-title">${esc(item.title || 'Δοκίμασε')}</div>
+      <div class="callout-row">
+        ${setup ? `<span class="callout-label">${esc(item.setupLabel || 'Ρύθμισε')}</span>${setup}` : ''}
+        ${press ? `<span class="callout-label">${esc(item.pressLabel || 'Πίεσε')}</span>${press}` : ''}
+      </div>
+      ${observe ? `<div class="callout-observe"><span class="callout-observe-title">${esc(item.observeTitle || 'Παρατήρησε')}</span><ul>${observe}</ul></div>` : ''}`;
+    return wrap;
+  }
+  if(t === 'clear'){
+    wrap.style.clear = 'both';
+    wrap.style.height = '0';
+    return wrap;
+  }
+
+  wrap.className = 'page-paragraph';
+  wrap.style.marginBottom = `${paraGap}px`;
+  wrap.textContent = `[Άγνωστο item: ${t}]`;
+  return wrap;
+}
+</script>
+</body>
+</html>
