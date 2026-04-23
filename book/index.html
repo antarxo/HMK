@@ -401,7 +401,7 @@ function normalizeAppSrc(url=''){
   if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return raw;
   const path=(window.location.pathname || '').replace(/\\/g,'/').toLowerCase();
   const inBook=/\/book(\/|$)/.test(path);
-  const appEntry=inBook ? '../index_patched.html' : './index_patched.html';
+  const appEntry=inBook ? '../index.html' : './index.html';
   return raw
     .replace(/^\.\.\/index_printmatch\.html/i, appEntry)
     .replace(/^\.\.\/index\.html/i, appEntry)
@@ -587,7 +587,11 @@ async function preparePrintSnapshots(force=false){
   for(const frame of frames){
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
-    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
+
+    let dataUrl = await requestIframePrintSnapshotWithRetry(liveIframe, 5);
+    if(!dataUrl){
+      dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
+    }
     if(!dataUrl) continue;
 
     const img = document.createElement('img');
@@ -709,7 +713,7 @@ function renderScene(item){
   frame.className='media-frame scene-frame';
   frame.style.aspectRatio=String(sceneAspect(item));
   const iframe=document.createElement('iframe');
-  iframe.loading='lazy';
+  iframe.loading='eager';
   iframe.referrerPolicy='no-referrer';
   iframe.allow='fullscreen';
   iframe.src=withCacheBust(normalizeAppSrc(item.singleSrc || ''));
