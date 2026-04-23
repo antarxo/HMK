@@ -16,7 +16,8 @@
     "pageInnerPaddingMm": 14,
     "showPageNumbers": true,
     "headerFontSize": 0,
-    "footerFontSize": 0
+    "footerFontSize": 0,
+    "bodyFontFamily": "sans"
   },
   "pages": [
     {
