@@ -48,7 +48,21 @@
   @media (max-width:860px){
     .overlay{left:8px;right:8px;bottom:8px;top:auto;width:auto}
     .note{left:8px;right:8px;top:8px;max-width:none}
-  }
+  }  /* Book embedding mode: compact in-frame controls, same logic as the main app scenes. */
+  body.book-embed .top{display:none!important}
+  body.book-embed .note{display:none!important}
+  body.book-embed .main{height:100dvh;overflow:hidden}
+  body.book-embed #stage{inset:0 0 112px 0}
+  body.book-embed .overlay{left:6px;right:6px;top:auto;bottom:6px;width:auto;gap:4px;display:flex;flex-direction:column;justify-content:flex-end}
+  body.book-embed .hud{padding:4px;border-radius:9px;background:rgba(10,14,20,.56)}
+  body.book-embed .hud.book-hide{display:none!important}
+  body.book-embed .label{font-size:9px;margin:0 0 3px 1px}
+  body.book-embed button{min-height:22px;padding:3px 5px;font-size:9px;border-radius:7px}
+  body.book-embed .row{gap:3px}
+  body.book-embed .row.transport{grid-template-columns:repeat(5,26px)}
+  body.book-embed .row.transport button{width:26px;height:23px;font-size:12px}
+  body.book-embed #modeRow{max-width:190px}
+
 </style>
 </head>
 <body>
@@ -338,6 +352,11 @@ if(qControls === 'minimal') {
   const noteEl = document.getElementById('note'); if(noteEl) noteEl.style.display = 'none';
 }
 const qEmbedded = qs.get('embedded') || qs.get('book');
+const qBookControls = ['book','guided','book-guided'].includes(String(qControls || '').toLowerCase());
+if(qBookControls){
+  document.body.classList.add('book-embed');
+  document.querySelectorAll('.hud').forEach((el, idx) => { if(idx >= 3) el.classList.add('book-hide'); });
+}
 if(qEmbedded === '1' || qEmbedded === 'true') {
   const topEl = document.querySelector('.top');
   if(topEl) topEl.style.display = 'none';
