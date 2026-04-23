@@ -119,6 +119,7 @@ body{
 }
 .sheet{
   width:var(--sheet-width);
+  height:var(--sheet-height);
   min-height:var(--sheet-height);
   transform:scale(var(--screen-scale));
   transform-origin:top left;
@@ -126,9 +127,11 @@ body{
   border:1px solid var(--line);
   box-shadow:var(--shadow);
   position:absolute; left:0; top:0;
+  overflow:hidden;
 }
 .sheet-inner{
   position:relative;
+  height:100%;
   min-height:100%;
   padding:var(--sheet-pad-top) var(--sheet-pad-right) var(--sheet-pad-bottom) var(--sheet-pad-left);
 }
@@ -246,6 +249,7 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
   .sheet-wrap:last-child{page-break-after:auto;break-after:auto}
   .sheet{
     width:210mm !important;
+    height:297mm !important;
     min-height:297mm !important;
     transform:none !important;
     position:relative !important;
@@ -253,12 +257,18 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
     top:auto !important;
     border:0 !important;
     box-shadow:none !important;
-    overflow:visible !important;
+    overflow:hidden !important;
   }
-  .sheet-inner{padding:14mm !important}
-  .sheet-header{margin-bottom:14px}
-  .sheet-footer{left:14mm !important; right:14mm !important; bottom:10mm !important}
-  .sheet-body{min-height:calc(297mm - 28mm - var(--header-h) - var(--footer-h) - 22px) !important}
+  .sheet-inner{
+    height:100% !important;
+    min-height:100% !important;
+    padding:14mm !important;
+  }
+  .sheet-footer{
+    left:14mm !important;
+    right:14mm !important;
+    bottom:10mm !important;
+  }
   figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
   .media-frame.print-ready iframe{display:none !important}
   .media-frame img{object-fit:contain !important; background:#fff !important}
