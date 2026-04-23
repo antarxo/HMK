@@ -846,7 +846,7 @@ function applyMainMode(mode, skipApply=false){
   if(!skipApply){ restartEvolutionForSelection(); }
 }
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp', preserveDrawingBuffer:true });
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
@@ -3696,50 +3696,107 @@ function buildViewportSnapshotClone(sourceRoot){
       cloneEls[idx] = img;
     }
   });
-  clone.querySelectorAll('.machineHud, #hiddenSettings, .top').forEach(el => el.remove());
+  clone.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
   clone.style.margin = '0';
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.display = 'block';
-  clone.style.height = 'auto';
-  const main = clone.querySelector('.main');
-  if(main){
-    main.style.padding = '0';
-    main.style.margin = '0';
-    main.style.display = 'block';
-    main.style.overflow = 'hidden';
-  }
-  const viewport = clone.querySelector('.card.viewport');
-  if(viewport){
-    viewport.style.margin = '0';
-    viewport.style.border = '0';
-    viewport.style.borderRadius = '0';
-    viewport.style.boxShadow = 'none';
-    viewport.style.overflow = 'hidden';
-  }
+  clone.style.background = '#ffffff';
   return clone;
 }
+
+function getPrintSceneUrlParams(){
+  try{ return new URLSearchParams(window.location.search || ''); }
+  catch(_e){ return new URLSearchParams(''); }
+}
+function getExpectedPrintGraphKeys(){
+  const params = getPrintSceneUrlParams();
+  return normalizeAvailableGraphList(params.get('graphs') || params.get('activeGraphs') || '');
+}
+function getExpectedPrintGraphCount(expectedKeys=[]){
+  const params = getPrintSceneUrlParams();
+  const layoutRaw = String(params.get('layout') || '').trim().toLowerCase();
+  const specCount = BOOK_LAYOUT_SPECS[layoutRaw]?.graphs;
+  if(Number.isFinite(specCount)) return Math.min(3, Math.max(0, specCount));
+  if(expectedKeys.length) return Math.min(3, expectedKeys.length);
+  return Math.min(3, activeBookSceneState?.graphs?.length || 0);
+}
+function getVisibleBookGraphKeys(){
+  const keys = [];
+  for(const key of ['V','Q','I','E','B']){
+    const panel = domRefs.graphPanels[key];
+    const canvas = graphPapers[key];
+    if(!panel || !canvas) continue;
+    const cs = getComputedStyle(panel);
+    const rect = panel.getBoundingClientRect();
+    if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || 1) === 0) continue;
+    if(rect.width < 12 || rect.height < 12) continue;
+    if(canvas.width < 50 || canvas.height < 20) continue;
+    keys.push(key);
+  }
+  return keys;
+}
+function forceBookPrintGraphState(expectedKeys=[]){
+  if(!(activeFocus === 'book_multiscene' || activeBookSceneState)) return;
+  const wanted = (expectedKeys.length ? expectedKeys : (activeBookSceneState?.graphs || [])).slice(0, 3);
+  if(activeBookSceneState){
+    activeBookSceneState.graphs = [...wanted];
+  }
+  const cfg = getFocusPresetConfig('book_multiscene') || FOCUS_PRESETS.book_multiscene;
+  if(cfg){
+    cfg.graphs = { V:false, Q:false, I:false, E:false, B:false };
+    wanted.forEach(k => { cfg.graphs[k] = true; });
+    if(cfg.bookMeta) cfg.bookMeta.graphs = [...wanted];
+    relayoutGraphContainers(cfg);
+  }
+  if(domRefs.bookGraphStack){
+    const count = wanted.length;
+    domRefs.bookGraphStack.style.display = count ? 'grid' : 'none';
+    domRefs.bookGraphStack.style.gridTemplateColumns = '1fr';
+    domRefs.bookGraphStack.style.gridTemplateRows = count ? `repeat(${count}, minmax(0, 1fr))` : '';
+    placeBookGraphPanels(wanted);
+  }
+  ['V','Q','I','E','B'].forEach(k => setGraphPanelVisible(k, wanted.includes(k)));
+}
+async function stabilizeBookPrintScene(){
+  if(!(activeFocus === 'book_multiscene' || activeBookSceneState)) return;
+  const params = getPrintSceneUrlParams();
+  if(params.size){
+    const raw = {};
+    for(const [k,v] of params.entries()) raw[k] = v;
+    applyExternalState(raw, { announce:false, forcePause:false });
+  }
+  const expectedKeys = getExpectedPrintGraphKeys();
+  const expectedCount = getExpectedPrintGraphCount(expectedKeys);
+  for(let attempt = 0; attempt < 8; attempt++){
+    forceBookPrintGraphState(expectedKeys);
+    try{ scheduleRendererResize(); }catch(_e){}
+    graphState.dynamicDirty = true;
+    graphState.staticDirty = true;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    applyUI();
+    drawGraphs(true);
+    try{ renderer.render(scene, camera); }catch(_e){}
+    await new Promise(resolve => setTimeout(resolve, 80 + attempt * 25));
+    const visible = getVisibleBookGraphKeys();
+    const enough = !expectedCount || visible.length >= expectedCount;
+    const exact = !expectedKeys.length || expectedKeys.every(k => visible.includes(k));
+    if(enough && exact) break;
+  }
+}
 async function getBookPrintSnapshot(){
-  const sourceRoot = document.querySelector('.app');
+  const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
-  try{ renderer.render(scene, camera); }catch(_e){}
-  try{ drawGraphs(true); }catch(_e){}
-  try{ applyUI(); }catch(_e){}
+  await stabilizeBookPrintScene();
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const rect = sourceRoot.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width));
   const height = Math.max(1, Math.round(rect.height));
   const clone = buildViewportSnapshotClone(sourceRoot);
   clone.style.width = `${width}px`;
-  clone.style.minWidth = `${width}px`;
-  clone.style.maxWidth = `${width}px`;
   clone.style.height = `${height}px`;
-  clone.style.minHeight = `${height}px`;
-  clone.style.maxHeight = `${height}px`;
-  const bg = getComputedStyle(document.body).backgroundColor || '#0b0f14';
   const serialized = new XMLSerializer().serializeToString(clone);
-  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${bg};">${serialized}</div>`;
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
