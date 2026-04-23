@@ -265,7 +265,7 @@ function applyLanguage(){
 }
 
 
-const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:'high-performance'});
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false, powerPreference:'high-performance', preserveDrawingBuffer:true});
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setClearColor(0x0b0f14, 1);
 stage.appendChild(renderer.domElement);
@@ -1109,6 +1109,37 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 
+
+
+async function getBookPrintSnapshot(){
+  try{
+    const wasPlaying = state.playing;
+    state.playing = false;
+    animateFrame(0);
+    const dataUrl = renderer.domElement.toDataURL('image/png');
+    state.playing = wasPlaying;
+    return dataUrl;
+  }catch(err){
+    console.warn('static print snapshot failed', err);
+    return null;
+  }
+}
+window.getBookPrintSnapshot = getBookPrintSnapshot;
+window.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if(data.type === 'capturePrintSnapshot'){
+    Promise.resolve(getBookPrintSnapshot()).then((dataUrl) => {
+      try{
+        if(event.source && typeof event.source.postMessage === 'function'){
+          event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*');
+        }
+      }catch(_e){}
+    });
+  }
+});
+window.EMStaticFieldApp = {
+  getPrintSnapshot: () => getBookPrintSnapshot()
+};
 resetTimelineForMode('appear');
 setViewPreset('2d');
 applyButtons();
