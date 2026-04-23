@@ -234,13 +234,17 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
 @media print{
   @page{size:A4 portrait; margin:0}
   html,body{background:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
-  body{font:15px/var(--body-leading) Georgia,"Noto Serif",serif !important}
+  body{
+    font-size:var(--body-font-size) !important;
+    line-height:var(--body-leading) !important;
+    font-family:var(--body-font-family) !important;
+  }
   .topbar,.status{display:none !important}
   .viewport{padding:0 !important; max-width:none !important}
   .page-stack{gap:0 !important}
   .sheet-wrap{
-    width:210mm !important;
-    min-height:297mm !important;
+    width:var(--sheet-width) !important;
+    min-height:var(--sheet-height) !important;
     page-break-after:always;
     break-after:page;
     break-inside:avoid;
@@ -248,9 +252,9 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
   }
   .sheet-wrap:last-child{page-break-after:auto;break-after:auto}
   .sheet{
-    width:210mm !important;
-    height:297mm !important;
-    min-height:297mm !important;
+    width:var(--sheet-width) !important;
+    height:var(--sheet-height) !important;
+    min-height:var(--sheet-height) !important;
     transform:none !important;
     position:relative !important;
     left:auto !important;
@@ -262,12 +266,21 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
   .sheet-inner{
     height:100% !important;
     min-height:100% !important;
-    padding:14mm !important;
+    padding:var(--sheet-pad-top) var(--sheet-pad-right) var(--sheet-pad-bottom) var(--sheet-pad-left) !important;
+  }
+  .sheet-header{
+    left:var(--sheet-pad-left) !important;
+    right:var(--sheet-pad-right) !important;
+    top:var(--header-top) !important;
+    height:var(--header-h) !important;
+    font-size:var(--header-font-size) !important;
   }
   .sheet-footer{
-    left:14mm !important;
-    right:14mm !important;
-    bottom:10mm !important;
+    left:var(--sheet-pad-left) !important;
+    right:var(--sheet-pad-right) !important;
+    bottom:var(--footer-bottom) !important;
+    height:var(--footer-h) !important;
+    font-size:var(--footer-font-size) !important;
   }
   figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
   .media-frame.print-ready iframe{display:none !important}
@@ -302,7 +315,18 @@ const pageStack=document.getElementById('pageStack');
 const megaNav=document.getElementById('megaNav');
 const statusEl=document.getElementById('status');
 const printSandbox=document.getElementById('printSandbox');
-const JSON_CANDIDATES=['chapter_content - Αντιγραφή (3)_with_new_layout_v4_missing_functions_fix.json','chapter_content.json','chapter_content_pages_v1.json'];
+const JSON_CANDIDATES=['chapter_content.json'];
+
+function applyPrintPageSettings(defs){
+  if(!printPageStyleEl){
+    printPageStyleEl = document.createElement('style');
+    printPageStyleEl.id = 'dynamic-print-page-style';
+    document.head.appendChild(printPageStyleEl);
+  }
+  const size = String(defs?.pageSize || 'A4').trim() || 'A4';
+  const orientation = String(defs?.orientation || 'portrait').trim() || 'portrait';
+  printPageStyleEl.textContent = `@media print{ @page{ size:${size} ${orientation}; margin:0 } }`;
+}
 
 function setStatus(msg){ statusEl.textContent = msg || ''; }
 function esc(s=''){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -918,6 +942,7 @@ async function boot(){
   }
   const defs=data.layoutDefaults || {};
   applyLayoutDefaults(defs);
+  applyPrintPageSettings(defs);
   renderPages(data);
   deriveNav(data);
   updateActiveNav();
