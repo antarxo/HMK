@@ -649,61 +649,6 @@ function wireFigureImageControls(item){
   });
 }
 
-function renderMetaEditor(){
-  editor.innerHTML = `
-    <div class="grid">
-      <label><span>Υπέρτιτλος βιβλίου</span><input type="text" id="metaEyebrow"></label>
-      <label><span>Κύριος τίτλος βιβλίου</span><input type="text" id="metaTitle"></label>
-      <label><span>Υπότιτλος βιβλίου</span><input type="text" id="metaSubtitle"></label>
-
-      <label><span>Μέγεθος βασικού κειμένου (px)</span><input type="number" id="ldBodyFontSize" step="1"></label>
-      <label><span>Διάστιχο βασικού κειμένου</span><input type="number" id="ldLineHeight" step="0.01"></label>
-      <label><span>Κενό ανάμεσα σε παραγράφους (px)</span><input type="number" id="ldParaGap" step="1"></label>
-
-      <label><span>Κενό ανάμεσα σε ενότητες (px)</span><input type="number" id="ldSecGap" step="1"></label>
-      <label><span>Κενό γύρω από notes (px)</span><input type="number" id="ldNoteGap" step="1"></label>
-      <label><span>Κενό γύρω από callouts (px)</span><input type="number" id="ldCalloutGap" step="1"></label>
-
-      <label><span>Μέγεθος κεφαλίδας σελίδας (px)</span><input type="number" id="ldHeaderFontSize" step="1"></label>
-      <label><span>Μέγεθος υποσέλιδου σελίδας (px)</span><input type="number" id="ldFooterFontSize" step="1"></label>
-
-      <label><span>Γραμματοσειρά βασικού κειμένου</span>
-        <select id="ldBodyFontFamily">
-          <option value="serif">Serif</option>
-          <option value="sans">Sans</option>
-        </select>
-      </label>
-      <label><span>Γραμματοσειρά τίτλων</span>
-        <select id="ldHeadingFontFamily">
-          <option value="classic">Classic Sans</option>
-          <option value="serif">Serif</option>
-          <option value="sans">Sans</option>
-        </select>
-      </label>
-    </div>
-    <div class="editor-help">Εδώ ρυθμίζεις την τυπογραφική βάση όλου του βιβλίου. Οι αλλαγές φαίνονται αμέσως στη μικρή προεπισκόπηση της σελίδας.</div>
-  `;
-  bindTextInput(document.getElementById('metaEyebrow'), data.meta, 'eyebrow');
-  bindTextInput(document.getElementById('metaTitle'), data.meta, 'title');
-  bindTextInput(document.getElementById('metaSubtitle'), data.meta, 'subtitle');
-  bindNumberInput(document.getElementById('ldBodyFontSize'), data.layoutDefaults, 'bodyFontSize');
-  bindNumberInput(document.getElementById('ldLineHeight'), data.layoutDefaults, 'lineHeight');
-  bindNumberInput(document.getElementById('ldParaGap'), data.layoutDefaults, 'paragraphGap');
-  bindNumberInput(document.getElementById('ldSecGap'), data.layoutDefaults, 'sectionGap');
-  bindNumberInput(document.getElementById('ldNoteGap'), data.layoutDefaults, 'noteGap');
-  bindNumberInput(document.getElementById('ldCalloutGap'), data.layoutDefaults, 'calloutGap');
-  bindNumberInput(document.getElementById('ldHeaderFontSize'), data.layoutDefaults, 'headerFontSize');
-  bindNumberInput(document.getElementById('ldFooterFontSize'), data.layoutDefaults, 'footerFontSize');
-
-  const bodySel = document.getElementById('ldBodyFontFamily');
-  bodySel.value = data.layoutDefaults?.bodyFontFamily || 'serif';
-  bodySel.onchange = ()=>{ data.layoutDefaults.bodyFontFamily = bodySel.value; renderPreview(); };
-
-  const headSel = document.getElementById('ldHeadingFontFamily');
-  headSel.value = data.layoutDefaults?.headingFontFamily || 'classic';
-  headSel.onchange = ()=>{ data.layoutDefaults.headingFontFamily = headSel.value; renderPreview(); };
-}
-
 function renderPageEditor(page, pageIndex){
   editor.innerHTML = `
     <div class="grid">
@@ -885,159 +830,167 @@ function renderItemEditor(item, pageIndex, itemIndex){
   renderTypeFields(item);
 }
 
-function renderTypeFields(item){
-  const box = document.getElementById('typeFields');
-  if(item.type === 'hero'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>eyebrow</span><input type="text" id="heroEyebrow"></label>
-        <label><span>title</span><input type="text" id="heroTitle"></label>
-        <label><span>subtitle</span><textarea id="heroSubtitle"></textarea></label>
-      </div>`;
-    bindTextInput(document.getElementById('heroEyebrow'), item, 'eyebrow');
-    bindTextInput(document.getElementById('heroTitle'), item, 'title');
-    bindTextarea(document.getElementById('heroSubtitle'), item, 'subtitle');
-    return;
-  }
-  if(item.type === 'part_title'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>label</span><input type="text" id="partLabel"></label>
-        <label><span>title</span><input type="text" id="partTitle"></label>
-      </div>`;
-    bindTextInput(document.getElementById('partLabel'), item, 'label');
-    bindTextInput(document.getElementById('partTitle'), item, 'title');
-    return;
-  }
-  if(item.type === 'section_heading'){
-    box.innerHTML = `<label><span>title</span><input type="text" id="shTitle"></label>`;
-    bindTextInput(document.getElementById('shTitle'), item, 'title');
-    return;
-  }
-  if(item.type === 'paragraph'){
-    box.innerHTML = `<label><span>html</span><textarea id="pHtml" class="big"></textarea></label>`;
-    bindTextarea(document.getElementById('pHtml'), item, 'html');
-    return;
-  }
-  if(item.type === 'note'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>label</span><input type="text" id="nLabel"></label>
-      </div>
-      <label><span>html</span><textarea id="nHtml" class="big"></textarea></label>`;
-    bindTextInput(document.getElementById('nLabel'), item, 'label');
-    bindTextarea(document.getElementById('nHtml'), item, 'html');
-    return;
-  }
-  if(item.type === 'figure'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>src</span><input type="text" id="figSrc"></label>
-        <label><span>alt</span><input type="text" id="figAlt"></label>
-        <label><span>title</span><input type="text" id="figTitle"></label>
-        <label><span>Τοποθέτηση</span>
-          <select id="figPlacement">
-            <option value="right">right</option>
-            <option value="left">left</option>
-            <option value="wide">wide</option>
-          </select>
-        </label>
-        <label><span>caption</span><textarea id="figCaption"></textarea></label>
-        <label><span>Προεπιλεγμένο πλάτος (px)</span><input type="number" id="figWidth"></label>
-      </div>
-      <div class="editor-help">Το ύψος της εικόνας προσαρμόζεται αυτόματα από το φυσικό aspect ratio της εικόνας. Επεμβαίνεις μόνο στο πλάτος.</div>
-      <div class="image-tools">
-        <div>
-          <div class="subhead"><span>Χειρισμός εικόνας</span></div>
-          <div class="row">
-            <input type="file" id="figFile" accept="image/*">
-            <div class="image-actions">
-              <button type="button" id="figOpen">Άνοιγμα</button>
-              <button type="button" id="figClear" class="danger">Καθάρισμα src</button>
-            </div>
-          </div>
-          <div class="hint">Μπορείς είτε να δώσεις src/URL χειροκίνητα είτε να φορτώσεις εικόνα και να περάσει ως data URL μέσα στο JSON.</div>
-        </div>
-        <div id="figThumb" class="image-thumb empty">Δεν έχει οριστεί εικόνα ακόμη</div>
-      </div>`;
-    bindTextInput(document.getElementById('figSrc'), item, 'src');
-    bindTextInput(document.getElementById('figAlt'), item, 'alt');
-    bindTextInput(document.getElementById('figTitle'), item, 'title');
-    bindTextarea(document.getElementById('figCaption'), item, 'caption');
-    bindNumberInput(document.getElementById('figWidth'), item, 'frameWidth');
-    const pl = document.getElementById('figPlacement');
-    pl.value = item.placement || 'right';
-    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
-    wireFigureImageControls(item);
-    return;
-  }
-  if(item.type === 'scene'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>title</span><input type="text" id="scTitle"></label>
-        <label><span>caption</span><textarea id="scCaption"></textarea></label>
-        <label><span>singleSrc</span><textarea id="scSrc" class="big"></textarea></label>
-        <label><span>placement</span>
-          <select id="scPlacement">
-            <option value="right">right</option>
-            <option value="left">left</option>
-            <option value="wide">wide</option>
-          </select>
-        </label>
-        <label><span>frameWidth</span><input type="number" id="scWidth"></label>
-        <label><span>hideCaption</span><select id="scHide"><option value="0">false</option><option value="1">true</option></select></label>
-      </div>`;
-    bindTextInput(document.getElementById('scTitle'), item, 'title');
-    bindTextarea(document.getElementById('scCaption'), item, 'caption');
-    bindTextarea(document.getElementById('scSrc'), item, 'singleSrc');
-    bindNumberInput(document.getElementById('scWidth'), item, 'frameWidth');
-    const pl = document.getElementById('scPlacement');
-    pl.value = item.placement || 'right';
-    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
-    const hideSel = document.getElementById('scHide');
-    hideSel.value = item.hideCaption ? '1' : '0';
-    hideSel.onchange = ()=>{ item.hideCaption = hideSel.value === '1'; renderTree(); renderPreview(); };
-    return;
-  }
-  if(item.type === 'interactive_callout'){
-    box.innerHTML = `
-      <div class="grid">
-        <label><span>Τίτλος callout</span><input type="text" id="coTitle"></label>
-        <label><span>Ετικέτα «Ρύθμισε»</span><input type="text" id="coSetupLabel"></label>
-        <label><span>Ετικέτα «Πίεσε»</span><input type="text" id="coPressLabel"></label>
-        <label><span>Ετικέτα «Παρατήρησε»</span><input type="text" id="coObserveTitle"></label>
-      </div>
-      <label><span>Κουμπιά στο «Ρύθμισε» (comma separated)</span><input type="text" id="coSetup"></label>
-      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Ρύθμισε» — πάτα ✕ για αφαίρεση ή διάλεξε βοηθητικά από κάτω.</div>
-      <div id="coSetupList" class="chip-list"></div>
-      <div id="coSetupPalette" class="chip-palette"></div>
+function renderMetaEditor(){
+  editor.innerHTML = `
+    <div class="subhead">Γενικά στοιχεία</div>
+    <div class="grid">
+      <label><span>Υπέρτιτλος βιβλίου</span><input type="text" id="metaEyebrow"></label>
+      <label><span>Κύριος τίτλος βιβλίου</span><input type="text" id="metaTitle"></label>
+      <label><span>Υπότιτλος βιβλίου</span><input type="text" id="metaSubtitle"></label>
+    </div>
 
-      <label><span>Κουμπιά στο «Πίεσε» (comma separated)</span><input type="text" id="coPress"></label>
-      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Πίεσε» — όλα μαζεμένα για αντιγραφή/διαγραφή χωρίς ψάξιμο.</div>
-      <div id="coPressList" class="chip-list"></div>
-      <div id="coPressPalette" class="chip-palette"></div>
+    <div class="subhead">Βασικό κείμενο και αποστάσεις</div>
+    <div class="grid">
+      <label><span>Μέγεθος βασικού κειμένου (px)</span><input type="number" id="ldBodyFontSize" step="1"></label>
+      <label><span>Διάστιχο βασικού κειμένου</span><input type="number" id="ldLineHeight" step="0.01"></label>
+      <label><span>Κενό ανάμεσα σε παραγράφους (px)</span><input type="number" id="ldParaGap" step="1"></label>
+      <label><span>Κενό ανάμεσα σε ενότητες (px)</span><input type="number" id="ldSecGap" step="1"></label>
+      <label><span>Κενό γύρω από notes (px)</span><input type="number" id="ldNoteGap" step="1"></label>
+      <label><span>Κενό γύρω από callouts (px)</span><input type="number" id="ldCalloutGap" step="1"></label>
+    </div>
 
-      <label><span>Σημεία στο «Παρατήρησε» (μία γραμμή ανά bullet)</span><textarea id="coObs" class="big"></textarea></label>`;
-    bindTextInput(document.getElementById('coTitle'), item, 'title');
-    bindTextInput(document.getElementById('coSetupLabel'), item, 'setupLabel');
-    bindTextInput(document.getElementById('coPressLabel'), item, 'pressLabel');
-    bindTextInput(document.getElementById('coObserveTitle'), item, 'observeTitle');
-    const setInp = document.getElementById('coSetup');
-    const pressInp = document.getElementById('coPress');
-    wireCalloutChipEditor(setInp, document.getElementById('coSetupList'), document.getElementById('coSetupPalette'), item, 'setupChips', COMMON_SETUP_BUTTONS);
-    wireCalloutChipEditor(pressInp, document.getElementById('coPressList'), document.getElementById('coPressPalette'), item, 'pressChips', COMMON_PRESS_BUTTONS);
-    const obs = document.getElementById('coObs');
-    obs.value = (item.observeItems || []).join('\n');
-    obs.oninput = ()=>{ item.observeItems = obs.value.split(/\n+/).map(s=>s.trim()).filter(Boolean); renderTree(); renderPreview(); };
-    return;
-  }
-  if(item.type === 'clear'){
-    box.innerHTML = '<div class="hint">Clear item. Χρήσιμο όταν θες να καθαρίσει wrap πριν από επόμενο block.</div>';
-    return;
-  }
-  box.innerHTML = '<div class="hint">Άγνωστος τύπος item.</div>';
+    <div class="subhead">Σελίδα</div>
+    <div class="grid">
+      <label><span>Πλάτος σελίδας (px)</span><input type="number" id="ldPageWidthPx" step="1"></label>
+      <label><span>Ύψος σελίδας (px)</span><input type="number" id="ldPageHeightPx" step="1"></label>
+      <label><span>Πάνω περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingTopPx" step="1"></label>
+      <label><span>Δεξί περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingRightPx" step="1"></label>
+      <label><span>Κάτω περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingBottomPx" step="1"></label>
+      <label><span>Αριστερό περιθώριο σελίδας (px)</span><input type="number" id="ldPagePaddingLeftPx" step="1"></label>
+    </div>
+
+    <div class="subhead">Κεφαλίδα και υποσέλιδο</div>
+    <div class="grid">
+      <label><span>Απόσταση κεφαλίδας από πάνω (px)</span><input type="number" id="ldHeaderTopPx" step="1"></label>
+      <label><span>Ύψος κεφαλίδας (px)</span><input type="number" id="ldHeaderHeightPx" step="1"></label>
+      <label><span>Μέγεθος κεφαλίδας σελίδας (px)</span><input type="number" id="ldHeaderFontSize" step="1"></label>
+      <label><span>Απόσταση υποσέλιδου από κάτω (px)</span><input type="number" id="ldFooterBottomPx" step="1"></label>
+      <label><span>Ύψος υποσέλιδου (px)</span><input type="number" id="ldFooterHeightPx" step="1"></label>
+      <label><span>Μέγεθος υποσέλιδου σελίδας (px)</span><input type="number" id="ldFooterFontSize" step="1"></label>
+    </div>
+
+    <div class="subhead">Τίτλοι</div>
+    <div class="grid">
+      <label><span>Μέγεθος υπέρτιτλου αρχής (px)</span><input type="number" id="ldHeroEyebrowFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου αρχής (px)</span><input type="number" id="ldHeroTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος υπότιτλου αρχής (px)</span><input type="number" id="ldHeroSubtitleFontSize" step="1"></label>
+      <label><span>Μέγεθος ετικέτας μέρους (px)</span><input type="number" id="ldPartKickerFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου μέρους (px)</span><input type="number" id="ldPartTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου ενότητας (px)</span><input type="number" id="ldSectionHeadingFontSize" step="1"></label>
+    </div>
+
+    <div class="subhead">Notes, callouts και λεζάντες</div>
+    <div class="grid">
+      <label><span>Μέγεθος note (px)</span><input type="number" id="ldNoteFontSize" step="1"></label>
+      <label><span>Διάστιχο note</span><input type="number" id="ldNoteLineHeight" step="0.01"></label>
+      <label><span>Μέγεθος label note (px)</span><input type="number" id="ldNoteLabelFontSize" step="1"></label>
+      <label><span>Μέγεθος callout κειμένου (px)</span><input type="number" id="ldCalloutFontSize" step="1"></label>
+      <label><span>Μέγεθος τίτλου callout (px)</span><input type="number" id="ldCalloutTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος chips callout (px)</span><input type="number" id="ldCalloutChipFontSize" step="1"></label>
+      <label><span>Μέγεθος labels callout (px)</span><input type="number" id="ldCalloutLabelFontSize" step="1"></label>
+      <label><span>Μέγεθος «Παρατήρησε» (px)</span><input type="number" id="ldCalloutObserveTitleFontSize" step="1"></label>
+      <label><span>Μέγεθος λεζάντας (px)</span><input type="number" id="ldCaptionFontSize" step="1"></label>
+    </div>
+
+    <div class="subhead">Γραμματοσειρές</div>
+    <div class="grid">
+      <label><span>Γραμματοσειρά βασικού κειμένου</span>
+        <select id="ldBodyFontFamily">
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλων</span>
+        <select id="ldHeadingFontFamily">
+          <option value="classic">Classic Sans</option>
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλου αρχής</span>
+        <select id="ldHeroTitleFontFamily">
+          <option value="serif">Serif</option>
+          <option value="classic">Classic Sans</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλου μέρους</span>
+        <select id="ldPartTitleFontFamily">
+          <option value="classic">Classic Sans</option>
+          <option value="serif">Serif</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+      <label><span>Γραμματοσειρά τίτλου ενότητας</span>
+        <select id="ldSectionHeadingFontFamily">
+          <option value="serif">Serif</option>
+          <option value="classic">Classic Sans</option>
+          <option value="sans">Sans</option>
+        </select>
+      </label>
+    </div>
+    <div class="editor-help">Εδώ ρυθμίζεις την τυπογραφική βάση όλου του βιβλίου. Οι αλλαγές φαίνονται αμέσως στη μικρή προεπισκόπηση της σελίδας.</div>
+  `;
+  bindTextInput(document.getElementById('metaEyebrow'), data.meta, 'eyebrow');
+  bindTextInput(document.getElementById('metaTitle'), data.meta, 'title');
+  bindTextInput(document.getElementById('metaSubtitle'), data.meta, 'subtitle');
+  bindNumberInput(document.getElementById('ldBodyFontSize'), data.layoutDefaults, 'bodyFontSize');
+  bindNumberInput(document.getElementById('ldLineHeight'), data.layoutDefaults, 'lineHeight');
+  bindNumberInput(document.getElementById('ldParaGap'), data.layoutDefaults, 'paragraphGap');
+  bindNumberInput(document.getElementById('ldSecGap'), data.layoutDefaults, 'sectionGap');
+  bindNumberInput(document.getElementById('ldNoteGap'), data.layoutDefaults, 'noteGap');
+  bindNumberInput(document.getElementById('ldCalloutGap'), data.layoutDefaults, 'calloutGap');
+  bindNumberInput(document.getElementById('ldHeaderFontSize'), data.layoutDefaults, 'headerFontSize');
+  bindNumberInput(document.getElementById('ldFooterFontSize'), data.layoutDefaults, 'footerFontSize');
+
+  bindNumberInput(document.getElementById('ldPageWidthPx'), data.layoutDefaults, 'pageWidthPx');
+  bindNumberInput(document.getElementById('ldPageHeightPx'), data.layoutDefaults, 'pageHeightPx');
+  bindNumberInput(document.getElementById('ldPagePaddingTopPx'), data.layoutDefaults, 'pagePaddingTopPx');
+  bindNumberInput(document.getElementById('ldPagePaddingRightPx'), data.layoutDefaults, 'pagePaddingRightPx');
+  bindNumberInput(document.getElementById('ldPagePaddingBottomPx'), data.layoutDefaults, 'pagePaddingBottomPx');
+  bindNumberInput(document.getElementById('ldPagePaddingLeftPx'), data.layoutDefaults, 'pagePaddingLeftPx');
+  bindNumberInput(document.getElementById('ldHeaderTopPx'), data.layoutDefaults, 'headerTopPx');
+  bindNumberInput(document.getElementById('ldHeaderHeightPx'), data.layoutDefaults, 'headerHeightPx');
+  bindNumberInput(document.getElementById('ldFooterBottomPx'), data.layoutDefaults, 'footerBottomPx');
+  bindNumberInput(document.getElementById('ldFooterHeightPx'), data.layoutDefaults, 'footerHeightPx');
+
+  bindNumberInput(document.getElementById('ldHeroEyebrowFontSize'), data.layoutDefaults, 'heroEyebrowFontSize');
+  bindNumberInput(document.getElementById('ldHeroTitleFontSize'), data.layoutDefaults, 'heroTitleFontSize');
+  bindNumberInput(document.getElementById('ldHeroSubtitleFontSize'), data.layoutDefaults, 'heroSubtitleFontSize');
+  bindNumberInput(document.getElementById('ldPartKickerFontSize'), data.layoutDefaults, 'partKickerFontSize');
+  bindNumberInput(document.getElementById('ldPartTitleFontSize'), data.layoutDefaults, 'partTitleFontSize');
+  bindNumberInput(document.getElementById('ldSectionHeadingFontSize'), data.layoutDefaults, 'sectionHeadingFontSize');
+
+  bindNumberInput(document.getElementById('ldNoteFontSize'), data.layoutDefaults, 'noteFontSize');
+  bindNumberInput(document.getElementById('ldNoteLineHeight'), data.layoutDefaults, 'noteLineHeight');
+  bindNumberInput(document.getElementById('ldNoteLabelFontSize'), data.layoutDefaults, 'noteLabelFontSize');
+  bindNumberInput(document.getElementById('ldCalloutFontSize'), data.layoutDefaults, 'calloutFontSize');
+  bindNumberInput(document.getElementById('ldCalloutTitleFontSize'), data.layoutDefaults, 'calloutTitleFontSize');
+  bindNumberInput(document.getElementById('ldCalloutChipFontSize'), data.layoutDefaults, 'calloutChipFontSize');
+  bindNumberInput(document.getElementById('ldCalloutLabelFontSize'), data.layoutDefaults, 'calloutLabelFontSize');
+  bindNumberInput(document.getElementById('ldCalloutObserveTitleFontSize'), data.layoutDefaults, 'calloutObserveTitleFontSize');
+  bindNumberInput(document.getElementById('ldCaptionFontSize'), data.layoutDefaults, 'captionFontSize');
+
+  const bodySel = document.getElementById('ldBodyFontFamily');
+  bodySel.value = data.layoutDefaults?.bodyFontFamily || 'serif';
+  bodySel.onchange = ()=>{ data.layoutDefaults.bodyFontFamily = bodySel.value; renderPreview(); };
+
+  const headSel = document.getElementById('ldHeadingFontFamily');
+  headSel.value = data.layoutDefaults?.headingFontFamily || 'classic';
+  headSel.onchange = ()=>{ data.layoutDefaults.headingFontFamily = headSel.value; renderPreview(); };
+
+  const heroSel = document.getElementById('ldHeroTitleFontFamily');
+  heroSel.value = data.layoutDefaults?.heroTitleFontFamily || 'serif';
+  heroSel.onchange = ()=>{ data.layoutDefaults.heroTitleFontFamily = heroSel.value; renderPreview(); };
+
+  const partSel = document.getElementById('ldPartTitleFontFamily');
+  partSel.value = data.layoutDefaults?.partTitleFontFamily || 'classic';
+  partSel.onchange = ()=>{ data.layoutDefaults.partTitleFontFamily = partSel.value; renderPreview(); };
+
+  const sectionSel = document.getElementById('ldSectionHeadingFontFamily');
+  sectionSel.value = data.layoutDefaults?.sectionHeadingFontFamily || 'serif';
+  sectionSel.onchange = ()=>{ data.layoutDefaults.sectionHeadingFontFamily = sectionSel.value; renderPreview(); };
 }
-
 function renderPreview(){
   preview.innerHTML = '';
   if(!data){ preview.innerHTML='<div class="hint">Καμία φόρτωση ακόμη.</div>'; return; }
@@ -1076,25 +1029,49 @@ function renderPreview(){
   }
 }
 
+
 function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   const page = document.createElement('div');
   page.className = 'page-preview';
 
-  const bodyFontSize = Number(data.layoutDefaults?.bodyFontSize || 18);
-  const lineHeight = Number(data.layoutDefaults?.lineHeight || 1.34);
-  const headerFontSize = Number(data.layoutDefaults?.headerFontSize || 11);
-  const footerFontSize = Number(data.layoutDefaults?.footerFontSize || 11);
-  const bodyFamily = fontPresetValue(data.layoutDefaults?.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
-  const headingFamily = fontPresetValue(data.layoutDefaults?.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+  const defs = data.layoutDefaults || {};
+  const bodyFontSize = Number(defs.bodyFontSize || 18);
+  const lineHeight = Number(defs.lineHeight || 1.34);
+  const headerFontSize = Number(defs.headerFontSize ?? 11);
+  const footerFontSize = Number(defs.footerFontSize ?? 11);
+  const bodyFamily = fontPresetValue(defs.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
+  const headingFamily = fontPresetValue(defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+  const heroFamily = fontPresetValue(defs.heroTitleFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Times New Roman",serif');
+  const partFamily = fontPresetValue(defs.partTitleFontFamily || defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
+  const sectionFamily = fontPresetValue(defs.sectionHeadingFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
 
+  const pageWidthPx = Number(defs.pageWidthPx || 794);
+  const pageHeightPx = Number(defs.pageHeightPx || 1123);
+  const pagePaddingTopPx = Number(defs.pagePaddingTopPx || 54);
+  const pagePaddingRightPx = Number(defs.pagePaddingRightPx || 44);
+  const pagePaddingBottomPx = Number(defs.pagePaddingBottomPx || 54);
+  const pagePaddingLeftPx = Number(defs.pagePaddingLeftPx || 44);
+  const headerTopPx = Number(defs.headerTopPx || 20);
+  const headerHeightPx = Number(defs.headerHeightPx || 16);
+  const footerBottomPx = Number(defs.footerBottomPx || 18);
+  const footerHeightPx = Number(defs.footerHeightPx || 16);
+
+  page.style.width = `${pageWidthPx}px`;
+  page.style.minHeight = `${pageHeightPx}px`;
+  page.style.padding = `${pagePaddingTopPx}px ${pagePaddingRightPx}px ${pagePaddingBottomPx}px ${pagePaddingLeftPx}px`;
   page.style.lineHeight = String(lineHeight);
   page.style.fontSize = `${bodyFontSize}px`;
   page.style.fontFamily = bodyFamily;
 
   const header = document.createElement('div');
   header.className = 'page-header';
+  header.style.left = `${pagePaddingLeftPx}px`;
+  header.style.right = `${pagePaddingRightPx}px`;
+  header.style.top = `${headerTopPx}px`;
+  header.style.height = `${headerHeightPx}px`;
   header.style.fontSize = `${headerFontSize}px`;
   header.style.textTransform = 'none';
+  if(headerFontSize <= 0) header.style.display = 'none';
   header.innerHTML = `<span>${esc(pageObj.header?.left || '')}</span><span>${esc(pageObj.header?.center || '')}</span><span>${esc(pageObj.header?.right || '')}</span>`;
   page.appendChild(header);
 
@@ -1103,23 +1080,74 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   const footerLeft = String(pageObj.footer?.left || '').replace('{page}', pageNumber);
   const footer = document.createElement('div');
   footer.className = 'page-footer';
+  footer.style.left = `${pagePaddingLeftPx}px`;
+  footer.style.right = `${pagePaddingRightPx}px`;
+  footer.style.bottom = `${footerBottomPx}px`;
+  footer.style.height = `${footerHeightPx}px`;
   footer.style.fontSize = `${footerFontSize}px`;
   footer.style.textTransform = 'none';
+  if(footerFontSize <= 0) footer.style.display = 'none';
   footer.innerHTML = `<span>${esc(footerLeft)}</span><span>${esc(footerCenter)}</span><span>${esc(footerRight)}</span>`;
   page.appendChild(footer);
 
   pageObj.items.forEach((item, idx) => {
     const node = renderStandaloneItem(item);
     if(idx === highlightedIndex) node.classList.add('item-highlight');
+
     if(item?.type === 'part_title'){
-      node.querySelector('.part-main')?.style.setProperty('font-family', headingFamily);
+      const kickerEl = node.querySelector('.part-kicker');
+      const el = node.querySelector('.part-main');
+      if(kickerEl && defs.partKickerFontSize) kickerEl.style.setProperty('font-size', `${Number(defs.partKickerFontSize)}px`);
+      if(el){
+        el.style.setProperty('font-family', partFamily);
+        if(defs.partTitleFontSize) el.style.setProperty('font-size', `${Number(defs.partTitleFontSize)}px`);
+      }
     }
     if(item?.type === 'section_heading'){
-      node.style.fontFamily = headingFamily;
+      node.style.fontFamily = sectionFamily;
+      if(defs.sectionHeadingFontSize) node.style.fontSize = `${Number(defs.sectionHeadingFontSize)}px`;
     }
     if(item?.type === 'hero'){
-      node.querySelector('.hero-title')?.style.setProperty('font-family', headingFamily);
+      const eyebrowEl = node.querySelector('.hero-eyebrow');
+      const titleEl = node.querySelector('.hero-title');
+      const subtitleEl = node.querySelector('.hero-subtitle');
+      if(eyebrowEl && defs.heroEyebrowFontSize){
+        eyebrowEl.style.setProperty('font-size', `${Number(defs.heroEyebrowFontSize)}px`);
+      }
+      if(titleEl){
+        titleEl.style.setProperty('font-family', heroFamily);
+        if(defs.heroTitleFontSize) titleEl.style.setProperty('font-size', `${Number(defs.heroTitleFontSize)}px`);
+      }
+      if(subtitleEl && defs.heroSubtitleFontSize){
+        subtitleEl.style.setProperty('font-size', `${Number(defs.heroSubtitleFontSize)}px`);
+      }
     }
+    if(item?.type === 'note'){
+      if(defs.noteFontSize) node.style.setProperty('font-size', `${Number(defs.noteFontSize)}px`);
+      if(defs.noteLineHeight) node.style.setProperty('line-height', String(defs.noteLineHeight));
+      if(defs.noteLabelFontSize){
+        node.querySelector('.label')?.style.setProperty('font-size', `${Number(defs.noteLabelFontSize)}px`);
+      }
+    }
+    if(item?.type === 'interactive_callout'){
+      if(defs.calloutFontSize) node.style.setProperty('font-size', `${Number(defs.calloutFontSize)}px`);
+      if(defs.calloutTitleFontSize){
+        node.querySelector('.callout-title')?.style.setProperty('font-size', `${Number(defs.calloutTitleFontSize)}px`);
+      }
+      if(defs.calloutChipFontSize){
+        node.querySelectorAll('.callout-chip').forEach(el=>el.style.setProperty('font-size', `${Number(defs.calloutChipFontSize)}px`));
+      }
+      if(defs.calloutLabelFontSize){
+        node.querySelectorAll('.callout-label').forEach(el=>el.style.setProperty('font-size', `${Number(defs.calloutLabelFontSize)}px`));
+      }
+      if(defs.calloutObserveTitleFontSize){
+        node.querySelector('.callout-observe-title')?.style.setProperty('font-size', `${Number(defs.calloutObserveTitleFontSize)}px`);
+      }
+    }
+    if((item?.type === 'figure' || item?.type === 'scene') && defs.captionFontSize){
+      node.querySelector('figcaption')?.style.setProperty('font-size', `${Number(defs.captionFontSize)}px`);
+    }
+
     page.appendChild(node);
   });
 
