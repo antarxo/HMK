@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Η/Μ κύμα · βιβλίο σελίδων</title>
+  <link rel="icon" href="data:,">
 <style>
 :root{
   --bg:#ece6d9;
@@ -288,7 +289,7 @@ const pageStack=document.getElementById('pageStack');
 const megaNav=document.getElementById('megaNav');
 const statusEl=document.getElementById('status');
 const printSandbox=document.getElementById('printSandbox');
-const JSON_CANDIDATES=['chapter_content - Αντιγραφή (3)_with_new_layout_v4_missing_functions_fix.json','chapter_content.json','chapter_content_pages_v1.json'];
+const JSON_CANDIDATES=['chapter_content.json','chapter_content - Αντιγραφή (3)_with_new_layout_v4_missing_functions_fix.json','chapter_content_pages_v1.json'];
 
 function setStatus(msg){ statusEl.textContent = msg || ''; }
 function esc(s=''){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -489,6 +490,7 @@ async function requestIframePrintSnapshotWithRetry(iframe, attempts=3){
 }
 let printSnapshotsPrepared = false;
 let printFlowRunning = false;
+let bookData = null;
 
 function cleanupPrintSnapshots(){
   document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
@@ -678,14 +680,14 @@ function renderItem(item){
 function buildHeader(page, pageNo, total){
   const h=document.createElement('div');
   h.className='sheet-header';
-  if(Number((data.layoutDefaults || {}).headerFontSize) <= 0) h.classList.add('hidden');
+  if(Number((bookData?.layoutDefaults || {}).headerFontSize) <= 0) h.classList.add('hidden');
   h.innerHTML=`<div class="l">${replaceTokens(page.header?.left, {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(page.header?.center, {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(page.header?.right, {page:pageNo,pages:total})}</div>`;
   return h;
 }
 function buildFooter(page, pageNo, total, showNumbers=true){
   const f=document.createElement('div');
   f.className='sheet-footer';
-  if(Number((data.layoutDefaults || {}).footerFontSize) <= 0) f.classList.add('hidden');
+  if(Number((bookData?.layoutDefaults || {}).footerFontSize) <= 0) f.classList.add('hidden');
   const rightValue = showNumbers === false ? '' : page.footer?.right;
   f.innerHTML=`<div class="l">${replaceTokens(page.footer?.left, {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(page.footer?.center, {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(rightValue, {page:pageNo,pages:total})}</div>`;
   return f;
@@ -897,6 +899,7 @@ function applyLayoutDefaults(defs){
 async function boot(){
   applyScreenScale();
   const data=await loadData();
+  bookData = data;
   if(data?.schemaVersion !== 'pages-v1' && !Array.isArray(data?.pages)){
     throw new Error('Το βιβλίο περιμένει page-first JSON (pages-v1).');
   }
