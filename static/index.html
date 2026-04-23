@@ -305,6 +305,8 @@ const qSpeed = parseFloat(qs.get('speed') || '');
 const qAutoplay = qs.get('autoplay');
 const qControls = qs.get('controls');
 const qLang = (qs.get('lang') || '').toLowerCase();
+const qNote = (qs.get('note') || qs.get('showNote') || '').toLowerCase();
+const qTop = (qs.get('top') || qs.get('showTop') || '').toLowerCase();
 if(qSource){
   const sourceMap = {
     plus:'plus', minus:'minus', dipole:'dipole',
@@ -339,6 +341,14 @@ const qEmbedded = qs.get('embedded') || qs.get('book');
 if(qEmbedded === '1' || qEmbedded === 'true') {
   const topEl = document.querySelector('.top');
   if(topEl) topEl.style.display = 'none';
+}
+if(qTop === '0' || qTop === 'false' || qTop === 'none') {
+  const topEl = document.querySelector('.top');
+  if(topEl) topEl.style.display = 'none';
+}
+if(qNote === '0' || qNote === 'false' || qNote === 'none') {
+  const noteEl = document.getElementById('note');
+  if(noteEl) noteEl.style.display = 'none';
 }
 if(qLang === 'en' || qLang === 'el' || qLang === 'gr') state.lang = qLang === 'en' ? 'en' : 'el';
 

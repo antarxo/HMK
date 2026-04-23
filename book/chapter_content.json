@@ -1233,7 +1233,7 @@
           "wrapTight": true,
           "hideCaption": false,
           "status": "scene",
-          "singleSrc": "../static/index.html?source=plus&mode=appear&controls=none&embedded=1&lang=el&autoplay=0&speed=0.0080",
+          "singleSrc": "../static/index.html?source=plus&mode=appear&controls=full&embedded=1&lang=el&autoplay=0&speed=0.0080&note=0",
           "sceneAspect": "4/3",
           "title_en": "Scene A1",
           "caption_en": "Scene A1 — Establishment of the electrostatic field by a positive point charge"
