@@ -835,7 +835,7 @@ function applyLayoutDefaults(defs={}){
   }
 }
 
-function loadData(){
+async function loadData(){
   let lastErr=null;
   for(const name of JSON_CANDIDATES){
     try{
