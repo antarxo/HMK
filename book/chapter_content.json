@@ -2,22 +2,23 @@
   "schemaVersion": "pages-v1",
   "meta": {
     "eyebrow": "",
-    "title": "Γέννηση και διάδοση του ηλεκτρομαγνητικού κύματος",
+    "title": "Γέννηση και διάδοση του ΗΜ κύματος",
     "subtitle": ""
   },
   "layoutDefaults": {
     "pageSize": "A4",
     "orientation": "portrait",
-    "lineHeight": 1.34,
-    "paragraphGap": 7,
-    "sectionGap": 16,
-    "noteGap": 10,
-    "calloutGap": 8,
+    "lineHeight": 1.3,
+    "paragraphGap": 6,
+    "sectionGap": 14,
+    "noteGap": 8,
+    "calloutGap": 7,
     "pageInnerPaddingMm": 14,
     "showPageNumbers": true,
     "headerFontSize": 0,
     "footerFontSize": 0,
-    "bodyFontFamily": "sans"
+    "bodyFontFamily": "serif",
+    "headingFontFamily": "serif"
   },
   "pages": [
     {
@@ -37,7 +38,7 @@
         {
           "type": "hero",
           "eyebrow": "",
-          "title": "Γέννηση και διάδοση του ηλεκτρομαγνητικού κύματος",
+          "title": "Γέννηση και διάδοση του ΗΜ κύματος",
           "subtitle": ""
         },
         {
