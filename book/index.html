@@ -22,6 +22,7 @@
   --screen-scale:1;
   --shadow:0 18px 36px rgba(0,0,0,.10);
   --shape-width:340px;
+  --body-font-size:15px;
   --body-leading:1.34;
   --para-gap:7px;
   --section-gap:16px;
@@ -29,6 +30,10 @@
   --callout-gap:8px;
   --header-h:28px;
   --footer-h:22px;
+  --header-font-size:12px;
+  --footer-font-size:12px;
+  --body-font-family:Georgia,"Noto Serif",serif;
+  --heading-font-family:Georgia,"Times New Roman",serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -36,7 +41,9 @@ body{
   margin:0;
   background:linear-gradient(180deg,#efe9dc 0,#ece6d9 120px);
   color:var(--ink);
-  font:15px/var(--body-leading) Georgia,"Noto Serif",serif;
+  font-size:var(--body-font-size);
+  line-height:var(--body-leading);
+  font-family:var(--body-font-family);
 }
 .topbar{
   position:sticky; top:0; z-index:30;
@@ -110,9 +117,9 @@ body{
   border-bottom:1px solid rgba(0,0,0,.08);
   padding-bottom:6px;
   margin-bottom:18px;
-  font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-  letter-spacing:.11em;
-  text-transform:uppercase;
+  font:700 var(--header-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  letter-spacing:.04em;
+  text-transform:none;
   color:#7f8890;
 }
 .sheet-header .c{text-align:center}
@@ -130,7 +137,7 @@ body{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   align-items:end;
-  font:600 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  font:600 var(--footer-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
   color:#7b8791;
 }
 .sheet-footer .c{text-align:center}
@@ -138,14 +145,14 @@ body{
 
 .hero{margin:0 0 var(--section-gap)}
 .eyebrow{margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
-h1{margin:0 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:31px;line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
+h1{margin:0 0 8px;font-family:var(--heading-font-family);font-size:31px;line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
 .subtitle{margin:0;color:var(--muted);font-size:15px;line-height:1.42;max-width:56ch}
 
 .part-head{margin:0 0 var(--section-gap);padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}
 .part-kicker{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
-.part-title-main{margin:0;font:780 24px/1.08 "Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;letter-spacing:-.022em;color:#2f627f}
+.part-title-main{margin:0;font-family:var(--heading-font-family);font-size:24px;line-height:1.08;font-weight:780;letter-spacing:-.022em;color:#2f627f}
 
-.section-heading{margin:0 0 8px;font:690 18px/1.18 Georgia,"Noto Serif",serif;letter-spacing:-.008em;color:#5d7281}
+.section-heading{margin:0 0 8px;font-family:var(--heading-font-family);font-size:18px;line-height:1.18;font-weight:690;letter-spacing:-.008em;color:#5d7281}
 .paragraph{margin:0 0 var(--para-gap); text-align:justify; text-justify:inter-word; hyphens:auto}
 .note{
   margin:var(--note-gap) 0; padding:10px 12px; border-radius:14px; background:var(--note); border:1px solid #e4d7ae;
@@ -798,7 +805,37 @@ function updateActiveNav(){
 }
 window.addEventListener('scroll', updateActiveNav, {passive:true});
 
-async function loadData(){
+async function resolveBodyFontFamily(mode='serif'){
+  return mode === 'sans'
+    ? 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif'
+    : 'Georgia,"Noto Serif",serif';
+}
+function resolveHeadingFontFamily(mode='classic'){
+  if(mode === 'serif') return 'Georgia,"Times New Roman",serif';
+  if(mode === 'sans') return 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif';
+  return '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif';
+}
+function applyLayoutDefaults(defs={}){
+  const root = document.documentElement;
+  if(defs.lineHeight) root.style.setProperty('--body-leading', String(defs.lineHeight));
+  if(typeof defs.paragraphGap === 'number') root.style.setProperty('--para-gap', `${defs.paragraphGap}px`);
+  if(typeof defs.sectionGap === 'number') root.style.setProperty('--section-gap', `${defs.sectionGap}px`);
+  if(typeof defs.noteGap === 'number') root.style.setProperty('--note-gap', `${defs.noteGap}px`);
+  if(typeof defs.calloutGap === 'number') root.style.setProperty('--callout-gap', `${defs.calloutGap}px`);
+  if(typeof defs.bodyFontSize === 'number' && defs.bodyFontSize > 0) root.style.setProperty('--body-font-size', `${defs.bodyFontSize}px`);
+  if(typeof defs.headerFontSize === 'number' && defs.headerFontSize > 0) root.style.setProperty('--header-font-size', `${defs.headerFontSize}px`);
+  if(typeof defs.footerFontSize === 'number' && defs.footerFontSize > 0) root.style.setProperty('--footer-font-size', `${defs.footerFontSize}px`);
+  root.style.setProperty('--body-font-family', resolveBodyFontFamily(defs.bodyFontFamily || 'serif'));
+  root.style.setProperty('--heading-font-family', resolveHeadingFontFamily(defs.headingFontFamily || 'classic'));
+  const padMm = Number(defs.pageInnerPaddingMm);
+  if(Number.isFinite(padMm) && padMm > 0){
+    const px = Math.round(padMm * 3.7795);
+    root.style.setProperty('--sheet-pad-x', `${px}px`);
+    root.style.setProperty('--sheet-pad-y', `${px}px`);
+  }
+}
+
+function loadData(){
   let lastErr=null;
   for(const name of JSON_CANDIDATES){
     try{
@@ -818,17 +855,7 @@ async function boot(){
     throw new Error('Το βιβλίο περιμένει page-first JSON (pages-v1).');
   }
   const defs=data.layoutDefaults || {};
-  if(defs.lineHeight) document.documentElement.style.setProperty('--body-leading', String(defs.lineHeight));
-  if(typeof defs.paragraphGap === 'number') document.documentElement.style.setProperty('--para-gap', `${defs.paragraphGap}px`);
-  if(typeof defs.sectionGap === 'number') document.documentElement.style.setProperty('--section-gap', `${defs.sectionGap}px`);
-  if(typeof defs.noteGap === 'number') document.documentElement.style.setProperty('--note-gap', `${defs.noteGap}px`);
-  if(typeof defs.calloutGap === 'number') document.documentElement.style.setProperty('--callout-gap', `${defs.calloutGap}px`);
-  const padMm = Number(defs.pageInnerPaddingMm);
-  if(Number.isFinite(padMm) && padMm > 0){
-    const px = Math.round(padMm * 3.7795);
-    document.documentElement.style.setProperty('--sheet-pad-x', `${px}px`);
-    document.documentElement.style.setProperty('--sheet-pad-y', `${px}px`);
-  }
+  applyLayoutDefaults(defs);
   renderPages(data);
   deriveNav(data);
   updateActiveNav();
