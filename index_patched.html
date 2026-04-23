@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Η/Μ app wrapper</title>
+<style>
+  html,body{margin:0;height:100%;background:#fff;overflow:hidden}
+  iframe{border:0;display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+<iframe id="appFrame" allow="fullscreen"></iframe>
+<script>
+'use strict';
+const frame = document.getElementById('appFrame');
+const originalSearch = window.location.search || '';
+const innerSrc = `./index.html${originalSearch}`;
+frame.src = innerSrc;
+
+function waitForFrameLoad(){
+  return new Promise(resolve=>{
+    try{
+      const doc = frame.contentDocument;
+      if(doc && doc.readyState === 'complete') return resolve();
+    }catch(_e){}
+    frame.addEventListener('load', ()=>resolve(), {once:true});
+    setTimeout(resolve, 4000);
+  });
+}
+function wait(ms){ return new Promise(resolve=>setTimeout(resolve, ms)); }
+function getInnerWin(){ return frame.contentWindow || null; }
+function getInnerDoc(){ try{ return frame.contentDocument || getInnerWin()?.document || null; }catch(_e){ return null; } }
+function isVisible(el){
+  if(!el) return false;
+  const cs = getComputedStyle(el);
+  if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || 1) === 0) return false;
+  const rect = el.getBoundingClientRect();
+  return rect.width > 1 && rect.height > 1;
+}
+function rectRelativeTo(rootRect, rect){
+  return {
+    x: rect.left - rootRect.left,
+    y: rect.top - rootRect.top,
+    w: rect.width,
+    h: rect.height,
+  };
+}
+function colorIsVisible(v){
+  return !!v && v !== 'transparent' && !/^rgba\([^)]*,\s*0\s*\)$/.test(v);
+}
+function drawPanelBox(ctx, rootRect, el, scale){
+  if(!el || !isVisible(el)) return;
+  const rect = el.getBoundingClientRect();
+  const rel = rectRelativeTo(rootRect, rect);
+  const cs = getComputedStyle(el);
+  const bg = cs.backgroundColor;
+  if(colorIsVisible(bg)){
+    ctx.fillStyle = bg;
+    ctx.fillRect(rel.x*scale, rel.y*scale, rel.w*scale, rel.h*scale);
+  }
+  const borderColor = cs.borderTopColor;
+  const borderW = parseFloat(cs.borderTopWidth || '0') || 0;
+  if(borderW > 0 && colorIsVisible(borderColor)){
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = borderW * scale;
+    ctx.strokeRect(rel.x*scale, rel.y*scale, rel.w*scale, rel.h*scale);
+  }
+}
+async function rasterSnapshot(){
+  await waitForFrameLoad();
+  await wait(250);
+  const doc = getInnerDoc();
+  if(!doc) return null;
+  const root = doc.querySelector('.card.viewport') || doc.querySelector('.viewport') || doc.body;
+  if(!root) return null;
+  const rootRect = root.getBoundingClientRect();
+  const width = Math.max(1, Math.round(rootRect.width));
+  const height = Math.max(1, Math.round(rootRect.height));
+  const scale = Math.max(2, Math.min(4, Math.floor(1600 / Math.max(1,width)) || 2));
+  const canvas = document.createElement('canvas');
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const ctx = canvas.getContext('2d', {alpha:false});
+  ctx.save();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Try to let the inner app settle visually.
+  try{
+    const win = getInnerWin();
+    if(win && typeof win.requestAnimationFrame === 'function'){
+      await new Promise(r => win.requestAnimationFrame(() => win.requestAnimationFrame(r)));
+    }
+  }catch(_e){}
+  await wait(120);
+
+  // Paint key panel backgrounds first.
+  [
+    root,
+    doc.querySelector('#stage'),
+    ...Array.from(doc.querySelectorAll('.graphPanel')),
+    doc.querySelector('.leftOverlayStack'),
+    doc.querySelector('.topWaveOverlay'),
+    doc.querySelector('.bookGraphStack')
+  ].filter(Boolean).forEach(el => drawPanelBox(ctx, rootRect, el, scale));
+
+  // Draw all visible canvases in DOM order.
+  const canvases = Array.from(root.querySelectorAll('canvas')).filter(isVisible);
+  for(const srcCanvas of canvases){
+    try{
+      const rect = srcCanvas.getBoundingClientRect();
+      const rel = rectRelativeTo(rootRect, rect);
+      if(rel.w < 2 || rel.h < 2) continue;
+      ctx.drawImage(srcCanvas, rel.x*scale, rel.y*scale, rel.w*scale, rel.h*scale);
+    }catch(_e){}
+  }
+
+  // Draw visible images too, just in case.
+  const imgs = Array.from(root.querySelectorAll('img')).filter(isVisible);
+  for(const img of imgs){
+    try{
+      const rect = img.getBoundingClientRect();
+      const rel = rectRelativeTo(rootRect, rect);
+      if(rel.w < 2 || rel.h < 2) continue;
+      ctx.drawImage(img, rel.x*scale, rel.y*scale, rel.w*scale, rel.h*scale);
+    }catch(_e){}
+  }
+
+  ctx.restore();
+  return canvas.toDataURL('image/png');
+}
+
+async function getBookPrintSnapshot(){
+  try{
+    const png = await rasterSnapshot();
+    if(png) return png;
+  }catch(_e){}
+  try{
+    const inner = getInnerWin();
+    const direct = inner?.getBookPrintSnapshot || inner?.EMWaveApp?.getPrintSnapshot;
+    if(typeof direct === 'function') return await Promise.resolve(direct.call(inner));
+  }catch(_e){}
+  return null;
+}
+window.getBookPrintSnapshot = getBookPrintSnapshot;
+window.EMWaveApp = {
+  scenes: () => {
+    try{ return getInnerWin()?.EMWaveApp?.scenes?.() || []; }catch(_e){ return []; }
+  },
+  focuses: () => {
+    try{ return getInnerWin()?.EMWaveApp?.focuses?.() || []; }catch(_e){ return []; }
+  },
+  getState: () => {
+    try{ return getInnerWin()?.EMWaveApp?.getState?.() || null; }catch(_e){ return null; }
+  },
+  setState: (state={}) => {
+    try{ return getInnerWin()?.EMWaveApp?.setState?.(state) || null; }catch(_e){ return null; }
+  },
+  setScene: (scene, overrides={}) => {
+    try{ return getInnerWin()?.EMWaveApp?.setScene?.(scene, overrides) || null; }catch(_e){ return null; }
+  },
+  setFocus: (focus, overrides={}) => {
+    try{ return getInnerWin()?.EMWaveApp?.setFocus?.(focus, overrides) || null; }catch(_e){ return null; }
+  },
+  setRegion: (region, overrides={}) => {
+    try{ return getInnerWin()?.EMWaveApp?.setRegion?.(region, overrides) || null; }catch(_e){ return null; }
+  },
+  play: () => { try{ return getInnerWin()?.EMWaveApp?.play?.(); }catch(_e){} },
+  pause: () => { try{ return getInnerWin()?.EMWaveApp?.pause?.(); }catch(_e){} },
+  reset: () => { try{ return getInnerWin()?.EMWaveApp?.reset?.(); }catch(_e){ return null; } },
+  step: (delta=1/8) => { try{ return getInnerWin()?.EMWaveApp?.step?.(delta); }catch(_e){ return null; } },
+  getPrintSnapshot: () => getBookPrintSnapshot()
+};
+window.addEventListener('message', async (event)=>{
+  const data = event.data;
+  if(!data || typeof data !== 'object') return;
+  if(data.type === 'capturePrintSnapshot'){
+    const dataUrl = await getBookPrintSnapshot();
+    try{ if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*'); }catch(_e){}
+    return;
+  }
+  try{ getInnerWin()?.postMessage(data, '*'); }catch(_e){}
+});
+</script>
+</body>
+</html>

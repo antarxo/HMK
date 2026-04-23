@@ -401,7 +401,7 @@ function normalizeAppSrc(url=''){
   if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return raw;
   const path=(window.location.pathname || '').replace(/\\/g,'/').toLowerCase();
   const inBook=/\/book(\/|$)/.test(path);
-  const appEntry=inBook ? '../index.html' : './index.html';
+  const appEntry=inBook ? '../index_patched.html' : './index_patched.html';
   return raw
     .replace(/^\.\.\/index_printmatch\.html/i, appEntry)
     .replace(/^\.\.\/index\.html/i, appEntry)
@@ -476,79 +476,6 @@ async function waitForFigureImages(){
 function cleanupPrintSandbox(){
   if(printSandbox) printSandbox.innerHTML = '';
 }
-function isRenderableElement(el){
-  if(!el || !(el instanceof Element)) return false;
-  const cs = getComputedStyle(el);
-  const r = el.getBoundingClientRect();
-  return cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity || 1) > 0 && r.width > 1 && r.height > 1;
-}
-function rectRelativeToRoot(el, rootRect){
-  const r = el.getBoundingClientRect();
-  return { x:r.left - rootRect.left, y:r.top - rootRect.top, w:r.width, h:r.height };
-}
-function paintElementBackground(ctx, el, rootRect){
-  if(!isRenderableElement(el)) return;
-  const cs = getComputedStyle(el);
-  const bg = cs.backgroundColor;
-  if(!bg || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)') return;
-  const box = rectRelativeToRoot(el, rootRect);
-  ctx.fillStyle = bg;
-  ctx.fillRect(box.x, box.y, box.w, box.h);
-}
-async function buildSceneSnapshotFromLiveIframe(liveIframe){
-  if(!liveIframe) return null;
-  await waitForIframeLoad(liveIframe);
-  await wait(180);
-  let win, doc;
-  try{
-    win = liveIframe.contentWindow;
-    doc = liveIframe.contentDocument || win?.document;
-  }catch(_e){ return null; }
-  if(!win || !doc) return null;
-  try{ win.EMWaveApp?.pause?.(); }catch(_e){}
-  try{ await new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve))); }catch(_e){}
-  await wait(80);
-
-  const sourceRoot = doc.querySelector('.card.viewport');
-  if(!sourceRoot) return null;
-  const rootRect = sourceRoot.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rootRect.width || 1));
-  const height = Math.max(1, Math.round(rootRect.height || 1));
-  const maxW = 1800;
-  const maxH = 2400;
-  let scale = Math.max(2, Math.min(4, Math.floor(maxW / width) || 2));
-  if(height * scale > maxH){
-    scale = Math.max(1, Math.floor(maxH / height) || 1);
-  }
-
-  const out = document.createElement('canvas');
-  out.width = Math.max(1, width * scale);
-  out.height = Math.max(1, height * scale);
-  const ctx = out.getContext('2d', { alpha:false });
-  if(!ctx) return null;
-  ctx.save();
-  ctx.scale(scale, scale);
-
-  const rootStyle = win.getComputedStyle(sourceRoot);
-  ctx.fillStyle = (rootStyle.backgroundColor && rootStyle.backgroundColor !== 'rgba(0, 0, 0, 0)' && rootStyle.backgroundColor !== 'transparent') ? rootStyle.backgroundColor : '#ffffff';
-  ctx.fillRect(0, 0, width, height);
-
-  // paint panel/stage backgrounds first, then actual canvases on top
-  const bgEls = [
-    sourceRoot,
-    ...sourceRoot.querySelectorAll('.graphPanel, .paperWrap, #stage, .topWaveOverlay, .leftOverlayStack, .vqiOverlay, .bookGraphStack')
-  ];
-  bgEls.forEach(el => paintElementBackground(ctx, el, rootRect));
-
-  const canvases = Array.from(sourceRoot.querySelectorAll('canvas')).filter(isRenderableElement);
-  for(const canvas of canvases){
-    const box = rectRelativeToRoot(canvas, rootRect);
-    try{ ctx.drawImage(canvas, box.x, box.y, box.w, box.h); }catch(_e){}
-  }
-
-  ctx.restore();
-  try{ return out.toDataURL('image/png'); }catch(_e){ return null; }
-}
 async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
   if(!printSandbox || !src) return null;
   cleanupPrintSandbox();
@@ -593,8 +520,7 @@ async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
   await waitForIframeLoad(iframe);
   await wait(650);
 
-  let shot = await buildSceneSnapshotFromLiveIframe(iframe);
-  if(!shot) shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
+  let shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
   if(!shot){
     await wait(450);
     shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
@@ -656,21 +582,12 @@ async function preparePrintSnapshots(force=false){
   await waitForFigureImages();
 
   const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
-  const liveIframes = frames.map(frame => frame.querySelector('iframe')).filter(Boolean);
-  for(const iframe of liveIframes){
-    await waitForIframeLoad(iframe);
-  }
-  await wait(180);
-
   let readyCount = 0;
 
   for(const frame of frames){
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
-    let dataUrl = await buildSceneSnapshotFromLiveIframe(liveIframe);
-    if(!dataUrl){
-      dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
-    }
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
     if(!dataUrl) continue;
 
     const img = document.createElement('img');
@@ -792,7 +709,7 @@ function renderScene(item){
   frame.className='media-frame scene-frame';
   frame.style.aspectRatio=String(sceneAspect(item));
   const iframe=document.createElement('iframe');
-  iframe.loading='eager';
+  iframe.loading='lazy';
   iframe.referrerPolicy='no-referrer';
   iframe.allow='fullscreen';
   iframe.src=withCacheBust(normalizeAppSrc(item.singleSrc || ''));
