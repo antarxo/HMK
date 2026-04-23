@@ -137,6 +137,21 @@
           "title_en": "Conventions"
         },
         {
+          "type": "figure",
+          "id": "orientation_axes_static",
+          "src": "images/orientation_axes.png",
+          "alt": "Σχήμα προσανατολισμού με άξονες x, y, z.",
+          "caption": "Εικόνα 1",
+          "placement": "right",
+          "status": "static_image",
+          "frameWidth": 340,
+          "aspect": "natural",
+          "title": "Εικόνα 1",
+          "alt_en": "Orientation diagram with the x, y, z axes.",
+          "caption_en": "Figure 1",
+          "title_en": "Figure 1"
+        },
+        {
           "type": "paragraph",
           "html": "<ul><li>Θεωρούμε τη ράβδο-δίπολο κατακόρυφη όπως κοιτάμε στο χαρτί και πάνω στον άξονα y,</li><li>η διάδοση της διαταραχής δηλαδή του παραγόμενου κύματος θετική προς τα δεξιά και κατά τον άξονα x</li><li>Ο άξονας z είναι κάθετος στο επίπεδο του χαρτιού σχηματίζοντας τρισορθογώνιο σύστημα συνtετεταγμένων  με τους άξονες x και y και χρησιμοποιείται για την χωρική ανάγνωση του μαγνητικού πεδίου.</li></ul>",
           "html_en": "<ul><li>We consider the rod-dipole vertical as seen on the page and lying along the y axis,</li><li>the propagation of the disturbance, that is, of the produced wave, as positive toward the right and along the x axis,</li><li>the z axis as perpendicular to the plane of the page, forming with the x and y axes a right-handed three-dimensional coordinate system, and it is used for the spatial reading of the magnetic field.</li></ul>"
@@ -170,31 +185,6 @@
         },
         {
           "type": "figure",
-          "id": "orientation_axes_static",
-          "src": "images/orientation_axes.png",
-          "alt": "Σχήμα προσανατολισμού με άξονες x, y, z.",
-          "caption": "Εικόνα 1",
-          "placement": "right",
-          "status": "static_image",
-          "frameWidth": 340,
-          "aspect": "natural",
-          "title": "Εικόνα 1",
-          "alt_en": "Orientation diagram with the x, y, z axes.",
-          "caption_en": "Figure 1",
-          "title_en": "Figure 1"
-        },
-        {
-          "type": "note",
-          "label": "Σύμβαση",
-          "html": "<ul><li>Το q θεωρείται θετικό όταν το κάτω άκρο της ράβδου είναι θετικό. Παράλληλα,</li><li>το i(t) θεωρείται θετικό όταν διαρρέει τον αγωγό από πάνω προς τα κάτω</li><li>Η εναλλασσόμενη τάση που εφαρμόζεται στον αγωγό μεταβάλλεται όπως στο σχήμα (ημιτονοειδώς) ενώ αντίστοιχα το φορτίο στα άκρα του μεταβάλλεται με τον ίδιο τρόπο. (Δες διπλανές καμπύλες).</li></ul>",
-          "label_en": "Convention",
-          "html_en": "<ul><li>q is taken as positive when the lower end of the rod is positive. At the same time,</li><li>i(t) is taken as positive when it flows through the conductor from top to bottom,</li><li>the alternating voltage applied to the conductor varies as shown in the figure (sinusoidally), while the charge at its ends varies in the same way. (See the adjacent curves.)</li></ul>"
-        },
-        {
-          "type": "clear"
-        },
-        {
-          "type": "figure",
           "id": "v_q_static_preview",
           "src": "images/v_q_static.png",
           "alt": "Στατικό διπλό γράφημα V(t) και q(t).",
@@ -207,6 +197,13 @@
           "alt_en": "Static double graph V(t) and q(t).",
           "caption_en": "Figure 2",
           "title_en": "Figure 2"
+        },
+        {
+          "type": "note",
+          "label": "Σύμβαση",
+          "html": "<ul><li>Το q θεωρείται θετικό όταν το κάτω άκρο της ράβδου είναι θετικό. Παράλληλα,</li><li>το i(t) θεωρείται θετικό όταν διαρρέει τον αγωγό από πάνω προς τα κάτω</li><li>Η εναλλασσόμενη τάση που εφαρμόζεται στον αγωγό μεταβάλλεται όπως στο σχήμα (ημιτονοειδώς) ενώ αντίστοιχα το φορτίο στα άκρα του μεταβάλλεται με τον ίδιο τρόπο. (Δες διπλανές καμπύλες).</li></ul>",
+          "label_en": "Convention",
+          "html_en": "<ul><li>q is taken as positive when the lower end of the rod is positive. At the same time,</li><li>i(t) is taken as positive when it flows through the conductor from top to bottom,</li><li>the alternating voltage applied to the conductor varies as shown in the figure (sinusoidally), while the charge at its ends varies in the same way. (See the adjacent curves.)</li></ul>"
         },
         {
           "type": "paragraph",
@@ -255,29 +252,7 @@
           "type": "paragraph",
           "html": "1. Οι Biot–Savart (αλλά και η εφαρμογή του Νόμου του Ampere) συνδέουν το ρεύμα <em>I</em> που διαρρέει έναν αγωγό με το μαγνητικό πεδίο <em>B</em> που δημιουργεί γύρω του. Υπολογίζουν μάλιστα το μέτρο του σε οποιαδήποτε απόσταση <em>α</em> από τον αγωγό από τη σχέση <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>I</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac></math></span> και τη φορά του με τον κανόνα του δεξιού χεριού.",
           "html_en": "1. Biot–Savart (as well as the application of Ampère’s law) connects the current <em>I</em> flowing through a conductor with the magnetic field <em>B</em> it creates around it. It even gives its magnitude at any distance <em>α</em> from the conductor through the relation <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>I</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac></math></span> and its direction by the right-hand rule."
-        }
-      ]
-    },
-    {
-      "id": "page-3",
-      "sourcePdfPage": 3,
-      "header": {
-        "left": "ΜΕΡΟΣ Β΄",
-        "center": "",
-        "right": "Σχολικό αφήγημα",
-        "center_en": "",
-        "left_en": "PART B",
-        "right_en": "School narrative"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
+        },
         {
           "type": "paragraph",
           "html": "2. Ο Faraday λέει ότι μεταβολή του μαγνητικού πεδίου (ευρύτερα, η μεταβολή της μαγνητικής ροής) δημιουργεί επαγωγικό ηλεκτρικό πεδίο ή ισοδύναμα ΗΕΔ από επαγωγή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><msub><mi>E</mi><mtext>επ</mtext></msub><mo>=</mo><mo>−</mo><mfrac><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>.",
@@ -309,7 +284,29 @@
           "type": "paragraph",
           "html": "Ξεκινάμε συνειδητά από το σχολικό αφήγημα. Έτσι, στην αρχική αυτή περιγραφή παίρνουμε υπόψη τον νόμο Coulomb για το ηλεκτρικό πεδίο που συνδέεται με τη φόρτιση των άκρων του διπόλου και τον νόμο Biot–Savart για το μαγνητικό πεδίο που συνδέεται με το ρεύμα που διαρρέει τη ράβδο. Ταυτόχρονα δηλώνουμε εξαρχής ότι σε αυτή την περιγραφή δεν λαμβάνουμε υπόψη την απόσβεση των εντάσεων των πεδίων  <em>E</em> και <em>B</em> λόγω απόστασης από το δίπολο.\n",
           "html_en": "We begin deliberately from the school narrative. Thus, in this initial description we take into account Coulomb’s law for the electric field associated with the charging of the ends of the dipole and Biot–Savart’s law for the magnetic field associated with the current flowing through the rod. At the same time, we state from the outset that in this description we do not take into account the attenuation of the field intensities <em>E</em> and <em>B</em> due to the distance from the dipole.\n"
-        },
+        }
+      ]
+    },
+    {
+      "id": "page-3",
+      "sourcePdfPage": 3,
+      "header": {
+        "left": "ΜΕΡΟΣ Β΄",
+        "center": "",
+        "right": "Σχολικό αφήγημα",
+        "center_en": "",
+        "left_en": "PART B",
+        "right_en": "School narrative"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
         {
           "type": "paragraph",
           "html": "Ακολουθούν στο τέλος περιγραφές του ηλεκτρομαγνητικού πεδίου που παίρνουν υπόψη τόσο την απόσβεση των εντάσεων των πεδίων E και B όσο και τα σημαντικά φαινόμενα επαγωγής όπως περιγράφονται από το Νόμο επαγωγής του Faraday και τον Νόμο Ampere-Maxwell.",
@@ -329,29 +326,7 @@
           "type": "paragraph",
           "html": "Τονίζουμε εξαρχής ότι αυτή η αφετηρία που δεν δίνει πλήρη περιγραφή της δημιουργίας και διάδοσης του ηλεκτρομαγνητικού κύματος είναι μια διδακτική αφετηρία, γιατί επιτρέπει να οργανωθεί καθαρά η λεγόμενη \"κοντινή\" εικόνα του πεδίου γύρω από την πηγή και να φανεί αργότερα πού ακριβώς αρχίζουν τα όριά της.",
           "html_en": "We stress from the outset that this starting point, which does not give a complete description of the creation and propagation of the electromagnetic wave, is a didactic starting point, because it allows the so-called “near” picture of the field around the source to be organized clearly and later makes it possible to see exactly where its limits begin."
-        }
-      ]
-    },
-    {
-      "id": "page-4",
-      "sourcePdfPage": 4,
-      "header": {
-        "left": "ΜΕΡΟΣ Β΄",
-        "center": "",
-        "right": "Σχολικό αφήγημα",
-        "center_en": "",
-        "left_en": "PART B",
-        "right_en": "School narrative"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
+        },
         {
           "type": "paragraph",
           "html": "<strong>Σχέσεις μεταξύ των μεγεθών</strong>",
@@ -423,11 +398,29 @@
           "type": "paragraph",
           "html": "5. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>i</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mn>0</mn></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><msub><mi>B</mi><mtext>max</mtext></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> Η μαγνητική επαγωγή που προκαλείται από το ρεύμα στον αγωγό. Είναι σαφής η διαφορά φάσης π/2 ανάμεσα στα E και B (δες και μελέτησε την τετράδα γραφημάτων, εστιάζοντας τελικά στη μορφή των E, B για τη συνέχεια).",
           "html_en": "5. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>i</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mn>0</mn></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><msub><mi>B</mi><mtext>max</mtext></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> The magnetic induction produced by the current in the conductor. The phase difference π/2 between E and B is clear (look at and study the set of four graphs, ultimately focusing on the form of E and B for what follows)."
-        },
-        {
-          "type": "clear"
         }
       ]
+    },
+    {
+      "id": "page-4",
+      "sourcePdfPage": 4,
+      "header": {
+        "left": "ΜΕΡΟΣ Β΄",
+        "center": "",
+        "right": "Σχολικό αφήγημα",
+        "center_en": "",
+        "left_en": "PART B",
+        "right_en": "School narrative"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": []
     },
     {
       "id": "page-5",
