@@ -484,7 +484,8 @@ async function preparePrintSnapshots(force=false){
   for(const frame of frames){
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
-    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
+
+    const dataUrl = await requestIframePrintSnapshotWithRetry(liveIframe, 5);
     if(!dataUrl) continue;
 
     const img = document.createElement('img');
@@ -825,8 +826,12 @@ function applyLayoutDefaults(defs={}){
   if(typeof defs.bodyFontSize === 'number' && defs.bodyFontSize > 0) root.style.setProperty('--body-font-size', `${defs.bodyFontSize}px`);
   if(typeof defs.headerFontSize === 'number' && defs.headerFontSize > 0) root.style.setProperty('--header-font-size', `${defs.headerFontSize}px`);
   if(typeof defs.footerFontSize === 'number' && defs.footerFontSize > 0) root.style.setProperty('--footer-font-size', `${defs.footerFontSize}px`);
-  root.style.setProperty('--body-font-family', resolveBodyFontFamily(defs.bodyFontFamily || 'serif'));
-  root.style.setProperty('--heading-font-family', resolveHeadingFontFamily(defs.headingFontFamily || 'classic'));
+  if(typeof defs.bodyFontFamily === 'string' && defs.bodyFontFamily.trim()){
+    root.style.setProperty('--body-font-family', resolveBodyFontFamily(defs.bodyFontFamily.trim()));
+  }
+  if(typeof defs.headingFontFamily === 'string' && defs.headingFontFamily.trim()){
+    root.style.setProperty('--heading-font-family', resolveHeadingFontFamily(defs.headingFontFamily.trim()));
+  }
   const padMm = Number(defs.pageInnerPaddingMm);
   if(Number.isFinite(padMm) && padMm > 0){
     const px = Math.round(padMm * 3.7795);
