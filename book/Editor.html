@@ -106,7 +106,7 @@
     .callout-observe-title{font:700 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
     .callout-observe ul{margin:6px 0 0 16px;padding:0}
     .callout-observe li{margin:4px 0;font-style:italic}
-    .item-highlight{position:relative;outline:2px solid #caa24b;outline-offset:3px;box-shadow:0 0 0 6px rgba(202,162,75,.16);border-radius:12px}
+    .item-highlight{outline:3px solid rgba(249,115,22,.45);outline-offset:3px}
     .meta-line{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a3b1c2}
     .scene-frame{margin-top:8px;border:1px solid #243244;border-radius:12px;overflow:hidden;background:#fff;color:#111}
     .scene-frame.float{width:min(var(--fw,340px),100%)}
@@ -133,6 +133,7 @@
     <input type="file" id="jsonInput" accept="application/json,.json">
     <button id="loadDefaultBtn">Φόρτωση default</button>
     <button id="exportBtn" class="good" disabled>Export JSON</button>
+    <label style="display:flex;align-items:center;gap:6px;color:#cbd5e1;font-size:12px">Γλώσσα περιεχομένου <select id="contentLang"><option value="el">Ελληνικά</option><option value="en">English</option></select></label>
   </div>
 </header>
 
@@ -169,6 +170,48 @@ const editor = document.getElementById('editor');
 const preview = document.getElementById('preview');
 const treeBadge = document.getElementById('treeBadge');
 const editorBadge = document.getElementById('editorBadge');
+const contentLangSelect = document.getElementById('contentLang');
+let contentLang = localStorage.getItem('hmkContentLang') || 'el';
+const TRANSLATABLE_KEYS = new Set(['eyebrow','title','subtitle','label','html','left','center','right','alt','caption','setupLabel','pressLabel','observeTitle']);
+function isTranslatableKey(key){ return TRANSLATABLE_KEYS.has(key); }
+function locKey(key){ return contentLang === 'en' ? `${key}_en` : key; }
+function getLoc(obj, key, fallback=''){
+  if(!obj) return fallback;
+  const v = obj[locKey(key)];
+  if(v != null && v !== '') return v;
+  const base = obj[key];
+  return base != null ? base : fallback;
+}
+function getLocArray(obj, key){
+  if(!obj) return [];
+  const v = obj[locKey(key)];
+  if(Array.isArray(v)) return v;
+  return Array.isArray(obj[key]) ? obj[key] : [];
+}
+function setLoc(obj, key, value){
+  if(!obj) return;
+  if(contentLang === 'en') obj[`${key}_en`] = value;
+  else obj[key] = value;
+}
+function setLocArray(obj, key, arr){
+  if(!obj) return;
+  if(contentLang === 'en') obj[`${key}_en`] = arr;
+  else obj[key] = arr;
+}
+function updateContentLangUI(){
+  if(contentLangSelect) contentLangSelect.value = contentLang;
+  document.documentElement.lang = contentLang;
+}
+if(contentLangSelect){
+  contentLangSelect.value = contentLang;
+  contentLangSelect.onchange = ()=>{
+    contentLang = contentLangSelect.value === 'en' ? 'en' : 'el';
+    localStorage.setItem('hmkContentLang', contentLang);
+    updateContentLangUI();
+    renderAll();
+  };
+}
+updateContentLangUI();
 
 jsonInput.addEventListener('change', async e => {
   const file = e.target.files?.[0]; if(!file) return;
@@ -183,7 +226,7 @@ jsonInput.addEventListener('change', async e => {
 
 loadDefaultBtn.addEventListener('click', async ()=>{
   try{
-    const res = await fetch('chapter_content_pages_v1.json?ts='+Date.now());
+    const res = await fetch('chapter_content_bilingual.json?ts='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const parsed = await res.json();
     data = normalizeData(parsed);
@@ -199,7 +242,7 @@ exportBtn.addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'chapter_content_pages_edited.json';
+  a.download = 'chapter_content_bilingual.json';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
 });
@@ -289,14 +332,14 @@ function fontPresetValue(key, fallback){
 
 function summarizeItem(item){
   const t = item?.type || 'unknown';
-  if(t==='hero') return (item.title || '').slice(0,72);
-  if(t==='part_title') return `${item.label || ''} — ${item.title || ''}`.slice(0,72);
-  if(t==='section_heading') return item.title || '(χωρίς τίτλο)';
-  if(t==='paragraph') return stripHtml(item.html || '').slice(0,72) || '(κενό)';
-  if(t==='note') return ((item.label || '') + ' · ' + stripHtml(item.html || '')).slice(0,72);
-  if(t==='figure') return (item.title || item.caption || item.src || 'figure').slice(0,72);
-  if(t==='scene') return (item.title || item.caption || item.singleSrc || 'scene').slice(0,72);
-  if(t==='interactive_callout') return ((item.title || 'Δοκίμασε') + ' · ' + (item.observeItems?.[0] || '')).slice(0,72);
+  if(t==='hero') return String(getLoc(item,'title','')).slice(0,72);
+  if(t==='part_title') return `${getLoc(item,'label','')} — ${getLoc(item,'title','')}`.slice(0,72);
+  if(t==='section_heading') return getLoc(item,'title','(χωρίς τίτλο)');
+  if(t==='paragraph') return stripHtml(getLoc(item,'html','')).slice(0,72) || '(κενό)';
+  if(t==='note') return ((getLoc(item,'label','') + ' · ' + stripHtml(getLoc(item,'html','')))).slice(0,72);
+  if(t==='figure') return (getLoc(item,'title','') || getLoc(item,'caption','') || item.src || 'figure').slice(0,72);
+  if(t==='scene') return (getLoc(item,'title','') || getLoc(item,'caption','') || item.singleSrc || 'scene').slice(0,72);
+  if(t==='interactive_callout') return ((getLoc(item,'title', contentLang==='en' ? 'Try' : 'Δοκίμασε') + ' · ' + (getLocArray(item,'observeItems')[0] || ''))).slice(0,72);
   if(t==='clear') return 'clear';
   return JSON.stringify(item).slice(0,72);
 }
@@ -393,7 +436,7 @@ function renderTree(){
   data.pages.forEach((p, pIdx) => {
     const opt = document.createElement('option');
     opt.value = String(pIdx);
-    const label = (p.header?.left || p.header?.right || p.id || '').trim();
+    const label = (getLoc(p.header,'left','') || getLoc(p.header,'right','') || p.id || '').trim();
     opt.textContent = label ? `Σελίδα ${pIdx+1} — ${label}` : `Σελίδα ${pIdx+1}`;
     if((selection?.pageIndex === pIdx) || (selection?.kind === 'item' && selection?.pageIndex === pIdx)) opt.selected = true;
     select.appendChild(opt);
@@ -448,7 +491,7 @@ function renderTree(){
 
     const pill = document.createElement('div');
     pill.className = 'tree-block' + (((selection?.kind==='page' && selection.pageIndex===pIdx) || (selection?.kind==='item' && selection.pageIndex===pIdx)) ? ' active' : '');
-    pill.innerHTML = `<span class="type">page</span><span class="info">${esc(p.id)} — ${esc(p.header?.left || '')} / ${esc(p.header?.right || '')}</span><span class="idx">#${pIdx+1}</span>`;
+    pill.innerHTML = `<span class="type">page</span><span class="info">${esc(p.id)} — ${esc(getLoc(p.header,'left',''))} / ${esc(getLoc(p.header,'right',''))}</span><span class="idx">#${pIdx+1}</span>`;
     pill.onclick = ()=> selectPage(pIdx);
     pageWrap.appendChild(pill);
 
@@ -476,13 +519,13 @@ function createEmptyPage(n){
 }
 function createItemByType(type='paragraph'){
   if(type==='hero') return {type:'hero', eyebrow:'', title:'', subtitle:''};
-  if(type==='part_title') return {type:'part_title', label:'ΜΕΡΟΣ', title:''};
+  if(type==='part_title') return {type:'part_title', label:'ΜΕΡΟΣ', label_en:'PART', title:''};
   if(type==='section_heading') return {type:'section_heading', title:''};
   if(type==='paragraph') return {type:'paragraph', html:''};
   if(type==='note') return {type:'note', label:'', html:''};
   if(type==='figure') return {type:'figure', src:'', alt:'', title:'', caption:'', placement:'right', frameWidth:340};
   if(type==='scene') return {type:'scene', title:'', caption:'', placement:'right', frameWidth:340, wrapTight:true, hideCaption:false, singleSrc:''};
-  if(type==='interactive_callout') return {type:'interactive_callout', title:'Δοκίμασε', setupLabel:'Ρύθμισε', setupChips:[], pressLabel:'Πίεσε', pressChips:[], observeTitle:'Παρατήρησε', observeItems:[]};
+  if(type==='interactive_callout') return {type:'interactive_callout', title:'Δοκίμασε', title_en:'Try', setupLabel:'Ρύθμισε', setupLabel_en:'Set', setupChips:[], pressLabel:'Πίεσε', pressLabel_en:'Press', pressChips:[], observeTitle:'Παρατήρησε', observeTitle_en:'Observe', observeItems:[]};
   if(type==='clear') return {type:'clear'};
   return {type:'paragraph', html:''};
 }
@@ -522,8 +565,22 @@ function renderEditor(){
   if(selection.kind === 'item'){ editorBadge.textContent = 'item'; renderItemEditor(currentItem(), selection.pageIndex, selection.itemIndex); return; }
 }
 
-function bindTextInput(el, obj, key){ el.value = obj[key] ?? ''; el.oninput = ()=>{ obj[key] = el.value; renderTree(); renderPreview(); }; }
-function bindTextarea(el, obj, key){ el.value = obj[key] ?? ''; el.oninput = ()=>{ obj[key] = el.value; renderTree(); renderPreview(); }; }
+function bindTextInput(el, obj, key){
+  el.value = isTranslatableKey(key) ? getLoc(obj, key, '') : (obj[key] ?? '');
+  el.oninput = ()=>{
+    if(isTranslatableKey(key)) setLoc(obj, key, el.value);
+    else obj[key] = el.value;
+    renderTree(); renderPreview();
+  };
+}; }
+function bindTextarea(el, obj, key){
+  el.value = isTranslatableKey(key) ? getLoc(obj, key, '') : (obj[key] ?? '');
+  el.oninput = ()=>{
+    if(isTranslatableKey(key)) setLoc(obj, key, el.value);
+    else obj[key] = el.value;
+    renderTree(); renderPreview();
+  };
+}; }
 function bindNumberInput(el, obj, key){
   el.value = obj[key] ?? '';
   el.oninput = ()=>{ const v = el.value.trim(); if(v==='') delete obj[key]; else obj[key] = Number(v); renderTree(); renderPreview(); };
@@ -830,6 +887,159 @@ function renderItemEditor(item, pageIndex, itemIndex){
   renderTypeFields(item);
 }
 
+function renderTypeFields(item){
+  const box = document.getElementById('typeFields');
+  if(item.type === 'hero'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>eyebrow</span><input type="text" id="heroEyebrow"></label>
+        <label><span>title</span><input type="text" id="heroTitle"></label>
+        <label><span>subtitle</span><textarea id="heroSubtitle"></textarea></label>
+      </div>`;
+    bindTextInput(document.getElementById('heroEyebrow'), item, 'eyebrow');
+    bindTextInput(document.getElementById('heroTitle'), item, 'title');
+    bindTextarea(document.getElementById('heroSubtitle'), item, 'subtitle');
+    return;
+  }
+  if(item.type === 'part_title'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>label</span><input type="text" id="partLabel"></label>
+        <label><span>title</span><input type="text" id="partTitle"></label>
+      </div>`;
+    bindTextInput(document.getElementById('partLabel'), item, 'label');
+    bindTextInput(document.getElementById('partTitle'), item, 'title');
+    return;
+  }
+  if(item.type === 'section_heading'){
+    box.innerHTML = `<label><span>title</span><input type="text" id="shTitle"></label>`;
+    bindTextInput(document.getElementById('shTitle'), item, 'title');
+    return;
+  }
+  if(item.type === 'paragraph'){
+    box.innerHTML = `<label><span>html</span><textarea id="pHtml" class="big"></textarea></label>`;
+    bindTextarea(document.getElementById('pHtml'), item, 'html');
+    return;
+  }
+  if(item.type === 'note'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>label</span><input type="text" id="nLabel"></label>
+      </div>
+      <label><span>html</span><textarea id="nHtml" class="big"></textarea></label>`;
+    bindTextInput(document.getElementById('nLabel'), item, 'label');
+    bindTextarea(document.getElementById('nHtml'), item, 'html');
+    return;
+  }
+  if(item.type === 'figure'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>src</span><input type="text" id="figSrc"></label>
+        <label><span>alt</span><input type="text" id="figAlt"></label>
+        <label><span>title</span><input type="text" id="figTitle"></label>
+        <label><span>Τοποθέτηση</span>
+          <select id="figPlacement">
+            <option value="right">right</option>
+            <option value="left">left</option>
+            <option value="wide">wide</option>
+          </select>
+        </label>
+        <label><span>caption</span><textarea id="figCaption"></textarea></label>
+        <label><span>Προεπιλεγμένο πλάτος (px)</span><input type="number" id="figWidth"></label>
+      </div>
+      <div class="editor-help">Το ύψος της εικόνας προσαρμόζεται αυτόματα από το φυσικό aspect ratio της εικόνας. Επεμβαίνεις μόνο στο πλάτος.</div>
+      <div class="image-tools">
+        <div>
+          <div class="subhead"><span>Χειρισμός εικόνας</span></div>
+          <div class="row">
+            <input type="file" id="figFile" accept="image/*">
+            <div class="image-actions">
+              <button type="button" id="figOpen">Άνοιγμα</button>
+              <button type="button" id="figClear" class="danger">Καθάρισμα src</button>
+            </div>
+          </div>
+          <div class="hint">Μπορείς είτε να δώσεις src/URL χειροκίνητα είτε να φορτώσεις εικόνα και να περάσει ως data URL μέσα στο JSON.</div>
+        </div>
+        <div id="figThumb" class="image-thumb empty">Δεν έχει οριστεί εικόνα ακόμη</div>
+      </div>`;
+    bindTextInput(document.getElementById('figSrc'), item, 'src');
+    bindTextInput(document.getElementById('figAlt'), item, 'alt');
+    bindTextInput(document.getElementById('figTitle'), item, 'title');
+    bindTextarea(document.getElementById('figCaption'), item, 'caption');
+    bindNumberInput(document.getElementById('figWidth'), item, 'frameWidth');
+    const pl = document.getElementById('figPlacement');
+    pl.value = item.placement || 'right';
+    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
+    wireFigureImageControls(item);
+    return;
+  }
+  if(item.type === 'scene'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>title</span><input type="text" id="scTitle"></label>
+        <label><span>caption</span><textarea id="scCaption"></textarea></label>
+        <label><span>singleSrc</span><textarea id="scSrc" class="big"></textarea></label>
+        <label><span>placement</span>
+          <select id="scPlacement">
+            <option value="right">right</option>
+            <option value="left">left</option>
+            <option value="wide">wide</option>
+          </select>
+        </label>
+        <label><span>frameWidth</span><input type="number" id="scWidth"></label>
+        <label><span>hideCaption</span><select id="scHide"><option value="0">false</option><option value="1">true</option></select></label>
+      </div>`;
+    bindTextInput(document.getElementById('scTitle'), item, 'title');
+    bindTextarea(document.getElementById('scCaption'), item, 'caption');
+    bindTextarea(document.getElementById('scSrc'), item, 'singleSrc');
+    bindNumberInput(document.getElementById('scWidth'), item, 'frameWidth');
+    const pl = document.getElementById('scPlacement');
+    pl.value = item.placement || 'right';
+    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
+    const hideSel = document.getElementById('scHide');
+    hideSel.value = item.hideCaption ? '1' : '0';
+    hideSel.onchange = ()=>{ item.hideCaption = hideSel.value === '1'; renderTree(); renderPreview(); };
+    return;
+  }
+  if(item.type === 'interactive_callout'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>Τίτλος callout</span><input type="text" id="coTitle"></label>
+        <label><span>Ετικέτα «Ρύθμισε»</span><input type="text" id="coSetupLabel"></label>
+        <label><span>Ετικέτα «Πίεσε»</span><input type="text" id="coPressLabel"></label>
+        <label><span>Ετικέτα «Παρατήρησε»</span><input type="text" id="coObserveTitle"></label>
+      </div>
+      <label><span>Κουμπιά στο «Ρύθμισε» (comma separated)</span><input type="text" id="coSetup"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Ρύθμισε» — πάτα ✕ για αφαίρεση ή διάλεξε βοηθητικά από κάτω.</div>
+      <div id="coSetupList" class="chip-list"></div>
+      <div id="coSetupPalette" class="chip-palette"></div>
+
+      <label><span>Κουμπιά στο «Πίεσε» (comma separated)</span><input type="text" id="coPress"></label>
+      <div class="editor-help">Περιλαμβανόμενα κουμπιά «Πίεσε» — όλα μαζεμένα για αντιγραφή/διαγραφή χωρίς ψάξιμο.</div>
+      <div id="coPressList" class="chip-list"></div>
+      <div id="coPressPalette" class="chip-palette"></div>
+
+      <label><span>Σημεία στο «Παρατήρησε» (μία γραμμή ανά bullet)</span><textarea id="coObs" class="big"></textarea></label>`;
+    bindTextInput(document.getElementById('coTitle'), item, 'title');
+    bindTextInput(document.getElementById('coSetupLabel'), item, 'setupLabel');
+    bindTextInput(document.getElementById('coPressLabel'), item, 'pressLabel');
+    bindTextInput(document.getElementById('coObserveTitle'), item, 'observeTitle');
+    const setInp = document.getElementById('coSetup');
+    const pressInp = document.getElementById('coPress');
+    wireCalloutChipEditor(setInp, document.getElementById('coSetupList'), document.getElementById('coSetupPalette'), item, 'setupChips', COMMON_SETUP_BUTTONS);
+    wireCalloutChipEditor(pressInp, document.getElementById('coPressList'), document.getElementById('coPressPalette'), item, 'pressChips', COMMON_PRESS_BUTTONS);
+    const obs = document.getElementById('coObs');
+    obs.value = getLocArray(item,'observeItems').join('\n');
+    obs.oninput = ()=>{ setLocArray(item,'observeItems', obs.value.split(/\n+/).map(s=>s.trim()).filter(Boolean)); renderTree(); renderPreview(); };
+    return;
+  }
+  if(item.type === 'clear'){
+    box.innerHTML = '<div class="hint">Clear item. Χρήσιμο όταν θες να καθαρίσει wrap πριν από επόμενο block.</div>';
+    return;
+  }
+  box.innerHTML = '<div class="hint">Άγνωστος τύπος item.</div>';
+}
+
 function renderMetaEditor(){
   editor.innerHTML = `
     <div class="subhead">Γενικά στοιχεία</div>
@@ -1024,7 +1234,7 @@ function renderPreview(){
   } else if(selection?.kind === 'meta'){
     const c = document.createElement('div');
     c.className = 'preview-card';
-    c.innerHTML = `<div class="preview-title">Meta</div><div class="preview-main"><strong>${esc(data.meta.title || '')}</strong><div>${esc(data.meta.subtitle || '')}</div><div class="meta-line">${esc(JSON.stringify(data.layoutDefaults,null,2))}</div></div>`;
+    c.innerHTML = `<div class="preview-title">Meta</div><div class="preview-main"><strong>${esc(getLoc(data.meta,'title',''))}</strong><div>${esc(getLoc(data.meta,'subtitle',''))}</div><div class="meta-line">${esc(JSON.stringify(data.layoutDefaults,null,2))}</div></div>`;
     preview.appendChild(c);
   }
 }
@@ -1072,12 +1282,12 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   header.style.fontSize = `${headerFontSize}px`;
   header.style.textTransform = 'none';
   if(headerFontSize <= 0) header.style.display = 'none';
-  header.innerHTML = `<span>${esc(pageObj.header?.left || '')}</span><span>${esc(pageObj.header?.center || '')}</span><span>${esc(pageObj.header?.right || '')}</span>`;
+  header.innerHTML = `<span>${esc(getLoc(pageObj.header,'left',''))}</span><span>${esc(getLoc(pageObj.header,'center',''))}</span><span>${esc(getLoc(pageObj.header,'right',''))}</span>`;
   page.appendChild(header);
 
-  const footerRight = String(pageObj.footer?.right || '').replace('{page}', pageNumber);
-  const footerCenter = String(pageObj.footer?.center || '').replace('{page}', pageNumber);
-  const footerLeft = String(pageObj.footer?.left || '').replace('{page}', pageNumber);
+  const footerRight = String(getLoc(pageObj.footer,'right','')).replace('{page}', pageNumber);
+  const footerCenter = String(getLoc(pageObj.footer,'center','')).replace('{page}', pageNumber);
+  const footerLeft = String(getLoc(pageObj.footer,'left','')).replace('{page}', pageNumber);
   const footer = document.createElement('div');
   footer.className = 'page-footer';
   footer.style.left = `${pagePaddingLeftPx}px`;
@@ -1213,19 +1423,19 @@ function renderStandaloneItem(item){
 
   if(t === 'hero'){
     wrap.className = 'hero-block';
-    wrap.innerHTML = `${item.eyebrow ? `<p class="hero-eyebrow">${esc(item.eyebrow)}</p>` : ''}${item.title ? `<h1 class="hero-title">${esc(item.title)}</h1>` : ''}${item.subtitle ? `<p class="hero-subtitle">${esc(item.subtitle)}</p>` : ''}`;
+    wrap.innerHTML = `${getLoc(item,'eyebrow','') ? `<p class="hero-eyebrow">${esc(getLoc(item,'eyebrow',''))}</p>` : ''}${getLoc(item,'title','') ? `<h1 class="hero-title">${esc(getLoc(item,'title',''))}</h1>` : ''}${getLoc(item,'subtitle','') ? `<p class="hero-subtitle">${esc(getLoc(item,'subtitle',''))}</p>` : ''}`;
     wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
     return wrap;
   }
   if(t === 'part_title'){
     wrap.className = 'part-title';
-    wrap.innerHTML = `${item.label ? `<p class="part-kicker">${esc(item.label)}</p>` : ''}${item.title ? `<p class="part-main">${esc(item.title)}</p>` : ''}`;
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<p class="part-kicker">${esc(getLoc(item,'label',''))}</p>` : ''}${getLoc(item,'title','') ? `<p class="part-main">${esc(getLoc(item,'title',''))}</p>` : ''}`;
     wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
     return wrap;
   }
   if(t === 'section_heading'){
     wrap.className = 'section-heading';
-    wrap.textContent = item.title || '';
+    wrap.textContent = getLoc(item,'title','');
     wrap.style.marginTop = `${Math.max(8, sectionGap)}px`;
     wrap.style.marginBottom = `${Math.max(6, Math.round(sectionGap * 0.4))}px`;
     return wrap;
@@ -1233,14 +1443,14 @@ function renderStandaloneItem(item){
   if(t === 'paragraph'){
     wrap.className = 'page-paragraph';
     wrap.style.marginBottom = `${paraGap}px`;
-    wrap.innerHTML = item.html || '<em>(κενό)</em>';
+    wrap.innerHTML = getLoc(item,'html','') || '<em>(κενό)</em>';
     return wrap;
   }
   if(t === 'note'){
     wrap.className = 'page-note';
     wrap.style.marginTop = `${Math.max(4, Math.round(noteGap * 0.6))}px`;
     wrap.style.marginBottom = `${noteGap}px`;
-    wrap.innerHTML = `${item.label ? `<span class="label">${esc(item.label)}</span>` : ''}${item.html || '<em>(κενό)</em>'}`;
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<span class="label">${esc(getLoc(item,'label',''))}</span>` : ''}${getLoc(item,'html','') || '<em>(κενό)</em>'}`;
     return wrap;
   }
   if(t === 'figure'){
@@ -1249,9 +1459,9 @@ function renderStandaloneItem(item){
     wrap.innerHTML = `
       <figure class="${wrap.className}" style="--figure-width:${item.frameWidth || 340}px">
         <div class="media-frame natural">
-          ${item.src ? `<img src="${item.src}" alt="${esc(item.alt || '')}">` : `<div class="media-placeholder" style="position:static;display:grid;place-items:center;padding:14px;color:#465666;min-height:140px">Χωρίς src</div>`}
+          ${item.src ? `<img src="${item.src}" alt="${esc(getLoc(item,'alt',''))}">` : `<div class="media-placeholder" style="position:static;display:grid;place-items:center;padding:14px;color:#465666;min-height:140px">Χωρίς src</div>`}
         </div>
-        ${item.hideCaption ? '' : `<figcaption>${esc(item.caption || item.title || '')}</figcaption>`}
+        ${item.hideCaption ? '' : `<figcaption>${esc(getLoc(item,'caption','') || getLoc(item,'title',''))}</figcaption>`}
       </figure>`;
     return wrap.firstElementChild;
   }
@@ -1287,7 +1497,7 @@ function renderStandaloneItem(item){
 
     if(!item.hideCaption){
       const cap = document.createElement('figcaption');
-      cap.textContent = item.caption || item.title || 'Σκηνή';
+      cap.textContent = getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Scene' : 'Σκηνή');
       fig.appendChild(cap);
     }
     return fig;
@@ -1298,7 +1508,7 @@ function renderStandaloneItem(item){
     wrap.style.marginBottom = `${calloutGap}px`;
     const setup = (item.setupChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
     const press = (item.pressChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
-    const observe = (item.observeItems || []).map(ch => `<li>${esc(ch)}</li>`).join('');
+    const observe = getLocArray(item,'observeItems').map(ch => `<li>${esc(ch)}</li>`).join('');
     wrap.innerHTML = `
       <div class="callout-title">${esc(item.title || 'Δοκίμασε')}</div>
       <div class="callout-row">

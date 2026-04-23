@@ -77,6 +77,9 @@ body{
 .topbar-inner{
   max-width:1200px; margin:0 auto; padding:10px 18px;
 }
+.lang-tools{display:flex;justify-content:flex-end;gap:8px;max-width:var(--sheet-width);margin:0 auto 8px}
+.lang-btn{border:1px solid rgba(0,0,0,.12);background:#fff;color:var(--ink);padding:8px 12px;border-radius:14px;font:700 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;cursor:pointer}
+.lang-btn.active{background:#f7fafc;border-color:#cfd8e0;color:#173f5b}
 .mega-nav{
   display:grid;
   grid-template-columns:repeat(6,minmax(0,1fr));
@@ -299,6 +302,10 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
 <body>
   <div class="topbar">
     <div class="topbar-inner">
+      <div class="lang-tools">
+        <button type="button" class="lang-btn" id="langElBtn">Ελληνικά</button>
+        <button type="button" class="lang-btn" id="langEnBtn">English</button>
+      </div>
       <nav class="mega-nav" id="megaNav" aria-label="Μενού βιβλίου"></nav>
     </div>
   </div>
@@ -315,8 +322,40 @@ const pageStack=document.getElementById('pageStack');
 const megaNav=document.getElementById('megaNav');
 const statusEl=document.getElementById('status');
 const printSandbox=document.getElementById('printSandbox');
+const langElBtn=document.getElementById('langElBtn');
+const langEnBtn=document.getElementById('langEnBtn');
 let printPageStyleEl = null;
-const JSON_CANDIDATES=['chapter_content.json'];
+const JSON_CANDIDATES=['chapter_content_bilingual.json','chapter_content.json'];
+let contentLang = localStorage.getItem('hmkContentLang') || 'el';
+function locKey(key){ return contentLang === 'en' ? `${key}_en` : key; }
+function getLoc(obj,key,fallback=''){
+  if(!obj) return fallback;
+  const v = obj[locKey(key)];
+  if(v != null && v !== '') return v;
+  const base = obj[key];
+  return base != null ? base : fallback;
+}
+function getLocArray(obj,key){
+  if(!obj) return [];
+  const v = obj[locKey(key)];
+  if(Array.isArray(v)) return v;
+  return Array.isArray(obj[key]) ? obj[key] : [];
+}
+function updateLangButtons(){
+  document.documentElement.lang = contentLang;
+  langElBtn?.classList.toggle('active', contentLang==='el');
+  langEnBtn?.classList.toggle('active', contentLang==='en');
+}
+function rerenderBook(){
+  if(!bookData) return;
+  renderPages(bookData);
+  deriveNav(bookData);
+  updateActiveNav();
+  setStatus(`${contentLang==='en' ? 'Pages' : 'Σελίδες'}: ${(bookData.pages||[]).length}`);
+}
+langElBtn?.addEventListener('click', ()=>{ contentLang='el'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
+langEnBtn?.addEventListener('click', ()=>{ contentLang='en'; localStorage.setItem('hmkContentLang', contentLang); updateLangButtons(); rerenderBook(); });
+updateLangButtons();
 
 function applyPrintPageSettings(defs){
   if(!printPageStyleEl){
@@ -610,31 +649,31 @@ function sceneAspect(item){
 function renderHero(item){
   const wrap=document.createElement('section');
   wrap.className='hero';
-  wrap.innerHTML=`${item.eyebrow?`<p class="eyebrow">${item.eyebrow}</p>`:''}${item.title?`<h1>${item.title}</h1>`:''}${item.subtitle?`<p class="subtitle">${item.subtitle}</p>`:''}`;
+  wrap.innerHTML=`${getLoc(item,'eyebrow','')?`<p class="eyebrow">${getLoc(item,'eyebrow','')}</p>`:''}${getLoc(item,'title','')?`<h1>${getLoc(item,'title','')}</h1>`:''}${getLoc(item,'subtitle','')?`<p class="subtitle">${getLoc(item,'subtitle','')}</p>`:''}`;
   return wrap;
 }
 function renderPartTitle(item){
   const d=document.createElement('section');
   d.className='part-head';
-  d.innerHTML=`${item.label?`<p class="part-kicker">${item.label}</p>`:''}${item.title?`<h2 class="part-title-main">${item.title}</h2>`:''}`;
+  d.innerHTML=`${getLoc(item,'label','')?`<p class="part-kicker">${getLoc(item,'label','')}</p>`:''}${getLoc(item,'title','')?`<h2 class="part-title-main">${getLoc(item,'title','')}</h2>`:''}`;
   return d;
 }
 function renderSectionHeading(item){
   const h=document.createElement('h2');
   h.className='section-heading';
-  h.textContent=item.title || '';
+  h.textContent=getLoc(item,'title','');
   return h;
 }
 function renderParagraph(item){
   const p=document.createElement('p');
   p.className='paragraph';
-  p.innerHTML=item.html || '';
+  p.innerHTML=getLoc(item,'html','');
   return p;
 }
 function renderNote(item){
   const d=document.createElement('div');
   d.className='note';
-  d.innerHTML=`${item.label?`<span class="label">${item.label}</span>`:''}${item.html||''}`;
+  d.innerHTML=`${getLoc(item,'label','')?`<span class="label">${getLoc(item,'label','')}</span>`:''}${getLoc(item,'html','')||''}`;
   return d;
 }
 function renderFigure(item){
@@ -644,12 +683,12 @@ function renderFigure(item){
   const frame=document.createElement('div');
   frame.className=`media-frame ${item.aspect==='natural'?'natural':''}`.trim();
   const img=document.createElement('img');
-  img.alt=item.alt || item.title || 'Εικόνα';
+  img.alt=getLoc(item,'alt','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
   img.addEventListener('imagefallbackfailed', ()=>{
     img.remove();
     const ph=document.createElement('div');
     ph.className='media-placeholder';
-    ph.innerHTML=`<div><strong>${esc(item.title || 'Εικόνα')}</strong><br>Το αρχείο εικόνας δεν βρέθηκε.</div>`;
+    ph.innerHTML=`<div><strong>${esc(getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα'))}</strong><br>${contentLang==='en' ? 'Image file not found.' : 'Το αρχείο εικόνας δεν βρέθηκε.'}</div>`;
     frame.appendChild(ph);
   }, {once:true});
   applyImageWithFallback(img, item.src || '');
@@ -657,7 +696,7 @@ function renderFigure(item){
   fig.appendChild(frame);
   if(!item.hideCaption){
     const cap=document.createElement('figcaption');
-    cap.textContent=item.caption || item.title || 'Εικόνα';
+    cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
     fig.appendChild(cap);
   }
   return fig;
@@ -678,7 +717,7 @@ function renderScene(item){
   fig.appendChild(frame);
   if(!item.hideCaption){
     const cap=document.createElement('figcaption');
-    cap.textContent=item.caption || item.title || 'Σκηνή';
+    cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Scene' : 'Σκηνή');
     fig.appendChild(cap);
   }
   return fig;
@@ -686,10 +725,10 @@ function renderScene(item){
 function renderCallout(item){
   const d=document.createElement('div');
   d.className='callout';
-  const setup=(item.setupChips||[]).length ? `<div class="callout-row"><span class="callout-label">${item.setupLabel || 'Ρύθμισε'}</span>${(item.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
-  const press=(item.pressChips||[]).length ? `<div class="callout-row"><span class="callout-label">${item.pressLabel || 'Πίεσε'}</span>${(item.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
-  const observe=(item.observeItems||[]).length ? `<div class="callout-observe"><span class="callout-observe-title">${item.observeTitle || 'Παρατήρησε'}</span><ul>${(item.observeItems||[]).map(t=>`<li>${t}</li>`).join('')}</ul></div>` : '';
-  d.innerHTML=`<div class="callout-title">${item.title || 'Δοκίμασε'}</div>${setup}${press}${observe}`;
+  const setup=(item.setupChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'setupLabel', contentLang==='en' ? 'Set' : 'Ρύθμισε')}</span>${(item.setupChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
+  const press=(item.pressChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'pressLabel', contentLang==='en' ? 'Press' : 'Πίεσε')}</span>${(item.pressChips||[]).map(t=>`<span class="callout-chip">${t}</span>`).join('')}</div>` : '';
+  const observe=getLocArray(item,'observeItems').length ? `<div class="callout-observe"><span class="callout-observe-title">${getLoc(item,'observeTitle', contentLang==='en' ? 'Observe' : 'Παρατήρησε')}</span><ul>${getLocArray(item,'observeItems').map(t=>`<li>${t}</li>`).join('')}</ul></div>` : '';
+  d.innerHTML=`<div class="callout-title">${getLoc(item,'title', contentLang==='en' ? 'Try' : 'Δοκίμασε')}</div>${setup}${press}${observe}`;
   return d;
 }
 function renderItem(item){
@@ -719,15 +758,15 @@ function buildHeader(page, pageNo, total){
   const h=document.createElement('div');
   h.className='sheet-header';
   if(Number((bookData?.layoutDefaults || {}).headerFontSize) <= 0) h.classList.add('hidden');
-  h.innerHTML=`<div class="l">${replaceTokens(page.header?.left, {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(page.header?.center, {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(page.header?.right, {page:pageNo,pages:total})}</div>`;
+  h.innerHTML=`<div class="l">${replaceTokens(getLoc(page.header,'left',''), {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(getLoc(page.header,'center',''), {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(getLoc(page.header,'right',''), {page:pageNo,pages:total})}</div>`;
   return h;
 }
 function buildFooter(page, pageNo, total, showNumbers=true){
   const f=document.createElement('div');
   f.className='sheet-footer';
   if(Number((bookData?.layoutDefaults || {}).footerFontSize) <= 0) f.classList.add('hidden');
-  const rightValue = showNumbers === false ? '' : page.footer?.right;
-  f.innerHTML=`<div class="l">${replaceTokens(page.footer?.left, {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(page.footer?.center, {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(rightValue, {page:pageNo,pages:total})}</div>`;
+  const rightValue = showNumbers === false ? '' : getLoc(page.footer,'right','');
+  f.innerHTML=`<div class="l">${replaceTokens(getLoc(page.footer,'left',''), {page:pageNo,pages:total})}</div><div class="c">${replaceTokens(getLoc(page.footer,'center',''), {page:pageNo,pages:total})}</div><div class="r">${replaceTokens(rightValue, {page:pageNo,pages:total})}</div>`;
   return f;
 }
 function renderPages(data){
@@ -771,15 +810,15 @@ function deriveNav(data){
     'Τι να περιμένεις',
     'Εικόνα 1',
     'Εικόνα 2',
-    'Πυρήνας'
+    'Πυρήνας','Try','School description','What is the picture of the fields?','Events','How does the propagation of the fields evolve?','Snapshot','Convention','How to use it','What to expect','Figure 1','Figure 2','Core'
   ]);
 
   function menuGroupTitle(groupIndex, page, partItem){
-    if(groupIndex === 0) return 'Εισαγωγή';
-    if(groupIndex === 1) return 'Σχολικά';
-    if(partItem && String(partItem.title || '').trim()) return String(partItem.title).trim();
-    const right = String(page?.header?.right || '').trim();
-    return right || `Σελίδα ${groupIndex+1}`;
+    if(groupIndex === 0) return contentLang==='en' ? 'Introduction' : 'Εισαγωγή';
+    if(groupIndex === 1) return contentLang==='en' ? 'School version' : 'Σχολικά';
+    if(partItem && String(getLoc(partItem,'title','')).trim()) return String(getLoc(partItem,'title','')).trim();
+    const right = String(getLoc(page?.header,'right','')).trim();
+    return right || (contentLang==='en' ? `Page ${groupIndex+1}` : `Σελίδα ${groupIndex+1}`);
   }
 
   pages.forEach((page, idx) => {
@@ -802,7 +841,7 @@ function deriveNav(data){
 
     const candidates = [];
     (page.items || []).forEach(it => {
-      const raw = String(it.title || '').trim();
+      const raw = String(getLoc(it,'title','')).trim();
       if(!raw || ignoredTitles.has(raw)) return;
       if(it.type === 'section_heading' || it.type === 'scene'){
         candidates.push(raw);
@@ -836,7 +875,7 @@ function deriveNav(data){
   const appLink = document.createElement('a');
   appLink.className = 'menu-btn';
   appLink.href = resolveAppHref();
-  appLink.textContent = 'Στην εφαρμογή';
+  appLink.textContent = contentLang==='en' ? 'Open app' : 'Στην εφαρμογή';
   appNode.appendChild(appLink);
   megaNav.appendChild(appNode);
 
@@ -846,7 +885,7 @@ function deriveNav(data){
   btn.type = 'button';
   btn.className = 'menu-btn';
   btn.id = 'printBtn';
-  btn.textContent = 'Εκτύπωση';
+  btn.textContent = contentLang==='en' ? 'Print' : 'Εκτύπωση';
   btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
   printNode.appendChild(btn);
   megaNav.appendChild(printNode);
@@ -947,7 +986,7 @@ async function boot(){
   renderPages(data);
   deriveNav(data);
   updateActiveNav();
-  setStatus(`Σελίδες: ${(data.pages||[]).length}`);
+  setStatus(`${contentLang==='en' ? 'Pages' : 'Σελίδες'}: ${(data.pages||[]).length}`);
 }
 boot().catch(err=>{
   console.error(err);
