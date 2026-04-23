@@ -226,7 +226,7 @@ jsonInput.addEventListener('change', async e => {
 
 loadDefaultBtn.addEventListener('click', async ()=>{
   try{
-    const res = await fetch('chapter_content_bilingual.json?ts='+Date.now());
+    const res = await fetch('chapter_content_bilingual_from_current.json?ts='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const parsed = await res.json();
     data = normalizeData(parsed);
@@ -242,7 +242,7 @@ exportBtn.addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'chapter_content_bilingual.json';
+  a.download = 'chapter_content_bilingual_from_current.json';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
 });
@@ -572,7 +572,7 @@ function bindTextInput(el, obj, key){
     else obj[key] = el.value;
     renderTree(); renderPreview();
   };
-}; }
+}
 function bindTextarea(el, obj, key){
   el.value = isTranslatableKey(key) ? getLoc(obj, key, '') : (obj[key] ?? '');
   el.oninput = ()=>{
@@ -580,7 +580,7 @@ function bindTextarea(el, obj, key){
     else obj[key] = el.value;
     renderTree(); renderPreview();
   };
-}; }
+}
 function bindNumberInput(el, obj, key){
   el.value = obj[key] ?? '';
   el.oninput = ()=>{ const v = el.value.trim(); if(v==='') delete obj[key]; else obj[key] = Number(v); renderTree(); renderPreview(); };
