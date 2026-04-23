@@ -17,12 +17,10 @@
   --figure:#f6f8fa;
   --sheet-width:794px;
   --sheet-height:1123px;
-  --sheet-pad-x:48px;
-  --sheet-pad-y:46px;
   --screen-scale:1;
   --shadow:0 18px 36px rgba(0,0,0,.10);
   --shape-width:340px;
-  --body-font-size:15px;
+  --body-font-size:18px;
   --body-leading:1.34;
   --para-gap:7px;
   --section-gap:16px;
@@ -30,10 +28,15 @@
   --callout-gap:8px;
   --header-h:28px;
   --footer-h:22px;
-  --header-font-size:12px;
-  --footer-font-size:12px;
-  --body-font-family:Georgia,"Noto Serif",serif;
-  --heading-font-family:Georgia,"Times New Roman",serif;
+  --header-font-size:11px;
+  --footer-font-size:11px;
+  --body-font-family:Georgia,"Noto Serif","Times New Roman",serif;
+  --heading-font-family:"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  --page-pad-top:54px;
+  --page-pad-side:44px;
+  --page-pad-bottom:54px;
+  --page-header-top:20px;
+  --page-footer-bottom:18px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -107,16 +110,19 @@ body{
 .sheet-inner{
   position:relative;
   min-height:100%;
-  padding:var(--sheet-pad-y) var(--sheet-pad-x);
+  padding:var(--page-pad-top) var(--page-pad-side) var(--page-pad-bottom);
 }
 .sheet-header{
+  position:absolute;
+  left:var(--page-pad-side);
+  right:var(--page-pad-side);
+  top:var(--page-header-top);
   height:var(--header-h);
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  align-items:start;
+  align-items:center;
   border-bottom:1px solid rgba(0,0,0,.08);
-  padding-bottom:6px;
-  margin-bottom:18px;
+  padding-bottom:8px;
   font:700 var(--header-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
   letter-spacing:.04em;
   text-transform:none;
@@ -126,48 +132,51 @@ body{
 .sheet-header .r{text-align:right}
 .sheet-body{
   display:flow-root;
-  min-height:calc(var(--sheet-height) - (var(--sheet-pad-y) * 2) - var(--header-h) - var(--footer-h) - 22px);
+  min-height:calc(var(--sheet-height) - var(--page-pad-top) - var(--page-pad-bottom) - 8px);
 }
 .sheet-footer{
   position:absolute;
-  left:var(--sheet-pad-x);
-  right:var(--sheet-pad-x);
-  bottom:20px;
+  left:var(--page-pad-side);
+  right:var(--page-pad-side);
+  bottom:var(--page-footer-bottom);
   height:var(--footer-h);
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   align-items:end;
-  font:600 var(--footer-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  padding-top:8px;
+  border-top:1px solid rgba(0,0,0,.08);
+  font:700 var(--footer-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
   color:#7b8791;
+  text-transform:none;
 }
 .sheet-footer .c{text-align:center}
 .sheet-footer .r{text-align:right}
 
-.hero{margin:0 0 var(--section-gap)}
-.eyebrow{margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
-h1{margin:0 0 8px;font-family:var(--heading-font-family);font-size:31px;line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
-.subtitle{margin:0;color:var(--muted);font-size:15px;line-height:1.42;max-width:56ch}
+.hero{margin:0 0 22px}
+.eyebrow{margin:0 0 10px;font:800 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+h1{margin:0 0 10px;font-family:var(--heading-font-family);font-size:28px;line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
+.subtitle{margin:0;color:var(--muted);font-size:16px;line-height:1.35;max-width:56ch}
 
-.part-head{margin:0 0 var(--section-gap);padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}
-.part-kicker{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
-.part-title-main{margin:0;font-family:var(--heading-font-family);font-size:24px;line-height:1.08;font-weight:780;letter-spacing:-.022em;color:#2f627f}
+.part-head{margin:18px 0 14px;padding-top:2px;border-bottom:0}
+.part-kicker{margin:0 0 5px;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
+.part-title-main{margin:0;font-family:var(--heading-font-family);font-size:24px;line-height:1.08;font-weight:780;color:#2f627f}
 
-.section-heading{margin:0 0 8px;font-family:var(--heading-font-family);font-size:18px;line-height:1.18;font-weight:690;letter-spacing:-.008em;color:#5d7281}
+.section-heading{margin:20px 0 8px;padding-top:6px;border-top:1px solid rgba(0,0,0,.06);font-family:var(--heading-font-family);font-size:18px;line-height:1.18;font-weight:700;color:#5d7281}
 .paragraph{margin:0 0 var(--para-gap); text-align:justify; text-justify:inter-word; hyphens:auto}
 .note{
   margin:var(--note-gap) 0; padding:10px 12px; border-radius:14px; background:var(--note); border:1px solid #e4d7ae;
-  font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  font:500 14px/1.42 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
 }
-.note .label{display:block;margin:0 0 5px;font:800 10.5px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+.note .label{display:block;margin:0 0 5px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
 
 figure.media{
-  margin:6px 0 16px; background:var(--figure); border:1px solid var(--line); border-radius:18px; overflow:hidden;
+  margin:4px 0 12px; background:var(--figure); border:1px solid var(--line); border-radius:16px; overflow:hidden;
   box-shadow:0 6px 18px rgba(0,0,0,.04);
 }
-figure.media.float-right,figure.media.float-left{width:min(var(--figure-width, var(--shape-width)), 42vw);margin-top:4px}
-figure.media.float-right{float:right;margin:4px 0 10px 20px}
-figure.media.float-left{float:left;margin:4px 20px 10px 0}
-figure.media.wide{clear:both;width:100%;max-width:100%;margin:18px 0}
+figure.media.float-right,figure.media.float-left{width:min(var(--figure-width, var(--shape-width)), 42%)}
+figure.media.float-right{float:right;margin:4px 0 10px 18px}
+figure.media.float-left{float:left;margin:4px 18px 10px 0}
+figure.media.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
 .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
 .media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}
 .media-frame iframe,.media-frame img,.media-placeholder,.print-scene-snapshot{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
@@ -484,8 +493,7 @@ async function preparePrintSnapshots(force=false){
   for(const frame of frames){
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
-
-    const dataUrl = await requestIframePrintSnapshotWithRetry(liveIframe, 5);
+    const dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
     if(!dataUrl) continue;
 
     const img = document.createElement('img');
@@ -806,38 +814,33 @@ function updateActiveNav(){
 }
 window.addEventListener('scroll', updateActiveNav, {passive:true});
 
-async function resolveBodyFontFamily(mode='serif'){
-  return mode === 'sans'
-    ? 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif'
-    : 'Georgia,"Noto Serif",serif';
+function resolveBodyFontFamily(mode){
+  const presets = {
+    serif: 'Georgia,"Noto Serif","Times New Roman",serif',
+    sans: 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif'
+  };
+  return presets[mode] || presets.serif;
 }
-function resolveHeadingFontFamily(mode='classic'){
-  if(mode === 'serif') return 'Georgia,"Times New Roman",serif';
-  if(mode === 'sans') return 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif';
-  return '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif';
+function resolveHeadingFontFamily(mode){
+  const presets = {
+    classic: '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif',
+    serif: 'Georgia,"Times New Roman",serif',
+    sans: 'system-ui,-apple-system,"Segoe UI",Arial,sans-serif'
+  };
+  return presets[mode] || presets.classic;
 }
 function applyLayoutDefaults(defs={}){
-  const root = document.documentElement;
-  if(defs.lineHeight) root.style.setProperty('--body-leading', String(defs.lineHeight));
-  if(typeof defs.paragraphGap === 'number') root.style.setProperty('--para-gap', `${defs.paragraphGap}px`);
-  if(typeof defs.sectionGap === 'number') root.style.setProperty('--section-gap', `${defs.sectionGap}px`);
-  if(typeof defs.noteGap === 'number') root.style.setProperty('--note-gap', `${defs.noteGap}px`);
-  if(typeof defs.calloutGap === 'number') root.style.setProperty('--callout-gap', `${defs.calloutGap}px`);
-  if(typeof defs.bodyFontSize === 'number' && defs.bodyFontSize > 0) root.style.setProperty('--body-font-size', `${defs.bodyFontSize}px`);
-  if(typeof defs.headerFontSize === 'number' && defs.headerFontSize > 0) root.style.setProperty('--header-font-size', `${defs.headerFontSize}px`);
-  if(typeof defs.footerFontSize === 'number' && defs.footerFontSize > 0) root.style.setProperty('--footer-font-size', `${defs.footerFontSize}px`);
-  if(typeof defs.bodyFontFamily === 'string' && defs.bodyFontFamily.trim()){
-    root.style.setProperty('--body-font-family', resolveBodyFontFamily(defs.bodyFontFamily.trim()));
-  }
-  if(typeof defs.headingFontFamily === 'string' && defs.headingFontFamily.trim()){
-    root.style.setProperty('--heading-font-family', resolveHeadingFontFamily(defs.headingFontFamily.trim()));
-  }
-  const padMm = Number(defs.pageInnerPaddingMm);
-  if(Number.isFinite(padMm) && padMm > 0){
-    const px = Math.round(padMm * 3.7795);
-    root.style.setProperty('--sheet-pad-x', `${px}px`);
-    root.style.setProperty('--sheet-pad-y', `${px}px`);
-  }
+  const root=document.documentElement;
+  if(typeof defs.bodyFontSize === "number" && defs.bodyFontSize > 0) root.style.setProperty("--body-font-size", `${defs.bodyFontSize}px`);
+  if(typeof defs.lineHeight === "number" && defs.lineHeight > 0) root.style.setProperty("--body-leading", String(defs.lineHeight));
+  if(typeof defs.paragraphGap === "number") root.style.setProperty("--para-gap", `${defs.paragraphGap}px`);
+  if(typeof defs.sectionGap === "number") root.style.setProperty("--section-gap", `${defs.sectionGap}px`);
+  if(typeof defs.noteGap === "number") root.style.setProperty("--note-gap", `${defs.noteGap}px`);
+  if(typeof defs.calloutGap === "number") root.style.setProperty("--callout-gap", `${defs.calloutGap}px`);
+  if(typeof defs.headerFontSize === "number" && defs.headerFontSize > 0) root.style.setProperty("--header-font-size", `${defs.headerFontSize}px`);
+  if(typeof defs.footerFontSize === "number" && defs.footerFontSize > 0) root.style.setProperty("--footer-font-size", `${defs.footerFontSize}px`);
+  if(typeof defs.bodyFontFamily === "string" && defs.bodyFontFamily.trim()) root.style.setProperty("--body-font-family", resolveBodyFontFamily(defs.bodyFontFamily.trim()));
+  if(typeof defs.headingFontFamily === "string" && defs.headingFontFamily.trim()) root.style.setProperty("--heading-font-family", resolveHeadingFontFamily(defs.headingFontFamily.trim()));
 }
 
 async function loadData(){
