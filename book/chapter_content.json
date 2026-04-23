@@ -15,8 +15,8 @@
     "calloutGap": 8,
     "pageInnerPaddingMm": 14,
     "showPageNumbers": true,
-    "headerFontSize": 12,
-    "footerFontSize": 10
+    "headerFontSize": 0,
+    "footerFontSize": 0
   },
   "pages": [
     {
@@ -425,10 +425,6 @@
           "html": "Τη στιγμή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>t</mi><mo>=</mo><mfrac><mi>T</mi><mn>4</mn></mfrac></math></span> το φορτίο στα άκρα του διπόλου έχει μέγιστο μέτρο, άρα και το ηλεκτρικό πεδίο εμφανίζεται στην εντονότερη μορφή του. Την ίδια στιγμή το ρεύμα μηδενίζεται, επειδή η κλίση του διαγράμματος <em>q-t</em> είναι μηδενική, και έτσι το μαγνητικό πεδίο εξαφανίζεται στιγμιαία. Πρόκειται για την πρώτη καθαρά ηλεκτρική ακραία φάση της κίνησης."
         },
         {
-          "type": "paragraph",
-          "html": "<strong>T/4 → T/2</strong>"
-        },
-        {
           "type": "scene",
           "id": "phase_T4_T2",
           "title": "Σκηνή T/4→T/2",
@@ -439,6 +435,10 @@
           "hideCaption": false,
           "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>T/4 → T/2</strong>"
         },
         {
           "type": "interactive_callout",
