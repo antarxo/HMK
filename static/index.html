@@ -324,11 +324,21 @@ if(qSource){
 if(qMode === 'appear' || qMode === 'disappear') state.mode = qMode;
 if(Number.isFinite(qSpeed)) state.speed = qSpeed;
 if(qAutoplay === '1') state.playing = true;
-if(qControls === 'none') document.querySelector('.overlay').style.display = 'none';
+if(qControls === 'none') {
+  const overlay = document.querySelector('.overlay');
+  if(overlay) overlay.style.display = 'none';
+  const noteEl = document.getElementById('note');
+  if(noteEl) noteEl.style.display = 'none';
+}
 if(qControls === 'minimal') {
   const huds = document.querySelectorAll('.hud');
   huds.forEach((el, idx) => { if(idx < 3) el.style.display = 'none'; });
-  const note = document.getElementById('note'); if(note) note.style.display = 'none';
+  const noteEl = document.getElementById('note'); if(noteEl) noteEl.style.display = 'none';
+}
+const qEmbedded = qs.get('embedded') || qs.get('book');
+if(qEmbedded === '1' || qEmbedded === 'true') {
+  const topEl = document.querySelector('.top');
+  if(topEl) topEl.style.display = 'none';
 }
 if(qLang === 'en' || qLang === 'el' || qLang === 'gr') state.lang = qLang === 'en' ? 'en' : 'el';
 

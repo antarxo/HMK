@@ -636,6 +636,18 @@ window.addEventListener('afterprint', ()=>{
 });
 
 function sceneAspect(item){
+  const customAspect = item?.aspectRatio || item?.sceneAspect || item?.aspect;
+  if(customAspect && customAspect !== 'natural'){
+    if(typeof customAspect === 'number' && Number.isFinite(customAspect) && customAspect > 0) return customAspect;
+    const txt = String(customAspect).trim();
+    const frac = txt.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+    if(frac){
+      const a = Number(frac[1]), c = Number(frac[2]);
+      if(a > 0 && c > 0) return a / c;
+    }
+    const n = Number(txt);
+    if(Number.isFinite(n) && n > 0) return n;
+  }
   const src=String(item.singleSrc||'');
   let layout='';
   try{
