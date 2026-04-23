@@ -126,7 +126,7 @@
 <header>
   <div>
     <h1>Η/Μ Book Editor — σελίδες</h1>
-    <small>Page-first editor. Κάθε σελίδα έχει δικά της header / footer / items και ζωντανή mini-A4 προεπισκόπηση.</small>
+    <small>Page-first editor. Κάθε σελίδα έχει δικά της header / footer / items και ζωντανή mini-A4 προεπισκόπηση. Η default φόρτωση κοιτά πρώτα το chapter_content.json.</small>
   </div>
   <div class="controls">
     <span>JSON:</span>
@@ -226,7 +226,8 @@ jsonInput.addEventListener('change', async e => {
 
 loadDefaultBtn.addEventListener('click', async ()=>{
   try{
-    const res = await fetch('chapter_content_bilingual_from_current.json?ts='+Date.now());
+    let res = await fetch('chapter_content.json?ts='+Date.now(), {cache:'no-store'});
+    if(!res.ok) res = await fetch('chapter_content_bilingual_from_current.json?ts='+Date.now(), {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const parsed = await res.json();
     data = normalizeData(parsed);
@@ -242,7 +243,7 @@ exportBtn.addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'chapter_content_bilingual_from_current.json';
+  a.download = 'chapter_content.json';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
 });
