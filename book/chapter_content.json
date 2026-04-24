@@ -120,14 +120,6 @@
           "html_en": "The central aim is to clarify how we move from an oscillating rod, on which charges appear and through which current flows, to the idea of the electromagnetic wave. It is not enough to say this with a phrase of the form “this is how it follows from Maxwell’s equations.” It has to be explored theoretically and organized didactically."
         },
         {
-          "type": "side_note",
-          "label": "Σχόλιο",
-          "title": "",
-          "html": "ΔΟκιμαστικό",
-          "placement": "right",
-          "frameWidth": 340
-        },
-        {
           "type": "paragraph",
           "html": "Γι’ αυτό ξεκινάμε από το σχολικό αφήγημα, όχι επειδή είναι πλήρες, αλλά επειδή δίνει ένα πρώτο καθαρό στήσιμο της κατάστασης. Έπειτα δείχνουμε πού σπάει αυτή η εικόνα, τι αλλάζει όταν λάβουμε υπόψη την απόσβεση όσο απομακρυνόμαστε από το δίπολο, και τελικά πώς γεννιέται και διαδίδεται το πραγματικό ΗΜ κύμα.",
           "html_en": "That is why we begin with the school narrative, not because it is complete, but because it provides a first clear setup of the situation. Then we show where this picture breaks down, what changes when we take attenuation into account as we move away from the dipole, and finally how the real EM wave is generated and propagates."

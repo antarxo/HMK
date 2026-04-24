@@ -831,7 +831,111 @@ function renderPages(data){
     pageStack.appendChild(wrap);
   });
 }
+function appendNavTools(data){
+  const nav = data?.nav || {};
+  const showApp = nav.showApp !== false;
+  const showPrint = nav.showPrint !== false;
+
+  if(showApp){
+    const appNode = document.createElement('div');
+    appNode.className = 'menu-item menu-tool';
+    const appLink = document.createElement('a');
+    appLink.className = 'menu-btn';
+    appLink.href = resolveAppHref();
+    appLink.textContent = contentLang==='en' ? 'Open app' : 'Στην εφαρμογή';
+    appNode.appendChild(appLink);
+    megaNav.appendChild(appNode);
+  }
+
+  if(showPrint){
+    const printNode = document.createElement('div');
+    printNode.className = 'menu-item menu-tool';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'menu-btn';
+    btn.id = 'printBtn';
+    btn.textContent = contentLang==='en' ? 'Print' : 'Εκτύπωση';
+    btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
+    printNode.appendChild(btn);
+    megaNav.appendChild(printNode);
+  }
+}
+
+function renderNavGroups(groups, pageToGroup, data){
+  megaNav.innerHTML = '';
+  groups.forEach(group => {
+    if(group.hidden) return;
+    const node = document.createElement('div');
+    node.className = 'menu-item';
+    node.dataset.groupKey = group.key;
+    const entries = (group.entries || []).filter(entry => !entry.hidden);
+    const links = entries.map(entry => `<a class="menu-section-link" href="#${esc(entry.id)}">${esc(entry.text)}</a>`).join('');
+    node.innerHTML = `<a class="menu-trigger" href="#${esc(group.id)}">${esc(group.title)}<span class="caret">▾</span></a><div class="menu-dropdown">${links}</div>`;
+    megaNav.appendChild(node);
+  });
+  appendNavTools(data);
+  megaNav.dataset.pageGroupMap = JSON.stringify(Object.fromEntries(pageToGroup));
+}
+
+function deriveManualNav(data){
+  const pages = Array.isArray(data.pages) ? data.pages : [];
+  const rawGroups = Array.isArray(data?.nav?.groups) ? data.nav.groups : [];
+  const visibleGroups = rawGroups
+    .map((group, idx) => {
+      const id = String(group.target || group.id || pages[0]?.id || 'page-1').trim();
+      const entries = Array.isArray(group.entries) ? group.entries : [];
+      return {
+        key: `manual-${idx}`,
+        id,
+        title: String(getLoc(group,'title', group.title || id || `Menu ${idx+1}`)).trim() || id,
+        hidden: !!group.hidden,
+        entries: entries.map(entry => {
+          const entryId = String(entry.target || entry.id || id).trim() || id;
+          return {
+            id: entryId,
+            text: String(getLoc(entry,'title', entry.title || entryId)).trim() || entryId,
+            hidden: !!entry.hidden
+          };
+        })
+      };
+    })
+    .filter(group => group.title && group.id);
+
+  const groups = visibleGroups.length ? visibleGroups : [{
+    key:'manual-0',
+    id:pages[0]?.id || 'page-1',
+    title:contentLang==='en' ? 'Book' : 'Βιβλίο',
+    entries:[]
+  }];
+
+  const pageToGroup = new Map();
+  const pageIndex = new Map(pages.map((p, idx)=>[String(p.id || `page-${idx+1}`), idx]));
+  const anchors = groups.map((g, idx)=>({
+    key:g.key,
+    index:pageIndex.has(g.id) ? pageIndex.get(g.id) : idx
+  })).sort((a,b)=>a.index-b.index);
+
+  pages.forEach((page, idx)=>{
+    let active = anchors[0]?.key || groups[0].key;
+    for(const a of anchors){
+      if(a.index <= idx) active = a.key;
+      else break;
+    }
+    pageToGroup.set(page.id || `page-${idx+1}`, active);
+  });
+  groups.forEach(group => {
+    if(group.id) pageToGroup.set(group.id, group.key);
+    (group.entries || []).forEach(entry => { if(entry.id) pageToGroup.set(entry.id, group.key); });
+  });
+
+  renderNavGroups(groups, pageToGroup, data);
+}
+
 function deriveNav(data){
+  if(data?.nav?.mode === 'manual' && Array.isArray(data?.nav?.groups) && data.nav.groups.length){
+    deriveManualNav(data);
+    return;
+  }
   const pages = Array.isArray(data.pages) ? data.pages : [];
   const groups = [];
   const pageToGroup = new Map();
@@ -899,37 +1003,7 @@ function deriveNav(data){
     });
   });
 
-  megaNav.innerHTML = '';
-  groups.forEach(group => {
-    const node = document.createElement('div');
-    node.className = 'menu-item';
-    node.dataset.groupKey = group.key;
-    const links = group.entries.map(entry => `<a class="menu-section-link" href="#${entry.id}">${esc(entry.text)}</a>`).join('');
-    node.innerHTML = `<a class="menu-trigger" href="#${group.id}">${esc(group.title)}<span class="caret">▾</span></a><div class="menu-dropdown">${links}</div>`;
-    megaNav.appendChild(node);
-  });
-
-  const appNode = document.createElement('div');
-  appNode.className = 'menu-item menu-tool';
-  const appLink = document.createElement('a');
-  appLink.className = 'menu-btn';
-  appLink.href = resolveAppHref();
-  appLink.textContent = contentLang==='en' ? 'Open app' : 'Στην εφαρμογή';
-  appNode.appendChild(appLink);
-  megaNav.appendChild(appNode);
-
-  const printNode = document.createElement('div');
-  printNode.className = 'menu-item menu-tool';
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'menu-btn';
-  btn.id = 'printBtn';
-  btn.textContent = contentLang==='en' ? 'Print' : 'Εκτύπωση';
-  btn.addEventListener('click', async ()=>{ await beginPrintFlow(); });
-  printNode.appendChild(btn);
-  megaNav.appendChild(printNode);
-
-  megaNav.dataset.pageGroupMap = JSON.stringify(Object.fromEntries(pageToGroup));
+  renderNavGroups(groups, pageToGroup, data);
 }
 function updateActiveNav(){
   const pageEls=Array.from(document.querySelectorAll('.sheet-wrap[id]'));

@@ -29,6 +29,12 @@
     .badge{font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#020617;color:var(--soft)}
     .scroll{overflow:auto;min-height:0;padding-right:4px}
     .hint{font-size:11px;color:var(--soft)}
+
+    .nav-editor-group{border:1px solid #1f2937;border-radius:12px;background:#07101d;padding:10px;margin:10px 0}
+    .nav-editor-group.hidden{opacity:.55}
+    .nav-editor-entry{border:1px solid #1f2937;border-radius:10px;background:#020617;padding:8px;margin:7px 0}
+    .nav-mini-title{font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#bae6fd;margin-bottom:7px}
+    .target-select{width:100%;min-width:0}
     .tree-sticky-nav{margin:0 auto 10px;padding:10px 10px 12px;border:1px solid #31506d;border-radius:14px;background:linear-gradient(180deg,rgba(8,18,32,.98),rgba(2,6,23,.98));box-shadow:0 12px 22px rgba(0,0,0,.24);max-width:100%}
     .tree-sticky-nav .nav-title{display:block;margin:0 0 8px;font:900 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:none;color:#bae6fd;text-align:center}
     .page-picker{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
@@ -235,7 +241,7 @@ jsonInput.addEventListener('change', async e => {
 
 loadDefaultBtn.addEventListener('click', async ()=>{
   try{
-    const res = await fetch('chapter_content_bilingual_from_current.json?ts='+Date.now());
+    const res = await fetch('chapter_content.json?ts='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const parsed = await res.json();
     data = normalizeData(parsed);
@@ -251,7 +257,7 @@ exportBtn.addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'chapter_content_bilingual_from_current.json';
+  a.download = 'chapter_content.json';
   document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
 });
@@ -261,6 +267,11 @@ function normalizeData(raw){
   if(!out.schemaVersion) out.schemaVersion = 'pages-v1';
   if(!out.meta) out.meta = {};
   if(!out.layoutDefaults) out.layoutDefaults = {};
+  if(!out.nav) out.nav = {mode:'auto', showApp:true, showPrint:true, groups:[]};
+  if(!out.nav.mode) out.nav.mode = 'auto';
+  if(out.nav.showApp == null) out.nav.showApp = true;
+  if(out.nav.showPrint == null) out.nav.showPrint = true;
+  if(!Array.isArray(out.nav.groups)) out.nav.groups = [];
   if(!Array.isArray(out.pages)) out.pages = [];
   out.pages.forEach((p, i) => {
     if(!p.id) p.id = `page-${i+1}`;
@@ -433,6 +444,12 @@ function renderTree(){
   metaBtn.innerHTML = '<span class="type">meta</span><span class="info">τίτλος / subtitle / layoutDefaults</span>';
   metaBtn.onclick = ()=>{ selection={kind:'meta'}; renderAll(); };
   metaBox.appendChild(metaBtn);
+  const navBtn = document.createElement('div');
+  navBtn.className = 'tree-block' + (selection?.kind==='nav' ? ' active' : '');
+  const navModeLabel = data.nav?.mode === 'manual' ? 'χειροκίνητο' : 'αυτόματο';
+  navBtn.innerHTML = `<span class="type">nav</span><span class="info">μενού · ${navModeLabel}</span>`;
+  navBtn.onclick = ()=>{ ensureNav(); selection={kind:'nav'}; renderAll(); };
+  metaBox.appendChild(navBtn);
   tree.appendChild(metaBox);
 
   const stickyNav = document.createElement('div');
@@ -572,6 +589,7 @@ function renderEditor(){
   if(!selection){ editor.innerHTML = '<div class="hint">Διάλεξε κάτι αριστερά.</div>'; editorBadge.textContent = 'καμία επιλογή'; return; }
 
   if(selection.kind === 'meta'){ editorBadge.textContent = 'meta'; renderMetaEditor(); return; }
+  if(selection.kind === 'nav'){ editorBadge.textContent = 'nav'; renderNavEditor(); return; }
   if(selection.kind === 'page'){ editorBadge.textContent = 'page'; renderPageEditor(currentPage(), selection.pageIndex); return; }
   if(selection.kind === 'item'){ editorBadge.textContent = 'item'; renderItemEditor(currentItem(), selection.pageIndex, selection.itemIndex); return; }
 }
@@ -1081,6 +1099,217 @@ function renderTypeFields(item){
     return;
   }
   box.innerHTML = '<div class="hint">Άγνωστος τύπος item.</div>';
+}
+
+
+function ensureNav(){
+  if(!data.nav) data.nav = {mode:'auto', showApp:true, showPrint:true, groups:[]};
+  if(!data.nav.mode) data.nav.mode = 'auto';
+  if(data.nav.showApp == null) data.nav.showApp = true;
+  if(data.nav.showPrint == null) data.nav.showPrint = true;
+  if(!Array.isArray(data.nav.groups)) data.nav.groups = [];
+  return data.nav;
+}
+function pageLabel(page, idx){
+  const title = (page.items || []).map(it => getLoc(it,'title','')).find(Boolean);
+  const head = getLoc(page.header,'left','') || getLoc(page.header,'right','') || '';
+  const label = String(title || head || page.id || `page-${idx+1}`).trim();
+  return `Σελίδα ${idx+1} · ${label}`;
+}
+function pageOptionsHtml(selected=''){
+  return (data.pages || []).map((p, idx)=>{
+    const id = String(p.id || `page-${idx+1}`);
+    return `<option value="${esc(id)}"${id===selected?' selected':''}>${esc(id)} — ${esc(pageLabel(p, idx))}</option>`;
+  }).join('');
+}
+function generateAutoNavModel(){
+  const pages = Array.isArray(data.pages) ? data.pages : [];
+  const groups = [];
+  let currentGroup = null;
+  const ignoredTitles = new Set([
+    'Δοκίμασε','Σχολική Περιγραφή','Ποια είναι η εικόνα των πεδίων;','Συμβάντα','Πώς εξελίσσεται η διάδοση των πεδίων;','Στιγμιότυπο','Σύμβαση','Πώς να το χρησιμοποιήσεις','Τι να περιμένεις','Εικόνα 1','Εικόνα 2','Πυρήνας',
+    'Try','School description','What is the picture of the fields?','Events','How does the propagation of the fields evolve?','Snapshot','Convention','How to use it','What to expect','Figure 1','Figure 2','Core'
+  ]);
+  function menuGroupTitle(groupIndex, page, partItem){
+    if(groupIndex === 0) return contentLang==='en' ? 'Introduction' : 'Εισαγωγή';
+    if(groupIndex === 1) return contentLang==='en' ? 'School version' : 'Σχολικά';
+    if(partItem && String(getLoc(partItem,'title','')).trim()) return String(getLoc(partItem,'title','')).trim();
+    const right = String(getLoc(page?.header,'right','')).trim();
+    return right || (contentLang==='en' ? `Page ${groupIndex+1}` : `Σελίδα ${groupIndex+1}`);
+  }
+  pages.forEach((page, idx)=>{
+    const pageId = page.id || `page-${idx+1}`;
+    const partItem = (page.items || []).find(it => it.type === 'part_title');
+    const startsNewGroup = !currentGroup || !!partItem;
+    if(startsNewGroup){
+      currentGroup = {title:menuGroupTitle(groups.length, page, partItem), target:pageId, entries:[], seen:new Set()};
+      groups.push(currentGroup);
+    }
+    const candidates = [];
+    (page.items || []).forEach(it => {
+      const raw = String(getLoc(it,'title','')).trim();
+      if(!raw || ignoredTitles.has(raw)) return;
+      if(it.type === 'section_heading' || it.type === 'scene') candidates.push(raw);
+    });
+    if(!candidates.length && currentGroup.entries.length === 0) candidates.push(currentGroup.title);
+    candidates.forEach(text=>{
+      const key = text.toLowerCase();
+      if(currentGroup.seen.has(key)) return;
+      currentGroup.seen.add(key);
+      currentGroup.entries.push({title:text, target:pageId});
+    });
+  });
+  groups.forEach(g=>delete g.seen);
+  return {mode:'manual', showApp:data.nav?.showApp !== false, showPrint:data.nav?.showPrint !== false, groups};
+}
+function createNavGroup(){
+  const firstPage = data.pages?.[0]?.id || 'page-1';
+  return {title:'Νέα ομάδα', target:firstPage, entries:[]};
+}
+function createNavEntry(group){
+  return {title:'Νέα επιλογή', target:group?.target || data.pages?.[0]?.id || 'page-1'};
+}
+function moveInArray(arr, idx, delta){
+  const next = idx + delta;
+  if(next < 0 || next >= arr.length) return false;
+  const [item] = arr.splice(idx, 1);
+  arr.splice(next, 0, item);
+  return true;
+}
+function renderNavEditor(){
+  const nav = ensureNav();
+  const groupCount = nav.groups.length;
+  editor.innerHTML = `
+    <div class="subhead">Μενού βιβλίου</div>
+    <div class="grid">
+      <label><span>Λειτουργία μενού</span>
+        <select id="navMode">
+          <option value="auto">Αυτόματο από τίτλους/σκηνές</option>
+          <option value="manual">Χειροκίνητο</option>
+        </select>
+      </label>
+      <label><span>Ομάδες χειροκίνητου μενού</span><input type="text" value="${groupCount}" disabled></label>
+      <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="navShowApp"> <span>Να εμφανίζεται «Στην εφαρμογή»</span></label>
+      <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="navShowPrint"> <span>Να εμφανίζεται «Εκτύπωση»</span></label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="navGenerateBtn" class="primary">Γέμισμα από το αυτόματο μενού</button>
+      <button id="navAddGroupBtn">+ Νέα ομάδα</button>
+      <button id="navClearGroupsBtn" class="danger">Καθάρισμα χειροκίνητων ομάδων</button>
+    </div>
+    <div class="editor-help">Στο αυτόματο mode το βιβλίο παράγει μόνο του το μενού. Στο χειροκίνητο mode χρησιμοποιεί ακριβώς τις ομάδες και τις επιλογές που ορίζεις εδώ. Το target είναι το id σελίδας.</div>
+    <div id="navGroupsHost"></div>
+  `;
+  const modeSel = document.getElementById('navMode');
+  modeSel.value = nav.mode || 'auto';
+  modeSel.onchange = ()=>{ nav.mode = modeSel.value; renderTree(); };
+
+  const showApp = document.getElementById('navShowApp');
+  showApp.checked = nav.showApp !== false;
+  showApp.onchange = ()=>{ nav.showApp = !!showApp.checked; renderTree(); };
+
+  const showPrint = document.getElementById('navShowPrint');
+  showPrint.checked = nav.showPrint !== false;
+  showPrint.onchange = ()=>{ nav.showPrint = !!showPrint.checked; renderTree(); };
+
+  document.getElementById('navGenerateBtn').onclick = ()=>{
+    data.nav = generateAutoNavModel();
+    selection = {kind:'nav'};
+    renderAll();
+  };
+  document.getElementById('navAddGroupBtn').onclick = ()=>{
+    nav.mode = 'manual';
+    nav.groups.push(createNavGroup());
+    renderAll();
+  };
+  document.getElementById('navClearGroupsBtn').onclick = ()=>{
+    if(confirm('Να καθαριστούν όλες οι χειροκίνητες ομάδες μενού;')){
+      nav.groups = [];
+      renderAll();
+    }
+  };
+
+  const host = document.getElementById('navGroupsHost');
+  if(!nav.groups.length){
+    const empty = document.createElement('div');
+    empty.className = 'hint';
+    empty.style.marginTop = '12px';
+    empty.textContent = 'Δεν υπάρχουν χειροκίνητες ομάδες. Πάτα «Γέμισμα από το αυτόματο μενού» ή «Νέα ομάδα».';
+    host.appendChild(empty);
+    return;
+  }
+
+  nav.groups.forEach((group, gIdx)=>{
+    if(!Array.isArray(group.entries)) group.entries = [];
+    const box = document.createElement('div');
+    box.className = 'nav-editor-group' + (group.hidden ? ' hidden' : '');
+    box.innerHTML = `
+      <div class="nav-mini-title">Ομάδα ${gIdx+1}</div>
+      <div class="grid">
+        <label><span>Τίτλος ομάδας</span><input type="text" id="navGroupTitle_${gIdx}"></label>
+        <label><span>Στόχος ομάδας</span><select class="target-select" id="navGroupTarget_${gIdx}">${pageOptionsHtml(group.target || group.id || '')}</select></label>
+        <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="navGroupHidden_${gIdx}"> <span>Κρυφή ομάδα</span></label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button id="navGroupUp_${gIdx}">↑ Ομάδα</button>
+        <button id="navGroupDown_${gIdx}">↓ Ομάδα</button>
+        <button id="navAddEntry_${gIdx}">+ Επιλογή</button>
+        <button class="danger" id="navDeleteGroup_${gIdx}">Διαγραφή ομάδας</button>
+      </div>
+      <div id="navEntries_${gIdx}"></div>
+    `;
+    host.appendChild(box);
+
+    bindTextInput(document.getElementById(`navGroupTitle_${gIdx}`), group, 'title');
+    const targetSel = document.getElementById(`navGroupTarget_${gIdx}`);
+    targetSel.value = group.target || group.id || data.pages?.[0]?.id || '';
+    targetSel.onchange = ()=>{ group.target = targetSel.value; renderTree(); };
+    const hidden = document.getElementById(`navGroupHidden_${gIdx}`);
+    hidden.checked = !!group.hidden;
+    hidden.onchange = ()=>{ group.hidden = hidden.checked; renderNavEditor(); renderTree(); };
+
+    document.getElementById(`navGroupUp_${gIdx}`).onclick = ()=>{ if(moveInArray(nav.groups, gIdx, -1)) renderAll(); };
+    document.getElementById(`navGroupDown_${gIdx}`).onclick = ()=>{ if(moveInArray(nav.groups, gIdx, 1)) renderAll(); };
+    document.getElementById(`navAddEntry_${gIdx}`).onclick = ()=>{ group.entries.push(createNavEntry(group)); renderAll(); };
+    document.getElementById(`navDeleteGroup_${gIdx}`).onclick = ()=>{ nav.groups.splice(gIdx,1); renderAll(); };
+
+    const entriesHost = document.getElementById(`navEntries_${gIdx}`);
+    if(!group.entries.length){
+      const e = document.createElement('div');
+      e.className = 'hint';
+      e.style.marginTop = '8px';
+      e.textContent = 'Η ομάδα δεν έχει επιμέρους επιλογές.';
+      entriesHost.appendChild(e);
+    }
+    group.entries.forEach((entry, eIdx)=>{
+      const row = document.createElement('div');
+      row.className = 'nav-editor-entry';
+      row.innerHTML = `
+        <div class="nav-mini-title">Επιλογή ${eIdx+1}</div>
+        <div class="grid">
+          <label><span>Τίτλος επιλογής</span><input type="text" id="navEntryTitle_${gIdx}_${eIdx}"></label>
+          <label><span>Στόχος επιλογής</span><select class="target-select" id="navEntryTarget_${gIdx}_${eIdx}">${pageOptionsHtml(entry.target || entry.id || group.target || '')}</select></label>
+          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="navEntryHidden_${gIdx}_${eIdx}"> <span>Κρυφή επιλογή</span></label>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button id="navEntryUp_${gIdx}_${eIdx}">↑ Επιλογή</button>
+          <button id="navEntryDown_${gIdx}_${eIdx}">↓ Επιλογή</button>
+          <button class="danger" id="navDeleteEntry_${gIdx}_${eIdx}">Διαγραφή επιλογής</button>
+        </div>
+      `;
+      entriesHost.appendChild(row);
+      bindTextInput(document.getElementById(`navEntryTitle_${gIdx}_${eIdx}`), entry, 'title');
+      const es = document.getElementById(`navEntryTarget_${gIdx}_${eIdx}`);
+      es.value = entry.target || entry.id || group.target || data.pages?.[0]?.id || '';
+      es.onchange = ()=>{ entry.target = es.value; renderTree(); };
+      const eh = document.getElementById(`navEntryHidden_${gIdx}_${eIdx}`);
+      eh.checked = !!entry.hidden;
+      eh.onchange = ()=>{ entry.hidden = eh.checked; renderNavEditor(); renderTree(); };
+      document.getElementById(`navEntryUp_${gIdx}_${eIdx}`).onclick = ()=>{ if(moveInArray(group.entries, eIdx, -1)) renderAll(); };
+      document.getElementById(`navEntryDown_${gIdx}_${eIdx}`).onclick = ()=>{ if(moveInArray(group.entries, eIdx, 1)) renderAll(); };
+      document.getElementById(`navDeleteEntry_${gIdx}_${eIdx}`).onclick = ()=>{ group.entries.splice(eIdx,1); renderAll(); };
+    });
+  });
 }
 
 function renderMetaEditor(){
