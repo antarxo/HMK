@@ -337,6 +337,7 @@ function summarizeItem(item){
   if(t==='section_heading') return getLoc(item,'title','(χωρίς τίτλο)');
   if(t==='paragraph') return stripHtml(getLoc(item,'html','')).slice(0,72) || '(κενό)';
   if(t==='note') return ((getLoc(item,'label','') + ' · ' + stripHtml(getLoc(item,'html','')))).slice(0,72);
+  if(t==='side_note') return ((getLoc(item,'label','') + ' · ' + (getLoc(item,'title','') || stripHtml(getLoc(item,'html',''))))).slice(0,72);
   if(t==='figure') return (getLoc(item,'title','') || getLoc(item,'caption','') || item.src || 'figure').slice(0,72);
   if(t==='scene') return (getLoc(item,'title','') || getLoc(item,'caption','') || item.singleSrc || 'scene').slice(0,72);
   if(t==='interactive_callout') return ((getLoc(item,'title', contentLang==='en' ? 'Try' : 'Δοκίμασε') + ' · ' + (getLocArray(item,'observeItems')[0] || ''))).slice(0,72);
@@ -523,6 +524,7 @@ function createItemByType(type='paragraph'){
   if(type==='section_heading') return {type:'section_heading', title:''};
   if(type==='paragraph') return {type:'paragraph', html:''};
   if(type==='note') return {type:'note', label:'', html:''};
+  if(type==='side_note') return {type:'side_note', label:'Σχόλιο', title:'', html:'', placement:'right', frameWidth:340};
   if(type==='figure') return {type:'figure', src:'', alt:'', title:'', caption:'', placement:'right', frameWidth:340};
   if(type==='scene') return {type:'scene', title:'', caption:'', placement:'right', frameWidth:340, wrapTight:true, hideCaption:false, singleSrc:''};
   if(type==='interactive_callout') return {type:'interactive_callout', title:'Δοκίμασε', title_en:'Try', setupLabel:'Ρύθμισε', setupLabel_en:'Set', setupChips:[], pressLabel:'Πίεσε', pressLabel_en:'Press', pressChips:[], observeTitle:'Παρατήρησε', observeTitle_en:'Observe', observeItems:[]};
@@ -728,6 +730,7 @@ function renderPageEditor(page, pageIndex){
       <button id="addSecBtn">+ Τίτλος ενότητας</button>
       <button id="addParaBtn">+ Παράγραφος</button>
       <button id="addNoteBtn">+ Σημείωση</button>
+      <button id="addSideNoteBtn">+ Πλαϊνό σχόλιο</button>
       <button id="addFigBtn">+ Εικόνα / σχήμα</button>
       <button id="addSceneBtn">+ Σκηνή</button>
       <button id="addCallBtn">+ Δοκίμασε / Παρατήρησε</button>
@@ -761,6 +764,7 @@ function renderPageEditor(page, pageIndex){
   document.getElementById('addSecBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'section_heading');
   document.getElementById('addParaBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'paragraph');
   document.getElementById('addNoteBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'note');
+  document.getElementById('addSideNoteBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'side_note');
   document.getElementById('addFigBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'figure');
   document.getElementById('addSceneBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'scene');
   document.getElementById('addCallBtn').onclick = ()=> insertItemAt(pageIndex, page.items.length, 'interactive_callout');
@@ -803,6 +807,7 @@ function renderItemEditor(item, pageIndex, itemIndex){
           <option value="section_heading">section_heading · τίτλος ενότητας</option>
           <option value="paragraph">paragraph · παράγραφος</option>
           <option value="note">note · σημείωση</option>
+          <option value="side_note">side_note · πλαϊνό σχόλιο</option>
           <option value="figure">figure · εικόνα / σχήμα</option>
           <option value="scene">scene · σκηνή</option>
           <option value="interactive_callout">interactive_callout · δοκίμασε / παρατήρησε</option>
@@ -815,6 +820,7 @@ function renderItemEditor(item, pageIndex, itemIndex){
     <div class="row">
       <button id="addParaBeforeBtn">+ Παράγραφος πριν</button>
       <button id="addNoteBeforeBtn">+ Σημείωση πριν</button>
+      <button id="addSideNoteBeforeBtn">+ Πλαϊνό σχόλιο πριν</button>
       <button id="addFigureBeforeBtn">+ Εικόνα πριν</button>
       <button id="addSceneBeforeBtn">+ Σκηνή πριν</button>
       <button id="addCalloutBeforeBtn">+ Callout πριν</button>
@@ -824,6 +830,7 @@ function renderItemEditor(item, pageIndex, itemIndex){
     <div class="row">
       <button id="addParaAfterBtn">+ Παράγραφος μετά</button>
       <button id="addNoteAfterBtn">+ Σημείωση μετά</button>
+      <button id="addSideNoteAfterBtn">+ Πλαϊνό σχόλιο μετά</button>
       <button id="addFigureAfterBtn">+ Εικόνα μετά</button>
       <button id="addSceneAfterBtn">+ Σκηνή μετά</button>
       <button id="addCalloutAfterBtn">+ Callout μετά</button>
@@ -857,11 +864,13 @@ function renderItemEditor(item, pageIndex, itemIndex){
 
   document.getElementById('addParaBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'paragraph');
   document.getElementById('addNoteBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'note');
+  document.getElementById('addSideNoteBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'side_note');
   document.getElementById('addFigureBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'figure');
   document.getElementById('addSceneBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'scene');
   document.getElementById('addCalloutBeforeBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex, 'interactive_callout');
   document.getElementById('addParaAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'paragraph');
   document.getElementById('addNoteAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'note');
+  document.getElementById('addSideNoteAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'side_note');
   document.getElementById('addFigureAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'figure');
   document.getElementById('addSceneAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'scene');
   document.getElementById('addCalloutAfterBtn').onclick = ()=> insertItemAt(pageIndex, itemIndex + 1, 'interactive_callout');
@@ -929,6 +938,31 @@ function renderTypeFields(item){
       <label><span>html</span><textarea id="nHtml" class="big"></textarea></label>`;
     bindTextInput(document.getElementById('nLabel'), item, 'label');
     bindTextarea(document.getElementById('nHtml'), item, 'html');
+    return;
+  }
+  if(item.type === 'side_note'){
+    box.innerHTML = `
+      <div class="grid">
+        <label><span>label</span><input type="text" id="snLabel"></label>
+        <label><span>title</span><input type="text" id="snTitle"></label>
+        <label><span>Τοποθέτηση</span>
+          <select id="snPlacement">
+            <option value="right">right</option>
+            <option value="left">left</option>
+            <option value="wide">wide</option>
+          </select>
+        </label>
+        <label><span>Πλάτος πλαισίου (px)</span><input type="number" id="snWidth"></label>
+      </div>
+      <label><span>html</span><textarea id="snHtml" class="big"></textarea></label>
+      <div class="editor-help">Το πλαϊνό σχόλιο συμπεριφέρεται όπως μια εικόνα: float δεξιά/αριστερά ή wide, πλάτος συνήθως 340px και ύψος αυτόματο από το περιεχόμενο.</div>`;
+    bindTextInput(document.getElementById('snLabel'), item, 'label');
+    bindTextInput(document.getElementById('snTitle'), item, 'title');
+    bindTextarea(document.getElementById('snHtml'), item, 'html');
+    bindNumberInput(document.getElementById('snWidth'), item, 'frameWidth');
+    const pl = document.getElementById('snPlacement');
+    pl.value = item.placement || 'right';
+    pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
     return;
   }
   if(item.type === 'figure'){

@@ -194,6 +194,19 @@ h1{margin:0 0 10px;font-family:var(--hero-title-font-family);font-size:var(--her
   font:500 var(--note-font-size)/var(--note-line-height) system-ui,-apple-system,Segoe UI,Arial,sans-serif;
 }
 .note .label{display:block;margin:0 0 5px;font:800 var(--note-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+.side-note{
+  margin:4px 0 12px; padding:10px 12px; border-radius:16px;
+  background:#f7fafc; border:1px solid #d6e2eb; color:#29414f;
+  font:500 var(--note-font-size)/var(--note-line-height) system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+}
+.side-note.float-right,.side-note.float-left{width:min(var(--figure-width, var(--shape-width)), 42%)}
+.side-note.float-right{float:right;margin:4px 0 10px 18px}
+.side-note.float-left{float:left;margin:4px 18px 10px 0}
+.side-note.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
+.side-note .label{display:block;margin:0 0 6px;font:800 var(--note-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2f698f}
+.side-note .title{display:block;margin:0 0 6px;font:800 13px/1.25 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1f5f8b}
+.side-note p{margin:0 0 6px}
+.side-note p:last-child{margin-bottom:0}
 
 figure.media{
   margin:4px 0 12px; background:var(--figure); border:1px solid var(--line); border-radius:16px; overflow:hidden;
@@ -285,7 +298,7 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
     height:var(--footer-h) !important;
     font-size:var(--footer-font-size) !important;
   }
-  figure.media,.note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
+  figure.media,.note,.side-note,.callout,.hero,.part-head,.section-heading{break-inside:avoid; page-break-inside:avoid}
   .media-frame.print-ready iframe{display:none !important}
   .media-frame img{object-fit:contain !important; background:#fff !important}
   .media-frame.scene-frame::after{
@@ -692,6 +705,15 @@ function renderNote(item){
   d.innerHTML=`${getLoc(item,'label','')?`<span class="label">${getLoc(item,'label','')}</span>`:''}${getLoc(item,'html','')||''}`;
   return d;
 }
+function renderSideNote(item){
+  const d=document.createElement('aside');
+  d.className=`side-note ${placementClass(item)}`;
+  if(item.frameWidth) d.style.setProperty('--figure-width', `${item.frameWidth}px`);
+  const label=getLoc(item,'label','');
+  const title=getLoc(item,'title','');
+  d.innerHTML=`${label?`<span class="label">${label}</span>`:''}${title?`<span class="title">${title}</span>`:''}${getLoc(item,'html','')||''}`;
+  return d;
+}
 function renderFigure(item){
   const fig=document.createElement('figure');
   fig.className=`media ${placementClass(item)}`;
@@ -759,6 +781,7 @@ function renderItem(item){
     case 'section_heading': return renderSectionHeading(item);
     case 'paragraph': return renderParagraph(item);
     case 'note': return renderNote(item);
+    case 'side_note': return renderSideNote(item);
     case 'figure': return renderFigure(item);
     case 'scene': return renderScene(item);
     case 'interactive_callout': return renderCallout(item);
