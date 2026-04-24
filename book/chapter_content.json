@@ -1123,5 +1123,92 @@
         }
       ]
     }
-  ]
+  ],
+  "nav": {
+    "mode": "manual",
+    "showApp": true,
+    "showPrint": false,
+    "groups": [
+      {
+        "title": "Εισαγωγή",
+        "target": "page-1",
+        "entries": [
+          {
+            "title": "Πώς διαβάζεται αυτό το Βιβλίο;",
+            "target": "page-1"
+          },
+          {
+            "title": "Τι θέλουμε να εξηγήσουμε",
+            "target": "page-1"
+          },
+          {
+            "title": "Συμβάσεις",
+            "target": "page-1"
+          }
+        ]
+      },
+      {
+        "title": "Σχολικά",
+        "target": "page-2",
+        "entries": [
+          {
+            "title": "Να θυμηθούμε!",
+            "target": "page-2"
+          },
+          {
+            "title": "Η αρχική απλοποίηση",
+            "target": "page-2"
+          },
+          {
+            "title": "Η σχολική εικόνα του πεδίου",
+            "target": "page-5"
+          },
+          {
+            "title": "Σκηνή 0→T/4",
+            "target": "page-5"
+          },
+          {
+            "title": "Σκηνή T/4→T/2",
+            "target": "page-6"
+          },
+          {
+            "title": "Σκηνή T/2→3T/4",
+            "target": "page-7"
+          },
+          {
+            "title": "Σκηνή 3T/4→T",
+            "target": "page-8"
+          }
+        ]
+      },
+      {
+        "title": "Επεκτάσεις",
+        "target": "page-9",
+        "entries": [
+          {
+            "title": "Η σχολική εικόνα με απόσβεση",
+            "target": "page-9"
+          },
+          {
+            "title": "Το πραγματικό ΗΜ κύμα",
+            "target": "page-10"
+          }
+        ]
+      },
+      {
+        "title": "Παραρτήματα",
+        "target": "page-11",
+        "entries": [
+          {
+            "title": "Το πραγματικό ΗΜ κύμα",
+            "target": "page-11"
+          },
+          {
+            "title": "Τι να κρατήσει ο αναγνώστης",
+            "target": "page-11"
+          }
+        ]
+      }
+    ]
+  }
 }
