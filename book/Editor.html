@@ -1631,7 +1631,7 @@ function renderNavPreviewPanel(){
   const card = document.createElement('div');
   card.className = 'preview-card';
   const modeLabel = nav.mode === 'manual' ? 'χειροκίνητο' : 'αυτόματο';
-  card.innerHTML = `<div class="preview-title">Προεπισκόπηση μενού · ${esc(modeLabel)}</div>`;
+  card.innerHTML = `<div class="preview-title">Προεπισκόπηση μενού · ${esc(modeLabel)}</div><div class="hint">Οι κύριες επιλογές ανοίγουν μόνο το υπομενού. Η μετάβαση γίνεται από τις επιμέρους επιλογές.</div>`;
   const body = document.createElement('div');
   body.className = 'preview-main';
 
@@ -1646,7 +1646,7 @@ function renderNavPreviewPanel(){
       const title = getLoc(group,'title', group.title || group.target || 'Ομάδα');
       const target = group.target || group.id || '';
       const entries = (group.entries || []).filter(e => !e.hidden);
-      g.innerHTML = `<div class="nav-preview-trigger">${esc(title)} <span style="color:#94a3b8">▾</span></div>`;
+      g.innerHTML = `<div class="nav-preview-trigger" title="Ανοίγει υπομενού · δεν μεταβαίνει σε ενότητα">${esc(title)} <span style="color:#94a3b8">▾</span></div>`;
       const list = document.createElement('div');
       list.className = 'nav-preview-entries';
       if(entries.length){

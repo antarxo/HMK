@@ -106,7 +106,7 @@ body{
   position:absolute;left:0;top:calc(100% + 2px);min-width:100%;width:max-content;display:none;
   padding:10px;background:#fffdf9;border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,.12);z-index:35
 }
-.menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown{display:block}
+.menu-item:hover>.menu-dropdown,.menu-item:focus-within>.menu-dropdown,.menu-item.open>.menu-dropdown{display:block}
 .menu-dropdown .menu-section-link{
   display:block;text-decoration:none;color:var(--ink);background:#faf8f3;border:1px solid rgba(0,0,0,.06);
   border-radius:12px;padding:10px 12px;font:650 13px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:0 0 8px
@@ -929,6 +929,42 @@ function appendNavTools(data){
   }
 }
 
+
+function closeAllNavMenus(except=null){
+  megaNav.querySelectorAll('.menu-item.open').forEach(item=>{
+    if(except && item === except) return;
+    item.classList.remove('open');
+    const btn = item.querySelector('.menu-trigger');
+    if(btn) btn.setAttribute('aria-expanded','false');
+  });
+}
+function wireNavMenuInteractions(){
+  megaNav.querySelectorAll('.menu-trigger').forEach(btn=>{
+    btn.addEventListener('click', ev=>{
+      ev.preventDefault();
+      ev.stopPropagation();
+      const item = btn.closest('.menu-item');
+      if(!item) return;
+      const willOpen = !item.classList.contains('open');
+      closeAllNavMenus(item);
+      item.classList.toggle('open', willOpen);
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    });
+  });
+  megaNav.querySelectorAll('.menu-dropdown a').forEach(link=>{
+    link.addEventListener('click', ()=>closeAllNavMenus());
+  });
+}
+if(!window.__bookNavCloseHandlersInstalled){
+  window.__bookNavCloseHandlersInstalled = true;
+  document.addEventListener('click', ev=>{
+    if(!megaNav.contains(ev.target)) closeAllNavMenus();
+  });
+  document.addEventListener('keydown', ev=>{
+    if(ev.key === 'Escape') closeAllNavMenus();
+  });
+}
+
 function renderNavGroups(groups, pageToGroup, data){
   megaNav.innerHTML = '';
   groups.forEach(group => {
@@ -938,10 +974,11 @@ function renderNavGroups(groups, pageToGroup, data){
     node.dataset.groupKey = group.key;
     const entries = (group.entries || []).filter(entry => !entry.hidden);
     const links = entries.map(entry => `<a class="menu-section-link" href="#${esc(entry.id)}">${esc(entry.text)}</a>`).join('');
-    node.innerHTML = `<a class="menu-trigger" href="#${esc(group.id)}">${esc(group.title)}<span class="caret">▾</span></a><div class="menu-dropdown">${links}</div>`;
+    node.innerHTML = `<button class="menu-trigger" type="button" aria-expanded="false">${esc(group.title)}<span class="caret">▾</span></button><div class="menu-dropdown">${links}</div>`;
     megaNav.appendChild(node);
   });
   appendNavTools(data);
+  wireNavMenuInteractions();
   megaNav.dataset.pageGroupMap = JSON.stringify(Object.fromEntries(pageToGroup));
 }
 
