@@ -237,7 +237,8 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
 .callout-observe ul{margin:6px 0 0 18px;padding:0}
 .callout-observe li{margin:4px 0;font-style:italic}
 .clear{clear:both}
-.nav-anchor{display:block;position:relative;height:0;overflow:hidden;clear:both}
+.nav-anchor{display:block;position:relative;height:0;overflow:hidden;scroll-margin-top:120px}
+.sheet-wrap[id],.sheet-body [id],.nav-anchor[id]{scroll-margin-top:120px}
 .status{max-width:var(--sheet-width);margin:16px auto 0;color:var(--muted);font:500 14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
 
 .math-inline math{font-size:1em}
@@ -705,14 +706,25 @@ function itemAnchorId(page, pageIndex, item, itemIndex){
 function attachItemAnchor(el, item, ctx){
   if(!el || !ctx || !isStructuralNavItem(item)) return el;
   const id = itemAnchorId(ctx.page, ctx.pageIndex, item, ctx.itemIndex);
-  if(id) el.id = id;
+  if(id) el.dataset.navTargetId = id;
   if(item?.showInNav === false) el.dataset.navHidden = '1';
   return el;
 }
 function renderNavAnchor(item){
   const s=document.createElement('span');
+  s.className='nav-anchor nav-anchor-inline';
+  s.setAttribute('aria-hidden', 'true');
+  return s;
+}
+function renderItemAnchor(item, ctx){
+  if(!ctx || !isStructuralNavItem(item)) return null;
+  const id = itemAnchorId(ctx.page, ctx.pageIndex, item, ctx.itemIndex);
+  if(!id) return null;
+  const s=document.createElement('span');
   s.className='nav-anchor';
-  s.setAttribute('aria-hidden','true');
+  s.id=id;
+  s.dataset.anchorFor=item.type || 'item';
+  s.setAttribute('aria-hidden', 'true');
   return s;
 }
 function collectNavTargets(data){
@@ -891,7 +903,12 @@ function renderPages(data){
     inner.appendChild(buildHeader(page, idx+1, total));
     const body=document.createElement('div');
     body.className='sheet-body';
-    (page.items || []).forEach((item, itemIndex) => body.appendChild(renderItem(item, {page, pageIndex:idx, itemIndex})));
+    (page.items || []).forEach((item, itemIndex) => {
+      const ctx = {page, pageIndex:idx, itemIndex};
+      const anchor = renderItemAnchor(item, ctx);
+      if(anchor) body.appendChild(anchor);
+      body.appendChild(renderItem(item, ctx));
+    });
     inner.appendChild(body);
     inner.appendChild(buildFooter(page, idx+1, total, data.layoutDefaults?.showPageNumbers));
     sheet.appendChild(inner);
@@ -952,7 +969,42 @@ function wireNavMenuInteractions(){
     });
   });
   megaNav.querySelectorAll('.menu-dropdown a').forEach(link=>{
-    link.addEventListener('click', ()=>closeAllNavMenus());
+    link.addEventListener('click', ev=>{
+      ev.preventDefault();
+      closeAllNavMenus();
+      const id = decodeURIComponent((link.getAttribute('href') || '').replace(/^#/, ''));
+      scrollToNavTarget(id, { updateHash:true });
+    });
+  });
+}
+function navScrollOffset(){
+  const topbar = document.querySelector('.topbar');
+  return Math.ceil((topbar?.getBoundingClientRect?.().height || 0) + 16);
+}
+function scrollToNavTarget(id, opts={}){
+  if(!id) return;
+  const el = document.getElementById(id);
+  if(!el) return;
+  const offset = navScrollOffset();
+  const doScroll = (behavior='smooth') => {
+    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset);
+    window.scrollTo({ top, behavior });
+  };
+  doScroll(opts.instant ? 'auto' : 'smooth');
+  if(opts.updateHash){
+    try{ history.pushState(null, '', `#${encodeURIComponent(id)}`); }catch(_e){}
+  }
+  [80, 220, 520, 900].forEach(ms => setTimeout(() => doScroll('auto'), ms));
+}
+if(!window.__bookStructuralHashScrollInstalled){
+  window.__bookStructuralHashScrollInstalled = true;
+  window.addEventListener('load', () => {
+    const id = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+    if(id) setTimeout(() => scrollToNavTarget(id, { instant:true }), 60);
+  });
+  window.addEventListener('hashchange', () => {
+    const id = decodeURIComponent((location.hash || '').replace(/^#/, ''));
+    if(id) scrollToNavTarget(id, { instant:true });
   });
 }
 if(!window.__bookNavCloseHandlersInstalled){
@@ -1121,7 +1173,7 @@ function deriveNav(data){
   renderNavGroups(groups, pageToGroup, data);
 }
 function updateActiveNav(){
-  const targetEls=Array.from(document.querySelectorAll('.sheet-wrap[id], .sheet-body [id]'));
+  const targetEls=Array.from(document.querySelectorAll('.sheet-wrap[id], .sheet-body .nav-anchor[id]'));
   const y=window.scrollY + 140;
   let activeId='';
   for(const el of targetEls){
