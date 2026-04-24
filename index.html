@@ -3869,8 +3869,7 @@ async function rasterizeViewportSnapshot(sourceRoot){
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.clearRect(0, 0, width, height);
-  const fallbackBg = getComputedStyle(document.body).backgroundColor || getComputedStyle(document.documentElement).backgroundColor || '#ffffff';
-  ctx.fillStyle = fallbackBg;
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
 
   const sourceStyle = getComputedStyle(sourceRoot);
@@ -3899,73 +3898,18 @@ async function rasterizeViewportSnapshot(sourceRoot){
 
   return out.toDataURL('image/png');
 }
-function beginPrintSnapshotLayout(){
-  if(!(activeFocus === 'book_multiscene' || activeBookSceneState)) return null;
-  const cfg = getFocusPresetConfig('book_multiscene') || FOCUS_PRESETS.book_multiscene;
-  if(!cfg) return null;
-  const snapshot = {
-    controls: cfg.controls,
-    controlsMode: activeBookSceneState?.controlsMode || null,
-    allowedControls: activeBookSceneState?.allowedControls ? [...activeBookSceneState.allowedControls] : null,
-    controlsHeight: cfg.bookMeta?.controlsHeight,
-    focusHidden: ui.focusMiniControls ? ui.focusMiniControls.hidden : null,
-    focusMinHeight: ui.focusMiniControls ? ui.focusMiniControls.style.minHeight : null,
-    focusDisplay: ui.focusMiniControls ? ui.focusMiniControls.style.display : null
-  };
-  cfg.controls = 'none';
-  if(cfg.bookMeta) cfg.bookMeta.controlsHeight = 0;
-  if(activeBookSceneState){
-    activeBookSceneState.controlsMode = 'none';
-    activeBookSceneState.allowedControls = [];
-  }
-  if(ui.focusMiniControls){
-    ui.focusMiniControls.hidden = true;
-    ui.focusMiniControls.style.minHeight = '0px';
-    ui.focusMiniControls.style.display = 'none';
-  }
-  relayoutGraphContainers(cfg);
-  scheduleRendererResize();
-  return snapshot;
-}
-function endPrintSnapshotLayout(snapshot){
-  if(!snapshot) return;
-  const cfg = getFocusPresetConfig('book_multiscene') || FOCUS_PRESETS.book_multiscene;
-  if(cfg){
-    cfg.controls = snapshot.controls || 'minimal';
-    if(cfg.bookMeta && snapshot.controlsHeight != null) cfg.bookMeta.controlsHeight = snapshot.controlsHeight;
-  }
-  if(activeBookSceneState){
-    activeBookSceneState.controlsMode = snapshot.controlsMode || activeBookSceneState.controlsMode;
-    activeBookSceneState.allowedControls = snapshot.allowedControls ? [...snapshot.allowedControls] : activeBookSceneState.allowedControls;
-  }
-  if(ui.focusMiniControls){
-    ui.focusMiniControls.hidden = !!snapshot.focusHidden;
-    ui.focusMiniControls.style.minHeight = snapshot.focusMinHeight || '';
-    ui.focusMiniControls.style.display = snapshot.focusDisplay || '';
-  }
-  if(cfg){
-    relayoutGraphContainers(cfg);
-    scheduleRendererResize();
-  }
-}
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
-  let layoutSnapshot = null;
-  try{
-    await stabilizeBookPrintScene();
-    layoutSnapshot = beginPrintSnapshotLayout();
-    graphState.dynamicDirty = true;
-    graphState.staticDirty = true;
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    applyUI();
-    drawGraphs(true);
-    try{ renderer.render(scene, camera); }catch(_e){}
-    await new Promise(resolve => setTimeout(resolve, 60));
-    return await rasterizeViewportSnapshot(sourceRoot);
-  } finally {
-    endPrintSnapshotLayout(layoutSnapshot);
-  }
+  await stabilizeBookPrintScene();
+  graphState.dynamicDirty = true;
+  graphState.staticDirty = true;
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  applyUI();
+  drawGraphs(true);
+  try{ renderer.render(scene, camera); }catch(_e){}
+  await new Promise(resolve => setTimeout(resolve, 60));
+  return await rasterizeViewportSnapshot(sourceRoot);
 }
 window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {

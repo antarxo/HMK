@@ -478,7 +478,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene 0→T/4",
           "caption_en": "Scene 0→T/4"
@@ -582,7 +582,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene T/4→T/2",
           "caption_en": "Scene T/4→T/2"
@@ -691,7 +691,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene T/2→3T/4",
           "caption_en": "Scene T/2→3T/4"
@@ -795,7 +795,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene 3T/4→T",
           "caption_en": "Scene 3T/4→T"
@@ -1120,196 +1120,6 @@
           "title": "Παραρτήματα",
           "label_en": "PART D",
           "title_en": "Appendices"
-        }
-      ]
-    },
-    {
-      "id": "page-12",
-      "sourcePdfPage": 12,
-      "header": {
-        "left": "ΠΑΡΑΡΤΗΜΑ",
-        "center": "",
-        "right": "Παράρτημα Εμβάθυνσης",
-        "left_en": "APPENDIX",
-        "center_en": "",
-        "right_en": "Deepening Appendix"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "section_heading",
-          "title": "Το πεδίο ως φυσική κατάσταση του χώρου"
-        },
-        {
-          "type": "paragraph",
-          "html": "Στη σχολική φυσική, όταν πρωτοεμφανίζεται η έννοια του πεδίου, συνήθως παρουσιάζεται βιαστικά. Λέμε ότι γύρω από μια μάζα υπάρχει βαρυτικό πεδίο ή ότι γύρω από ένα ηλεκτρικό φορτίο υπάρχει ηλεκτρικό πεδίο, σχεδιάζουμε μερικές γραμμές και σχεδόν αμέσως περνάμε σε τύπους και ασκήσεις. Έτσι όμως μένει εύκολα η εντύπωση ότι το πεδίο είναι ένα αόρατο σκηνικό ή μια βολική λέξη, χωρίς να εξηγείται τι ακριβώς σημαίνει."
-        },
-        {
-          "type": "paragraph",
-          "html": "Για να πλησιάσουμε τη ρίζα της ιδέας, χρειάζεται να θυμηθούμε ότι ιστορικά προηγήθηκε μια άλλη εικόνα: η θεωρία της δράσης από απόσταση. Σύμφωνα με αυτήν, ένα σώμα ή ένα φορτίο μπορούσε να επιδρά πάνω σε άλλο σώμα αλλού, χωρίς να αποδίδεται ιδιαίτερος φυσικός ρόλος στον ενδιάμεσο χώρο. Ο χώρος έμενε ουσιαστικά ένα κενό φόντο. Η αλληλεπίδραση νοούνταν σαν άμεσο «πιάσιμο» από μακριά."
-        },
-        {
-          "type": "paragraph",
-          "html": "Η εικόνα αυτή, όσο βολική κι αν φαινόταν, άφηνε πίσω της μια βαθιά δυσκολία. Αν η πηγή επηρεάζει κάτι μακριά της, τότε τι ακριβώς μεσολαβεί; Πώς \"μαθαίνει\" το μακρινό σώμα ότι υπάρχει η πηγή; Για πολύ καιρό η φυσική μπορούσε να ζει με αυτό το ερώτημα, όσο αρκούσε η επιτυχία των υπολογισμών. Όμως το εννοιολογικό κενό παρέμενε."
-        },
-        {
-          "type": "paragraph",
-          "html": "Εδώ εμφανίζεται η μεγάλη σύλληψη του Faraday. Η ηλεκτρική και η μαγνητική επίδραση, πρότεινε, δεν πρέπει να νοούνται ως άμεση δράση μιας πηγής πάνω σε άλλη από απόσταση, αλλά ως αλλαγή που υφίσταται ο ίδιος ο χώρος γύρω από την πηγή. Ο χώρος παύει να είναι παθητικό φόντο. Γίνεται φορέας φυσικής κατάστασης. Αυτήν ακριβώς την κατάσταση ονομάζουμε πεδίο."
-        }
-      ]
-    },
-    {
-      "id": "page-13",
-      "sourcePdfPage": 13,
-      "header": {
-        "left": "ΠΑΡΑΡΤΗΜΑ",
-        "center": "",
-        "right": "Παράρτημα Εμβάθυνσης",
-        "left_en": "APPENDIX",
-        "center_en": "",
-        "right_en": "Deepening Appendix"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "paragraph",
-          "html": "Με αυτή τη μετατόπιση αλλάζει όλο το νόημα της αλληλεπίδρασης. Δεν λέμε πια απλώς ότι ένα φορτίο εδώ σπρώχνει ή τραβά ένα άλλο εκεί. Λέμε ότι το φορτίο εγκαθιστά γύρω του μια συγκεκριμένη κατάσταση του χώρου και ότι ένα άλλο φορτίο, όταν βρεθεί μέσα σε αυτή την περιοχή, αλληλεπιδρά με αυτή την κατάσταση. Η αλληλεπίδραση δεν είναι πια «σώμα με σώμα» με μαγικό τρόπο. Είναι «σώμα με πεδίο»."
-        },
-        {
-          "type": "paragraph",
-          "html": "Η ιδέα αυτή γίνεται ακόμη ισχυρότερη όταν αργότερα, με τη σχετικότητα, το ακαριαίο παύει να μπορεί να θεωρείται γενικό φυσικό μοντέλο. Αν η φυσική πληροφορία και η επίδραση δεν μπορούν να διαδίδονται αυθαίρετα γρηγορότερα από μια πεπερασμένη ταχύτητα, τότε η αφελής εικόνα του ακαριαίου «βελακίου» που πετά από σώμα σε σώμα καταρρέει. Από τη στιγμή που κόβεται το ακαριαίο, ο χώρος δεν μπορεί πια να μένει άδειο σκηνικό. Πρέπει να του δοθεί φυσικός ρόλος. Αυτόν τον ρόλο ακριβώς εκφράζει η έννοια του πεδίου."
-        },
-        {
-          "type": "paragraph",
-          "html": "Γι’ αυτό το πεδίο δεν είναι απλώς μαθηματικό τέχνασμα. Είναι ο τρόπος με τον οποίο η φυσική λέει ότι μια πηγή αλλάζει τον χώρο γύρω της. Ο χώρος μπορεί να είναι κενός από ύλη και παρ’ όλα αυτά να μην είναι φυσικά αδιάφορος. Μπορεί να είναι χώρος μέσα στον οποίο υπάρχει ηλεκτρικό, μαγνητικό ή βαρυτικό πεδίο. Αυτό σημαίνει ότι σε κάθε σημείο του χώρου έχει ανατεθεί κάποια δυνατότητα αλληλεπίδρασης."
-        }
-      ]
-    },
-    {
-      "id": "page-14",
-      "sourcePdfPage": 14,
-      "header": {
-        "left": "ΠΑΡΑΡΤΗΜΑ",
-        "center": "",
-        "right": "Παράρτημα Εμβάθυνσης",
-        "left_en": "APPENDIX",
-        "center_en": "",
-        "right_en": "Deepening Appendix"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "paragraph",
-          "html": "Εδώ είναι χρήσιμη μια διδακτική εικόνα: το πεδίο μοιράζει «προίκα» σε κάθε σημείο του χώρου. Η εικόνα αυτή δεν είναι κυριολεξία, αλλά βοηθά πολύ. Μας λέει ότι κάθε σημείο του χώρου, όταν βρεθεί μέσα σε πεδίο, δεν είναι πια το ίδιο όπως πριν. Έχει προικιστεί με μια τοπική ιδιότητα."
-        },
-        {
-          "type": "scene",
-          "id": "appendix_static_field_plus_appear",
-          "title": "Σκηνή Π1",
-          "caption": "Σκηνή Π1 — Εγκατάσταση του ηλεκτροστατικού πεδίου από θετικό σημειακό φορτίο",
-          "placement": "right",
-          "frameWidth": 340,
-          "wrapTight": true,
-          "hideCaption": false,
-          "status": "scene",
-          "singleSrc": "../static/index.html?source=plus&mode=appear&controls=book&embedded=1&lang=el&autoplay=0&speed=0.0080&note=0&top=0",
-          "sceneAspect": "340/460",
-          "title_en": "Scene A1",
-          "caption_en": "Scene A1 — Establishment of the electrostatic field by a positive point charge"
-        },
-        {
-          "type": "paragraph",
-          "html": "Η σκηνή Π1 δείχνει ακριβώς αυτή τη διδακτική ιδέα: η πηγή δεν «ενημερώνει» ακαριαία όλον τον χώρο. Η περιοχή που έχει αποκτήσει την κατάσταση του πεδίου απλώνεται προοδευτικά από το φορτίο προς τα έξω."
-        },
-        {
-          "type": "paragraph",
-          "html": "Στο ηλεκτρικό πεδίο, για παράδειγμα, ένα σημείο του χώρου έχει πάρει την εξής παραγγελία: αν βρεθεί πάνω σου θετικό δοκιμαστικό φορτίο, να του ασκείς συγκεκριμένη δύναμη ανά μονάδα φορτίου και προς συγκεκριμένη κατεύθυνση. Αυτό ακριβώς αποτυπώνει η ένταση του πεδίου. Η ένταση δεν είναι λοιπόν απλώς ένας τύπος· είναι η ποσοτική μορφή της τοπικής οδηγίας δράσης που έχει πάρει το σημείο."
-        }
-      ]
-    },
-    {
-      "id": "page-15",
-      "sourcePdfPage": 15,
-      "header": {
-        "left": "ΠΑΡΑΡΤΗΜΑ",
-        "center": "",
-        "right": "Παράρτημα Εμβάθυνσης",
-        "left_en": "APPENDIX",
-        "center_en": "",
-        "right_en": "Deepening Appendix"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "paragraph",
-          "html": "Το ίδιο σημείο μπορεί να ιδωθεί και ενεργειακά. Μπορούμε να πούμε ότι έχει πάρει άλλη μια, συμπληρωματική, παραγγελία: αν βρεθεί εδώ φορτίο, να του αντιστοιχεί συγκεκριμένη δυναμική ενέργεια ανά μονάδα φορτίου. Αυτό εκφράζει το δυναμικό. Δεν είναι άλλο πεδίο· είναι ένας άλλος τρόπος να περιγράψουμε την ίδια αλλαγή του χώρου. Η ένταση μάς λέει πώς θα σπρώξει το σημείο ένα φορτίο. Το δυναμικό μάς λέει σε ποια ενεργειακή στάθμη βρίσκεται το φορτίο εκεί."
-        },
-        {
-          "type": "paragraph",
-          "html": "Έτσι καταλαβαίνουμε γιατί η φυσική χρειάστηκε περισσότερα από ένα εργαλεία περιγραφής. Η μία γλώσσα είναι πιο τοπική και διανυσματική: τι δύναμη θα ασκηθεί εδώ και προς ποια κατεύθυνση; Η άλλη είναι πιο ενεργειακή και βαθμωτή: πόση δυναμική ενέργεια ανά μονάδα φορτίου αντιστοιχεί εδώ; Δεν είναι δύο ανταγωνιστικές εικόνες. Είναι δύο συμπληρωματικές αναγνώσεις της ίδιας φυσικής κατάστασης του χώρου."
-        },
-        {
-          "type": "paragraph",
-          "html": "Αν έπρεπε να κρατήσουμε μόνο μία φράση από όλη αυτή την ενότητα, θα μπορούσε να είναι η εξής: το πεδίο είναι η φυσική κατάσταση που αποκτά ο χώρος λόγω της παρουσίας μιας πηγής. Από τη στιγμή που το δεχόμαστε αυτό, ο χώρος παύει να είναι αδιάφορο κενό. Αλλάζει, οργανώνεται, αποκτά τοπικές ιδιότητες. Και τότε ανοίγει ο δρόμος για όλα τα επόμενα: για το τι σημαίνει στατικό πεδίο, για το πώς εγκαθίσταται, για το γιατί οι μεταβολές του δεν μπορούν να διαδίδονται ακαριαία, και τελικά για το πώς από μια μεταβολή πεδίου μπορεί να προκύψει ηλεκτρομαγνητικό κύμα."
-        }
-      ]
-    },
-    {
-      "id": "page-16",
-      "sourcePdfPage": 16,
-      "header": {
-        "left": "ΠΑΡΑΡΤΗΜΑ",
-        "center": "",
-        "right": "Πρόταση για σχήμα",
-        "left_en": "APPENDIX",
-        "center_en": "",
-        "right_en": "Deepening Appendix"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "section_heading",
-          "title": "Πρόταση για σχήμα"
-        },
-        {
-          "type": "note",
-          "label": "Πρόταση για σχήμα",
-          "html": "<ul><li>Στο κέντρο ένα θετικό σημειακό φορτίο Q.</li><li>Γύρω του ο χώρος να αποδίδεται ως περιοχή που έχει αποκτήσει ιδιότητες και όχι μόνο ως κενό φόντο.</li><li>Ακτινικές γραμμές ή βέλη να δείχνουν ότι κάθε σημείο έχει πάρει τοπική «παραγγελία».</li><li>Σε 2-3 σημεία του χώρου να μπαίνουν μικρά σχόλια, π.χ. «εδώ το σημείο θα ασκήσει τόση δύναμη ανά 1 C» ή «εδώ αντιστοιχεί άλλη ενεργειακή στάθμη».</li><li>Σκοπός του σχήματος: να φανεί ότι το πεδίο δεν είναι απλώς γραμμές, αλλά η αλλαγή που έχει υποστεί ο ίδιος ο χώρος.</li></ul>"
         }
       ]
     }

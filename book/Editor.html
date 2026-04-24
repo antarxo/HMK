@@ -34,6 +34,21 @@
     .nav-editor-group.hidden{opacity:.55}
     .nav-editor-entry{border:1px solid #1f2937;border-radius:10px;background:#020617;padding:8px;margin:7px 0}
     .nav-mini-title{font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#bae6fd;margin-bottom:7px}
+
+    .nav-preview-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+    @media (max-width:700px){.nav-preview-menu{grid-template-columns:1fr}}
+    .nav-preview-group{border:1px solid #1f2937;border-radius:12px;background:#07101d;padding:8px}
+    .nav-preview-trigger{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border:1px solid #334155;border-radius:999px;background:#020617;color:#e5e7eb;font:800 12px/1.15 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-align:center}
+    .nav-preview-entries{display:grid;gap:5px;margin-top:7px}
+    .nav-preview-entry{display:block;padding:7px 8px;border:1px solid #1f2937;border-radius:9px;background:#0b1220;color:#cbd5e1;font:650 11px/1.25 system-ui,-apple-system,Segoe UI,Arial,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .nav-preview-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed #1f2937}
+    .nav-preview-tool{padding:6px 9px;border-radius:999px;border:1px solid #334155;background:#020617;color:#bae6fd;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .nav-candidates{margin-top:12px;padding:10px;border:1px solid #203047;border-radius:12px;background:#041020}
+    .nav-candidates-title{font:900 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.05em;color:#bae6fd;margin-bottom:8px}
+    .nav-candidate-group{border:1px solid #1f2937;border-radius:10px;background:#020617;padding:8px;margin:7px 0}
+    .nav-candidate-head{display:flex;gap:8px;justify-content:space-between;align-items:center;font:800 12px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#e5e7eb}
+    .nav-candidate-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;margin-top:6px;padding-top:6px;border-top:1px dashed #1f2937;color:#cbd5e1;font-size:11px}
+    .nav-candidate-entry .target{display:block;color:#64748b;font-size:10px;margin-top:2px}
     .target-select{width:100%;min-width:0}
     .tree-sticky-nav{margin:0 auto 10px;padding:10px 10px 12px;border:1px solid #31506d;border-radius:14px;background:linear-gradient(180deg,rgba(8,18,32,.98),rgba(2,6,23,.98));box-shadow:0 12px 22px rgba(0,0,0,.24);max-width:100%}
     .tree-sticky-nav .nav-title{display:block;margin:0 0 8px;font:900 12px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:none;color:#bae6fd;text-align:center}
@@ -1198,6 +1213,7 @@ function renderNavEditor(){
       <button id="navClearGroupsBtn" class="danger">Καθάρισμα χειροκίνητων ομάδων</button>
     </div>
     <div class="editor-help">Στο αυτόματο mode το βιβλίο παράγει μόνο του το μενού. Στο χειροκίνητο mode χρησιμοποιεί ακριβώς τις ομάδες και τις επιλογές που ορίζεις εδώ. Το target είναι το id σελίδας.</div>
+    <div id="navCandidatesHost"></div>
     <div id="navGroupsHost"></div>
   `;
   const modeSel = document.getElementById('navMode');
@@ -1228,6 +1244,8 @@ function renderNavEditor(){
       renderAll();
     }
   };
+
+  renderNavCandidateList(document.getElementById('navCandidatesHost'));
 
   const host = document.getElementById('navGroupsHost');
   if(!nav.groups.length){
@@ -1503,12 +1521,170 @@ function renderPreview(){
     body.appendChild(renderStandaloneItem(currentItem()));
     itemCard.appendChild(body);
     preview.appendChild(itemCard);
+  } else if(selection?.kind === 'nav'){
+    renderNavPreviewPanel();
   } else if(selection?.kind === 'meta'){
     const c = document.createElement('div');
     c.className = 'preview-card';
     c.innerHTML = `<div class="preview-title">Meta</div><div class="preview-main"><strong>${esc(getLoc(data.meta,'title',''))}</strong><div>${esc(getLoc(data.meta,'subtitle',''))}</div><div class="meta-line">${esc(JSON.stringify(data.layoutDefaults,null,2))}</div></div>`;
     preview.appendChild(c);
   }
+}
+
+
+function getEffectiveNavForPreview(){
+  const nav = ensureNav();
+  if(nav.mode === 'manual' && Array.isArray(nav.groups) && nav.groups.length){
+    return nav;
+  }
+  return generateAutoNavModel();
+}
+function renderNavPreviewPanel(){
+  const nav = getEffectiveNavForPreview();
+  const visibleGroups = (nav.groups || []).filter(g => !g.hidden);
+  const card = document.createElement('div');
+  card.className = 'preview-card';
+  const modeLabel = nav.mode === 'manual' ? 'χειροκίνητο' : 'αυτόματο';
+  card.innerHTML = `<div class="preview-title">Προεπισκόπηση μενού · ${esc(modeLabel)}</div>`;
+  const body = document.createElement('div');
+  body.className = 'preview-main';
+
+  if(!visibleGroups.length){
+    body.innerHTML = '<div class="hint">Δεν υπάρχουν ορατές ομάδες μενού.</div>';
+  } else {
+    const menu = document.createElement('div');
+    menu.className = 'nav-preview-menu';
+    visibleGroups.forEach(group => {
+      const g = document.createElement('div');
+      g.className = 'nav-preview-group';
+      const title = getLoc(group,'title', group.title || group.target || 'Ομάδα');
+      const target = group.target || group.id || '';
+      const entries = (group.entries || []).filter(e => !e.hidden);
+      g.innerHTML = `<div class="nav-preview-trigger">${esc(title)} <span style="color:#94a3b8">▾</span></div>`;
+      const list = document.createElement('div');
+      list.className = 'nav-preview-entries';
+      if(entries.length){
+        entries.forEach(entry => {
+          const a = document.createElement('div');
+          a.className = 'nav-preview-entry';
+          a.title = `${getLoc(entry,'title', entry.title || entry.target || '')} → ${entry.target || entry.id || target}`;
+          a.textContent = getLoc(entry,'title', entry.title || entry.target || 'Επιλογή');
+          list.appendChild(a);
+        });
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'hint';
+        empty.textContent = `Στόχος: ${target || '—'} · χωρίς επιμέρους επιλογές`;
+        list.appendChild(empty);
+      }
+      g.appendChild(list);
+      menu.appendChild(g);
+    });
+    body.appendChild(menu);
+  }
+
+  const tools = document.createElement('div');
+  tools.className = 'nav-preview-tools';
+  if(nav.showApp !== false){
+    const app = document.createElement('span');
+    app.className = 'nav-preview-tool';
+    app.textContent = 'Στην εφαρμογή';
+    tools.appendChild(app);
+  }
+  if(nav.showPrint !== false){
+    const print = document.createElement('span');
+    print.className = 'nav-preview-tool';
+    print.textContent = 'Εκτύπωση';
+    tools.appendChild(print);
+  }
+  body.appendChild(tools);
+  card.appendChild(body);
+  preview.appendChild(card);
+
+  const c = document.createElement('div');
+  c.className = 'preview-card';
+  c.innerHTML = `<div class="preview-title">JSON nav</div><div class="preview-main"><div class="meta-line">${esc(JSON.stringify(ensureNav(), null, 2))}</div></div>`;
+  preview.appendChild(c);
+}
+
+function cloneNavEntryLike(entry){
+  return {
+    title: getLoc(entry,'title', entry.title || entry.text || entry.target || 'Επιλογή'),
+    target: entry.target || entry.id || ''
+  };
+}
+function cloneNavGroupLike(group){
+  return {
+    title: getLoc(group,'title', group.title || group.target || 'Ομάδα'),
+    target: group.target || group.id || data.pages?.[0]?.id || 'page-1',
+    entries: (group.entries || []).map(cloneNavEntryLike)
+  };
+}
+function appendEntryToLastNavGroup(entry, fallbackGroup){
+  const nav = ensureNav();
+  nav.mode = 'manual';
+  if(!nav.groups.length){
+    nav.groups.push({
+      title: getLoc(fallbackGroup,'title', fallbackGroup?.title || 'Μενού'),
+      target: fallbackGroup?.target || fallbackGroup?.id || data.pages?.[0]?.id || 'page-1',
+      entries: []
+    });
+  }
+  const group = nav.groups[nav.groups.length - 1];
+  if(!Array.isArray(group.entries)) group.entries = [];
+  group.entries.push(cloneNavEntryLike(entry));
+  renderAll();
+}
+function renderNavCandidateList(host){
+  if(!host) return;
+  const auto = generateAutoNavModel();
+  host.innerHTML = '';
+  const box = document.createElement('div');
+  box.className = 'nav-candidates';
+  box.innerHTML = '<div class="nav-candidates-title">Πιθανές επιλογές από τίτλους ενοτήτων/σκηνές</div>';
+  if(!auto.groups?.length){
+    const empty = document.createElement('div');
+    empty.className = 'hint';
+    empty.textContent = 'Δεν βρέθηκαν υποψήφιες επιλογές.';
+    box.appendChild(empty);
+    host.appendChild(box);
+    return;
+  }
+  auto.groups.forEach(group => {
+    const g = document.createElement('div');
+    g.className = 'nav-candidate-group';
+    const head = document.createElement('div');
+    head.className = 'nav-candidate-head';
+    const title = document.createElement('span');
+    title.textContent = `${getLoc(group,'title', group.title || 'Ομάδα')} → ${group.target || group.id || ''}`;
+    const addGroup = document.createElement('button');
+    addGroup.type = 'button';
+    addGroup.textContent = '+ ως ομάδα';
+    addGroup.onclick = ()=>{
+      const nav = ensureNav();
+      nav.mode = 'manual';
+      nav.groups.push(cloneNavGroupLike(group));
+      renderAll();
+    };
+    head.appendChild(title);
+    head.appendChild(addGroup);
+    g.appendChild(head);
+    (group.entries || []).forEach(entry => {
+      const row = document.createElement('div');
+      row.className = 'nav-candidate-entry';
+      const text = document.createElement('div');
+      text.innerHTML = `${esc(getLoc(entry,'title', entry.title || entry.target || 'Επιλογή'))}<span class="target">${esc(entry.target || entry.id || group.target || '')}</span>`;
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.textContent = '+ επιλογή';
+      add.onclick = ()=>appendEntryToLastNavGroup(entry, group);
+      row.appendChild(text);
+      row.appendChild(add);
+      g.appendChild(row);
+    });
+    box.appendChild(g);
+  });
+  host.appendChild(box);
 }
 
 
