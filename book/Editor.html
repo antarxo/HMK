@@ -86,6 +86,15 @@
     .page-paragraph{margin:0 0 7px;text-align:justify}
     .page-note{margin:10px 0;padding:10px 12px;border-radius:14px;background:var(--note);border:1px solid #e4d7ae;font:500 14px/1.42 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
     .page-note .label{display:block;margin:0 0 5px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+    .side-note{margin:4px 0 12px;padding:10px 12px;border-radius:16px;background:#f7fafc;border:1px solid #d6e2eb;color:#29414f;font:500 14px/1.42 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .side-note.float-right,.side-note.float-left{width:min(var(--figure-width,340px),42%)}
+    .side-note.float-right{float:right;margin:4px 0 10px 18px}
+    .side-note.float-left{float:left;margin:4px 18px 10px 0}
+    .side-note.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
+    .side-note .label{display:block;margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2f698f}
+    .side-note .title{display:block;margin:0 0 6px;font:800 13px/1.25 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1f5f8b}
+    .side-note p{margin:0 0 6px}
+    .side-note p:last-child{margin-bottom:0}
     figure.media{margin:4px 0 12px;background:var(--figure);border:1px solid var(--paperLine);border-radius:16px;overflow:hidden}
     figure.media.float-right,figure.media.float-left{width:min(var(--figure-width,340px),42%)}
     figure.media.float-right{float:right;margin:4px 0 10px 18px}
@@ -1373,6 +1382,13 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
         node.querySelector('.label')?.style.setProperty('font-size', `${Number(defs.noteLabelFontSize)}px`);
       }
     }
+    if(item?.type === 'side_note'){
+      if(defs.noteFontSize) node.style.setProperty('font-size', `${Number(defs.noteFontSize)}px`);
+      if(defs.noteLineHeight) node.style.setProperty('line-height', String(defs.noteLineHeight));
+      if(defs.noteLabelFontSize){
+        node.querySelector('.label')?.style.setProperty('font-size', `${Number(defs.noteLabelFontSize)}px`);
+      }
+    }
     if(item?.type === 'interactive_callout'){
       if(defs.calloutFontSize) node.style.setProperty('font-size', `${Number(defs.calloutFontSize)}px`);
       if(defs.calloutTitleFontSize){
@@ -1485,6 +1501,12 @@ function renderStandaloneItem(item){
     wrap.style.marginTop = `${Math.max(4, Math.round(noteGap * 0.6))}px`;
     wrap.style.marginBottom = `${noteGap}px`;
     wrap.innerHTML = `${getLoc(item,'label','') ? `<span class="label">${esc(getLoc(item,'label',''))}</span>` : ''}${getLoc(item,'html','') || '<em>(κενό)</em>'}`;
+    return wrap;
+  }
+  if(t === 'side_note'){
+    wrap.className = `side-note ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<span class="label">${esc(getLoc(item,'label',''))}</span>` : ''}${getLoc(item,'title','') ? `<span class="title">${esc(getLoc(item,'title',''))}</span>` : ''}${getLoc(item,'html','') || '<em>(ÎºÎµÎ½Ï)</em>'}`;
     return wrap;
   }
   if(t === 'figure'){

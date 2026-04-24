@@ -396,9 +396,9 @@ function replaceTokens(value, ctx){
     .replace(/\{pages\}/g, String(ctx.pages || ''));
 }
 function placementClass(item){
-  const p=String(item?.placement || '').toLowerCase();
-  if(p==='left') return 'float-left';
-  if(p==='right') return 'float-right';
+  const p=String(item?.placement || '').trim().toLowerCase();
+  if(p==='left' || p==='float-left') return 'float-left';
+  if(p==='right' || p==='float-right') return 'float-right';
   return 'wide';
 }
 function withCacheBust(url){
