@@ -145,6 +145,14 @@
     .scene-media-frame iframe{background:#fff}
     .danger-note{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);color:#fecaca;font-size:11px}
     .editor-help{padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#bae6fd;font-size:11px}
+    .link-tool{margin:7px 0 10px;padding:8px;border:1px dashed #31506d;border-radius:10px;background:#031323}
+    .link-tool summary{cursor:pointer;color:#bae6fd;font:800 11px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .link-tool .link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:8px}
+    .link-tool .link-grid .wide{grid-column:1 / -1}
+    .link-tool .link-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px}
+    .link-tool .link-row label{display:flex;flex-direction:row;align-items:center;gap:5px;color:#cbd5e1}
+    .link-tool .link-row input[type=checkbox]{width:auto}
+    @media (max-width:700px){.link-tool .link-grid{grid-template-columns:1fr}}
     .image-tools{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:start;margin-top:8px}
     .image-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .image-thumb{border:1px solid #243244;border-radius:12px;background:#020617;overflow:hidden;min-height:140px;display:grid;place-items:center}
@@ -626,6 +634,100 @@ function bindTextarea(el, obj, key){
     else obj[key] = el.value;
     renderTree(); renderPreview();
   };
+  if(['html','caption','subtitle'].includes(key)) attachLinkTool(el, obj, key);
+}
+
+function htmlAttr(s=''){ return esc(String(s)).replace(/`/g,'&#96;'); }
+function normalizeExternalHref(raw=''){
+  const v = String(raw || '').trim();
+  if(!v) return '';
+  if(/^https?:\/\//i.test(v) || /^mailto:/i.test(v) || /^tel:/i.test(v) || /^\//.test(v) || /^\.\.?\//.test(v) || /^#/.test(v)) return v;
+  return `https://${v}`;
+}
+function setTextareaBoundValue(el, obj, key, value){
+  el.value = value;
+  if(isTranslatableKey(key)) setLoc(obj, key, value);
+  else obj[key] = value;
+  renderTree(); renderPreview();
+}
+function insertIntoTextarea(el, obj, key, text){
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? start;
+  const next = el.value.slice(0,start) + text + el.value.slice(end);
+  setTextareaBoundValue(el, obj, key, next);
+  requestAnimationFrame(()=>{
+    el.focus();
+    const pos = start + text.length;
+    try{ el.setSelectionRange(pos, pos); }catch(_e){}
+  });
+}
+function attachLinkTool(el, obj, key){
+  if(!el || el.dataset.linkToolAttached === '1') return;
+  el.dataset.linkToolAttached = '1';
+  const tool = document.createElement('details');
+  tool.className = 'link-tool';
+  const uid = `lt_${Math.random().toString(36).slice(2,9)}`;
+  tool.innerHTML = `
+    <summary>🔗 Εισαγωγή υπερσυνδέσμου</summary>
+    <div class="link-grid">
+      <label><span>Κείμενο συνδέσμου</span><input type="text" id="${uid}_text" placeholder="αν είναι κενό, χρησιμοποιείται η επιλεγμένη φράση"></label>
+      <label><span>Τύπος</span><select id="${uid}_mode"><option value="external">Εξωτερικός σύνδεσμος</option><option value="internal">Εσωτερικό σημείο βιβλίου</option></select></label>
+      <label class="wide" data-role="external"><span>URL / email / σχετική διαδρομή</span><input type="text" id="${uid}_href" placeholder="https://… ή mailto:… ή ../…"></label>
+      <label class="wide" data-role="internal"><span>Στόχος μέσα στο βιβλίο</span><select id="${uid}_target" class="target-select"></select></label>
+    </div>
+    <div class="link-row">
+      <label><input type="checkbox" id="${uid}_blank" checked> νέα καρτέλα για εξωτερικό link</label>
+      <button type="button" id="${uid}_insert" class="primary">Εισαγωγή</button>
+      <button type="button" id="${uid}_reload">Ανανέωση στόχων</button>
+    </div>
+    <div class="hint">Για εσωτερική παραπομπή χρησιμοποιούνται τα ίδια structural anchors του μενού.</div>
+  `;
+  el.insertAdjacentElement('afterend', tool);
+  const mode = tool.querySelector(`#${uid}_mode`);
+  const linkText = tool.querySelector(`#${uid}_text`);
+  const href = tool.querySelector(`#${uid}_href`);
+  const target = tool.querySelector(`#${uid}_target`);
+  const blank = tool.querySelector(`#${uid}_blank`);
+  const insertBtn = tool.querySelector(`#${uid}_insert`);
+  const reloadBtn = tool.querySelector(`#${uid}_reload`);
+  function populateTargets(){
+    const targets = typeof collectNavTargets === 'function' ? collectNavTargets() : [];
+    target.innerHTML = targets.map(t=>`<option value="${htmlAttr(t.id)}">${esc(t.kind || '')} · ${esc(t.title || t.id)} — #${esc(t.id)}</option>`).join('');
+  }
+  function syncMode(){
+    const isInternal = mode.value === 'internal';
+    tool.querySelectorAll('[data-role="external"]').forEach(n=>n.style.display = isInternal ? 'none' : '');
+    tool.querySelectorAll('[data-role="internal"]').forEach(n=>n.style.display = isInternal ? '' : 'none');
+    blank.closest('label').style.display = isInternal ? 'none' : 'flex';
+    if(isInternal) populateTargets();
+  }
+  function selectedText(){
+    const start = el.selectionStart ?? 0, end = el.selectionEnd ?? 0;
+    return start !== end ? el.value.slice(start,end) : '';
+  }
+  mode.addEventListener('change', syncMode);
+  reloadBtn.addEventListener('click', populateTargets);
+  tool.addEventListener('toggle', ()=>{ if(tool.open) { populateTargets(); syncMode(); const sel = selectedText().trim(); if(sel && !linkText.value.trim()) linkText.value = sel; } });
+  insertBtn.addEventListener('click', ()=>{
+    const selected = selectedText().trim();
+    const internal = mode.value === 'internal';
+    let url = '';
+    if(internal){
+      const id = target.value;
+      if(!id){ alert('Δεν υπάρχει εσωτερικός στόχος.'); return; }
+      url = `#${id}`;
+    } else {
+      url = normalizeExternalHref(href.value);
+      if(!url){ alert('Δώσε URL ή διάλεξε εσωτερικό στόχο.'); return; }
+    }
+    const fallbackTargetText = internal ? (target.options[target.selectedIndex]?.textContent || url).split(' — #')[0].replace(/^[^·]*·\s*/, '') : url;
+    const text = (linkText.value.trim() || selected || fallbackTargetText || url).trim();
+    const attrs = [`href="${htmlAttr(url)}"`];
+    if(!internal && blank.checked) attrs.push('target="_blank"','rel="noopener"');
+    const tag = `<a ${attrs.join(' ')}>${esc(text)}</a>`;
+    insertIntoTextarea(el, obj, key, tag);
+  });
+  syncMode();
 }
 function bindNumberInput(el, obj, key){
   el.value = obj[key] ?? '';
