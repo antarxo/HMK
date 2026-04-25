@@ -152,6 +152,9 @@
     .link-tool .link-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px}
     .link-tool .link-row label{display:flex;flex-direction:row;align-items:center;gap:5px;color:#cbd5e1}
     .link-tool .link-row input[type=checkbox]{width:auto}
+    .link-insert-status{margin-top:7px;padding:6px 7px;border-radius:8px;background:#071b2d;border:1px solid #1e3a56;color:#cbd5e1;font:700 11px/1.25 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .link-insert-status .muted{color:#93a4b8;font-weight:650}
+    textarea.link-insert-target{outline:2px solid rgba(56,189,248,.38);outline-offset:2px;box-shadow:0 0 0 3px rgba(56,189,248,.08)}
     @media (max-width:700px){.link-tool .link-grid{grid-template-columns:1fr}}
     .image-tools{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:10px;align-items:start;margin-top:8px}
     .image-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -677,10 +680,11 @@ function attachLinkTool(el, obj, key){
     </div>
     <div class="link-row">
       <label><input type="checkbox" id="${uid}_blank" checked> νέα καρτέλα για εξωτερικό link</label>
-      <button type="button" id="${uid}_insert" class="primary">Εισαγωγή</button>
+      <button type="button" id="${uid}_insert" class="primary">Εισαγωγή στο ενεργό σημείο</button>
       <button type="button" id="${uid}_reload">Ανανέωση στόχων</button>
     </div>
-    <div class="hint">Για εσωτερική παραπομπή χρησιμοποιούνται τα ίδια structural anchors του μενού.</div>
+    <div class="link-insert-status" id="${uid}_status"></div>
+    <div class="hint">Ο σύνδεσμος μπαίνει στο πεδίο ακριβώς από πάνω: αντικαθιστά την επιλεγμένη φράση ή εισάγεται στη θέση του κέρσορα. Για εσωτερική παραπομπή χρησιμοποιούνται τα ίδια structural anchors του μενού.</div>
   `;
   el.insertAdjacentElement('afterend', tool);
   const mode = tool.querySelector(`#${uid}_mode`);
@@ -690,6 +694,7 @@ function attachLinkTool(el, obj, key){
   const blank = tool.querySelector(`#${uid}_blank`);
   const insertBtn = tool.querySelector(`#${uid}_insert`);
   const reloadBtn = tool.querySelector(`#${uid}_reload`);
+  const status = tool.querySelector(`#${uid}_status`);
   function populateTargets(){
     const targets = typeof collectNavTargets === 'function' ? collectNavTargets() : [];
     target.innerHTML = targets.map(t=>`<option value="${htmlAttr(t.id)}">${esc(t.kind || '')} · ${esc(t.title || t.id)} — #${esc(t.id)}</option>`).join('');
@@ -705,9 +710,37 @@ function attachLinkTool(el, obj, key){
     const start = el.selectionStart ?? 0, end = el.selectionEnd ?? 0;
     return start !== end ? el.value.slice(start,end) : '';
   }
+  function fieldLabel(){
+    const map = { html:'κείμενο / HTML', caption:'λεζάντα', subtitle:'υπότιτλος' };
+    return map[key] || key;
+  }
+  function updateInsertionStatus(){
+    const start = el.selectionStart ?? 0;
+    const end = el.selectionEnd ?? start;
+    const sel = selectedText();
+    const safeSel = sel.replace(/\s+/g,' ').trim();
+    const preview = safeSel.length > 60 ? `${safeSel.slice(0,57)}…` : safeSel;
+    if(status){
+      status.innerHTML = sel
+        ? `Θέση εισαγωγής: <b>${esc(fieldLabel())}</b> · θα αντικατασταθεί η επιλεγμένη φράση <span class="muted">«${esc(preview)}»</span>.`
+        : `Θέση εισαγωγής: <b>${esc(fieldLabel())}</b> · θέση κέρσορα ${start}.`;
+    }
+    el.classList.toggle('link-insert-target', tool.open);
+  }
+  ['focus','click','keyup','mouseup','select','input'].forEach(ev => el.addEventListener(ev, updateInsertionStatus));
   mode.addEventListener('change', syncMode);
   reloadBtn.addEventListener('click', populateTargets);
-  tool.addEventListener('toggle', ()=>{ if(tool.open) { populateTargets(); syncMode(); const sel = selectedText().trim(); if(sel && !linkText.value.trim()) linkText.value = sel; } });
+  tool.addEventListener('toggle', ()=>{
+    if(tool.open) {
+      populateTargets();
+      syncMode();
+      updateInsertionStatus();
+      const sel = selectedText().trim();
+      if(sel && !linkText.value.trim()) linkText.value = sel;
+    } else {
+      el.classList.remove('link-insert-target');
+    }
+  });
   insertBtn.addEventListener('click', ()=>{
     const selected = selectedText().trim();
     const internal = mode.value === 'internal';
@@ -725,9 +758,11 @@ function attachLinkTool(el, obj, key){
     const attrs = [`href="${htmlAttr(url)}"`];
     if(!internal && blank.checked) attrs.push('target="_blank"','rel="noopener"');
     const tag = `<a ${attrs.join(' ')}>${esc(text)}</a>`;
+    updateInsertionStatus();
     insertIntoTextarea(el, obj, key, tag);
   });
   syncMode();
+  updateInsertionStatus();
 }
 function bindNumberInput(el, obj, key){
   el.value = obj[key] ?? '';
