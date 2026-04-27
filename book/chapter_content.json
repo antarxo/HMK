@@ -478,7 +478,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q1&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene 0→T/4",
           "caption_en": "Scene 0→T/4"
@@ -582,7 +582,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q2&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene T/4→T/2",
           "caption_en": "Scene T/4→T/2"
@@ -691,7 +691,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q3&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene T/2→3T/4",
           "caption_en": "Scene T/2→3T/4"
@@ -795,7 +795,7 @@
           "frameWidth": 340,
           "wrapTight": true,
           "hideCaption": false,
-          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines&play=0&zoom=1620",
+          "singleSrc": "../index.html?scene=book_multiscene&layout=rod_2graphs&graphs=E%2CB&availableGraphs=Q%2CI%2CE%2CB&layers=rod%2Ccharges%2CcurrentArrow%2CeFieldLines&timePreset=q4&controlsMode=guided&allowedControls=toggleCurrent%2CtoggleGraphQ%2CtoggleGraphI%2CtoggleGraphE%2CtoggleGraphB%2CtoggleELines%2CtoggleBLines%2CtoggleELinear%2CtoggleBLinear&play=0&zoom=1620",
           "status": "scene",
           "title_en": "Scene 3T/4→T",
           "caption_en": "Scene 3T/4→T"
