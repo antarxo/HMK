@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="el">
-<head> 
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Παραγωγή Διάδοση και Λήψη Η/Μ Κύματος</title>
@@ -34,6 +34,8 @@
   select{width:min(190px,34vw);background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 6px}
   .viewport{position:relative;min-height:0;height:100%}
   #stage{position:absolute;inset:0}
+  #stage canvas{cursor:grab}
+  #stage canvas.dragging{cursor:grabbing}
   .leftOverlayStack{position:absolute;left:4px;top:2px;bottom:2px;z-index:20;display:flex;flex-direction:column;gap:1px;align-items:flex-start;pointer-events:none;width:min(248px,25vw);min-height:0}
   .machineHud{position:relative;left:auto;top:auto;bottom:auto;z-index:20;display:flex;flex-direction:column;gap:2px;align-items:flex-start;pointer-events:none;max-width:none;width:100%;margin-top:auto}
   .machineHud .dpad,.machineHud button,.machineHud input,.machineHud label{pointer-events:auto}
@@ -1859,8 +1861,9 @@ function makeLobePoints(scaleX, scaleY, sx, sy, anchorTravel=0, pinToAnchor=fals
     let x, y;
     if(t <= 0.5){
       const u = t / 0.5;
-      const xBase = firstEndX * Math.pow(u, 3.4);
-      const yBase = -142 - (Math.abs(firstEndY) - 142) * (1 - Math.pow(1 - u, 1.35));
+      const xBase = firstEndX * Math.pow(u, 3.45);
+      const yEase = smoothstep01(Math.pow(u, 1.08));
+      const yBase = -142 - (Math.abs(firstEndY) - 142) * yEase;
       x = sx * xBase;
       y = sy * yBase;
     } else {
@@ -3484,7 +3487,7 @@ for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','show
 
 let playing = true;
 let phaseU = 0;
-ui.playBtn.addEventListener('click', () => {
+function togglePlayPause(){
   if(!playing && phaseU >= getEmitPeriods()){
     phaseU = getBookSceneStartPhase();
     lastPhaseBucket = -1;
@@ -3494,6 +3497,9 @@ ui.playBtn.addEventListener('click', () => {
   }
   playing = !playing;
   updatePlayButtons();
+}
+ui.playBtn.addEventListener('click', () => {
+  togglePlayPause();
 });
 ui.resetBtn.addEventListener('click', () => {
   forcePause();
@@ -4135,6 +4141,79 @@ ui.autoFit.addEventListener('input', () => {
 ui.screenBtn.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
 ui.printBtn.addEventListener('click', () => { applyViewPreset(VIEW_PRINT); });
 ui.resetView.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
+
+const stageCanvas = renderer.domElement;
+stageCanvas.style.touchAction = 'none';
+
+function clampZoomValue(v){
+  return Math.max(0, Math.min(ZOOM_MAX, v));
+}
+
+const stageMouse = {
+  active:false,
+  moved:false,
+  pointerId:null,
+  startX:0,
+  startY:0,
+  lastX:0,
+  lastY:0
+};
+
+stageCanvas.addEventListener('wheel', (ev) => {
+  ev.preventDefault();
+  const delta = ev.deltaY;
+  const step = Math.max(18, Math.min(120, Math.abs(delta) * 0.12));
+  const next = clampZoomValue((+ui.zoom.value || 0) + (delta < 0 ? step : -step));
+  ui.zoom.value = String(next);
+  applyUI();
+}, { passive:false });
+
+stageCanvas.addEventListener('pointerdown', (ev) => {
+  if(ev.button !== 0) return;
+  stageMouse.active = true;
+  stageMouse.moved = false;
+  stageMouse.pointerId = ev.pointerId;
+  stageMouse.startX = stageMouse.lastX = ev.clientX;
+  stageMouse.startY = stageMouse.lastY = ev.clientY;
+  stageCanvas.classList.add('dragging');
+  stageCanvas.setPointerCapture?.(ev.pointerId);
+});
+
+stageCanvas.addEventListener('pointermove', (ev) => {
+  if(!stageMouse.active || ev.pointerId !== stageMouse.pointerId) return;
+  const dx = ev.clientX - stageMouse.lastX;
+  const dy = ev.clientY - stageMouse.lastY;
+  const totalDx = ev.clientX - stageMouse.startX;
+  const totalDy = ev.clientY - stageMouse.startY;
+  if(!stageMouse.moved && Math.hypot(totalDx, totalDy) > 4) stageMouse.moved = true;
+  if(stageMouse.moved){
+    root.rotation.y += dx * 0.0065;
+    root.rotation.x += dy * 0.0048;
+    root.rotation.x = Math.max(-1.25, Math.min(1.25, root.rotation.x));
+    camera.lookAt(focusPoint);
+    invalidateGraphs(true);
+    drawGraphs(true);
+  }
+  stageMouse.lastX = ev.clientX;
+  stageMouse.lastY = ev.clientY;
+});
+
+function endStagePointer(ev){
+  if(!stageMouse.active || (ev && ev.pointerId !== stageMouse.pointerId)) return;
+  const wasMoved = stageMouse.moved;
+  stageMouse.active = false;
+  stageMouse.moved = false;
+  stageCanvas.classList.remove('dragging');
+  if(ev && stageMouse.pointerId != null){
+    stageCanvas.releasePointerCapture?.(stageMouse.pointerId);
+  }
+  stageMouse.pointerId = null;
+  if(!wasMoved){
+    togglePlayPause();
+  }
+}
+stageCanvas.addEventListener('pointerup', endStagePointer);
+stageCanvas.addEventListener('pointercancel', endStagePointer);
 
 function bindHold(button, fn){
   let timer = null;
