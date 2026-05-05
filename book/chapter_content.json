@@ -130,7 +130,185 @@
           "html": "Καταβλήθηκε προσπάθεια ώστε το κείμενο να είναι γραμμένο έτσι ώστε να μπορεί να το μελετήσει μαθητής, αλλά και να δώσει τροφή για σκέψη και προβληματισμό στο συνάδελφο φυσικό που θα το επισκεφθεί. Η βασική ροή είναι πιο σχολική, ενώ τα οι επεκτάσεις και τα παραρτήματα φιλοξενούν βαθύτερο αποτύπωμα της φυσικής πραγματικότητας.",
           "label_en": "What to expect",
           "html_en": "An effort has been made to write the text in such a way that it can be studied by a student, but also offer food for thought and reflection to the physics colleague who visits it. The main flow is more school-oriented, while the extensions and appendices host a deeper imprint of physical reality."
+        }
+      ]
+    },
+    {
+      "id": "page-added-intro-1",
+      "sourcePdfPage": 2,
+      "header": {
+        "left": "ΜΕΡΟΣ Α΄",
+        "center": "",
+        "right": "Εισαγωγικές έννοιες",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "section_heading",
+          "title": "Γενικά για τα ηλεκτρομαγνητικά κύματα"
         },
+        {
+          "type": "paragraph",
+          "html": "Τα ηλεκτρομαγνητικά κύματα είναι διαδιδόμενες διαταραχές της\nηλεκτρομαγνητικής κατάστασης του χώρου. Σε μια τέτοια διαταραχή\nσυμμετέχουν ηλεκτρικό και μαγνητικό πεδίο, τα οποία μεταβάλλονται\nχρονικά και χωρικά. Το ιδιαίτερο χαρακτηριστικό τους είναι ότι μπορούν\nνα διαδοθούν και στο κενό, δηλαδή χωρίς υλικό μέσο διάδοσης."
+        },
+        {
+          "type": "paragraph",
+          "html": "Η αρχική θεωρητική πρόβλεψη της ύπαρξής τους συνδέεται με τον James\nClerk Maxwell. Ο Maxwell ένωσε την περιγραφή των ηλεκτρικών και των\nμαγνητικών φαινομένων σε ένα ενιαίο σύστημα εξισώσεων. Από αυτό το\nσύστημα προκύπτει ότι μια ηλεκτρομαγνητική διαταραχή μπορεί να\nδιαδίδεται στο κενό με ταχύτητα <em>c = 3·10⁸ m/s</em> δηλαδή με την\nταχύτητα του φωτός. Αυτό ήταν ιστορικά τεράστιο συμπέρασμα ότι, δηλαδή\nτο φως είναι ηλεκτρομαγνητικό κύμα."
+        },
+        {
+          "type": "paragraph",
+          "html": "Η εργαστηριακή επιβεβαίωση ήρθε αργότερα από τον Heinrich Hertz, ο\nοποίος κατάφερε να δημιουργήσει και να ανιχνεύσει ηλεκτρομαγνητικά\nκύματα μέσω ηλεκτρικών ταλαντώσεων. Οι ταλαντώσεις αυτές αντιστοιχούν σε\nπεριοδική κίνηση φορτίων, άρα σε φορτία που επιταχύνονται και\nεπιβραδύνονται συνεχώς."
+        },
+        {
+          "type": "section_heading",
+          "title": "Το ταλαντούμενο ηλεκτρικό δίπολο"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ένα απλό διδακτικό μοντέλο παραγωγής ηλεκτρομαγνητικού κύματος είναι\nτο ταλαντούμενο ηλεκτρικό δίπολο. Μπορούμε να το φανταστούμε ως δύο\nμεταλλικές ράβδους που συνδέονται με πηγή εναλλασσόμενης τάσης (θα\nαναφέρεται στο εξής η ράβδος ή το δίπολο). Η εναλλασσόμενη τάση προκαλεί\nταλάντωση των ελεύθερων ηλεκτρονίων της ράβδου-διπόλου. Έτσι στα άκρα\nτης εμφανίζονται περιοδικά περιοχές περίσσειας θετικού και αρνητικού\nφορτίου με περίοδο Τ."
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>〜</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Εικόνα 1 Δίπολο και ισοδύναμη μορφή-ράβδος"
+        },
+        {
+          "type": "paragraph",
+          "html": "Για χρόνο Τ/2 το κάτω άκρο μπορεί να γίνεται θετικό και το πάνω\nαρνητικό, ενώ μετά Τ/2 οι ρόλοι αντιστρέφονται. Η ράβδος λειτουργεί έτσι\nως ηλεκτρικό δίπολο του οποίου η διπολική ροπή μεταβάλλεται με τον χρόνο\nκαι το ηλεκτρικό του πεδίο είναι πεδίο Coulomb. <strong>Η περιοδική\nφόρτιση των άκρων δημιουργεί μεταβαλλόμενο ηλεκτρικό πεδίο, το οποίο\nστην απλουστευμένη σχολική περιγραφή παρακολουθεί τη μεταβολή του\nφορτίου.</strong> Ταυτόχρονα, επειδή η κίνηση φορτίων της ράδου συνιστά\nηλεκτρικό ρεύμα, εμφανίζεται και μαγνητικό πεδίο γύρω από τη ράβδο (που\nπεριγράφεται από το Νόμο Biot-Savart). Όταν το ρεύμα μεταβάλλεται,\nμεταβάλλεται και το μαγνητικό πεδίο συνέπεια του οποίου είναι η\nδιαδοχική ενεργοποίηση των Νόμων της επαγωγής, του Faraday και\nAmpere-Maxwell. Από εδώ ξεκινά η φυσική αλυσίδα που θα οδηγήσει στην\nπαραγωγή και διάδοση του ηλεκτρομαγνητικού κύματος."
+        },
+        {
+          "type": "section_heading",
+          "title": "Πώς θα το προσεγγίσουμε στο βιβλίο"
+        }
+      ]
+    },
+    {
+      "id": "page-added-intro-2",
+      "sourcePdfPage": 3,
+      "header": {
+        "left": "ΜΕΡΟΣ Α΄",
+        "center": "",
+        "right": "Εισαγωγικές έννοιες",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "figure",
+          "src": "images/word_import/image1.png",
+          "alt": "Εικόνα 2 Το παραπάνω διάγραμμα αποτυπώνει τη σχολική αφήγηση ως πρώτο\nδιδακτικό μοντέλο",
+          "caption": "Εικόνα 2 Το παραπάνω διάγραμμα αποτυπώνει τη σχολική αφήγηση ως πρώτο\nδιδακτικό μοντέλο",
+          "placement": "center",
+          "status": "static_image",
+          "frameWidth": 340,
+          "aspect": "natural",
+          "title": "Εικόνα 2 Το παραπάνω διάγραμμα αποτυπώνει τη σχολική αφήγηση ως πρώτο\nδιδακτικό μοντέλο"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αρχικά, θα ακολουθήσουμε τη σχολική περιγραφή, γιατί δίνει μια πρώτη\nεποπτική εικόνα: τα φορτία του διπόλου ταλαντώνονται, το ηλεκτροστατικό\nπεδίο Coulomb που παράγεται από αυτά μεταβάλλεται καθώς διαδίδεται στο\nχώρο, το μαγνητικό πεδίο (Biot-Savart) που παράγεται από το ρεύμα (που\nδημιουργείται από την κίνηση των φορτίων) παράγεται και διαδίδεται στο\nχώρο με διαφορά φάσης 90<sup>0</sup> και η διαταραχή των δύο πεδίων\nδιαδίδεται στο χώρο γύρω από τη ράβδο, όπως είναι φυσικό και\nαναμενόμενο, με την ταχύτητα φωτός."
+        },
+        {
+          "type": "paragraph",
+          "html": "Τα πεδία αυτά όπως είναι γνωστό εξασθενούν με την απόσταση από το\nδίπολο, με αποτέλεσμα οι δυναμικές τους γραμμές (η εικόνα τους) να\nεμφανίζουν αραίωση όσο απομακρυνόμαστε από το δίπολο. Παρότι πρακτικά σε\nπολύ μικρή απόσταση (μικρότερη από το μήκος του διπόλου!) και σύντομα\n(σε χρόνο μικρότερο του Τ/2) εξασθενούν έως μηδενισμού τους (πρακτικά)\nμε πρώτο το ηλεκτρικό και μετά το μαγνητικό, στο σχολικό βιβλίο\nθεωρείται ότι δεν υφίστανται καμιά εξασθένηση. Στο πρώτο διδακτικό\nμοντέλο κρατάμε σταθερά τα πλάτη, ώστε να παρακολουθήσουμε καθαρά τη\nχρονική αλληλουχία των μεταβολών. Στη συνέχεια θα επανέλθουμε στα όρια\nαυτής της περιγραφής. Για αυτό το λόγο, περιγράφεται η διάδοσή τους με\nσταθερό το πλάτος της ταλάντωσης των εντάσεών τους Ε και Β! Θα\nακολουθήσουμε τη σύμβαση αυτή αλλά επιφυλασσόμαστε στη συνέχεια να\nεπαναφέρουμε τόσο την αφήγηση αυτή στα πραγματικά της όρια, όσο και την\nπραγματικότητα της γέννησης και της διάδοσης με πραγματικούς όρους του\nπαραγόμενου ηλεκτρομαγνητικού κύματος. Αφού, κοντά στην πηγή συνυπάρχουν\nπεδιακά κομμάτια διαφορετικής φύσης (ηλεκτροστατικά, μαγνητικά και\nεπαγωγικά), τα οποία εξασθενούν διαφορετικά με την απόσταση. Η\nπραγματικότητα δηλαδή επιτάσσει, καθώς απομακρυνόμαστε, τα μη\nακτινοβολούμενα κομμάτια σβήνουν γρήγορα και παραμένει κυρίως το\nακτινοβολούμενο ηλεκτρομαγνητικό κύμα, στο οποίο το ηλεκτρικό και το\nμαγνητικό πεδίο είναι εγκάρσια και συμφασικά και μεταφέρουν ενέργεια\nστον χώρο."
+        },
+        {
+          "type": "paragraph",
+          "html": "<em><strong>Ηλεκτροστατικό πεδίο Coulomb:</strong></em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>=</mo><mi>Κ</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>Q</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε = Κ\\frac{|Q|}{r^{2}}</annotation></semantics></math>\nΕξασθένιση ανάλογη του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mn>1</mn><msup><mi>r</mi><mn>2</mn></msup></mfrac><annotation encoding=\"application/x-tex\">\\frac{1}{r^{2}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em><strong>Μαγνητικό πεδίο Biot-Savart:</strong></em>"
+        }
+      ]
+    },
+    {
+      "id": "page-added-intro-3",
+      "sourcePdfPage": 4,
+      "header": {
+        "left": "ΜΕΡΟΣ Α΄",
+        "center": "",
+        "right": "Εισαγωγικές έννοιες",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>=</mo><mi>Κ</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>Q</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε = Κ\\frac{|Q|}{r^{2}}</annotation></semantics></math>\nΕξασθένιση ανάλογη του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mn>1</mn><msup><mi>r</mi><mn>2</mn></msup></mfrac><annotation encoding=\"application/x-tex\">\\frac{1}{r^{2}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Οι περιεχόμενες στο βιβλίο διαδραστικές σκηνές που ακολουθούν την\nπεριγραφή, βοηθούν τον αναγνώστη να παρακολουθήσει πρώτα την\nαπλουστευμένη σχολική αφήγηση ανά Τ/4 της περιόδου ταλάντωσης των\nηλεκτρονίων στη βάση απλουστεύσεων. Έτσι, αρχικά θα παρακολουθήσουμε τη\nσχολική περιγραφή ανά τέταρτο περιόδου. Έπειτα θα δούμε ποια στοιχεία\nαυτής της εικόνας αποτελούν διδακτική απλοποίηση και πώς προκύπτει η\nπραγματική ακτινοβολούμενη διαταραχή."
+        },
+        {
+          "type": "figure",
+          "src": "images/word_import/image2.png",
+          "alt": "Εικόνα 3 Σχέση της σχολικής αφήγησης με την πραγματικότητα",
+          "caption": "Εικόνα 3 Σχέση της σχολικής αφήγησης με την πραγματικότητα",
+          "placement": "center",
+          "status": "static_image",
+          "frameWidth": 340,
+          "aspect": "natural",
+          "title": "Εικόνα 3 Σχέση της σχολικής αφήγησης με την πραγματικότητα"
+        }
+      ]
+    },
+    {
+      "id": "page-conventions-1",
+      "sourcePdfPage": 5,
+      "header": {
+        "left": "ΜΕΡΟΣ Α΄",
+        "center": "",
+        "right": "Εισαγωγικές έννοιες",
+        "center_en": "",
+        "left_en": "PART A",
+        "right_en": "Introductory concepts"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
         {
           "type": "section_heading",
           "title": "Συμβάσεις",
@@ -160,7 +338,7 @@
     },
     {
       "id": "page-2",
-      "sourcePdfPage": 2,
+      "sourcePdfPage": 6,
       "header": {
         "left": "ΜΕΡΟΣ Α΄",
         "center": "",
@@ -289,7 +467,7 @@
     },
     {
       "id": "page-3",
-      "sourcePdfPage": 3,
+      "sourcePdfPage": 7,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -403,7 +581,7 @@
     },
     {
       "id": "page-4",
-      "sourcePdfPage": 4,
+      "sourcePdfPage": 8,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -424,7 +602,7 @@
     },
     {
       "id": "page-5",
-      "sourcePdfPage": 5,
+      "sourcePdfPage": 9,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -533,7 +711,7 @@
     },
     {
       "id": "page-6",
-      "sourcePdfPage": 6,
+      "sourcePdfPage": 10,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -637,7 +815,7 @@
     },
     {
       "id": "page-7",
-      "sourcePdfPage": 7,
+      "sourcePdfPage": 11,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -748,7 +926,7 @@
     },
     {
       "id": "page-8",
-      "sourcePdfPage": 8,
+      "sourcePdfPage": 12,
       "header": {
         "left": "ΜΕΡΟΣ Β΄",
         "center": "",
@@ -862,7 +1040,7 @@
     },
     {
       "id": "page-9",
-      "sourcePdfPage": 9,
+      "sourcePdfPage": 13,
       "header": {
         "left": "ΜΕΡΟΣ Γ΄",
         "center": "",
@@ -968,7 +1146,7 @@
     },
     {
       "id": "page-10",
-      "sourcePdfPage": 10,
+      "sourcePdfPage": 14,
       "header": {
         "left": "ΜΕΡΟΣ Γ΄",
         "center": "",
@@ -1034,7 +1212,7 @@
     },
     {
       "id": "page-11",
-      "sourcePdfPage": 11,
+      "sourcePdfPage": 15,
       "header": {
         "left": "ΜΕΡΟΣ Γ΄",
         "center": "",
@@ -1120,6 +1298,1635 @@
           "title": "Παραρτήματα",
           "label_en": "PART D",
           "title_en": "Appendices"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-1",
+      "sourcePdfPage": 16,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "section_heading",
+          "title": "Παράρτημα Α — Η έννοια του πεδίου, η διάδοση και η εγκατάστασή του στον χώρο"
+        },
+        {
+          "type": "paragraph",
+          "html": "Στη σχολική φυσική, συναντάμε τον ορισμό του πεδίου ως εξής<em>:\n«Πεδίο είναι ο χώρος μέσα στον οποίο αν βρεθεί κατάλληλο υπόθεμα δέχεται\nδύναμη»</em> ο οποίος στη συνέχεια ανάλογα με το υπόθεμα (μάζα ή φορτίο)\nλέγεται βαρυτικό ή ηλεκτρικό πεδίο αντίστοιχα:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>«<strong>Βαρυτικό πεδίο</strong> είναι ο χώρος στον οποίο αν\nβρεθεί ένα <strong>σώμα μάζας m</strong> δέχεται δύναμη που λέγεται\nβαρυτική» και αντίστοιχα</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>«<strong>Ηλεκτρικό πεδίο</strong> είναι ο χώρος στον οποίο αν\nβρεθεί ένα <strong>σώμα με φορτίο q</strong> δέχεται δύναμη που λέγεται\nηλεκτρική»</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αναρωτιέται συχνά ο μαθητής <strong>για πιο χώρο πρόκειται</strong>,\nειδικά όταν η συζήτηση περιστρέφεται γύρω από"
+        },
+        {
+          "type": "paragraph",
+          "html": "<ul>\n<li><p>το γήινο βαρυτικό πεδίο ή</p></li>\n<li><p>το βαρυτικό πεδίου του όποιου ουράνιου ή ακόμα\nπερισσότερο</p></li>\n<li><p>όποιου άλλου σώματος ή</p></li>\n<li><p>τα ηλεκτροστατικά πεδία που αφορούν ένα θετικά ή ένα αρνητικά\nφορτισμένο σώμα ή</p></li>\n<li><p>τα ηλεκτροστατικά πεδία που αφορούν ένα σύστημα ενός θετικά και\nενός αρνητικά σωμάτων ή και</p></li>\n<li><p>δύο ομώνυμα φορτισμένων σωμάτων.</p></li>\n</ul>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Από τα βιβλία από την άλλη, παρέχονται έτοιμες εικόνες των πεδίων με\nτις σχετικές αιτιολογήσεις ή και ερωτήσεις σχετικές με αυτά."
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Οι παραλείψεις</strong> είναι εμφανείς αλλά σημαντικές και\n<strong>ως προς τον χώρο</strong> αλλά και ως προς την εικόνα του πεδίου\nμέσω των δυναμικών γραμμών του και πώς αυτό εγκαθίσταται στο χώρο. Να\nξεκαθαρίσουμε εδώ ότι ως χώρος νοείται ένα τμήμα ή και (θεωρητικά) όλο\nτο σύμπαν!"
+        },
+        {
+          "type": "section_heading",
+          "title": "Ιστορική αναδρομή"
+        },
+        {
+          "type": "paragraph",
+          "html": "Τα ερωτήματα εύλογα: Πώς προέκυψε η ιδέα του πεδίου δυνάμεων; Ποια\nανάγκη ήλθε να καλύψει η έννοια του πεδίου;"
+        },
+        {
+          "type": "paragraph",
+          "html": "Για να πλησιάσουμε τη ρίζα της ιδέας, χρειάζεται να θυμηθούμε ότι\nιστορικά και όσον αφορά στο πώς και σε πόσο χρόνο, ένα σώμα Α ασκεί\nδύναμη σε (αλλά και δέχεται ταυτόχρονα δύναμη από) ένα σώμα Β που\nβρίσκεται σε αποσταση από αυτό, αναπτύχθηκε η <strong>θεωρία της δράσης\nαπό απόσταση</strong>. Σύμφωνα με αυτήν, <em><strong>«το σώμα Α ασκούσε\nακαριαία δύναμη στο (και δεχόταν αντίστοιχα από) το σώμα Β σε όποια\nαπόσταση και αν βρίσκονταν μεταξύ τους»</strong></em>. Η θεώρηση αυτή\nέκλεινε το μάτι στην ύπαρξη άπειρης ταχύτητας με την οποία ταξίδευε η\nδύναμη από το ένα σώμα στο άλλο ώστε η άσκησή της να γίνεται ακαριαία!\nΜε τον περιορισμό των ταχυτήτων που επέβαλε η θεωρία της ειδικής\nσχετικότητας του Einstein με όριο την πεπερασμένη ταχύτητα του φωτός, η\nθεωρία δράσης από απόσταση δέχτηκε σκληρό και ανεπανόρθωτο πλήγμα. Η\nφυσική χρειάζονταν μια θεωρία που να εξηγεί την παρόλα αυτά ακαριαία\nαλληλεπίδραση μεταξύ των σωμάτων!"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-2",
+      "sourcePdfPage": 17,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Η δράση από απόσταση μπορούσε να λειτουργεί πολύ καλά όσο η φυσική\nενδιαφερόταν κυρίως για το αποτέλεσμα της αλληλεπίδρασης: ποια δύναμη\nασκείται, προς ποια κατεύθυνση και τι κίνηση προκαλεί. Το ερώτημα του\nμηχανισμού, δηλαδή το πώς και γιατί ακαριαία φτάνει η επίδραση από την\nπηγή στο σώμα που βρίσκεται μακριά της, μπορούσε για ένα διάστημα να\nπαραμερίζεται. Όταν όμως η φυσική έφτασε στο σημείο να πάρει σοβαρά την\nπεπερασμένη ταχύτητα διάδοσης κάθε επίδρασης, το ακαριαίο έπαψε να είναι\nβολική σιωπή. Έγινε κόμπος στο χτένι. Εδώ εμφανίζεται <strong>η μεγάλη\nσύλληψη του Faraday</strong> ο οποίος βάζει στο χορό, <strong>τον χώρο\nως ενεργό συστατικό της αλληλεπίδρασης</strong>, μέσω της θεωρίας του\nπεδίου την οποία προτείνει"
+        },
+        {
+          "type": "paragraph",
+          "html": "Nα αναφέρουμε εδώ ότι, η έννοια του πεδίου είχε ήδη εμφανιστεί ως\nβαθύτερη και γονιμότερη εικόνα της αλληλεπίδρασης νωρίτερα από τον\nFaraday. Μετά όμως και τον περιορισμό που επέβαλε η ειδική σχετικότητα\nστην ταχύτητα διάδοσης κάθε φυσικής επίδρασης, η ακαριαία δράση από\nαπόσταση έχασε το έδαφος κάτω από τα πόδια της και η φυσική πλέον\nχρειαζόταν μια εικόνα όπου η επίδραση να μεταφέρεται τοπικά να είναι\nιδιότητα κάθε σημείου του χώρου. Τότε η ιδέα του Faraday περί πεδίου\nέγινε μονόδρομος και η φυσική βρέθηκε στην ανάγκη η νέα έννοια, να\nαποκτήσει μεγαλύτερη φυσική σημασία και να εξοπλιστεί με εργαλεία\nπεριγραφής."
+        },
+        {
+          "type": "paragraph",
+          "html": "Πώς προέκυψε όμως ο όρος πεδίο; Στην καθημερινή γλώσσα, ένα πεδίο\nμάχης δεν είναι ένας ουδέτερος χώρος. Είναι ένας χώρος που έχει ήδη\nαποκτήσει κατάσταση: μέσα του έχουν εγκατασταθεί δυνατότητες δράσης,\nκίνδυνοι, τροχιές, επιδράσεις. Αν κάποιος βρεθεί εκεί, δεν χρειάζεται η\nαρχική πηγή της δράσης να τον επηρεάσει ακαριαία τη στιγμή της άφιξής\nτου. Η δράση έχει, με έναν τρόπο, περάσει στον χώρο.<br/>\nΜε αυτή τη φυσική διαίσθηση, ο Faraday είδε τον χώρο γύρω από ηλεκτρικές\nκαι μαγνητικές πηγές όχι ως άδειο φόντο, αλλά ως περιοχή που έχει\nαποκτήσει ιδιότητες. Το πεδίο είναι αυτή η εγκατεστημένη φυσική\nκατάσταση του χώρου. Αν μέσα της βρεθεί το κατάλληλο υπόθεμα —μάζα,\nφορτίο, μαγνητικό υλικό— θα αλληλεπιδράσει με την κατάσταση που υπάρχει\nεκεί."
+        },
+        {
+          "type": "paragraph",
+          "html": "Με αυτή τη μετατόπιση από τη θεωρία δράσης από απόσταση στη θεωρία\nτου πεδίου, αλλάζει το νόημα της αλληλεπίδρασης. Το φορτίο βαθμιαία\nεγκαθιστά γύρω του μια συγκεκριμένη κατάσταση στον χώρο (1<sup>ο</sup>\nσημείο προσοχής!) και ένα άλλο φορτίο, όταν βρεθεί μέσα σε αυτή την\nκατάσταση, αλληλεπιδρά με αυτήν, αλληλεπιδρά με το χώρο, ο χώρος του\nασκεί δύναμη. Η αλληλεπίδραση πλέον μετατοπίζεται ανάμεσα σε σώμα και\nπεδίο. Αλλά επειδή και το άλλο σώμα εγκαθιστά στο μεταξύ το δικό του\nπεδίο (2<sup>ο</sup> σημείο προσοχής!), τελικά η αλληλεπίδραση δεν είναι\nπαρά αλληλεπίδραση των πεδίων των σωμάτων!"
+        },
+        {
+          "type": "paragraph",
+          "html": "Το πεδίο λοιπόν, είναι ο τρόπος με τον οποίο η φυσική περιγράφει ότι\nμια πηγή αλλάζει σταδιακά από πλευράς ιδιοτήτων τον χώρο γύρω της. Ο\nχώρος επομένως μπορεί να είναι έως και κενός από ύλη αλλά παρ’ όλα αυτά\nνα έχει εγκατεστημένη ηλεκτρική, μαγνητική ή βαρυτική κατάσταση (πεδίο)\nκαι σε κάθε σημείο του χώρου να έχει ανατεθεί η δυνατότητα\nαλληλεπίδρασης."
+        },
+        {
+          "type": "section_heading",
+          "title": "Γέννηση και διάδοση του πεδίου"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-3",
+      "sourcePdfPage": 18,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Ας φανταστούμε υποθετικά, ότι σε ένα άδειο σύμπαν (χώρο) εμφανίζεται\nξαφνικά (από το πουθενά) ένα θετικό φορτίο Q σε ένα σημείο Ο. Η\nπληροφορία ότι το φορτίο εμφανίστηκε στο συγκεκριμένο σημείο αλλά και\nότι συνεχίζει να βρίσκεται στο σημείο αυτό και ότι τα σημεία του χώρου\nανήκουν πλέον στην επικράτεια του πεδίου του, διαδίδεται συνεχώς\n(1<sup>ο</sup> σημείο προσοχής!) με πεπερασμένη ταχύτητα c προς τα\nαπώτερα σημεία του σύμπαντος. Σημειώνουμε εδώ ότι ότι στο κενό, αυτή η\nταχύτητα ισούται με την ταχύτητα του φωτός\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>c</mi><mo>=</mo><msup><mn>3.10</mn><mn>8</mn></msup><mfrac><mi>m</mi><mi>s</mi></mfrac></mrow><annotation encoding=\"application/x-tex\">c = 3.10^{8}\\frac{m}{s}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>O</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>A</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "r"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο έχει διαδοθεί"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο δεν έχει ακόμη διαδοθεί"
+        },
+        {
+          "type": "section_heading",
+          "title": "Δt μετά την εμφάνιση του φορτίου Q"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Q</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Εικόνα 4 Η εγκατάσταση του πεδίου δεν είναι ακαριαία αλλά διαδίδεται\nμε ταχύτητα φωτός\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mrow><mi>𝐜</mi><mo mathvariant=\"bold\">=</mo><mn>𝟑</mn><mi mathvariant=\"bold\">.</mi></mrow><msup><mn>𝟏𝟎</mn><mn>𝟖</mn></msup><mfrac><mi>𝐦</mi><mi>𝐬</mi></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{c = 3.}\\mathbf{10}^{\\mathbf{8}}\\frac{\\mathbf{m}}{\\mathbf{s}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong><u>t<sub>1</sub></u></strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αντιλαμβανόμαστε ότι μετά από χρόνο Δt από την εμφάνιση του φορτίου Q\nστο σημείο Ο, έχουν ενημερωθεί, ανήκουν στο πεδίο και έχουν αναλάβει\nνέους ρόλους (καθήκοντα) μόνο τα σημεία (π.χ. ένα από αυτά το Α του\nδιπλανού σχήματος) που βρίσκονται σε απόσταση"
+        },
+        {
+          "type": "paragraph",
+          "html": "r = ΟΑ≤ c Δt"
+        },
+        {
+          "type": "paragraph",
+          "html": "Πιο μακριά, ο χώρος δεν έχει ακόμη προλάβει να ενημερωθεί και να\nαποκτήσει τη νέα κατάσταση. Το ηλεκτρικό πεδίο του φορτίου Q,\nεγκαθίσταται δηλαδή σταδιακά (όχι ακαριαία) και ενημερώνεται συνεχώς,\nαπό περιοχή σε περιοχή, με ταχύτητα c."
+        },
+        {
+          "type": "paragraph",
+          "html": "Μόλις η διάδοση φτάσει σε ένα σημείο Α, αλλάζουν οι ιδιότητες του\nσημείου. Πιο συγκεκριμένα, το σημείο Α του χώρου επιφορτίζεται από το\nφορτίο (πηγή) Q (του «παραγγέλλεται»)"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-4",
+      "sourcePdfPage": 19,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "1) να ασκεί δύναμη (1<sup>η</sup> παραγγελία) και"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>Η λέξη «συνταγή» εδώ έχει το καθημερινό της νόημα: δηλώνει\nαναλογία. Όπως σε μια συνταγή δεν μας ενδιαφέρει μόνο πόσο αλεύρι βάλαμε\nσυνολικά, αλλά πόσο αλεύρι αντιστοιχεί σε κάθε ποσότητα των υπολοίπων\nσυστατικών του μίγματος, έτσι και στο πεδίο δεν μας ενδιαφέρει μόνο η\nσυνολική δύναμη που θα δεχτεί ένα συγκεκριμένο φορτίο. Μας ενδιαφέρει\nπόση δύναμη αντιστοιχεί σε κάθε μονάδα φορτίου. Αυτή η αναλογία\nχαρακτηρίζει το σημείο του χώρου. Γι’ αυτό ορίζουμε την ένταση ως δύναμη\nανά μονάδα φορτίου και με την ίδια λογική, το δυναμικό το ορίζουμε ως τη\nδυναμική ενέργεια ανά μονάδα φορτίου.</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>Έτσι, το σημείο A δεν παίρνει μια απόλυτη εντολή τύπου «άσκησε\nτόσα Newton». Παίρνει μια αναλογική οδηγία: «άσκησε τόσα Newton για κάθε\n1C φορτίου που θα βρεθεί πάνω σου». Αν το φορτίο είναι διπλάσιο, η\nδύναμη θα είναι διπλάσια. Αν είναι μισό, η δύναμη θα είναι μισή. Η\nαναλογία όμως παραμένει η ίδια και αυτή είναι που ονομάζουμε ένταση του\nπεδίου στο σημείο.</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "2) να παρέχει δυναμική ενέργεια (2<sup>η</sup> παραγγελία)"
+        },
+        {
+          "type": "paragraph",
+          "html": "σε όποιο άλλο φορτίο π.χ. q βρεθεί πάνω του."
+        },
+        {
+          "type": "paragraph",
+          "html": "Η ανάγκη να περιγράψουμε το ίδιο το σημείο του χώρου, και όχι το\nσυγκεκριμένο φορτίο που θα τοποθετηθεί σε αυτό, οδηγεί φυσικά στην\nαναλογία. Γι’ αυτό η ένταση ορίζεται ως δύναμη ανά μονάδα φορτίου και το\nδυναμικό ως δυναμική ενέργεια ανά μονάδα φορτίου. Είναι η «συνταγή» που\nγνωστοποιείται στο σημείο για να μπορεί να αναταποκρίνεται στην απόδοση\nτης κατάλληλης κάθε φορά τιμής δύναμης ή ενέργεια; στο φορτίο που θα\nβρεθεί πάνω του"
+        },
+        {
+          "type": "section_heading",
+          "title": "Η «συνταγή» της έντασης στο σημείο A"
+        },
+        {
+          "type": "paragraph",
+          "html": "Όταν η πληροφορία του φορτίου-πηγής Q φτάσει στο σημείο A, το σημείο\nαυτό αναλαμβάνει έναν νέο ρόλο: αν βρεθεί εκεί ένα άλλο φορτίο q, πρέπει\nνα του ασκήσει ηλεκτρική δύναμη."
+        },
+        {
+          "type": "paragraph",
+          "html": "Αλλά πώς μπορεί το σημείο A να «γνωρίζει» πόση δύναμη πρέπει να\nασκήσει και προς ποια κατεύθυνση; Η απάντηση είναι ότι δεν πρέπει στο\nσημείο Α να αποδοθεί μια τιμή για τη δύναμη που θα ασκήσει τοπικά, αλλά\nμια αναλογική πληροφορία μια «συνταγή» του τύπου «πόσα Newton δύναμης\nαντιστοιχούν σε κάθε 1 C θετικού φορτίου που θα βρεθεί στο σημείο A, και\nπρος ποια κατεύθυνση θα ασκηθεί αυτή η\nδύναμη»<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mspace width=\"0.222em\"></mspace><mover><mrow></mrow><mo accent=\"true\">→</mo></mover></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\\ }\\overrightarrow{}</annotation></semantics></math>."
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-5",
+      "sourcePdfPage": 20,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Χρειαζόμαστε λοιπόν ένα νέο φυσικό μέγεθος, με μονάδα N/C, το οποίο\nνα χαρακτηρίζει το ίδιο το σημείο A, πριν ακόμη καταφτάσει εκεί ένα έστω\nθετικό φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nκαι το οποίο να εξασφαλίζει ότι η δύναμη που θα ασκηθεί στο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nείναι όση σε τιμή, ο Νόμος του Coulomb προβλέπει για το σημείο Α σε\nαπόσταση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>r</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">r_{A}</annotation></semantics></math>\nαπό το Q που πρέπει να είναι για το φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup><annotation encoding=\"application/x-tex\">\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}</annotation></semantics></math>\n:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><mrow><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi></mrow><mfrac><mrow><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow><msubsup><mi>𝐫</mi><mi>𝐀</mi><mn>𝟐</mn></msubsup></mfrac><mover><mo>⇔</mo><mrow></mrow></mover><mfrac><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐫</mi><mi>𝐀</mi><mn>𝟐</mn></msubsup></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{= K}\\frac{\\left| \\mathbf{Q} \\right|\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}{\\mathbf{r}_{\\mathbf{A}}^{\\mathbf{2}}}\\overset{}{\\Leftrightarrow}\\frac{\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{=}\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}^{\\mathbf{2}}}</annotation></semantics></math>\nΤο μέγεθος\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}</annotation></semantics></math>\nπαρατηρούμε ότι περιγράφει την τιμή της δύναμης που δέχεται η μονάδα\nθετικού φορτίου (το κάθε 1C) όταν βρεθεί στο Α και μάλιστα εξαρτάται (\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐫</mi><mi>𝐀</mi><mn>𝟐</mn></msubsup></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}^{\\mathbf{2}}}</annotation></semantics></math>\n) από την «παραγγέλουσα» πηγή |Q| και από την απόσταση του σημείου Α,\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>r</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">r_{A}</annotation></semantics></math>\nαπό αυτήν. Ορίζουμε λοιπόν αυτήν την ποσότητα τιμή της έντασης\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>Ε</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">Ε_{A}</annotation></semantics></math>\nτου ηλεκτρικού πεδίου που παράγει το φορτίο Q στο σημείο A:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>E</mi><mi>A</mi></msub><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace><mfrac><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐫</mi><mi>𝐀</mi><mn>𝟐</mn></msubsup></mfrac></mrow><annotation encoding=\"application/x-tex\">E_{A}\\mathbf{=}\\mathbf{\\ }\\frac{\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{=}\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}^{\\mathbf{2}}}</annotation></semantics></math>\nη ένταση όμως πρέπει ως μέγεθος να είναι διανυσματικό και επομένως η\nσχέση ορισμού της θα είναι:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mspace width=\"0.222em\"></mspace><mover><msub><mi>E</mi><mi>A</mi></msub><mo accent=\"true\">→</mo></mover><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mfrac><mover><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><mo accent=\"true\">→</mo></mover><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\\ }\\overrightarrow{E_{A}}\\mathbf{=}\\mathbf{\\ }\\mathbf{\\ }\\frac{\\overrightarrow{\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}</annotation></semantics></math>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-6",
+      "sourcePdfPage": 21,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Αν αργότερα τοποθετηθεί στο Α θετικό φορτίο q<sub>1</sub>, το σημείο\nΑ εφαρμόζει τη «συνταγή» για αυτό:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>E</mi><mi>A</mi></msub><mrow><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace></mrow><mfrac><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mfrac><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow></mrow></mover><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace></mrow><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow></mrow><mrow></mrow></msubsup></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>E</mi><mi>A</mi></msub><msubsup><mi>𝐪</mi><mrow><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace></mrow><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow></mrow><mrow></mrow></msubsup><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">E_{A}\\mathbf{= \\ }\\frac{\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}}{\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}\\mathbf{\\ }\\overset{}{\\Leftrightarrow}\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ }\\mathbf{\\sigma\\tau ο\\ A}}^{}}\\mathbf{=}E_{A}\\mathbf{q}_{\\mathbf{1\\ }\\mathbf{\\sigma\\tau ο\\ A}}^{}\\mathbf{\\ }\\mathbf{\\ }</annotation></semantics></math>Έτσι\nτο σημείο A, μέσω της έντασης-ιδιότητας τύπου συνταγής- που του έχει\nαποδοθεί, εφαρμόζει άμμεσα-ακαριαία τον νόμο του Coulomb για το φορτίο\nq<sub>1</sub> που βρέθηκε πάνω του και του ασκεί δύναμη με τιμή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐅</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>E</mi><mi>A</mi></msub><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow><annotation encoding=\"application/x-tex\">\\mathbf{F}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}\\mathbf{=}E_{A}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}</annotation></semantics></math>.\nΔεν χρειάζεται επομένως κάθε φορά να ξαναχτίζεται η αλληλεπίδραση από\nτην αρχή, να ξεκινάει από το Q για να καταλήξει στο q<sub>1</sub> -να\n«παίρνει» χρόνο. Το σημείο A αναλαμβάνει ακαριαία να αλληλεπιδράσει με\nτο «μουσαφίρη» q<sub>1</sub>."
+        },
+        {
+          "type": "section_heading",
+          "title": "Η «συνταγή» του δυναμικού στο σημείο A"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η ίδια ιδέα μπορεί να ειπωθεί και ενεργειακά. Αν βρεθεί στο σημείο A\nφορτίο q, σε αυτό θα αντιστοιχεί ηλεκτρική δυναμική ενέργεια. Αλλά πώς\nμπορεί το σημείο A να «γνωρίζει» πόση δυναμική ενέργεια πρέπει να\nαποδώσει στο φορτίο «μουσαφίρη»; Η απάντηση είναι ότι δεν πρέπει στο\nσημείο Α να αποδοθεί μια τιμή για τη ΄δυναμική ενέργεια που θα αποδώσει\nτοπικά, αλλά μια αναλογική πληροφορία μια δεύτερη «συνταγή» του τύπου\n«πόσα Joule δυναμικής ενέργειας πρέπει να αποδωθούν σε κάθε 1 C θετικού\nφορτίου που θα βρεθεί στο σημείο A»."
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-7",
+      "sourcePdfPage": 22,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Χρειαζόμαστε λοιπόν και νέο φυσικό μέγεθος, με μονάδα J/C, το οποίο\nνα χαρακτηρίζει το ίδιο το σημείο A, πριν ακόμη καταφτάσει εκεί ένα έστω\nθετικό φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nκαι το οποίο να εξασφαλίζει ότι η δυναμική ενέργεια που θα αποδωθεί στο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nείναι όση σε τιμή, ο Νόμος του Coulomb προβλέπει. Για ένα φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup><annotation encoding=\"application/x-tex\">\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}</annotation></semantics></math>\nστο σημείο Α σε απόσταση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>r</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">r_{A}</annotation></semantics></math>\nαπό το Q η δυναμική ενέργεια U που πρέπει να αποκτήσει δίνεται από τη\nσχέση:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><mrow><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi></mrow><mfrac><mrow><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac><mover><mo>⇔</mo><mrow></mrow></mover><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{= K}\\frac{\\left| \\mathbf{Q} \\right|\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}{\\mathbf{r}_{\\mathbf{A}}}\\overset{}{\\Leftrightarrow}\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{=}\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}}</annotation></semantics></math>\nΤο μέγεθος\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}</annotation></semantics></math>\nπαρατηρούμε ότι περιγράφει την τιμή της δυναμικής ενέργειας που αποκτάει\nη μονάδα θετικού φορτίου (το κάθε 1C) όταν βρεθεί στο Α και μάλιστα\nεξαρτάται (\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}}</annotation></semantics></math>\n) από την «παραγγέλουσα» πηγή |Q| και από την απόσταση του σημείου Α,\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>r</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">r_{A}</annotation></semantics></math>\nαπό αυτήν. Ορίζουμε λοιπόν αυτήν την ποσότητα τιμή του δυναμικού\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>V</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">V_{A}</annotation></semantics></math>\nτου ηλεκτρικού πεδίου που αποδίδει το φορτίο Q στο σημείο A:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>V</mi><mi>A</mi></msub><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac></mrow><annotation encoding=\"application/x-tex\">V_{A}\\mathbf{=}\\mathbf{\\ }\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{=}\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}}</annotation></semantics></math>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-8",
+      "sourcePdfPage": 23,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Αν αργότερα τοποθετηθεί στο Α θετικό φορτίο q<sub>1</sub>, το σημείο\nΑ εφαρμόζει τη «συνταγή» για αυτό:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>V</mi><mi>A</mi></msub><mrow><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace></mrow><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mfrac><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow></mrow></mover><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace></mrow><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow></mrow><mrow></mrow></msubsup></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>V</mi><mi>A</mi></msub><msubsup><mi>𝐪</mi><mrow><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace></mrow><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow></mrow><mrow></mrow></msubsup><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">V_{A}\\mathbf{= \\ }\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}}{\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}\\mathbf{\\ }\\overset{}{\\Leftrightarrow}\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ }\\mathbf{\\sigma\\tau ο\\ A}}^{}}\\mathbf{=}V_{A}\\mathbf{q}_{\\mathbf{1\\ }\\mathbf{\\sigma\\tau ο\\ A}}^{}\\mathbf{\\ }\\mathbf{\\ }</annotation></semantics></math>Έτσι\nτο σημείο A, μέσω του δυναμικού-ιδιότητας τύπου συνταγής- που του έχει\nαποδοθεί, εφαρμόζει άμμεσα-ακαριαία τον νόμο του Coulomb για το φορτίο\nq<sub>1</sub> που βρέθηκε πάνω του και του αποδίδει δυναμική ενέργεια με\nτιμή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>V</mi><mi>A</mi></msub><msubsup><mi>𝐪</mi><mrow><mn>𝟏</mn><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mrow></mrow></msubsup></mrow><annotation encoding=\"application/x-tex\">\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}}\\mathbf{=}V_{A}\\mathbf{q}_{\\mathbf{1\\ \\sigma\\tau ο\\ A}}^{}</annotation></semantics></math>.\nΔεν χρειάζεται επομένως κάθε φορά να ξαναχτίζεται η αλληλεπίδραση από\nτην αρχή, να ξεκινάει από το Q για να καταλήξει στο q<sub>1</sub> -να\n«παίρνει» χρόνο. Το σημείο A αναλαμβάνει ακαριαία να τακτοποιήσει και\nενεργειακά το «μουσαφίρη» q<sub>1</sub>."
+        },
+        {
+          "type": "section_heading",
+          "title": "Εμφανίσεις, Διαδόσεις, Εξαφανίσεις!"
+        },
+        {
+          "type": "paragraph",
+          "html": "Το σημείο Α γίνεται με βάση τα παραπάνω, κάτι σαν εκπρόσωπος του\nφορτίου-πηγή Q διατεθειμένο να εκτελεί συγκεκριμένη «παραγγελία», ένα\nείδος συνταγής (μια αναλογία δηλαδή απόκρισης σε δράση) που αφορά στα\nνέα του καθήκοντα. Του «παραγγέλλεται» και εγγράφεται σ αυτό το"
+        },
+        {
+          "type": "paragraph",
+          "html": "1) πόση δύναμη θα ασκεί σε κάθε 1C φορτίου που θα βρεθεί πάνω του και\nπρος τα πού θα την ασκήσει και"
+        },
+        {
+          "type": "paragraph",
+          "html": "2) πόση δυναμική ενέργεια θα παρέχει σε κάθε 1C φορτίου που θα βρεθεί\nπάνω του."
+        },
+        {
+          "type": "paragraph",
+          "html": "Οι συνταγές αυτές («παραγγελίες» εκφρασμένες ως αναλογίες) αφορούν\nστα δύο γνωστά μεγέθη ένταση Ε<sub>Α</sub> και δυναμικό V<sub>Α</sub>\nτου σημείου Α."
+        },
+        {
+          "type": "paragraph",
+          "html": "Έτσι, η φυσική χρησιμοποιεί δύο συμπληρωματικές αναγνώσεις της ίδιας\nκατάστασης του χώρου όπως εγκαθίσταται από το φορτίο Q, σε κάθε σημείο\nτου Α, μια σε διανυσματική γλώσσα, με την ένταση Ε<sub>Α</sub>, και μια\nενεργειακή, βαθμωτή με το δυναμικό V<sub>A</sub>."
+        },
+        {
+          "type": "paragraph",
+          "html": "<em><strong>Ένταση πεδίου Coulomb:</strong></em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>=</mo><mi>Κ</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>Q</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε = Κ\\frac{|Q|}{r^{2}}</annotation></semantics></math>\nΕξασθένιση ανάλογη του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mn>1</mn><msup><mi>r</mi><mn>2</mn></msup></mfrac><annotation encoding=\"application/x-tex\">\\frac{1}{r^{2}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em><strong>Δυναμικό πεδίου Coulomb:</strong></em>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-9",
+      "sourcePdfPage": 24,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>V</mi><mo>=</mo><mi>Κ</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>Q</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><mi>r</mi></mfrac></mrow><annotation encoding=\"application/x-tex\">V = Κ\\frac{|Q|}{r}</annotation></semantics></math>\nΕξασθένιση ανάλογη του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mn>1</mn><mi>r</mi></mfrac><annotation encoding=\"application/x-tex\">\\frac{1}{r}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>Θυμίζουμε τις σχέσεις για την ένταση και το δυναμικό αντίστοιχα\nτου ηλεκτροστατικού πεδίου Coulomb δίπλα.</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ας δούμε πάλι τι θα πρέπει να κάνει το σημείο Α\n(E<sub>A</sub>,V<sub>A</sub>) αν πάνω του βρεθεί ένα φορτίο q."
+        },
+        {
+          "type": "paragraph",
+          "html": "1) ασκεί τόση δύναμη στο φορτίο q, όση προβλέπει η τιμή του\nΕ<sub>Α</sub>, για κάθε 1C του φορτίου q, δηλαδή συνολικά δύναμη\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐅</mi><mrow><mi>𝛔</mi><msub><mrow><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐪</mi></mrow><mrow><mi>𝛆</mi><mi>𝛑</mi><mi>𝛆</mi><mi>𝛊</mi><mi>𝛅</mi><mi mathvariant=\"bold\">ή</mi><mspace width=\"0.222em\"></mspace><mi>𝛃</mi><mi>𝛒</mi><mi mathvariant=\"bold\">έ</mi><mi>𝛉</mi><mi>𝛈</mi><mi>𝛋</mi><mi>𝛆</mi><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝚨</mi></mrow></msub></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>𝐄</mi><mi>𝐀</mi></msub><mrow><mi mathvariant=\"bold\">.</mi><mi>𝐪</mi></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{F}_{\\mathbf{\\sigma}\\mathbf{\\tau ο\\ q}_{\\mathbf{\\varepsilon\\pi\\varepsilon\\iota\\delta ή\\ \\beta\\rho έ\\theta\\eta\\kappa\\varepsilon\\ \\sigma\\tau ο\\ Α}}}\\mathbf{=}\\mathbf{E}_{\\mathbf{A}}\\mathbf{.q}</annotation></semantics></math>\nκαι"
+        },
+        {
+          "type": "paragraph",
+          "html": "2) παρέχει στο φορτίο q τόση δυναμική ενέργεια όση προβλέπει η τιμή\nτου V<sub>A,</sub> για κάθε 1C του φορτίου q, δηλαδή συνολικά\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐔</mi><mrow><mi>𝛔</mi><msub><mrow><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐪</mi></mrow><mrow><mi>𝛆</mi><mi>𝛑</mi><mi>𝛆</mi><mi>𝛊</mi><mi>𝛅</mi><mi mathvariant=\"bold\">ή</mi><mspace width=\"0.222em\"></mspace><mi>𝛃</mi><mi>𝛒</mi><mi mathvariant=\"bold\">έ</mi><mi>𝛉</mi><mi>𝛈</mi><mi>𝛋</mi><mi>𝛆</mi><mspace width=\"0.222em\"></mspace><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝚨</mi></mrow></msub></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>𝐕</mi><mi>𝐀</mi></msub><mi>𝐪</mi></mrow><annotation encoding=\"application/x-tex\">\\mathbf{U}_{\\mathbf{\\sigma}\\mathbf{\\tau ο\\ q}_{\\mathbf{\\varepsilon\\pi\\varepsilon\\iota\\delta ή\\ \\beta\\rho έ\\theta\\eta\\kappa\\varepsilon\\ \\sigma\\tau ο\\ Α}}}\\mathbf{=}\\mathbf{V}_{\\mathbf{A}}\\mathbf{q}</annotation></semantics></math>."
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>Παρατηρούμε επίσης από τις παραπάνω σχέσεις ότι η ένταση Ε\nελαττώνεται με την απόσταση, πράγμα αναμενόμενο, επειδή η ίδια επιρροή\nτου Q στο χώρο που το περιβάλλει, κατανέμεται σε ολοένα μεγαλύτερο\nπλήθος σημείων (σφαιρικές επιφάνειες) γύρω του. Η εξασθένηση του\nστατικού ηλεκτρικού πεδίου Ε είναι της μορφής 1/r² (π.χ. διπλασιασμός\nτης απόστασης σημαίνει υποτετραπλασιασμός της τιμής της\nέντασης).</em>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Εμφάνιση, Διάδοση!"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν θεωρήσουμε εδώ ότι η εμφάνιση του φορτίου Q στο σημείο Ο συνέβη τη\nχρονική στιγμή t=0 είναι κρίσιμο και συνάμα χρήσιμο να αντιληφθούμε ότι\n<strong>η πληροφορία της εμφάνισής του μέχρι τη στιγμή αυτή που\nδιαβάζονται αυτές τις γραμμές συνεχίζεται σε όλο και πιο απομακρυσμένες\nπεριοχές του άπειρου σύμπαντος!</strong> Επειδή το βιβλίο ή το τετράδιό\nμας είναι πεπερασμένος και μάλιστα μικρός ως χώρος, δικαίως το πεδίο του\nQ, σχεδιάζεται ως παγιωμένο και στατικό. Το στατικό πεδίο που\nσχεδιάζουμε δηλαδή είναι, η τελική κατανομή της ηλεκτρικής κατάστασης\nτου χώρου που εποπτεύουμε ως παρατηρητές γύρω από την ακίνητη πηγή\nQ."
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>O</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>A</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "r"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-10",
+      "sourcePdfPage": 25,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο έχει διαδοθεί"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο δεν έχει ακόμη διαδοθεί"
+        },
+        {
+          "type": "section_heading",
+          "title": "Εξαφάνιση του φορτίου Q"
+        },
+        {
+          "type": "paragraph",
+          "html": "Εικόνα 5 Έστω ότι τη στιγμή t<sub>1</sub> το φορτίο q\nεξαφανίζεται"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong><u>t<sub>1</sub></u></strong>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Εξαφάνιση!"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ας φανταστούμε τώρα ότι για κάποιο λόγο το φορτίο Q εξαφανίζεται αυτή\nτη στιγμή t<sub>1</sub> που μιλάμε. Θα ακολουθήσει τότε η διάδοση της\nπληροφορίας ότι πλέον δεν υπάρχει το φορτίο Q στο σημείο Ο, με ταχύτητα\nc. Κοντά στην περιοχή όπου βρισκόταν το φορτίο Q το πεδίο βαθμιαία\nαλλάζει, μηδενίζεται και εξαφανίζεται πρώτο. Τη χρονική στιγμή\nt<sub>2</sub> η πληροφορία ύπαρξης του Q έχει διαδοθεί μέχρι την\nαπόσταση r<sub>3</sub>=ct<sub>2</sub> ενώ της εξαφάνισής του μέχρι την\nαπόσταση r<sub>2</sub>=c(t<sub>2</sub>-t<sub>1</sub>) (δες και το\nσχετικό σχήμα). Σε απόσταση μεγαλύτερη από r<sub>3</sub> ο χώρος δεν\nγνωρίζει ακόμη ούτε για την εμφάνιση ούτε την εξαφάνιση του Q (αργότερα\nθα τα πληροφορηθεί και τα δύο!). <strong>Ο χώρος δηλαδή γνωρίζει μόνο\nό,τι έχει προλάβει να πληροφορηθεί, ότι έχει προλάβει να φτάσει μέχρι σ\nαυτόν.</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>O</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>A</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "r"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που διαδόθηκε η εξαφάνιση"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο δεν έχει ακόμη διαδοθεί"
+        },
+        {
+          "type": "section_heading",
+          "title": "Δt΄ μετά την εξαφάνιση του φορτίου Q"
+        },
+        {
+          "type": "paragraph",
+          "html": "Εικόνα 6 Η διάδοση της εγκατάστασης και απεγκατάστασης του πεδίου του\nφορτίου Q συνεχίζεται"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong><u>t<sub>2</sub></u></strong>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-11",
+      "sourcePdfPage": 26,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "r<sub>3</sub>"
+        },
+        {
+          "type": "paragraph",
+          "html": "r<sub>2</sub>"
+        },
+        {
+          "type": "paragraph",
+          "html": "χώρος που το πεδίο συνεχίζει να διαδίδεται"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν το φορτίο αλλάξει θέση, αντιλαμβανόμαστε πλέον ότι το πεδίο του\nαναδιοργανώνεται, η διαταραχή στην οποία υποβλήθηκε, από το χώρο κοντά\nστο φορτίο διαδίδεται και πάλι προς όλο και πιο απομακρυσμένα σημεία.\n<strong>Αν αυτή η μετατόπιση συνοδεύεται από επιτάχυνση του φορτίου τότε\nκαι μόνον τότε, δημιουργείται διαταραχή που μπορεί όπως θα δούμε\nπαρακάτω να αποσπαστεί από την πηγή και να διαδοθεί ως ηλεκτρομαγνητικό\nκύμα προς τα έξω.</strong>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Πεδίο και δυναμικές γραμμές"
+        },
+        {
+          "type": "paragraph",
+          "html": "Για να οπτικοποιήσουμε την κατάσταση του πεδίου ο Faraday πρότεινε\nτην απεικόνισή του μέσω δυναμικών γραμμών, δηλαδή συνεχών\nπροσανατολισμένων με βέλος γραμμών, σε κάθε σημείο των οποίων το\nδιάνυσμα της έντασης του πεδίου θα είναι εφαπτόμενο."
+        },
+        {
+          "type": "paragraph",
+          "html": "Χαρακτηριστικά των δυναμικών γραμμών"
+        },
+        {
+          "type": "paragraph",
+          "html": "<ol type=\"1\">\n<li><p>είναι ευθείες ή καμπύλες που καθορίζονται αποκλειστικά από την\nκατανομή των εντάσεων των σημείων του πεδίου</p></li>\n<li><p>Αναχωρούν από θετικό φορτίο και καταφθάνουν σε αρνητικό\nφορτίο</p></li>\n<li><p>Η πυκνότητα των δυναμικών γραμμών σε κάθε περιοχή του πεδίου μας\nπληροφορεί αν είναι ισχυρό ή ασθενές.</p></li>\n<li><p>Αν είναι παράλληλες και ισαπέχουσες το πεδίο είναι ομογενές με\nΕ=σταθ.</p></li>\n</ol>"
+        },
+        {
+          "type": "figure",
+          "src": "images/word_import/eikona7_composite.png",
+          "alt": "Εικόνα 7 (α) (β) (γ)",
+          "caption": "Εικόνα 7 (α) (β) (γ)",
+          "placement": "center",
+          "status": "static_image",
+          "frameWidth": 520,
+          "aspect": "natural",
+          "title": "Εικόνα 7 (α) (β) (γ)"
+        },
+        {
+          "type": "paragraph",
+          "html": "Παραδείγματα οπτικοποίησης ηλεκτροστατικών πεδίων που έχουν\nεγκατασταθεί είναι αυτά που φαίνονται στα διπλανά σχήματα. Διάδοση και\nεγκατάσταση αυτών των πεδίων φαίνεται στην εφαρμογή «Εγκατάσταση\nΗλεκτροστατικού πεδίου»"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-12",
+      "sourcePdfPage": 27,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "section_heading",
+          "title": "Από το ένα φορτίο στο δίπολο"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η γενίκευση από ένα φορτίο σε δύο φορτία, ένα θετικό και ένα\nαρνητικό, οδηγεί στην έννοια του ηλεκτρικού διπόλου. Το πεδίο του σε\nκάθε σημείο είναι αποτέλεσμα σύνθεσης των πεδίων των δύο φορτίων. Οι\nδυναμικές γραμμές ξεκινούν από το θετικό φορτίο και καταλήγουν στο\nαρνητικό."
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν το δίπολο παραμένει ακίνητο, έχουμε στατικό διπολικό πεδίο όπως το\nπεδίο (γ) της εικόνας 7. Αν μεταβάλλεται η διάταξη ή η ποσότητα των\nφορτίων στα άκρα του διπόλου, μεταβάλλεται σταδιακά και το πεδίο του\nδιπόλου και η νέα πληροφορία διαδίδεται επίσης με ταχύτητα c."
+        },
+        {
+          "type": "paragraph",
+          "html": "Η πιο σημαντική περίπτωση είναι όταν τα φορτία του διπόλου\nταλαντώνονται αρμονικά. Τότε έχουμε μια πηγή που δεν αφήνει το πεδίο της\nνα ηρεμήσει, να πάρει στατική μορφή. Κοντά στην πηγή το πεδίο θα\nπαραμορφώνεται συνεχώς, με αποτέλεσμα αυτή του η διαταραχή να διαδίδεται\nσυνεχώς σε όλο και πιο μακρινά σημεία από αυτό."
+        },
+        {
+          "type": "section_heading",
+          "title": "Συμπέρασμα"
+        },
+        {
+          "type": "paragraph",
+          "html": "Το πεδίο είναι φυσική κατάσταση του χώρου. Όταν η πηγή είναι ακίνητη\nκαι σταθερή, η κατάσταση αυτή μπορεί να καταλήξει σε στατικό πεδίο. Όταν\nη πηγή αλλάζει, η αλλαγή διαδίδεται. Η παρουσία φορτίου εγκαθιστά πεδίο,\nη εμφάνιση φορτίου στέλνει μήνυμα δημιουργίας, η εξαφάνιση φορτίου\nστέλνει μήνυμα σβησίματος και η επιτάχυνση φορτίου μπορεί να στείλει\nαποσπώμενη ηλεκτρομαγνητική διαταραχή."
+        },
+        {
+          "type": "section_heading",
+          "title": "Παράρτημα Β— Faraday – Maxwell – Συμφασικότητα"
+        },
+        {
+          "type": "section_heading",
+          "title": "Εμβαθύνοντας στο νόμο\nFaraday–Lenz"
+        },
+        {
+          "type": "paragraph",
+          "html": "Από τη Β’Λυκείου γνωρίζουμε για ομογενές ηλεκτρικό πεδίο τη σχέση που\nσυνδέει την έντασή του Ε και την τάση ΔV ανάμεσα σε δύο σημεία της ίδιας\nδυναμικής γραμμής που απέχουν απόσταση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>\n:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mspace width=\"0.222em\"></mspace><mi>E</mi><mspace width=\"0.222em\"></mspace><mo>=</mo><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>Δ</mi><mi>V</mi></mrow><mrow><mi>Δ</mi><mi>𝓁</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mi>ή</mi><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mi>𝚫</mi><mrow><mi>𝐕</mi><mspace width=\"0.222em\"></mspace><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace><mi>𝐄</mi><mo mathvariant=\"bold\">⋅</mo></mrow><mi>𝚫</mi><mi>𝓁</mi><mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\ E\\  = \\ \\frac{\\Delta V}{\\Delta\\mathcal{l}}\\ \\ ή\\ \\ \\mathbf{\\Delta}\\mathbf{V\\  = \\ E \\cdot}\\mathbf{\\Delta}\\mathcal{l}\\mathbf{\\ (1)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ο Νόμος της επαγωγής του Faraday προβλέπει ότι στο νοητό περίγραμμα\n(ε) μιας επιφάνειας με εμβαδόν Α, που διαρρέεται κάθετα από μεταβλητή\nμαγνητική ροή λόγω μεταβολής της μαγνητικής επαγωγής Β που το διαρρέει,\nαναπτύσσεται κατά μήκος του περιγράμματος, τάση από επαγωγή (πιο σωστά\nΗΕΔ από επαγωγή)\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mrow><mo mathvariant=\"bold\">=</mo><mspace width=\"0.222em\"></mspace><mo mathvariant=\"bold\">−</mo><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝐁</mi><mspace width=\"0.222em\"></mspace></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟐</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow><mspace width=\"0.222em\"></mspace></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}\\mathbf{= \\  - \\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{B\\ }}}{\\mathbf{\\Delta t}}\\mathbf{\\ (2)\\ }</annotation></semantics></math>\nμε το – να εξηγείται μέσω του κανόνα του Lenz."
+        },
+        {
+          "type": "paragraph",
+          "html": "Δ<strong>Β&gt;0</strong>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-13",
+      "sourcePdfPage": 28,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<strong>Α</strong>"
+        },
+        {
+          "type": "paragraph",
+          "html": "ε"
+        },
+        {
+          "type": "paragraph",
+          "html": "⮿"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Και εννοεί ΗΕΔ από επαγωγή (επαγωγική τάση) που εφαρμόζεται σε όλο το\nμήκος του! Τι χαρακτηριστικά έχει το ηλεκτρικό πεδίο που παράχθηκε από\nεπαγωγή και τι σχέση έχει με το «κατά μήκος αυτής της νοητής γραμμής\n(ε)»; πόση είναι κατά μήκος ενός πολύ μικρού τμήματος Δℓ της (ε);"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-14",
+      "sourcePdfPage": 29,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Το σίγουρο είναι ότι για το πεδίο αυτό Ε, θα υπάρχουν παράλληλες στην\n(ε) συνιστώσες\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝐢</mi></mrow></msub><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{i}}</annotation></semantics></math>\nσε κάποια στοιχειώδη τμήματα της διαδρομής (ε) και έστω\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel}}</annotation></semantics></math>\nκατά μήκος του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>\nόπως φαίνεται στην εικόνα. Έστω\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub></mrow><annotation encoding=\"application/x-tex\">\\Delta Ε_{\\varepsilon\\pi}</annotation></semantics></math>\nη τάση από επαγωγή στο τμήμα\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>.\nΑπό την σχέση (1) προφανώς θα ισχύει για το τμήμα\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>\n:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>𝚫</mi><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mspace width=\"0.222em\"></mspace><mo form=\"prefix\" mathvariant=\"script\" stretchy=\"false\">(</mo></mrow><mrow><mn>𝟑</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"false\">)</mo></mrow><mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\\Delta}\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}\\mathbf{=}\\mathbf{E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l\\ (}\\mathbf{3)}\\mathbf{\n}</annotation></semantics></math>Αν την κλειστή καμπύλη-διαδρομή (ε) την\nχωρίσουμε σε πολύ μικρά τμήματα\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta\\mathcal{l}</annotation></semantics></math>,\nτότε το άθροισμα όλων των\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub></mrow><annotation encoding=\"application/x-tex\">\\Delta Ε_{\\varepsilon\\pi}</annotation></semantics></math>\nτων κομματιών αυτών, θα πρέπει να ισούται με την τάση από επαγωγή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub><annotation encoding=\"application/x-tex\">Ε_{\\varepsilon\\pi}</annotation></semantics></math>\nπου αναπτύχτηκε κατά μήκος της (ε). Δηλαδή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>ε</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow></mrow></msubsup><mrow><mi>Δ</mi><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub></mrow><mover><mo>⇔</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>3</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>ε</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>𝓁</mi><mo form=\"postfix\" stretchy=\"false\">)</mo></mrow><mover><mo>⇔</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>2</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>ε</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo><mspace width=\"0.222em\"></mspace></mrow></mrow><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝐁</mi><mspace width=\"0.222em\"></mspace></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε_{\\varepsilon\\pi} = \\sum_{(\\varepsilon)}^{}{\\Delta Ε_{\\varepsilon\\pi}}\\overset{(3)}{\\Leftrightarrow}Ε_{\\varepsilon\\pi} = \\sum_{(\\varepsilon)}^{}{{\\mathbf{(}\\mathbf{E}}_{\\mathbf{\\parallel}}\\mathbf{.}\\Delta\\mathcal{l})}\\overset{(2)}{\\Leftrightarrow}\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}} = \\sum_{(\\varepsilon)}^{}{\\mathbf{(E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)\\ }}\\mathbf{= - \\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{B\\ }}}{\\mathbf{\\Delta t}}</annotation></semantics></math>\n<strong>(4)</strong>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-15",
+      "sourcePdfPage": 30,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Η σχέση (4) αποτελεί τον νόμο Faraday–Lenz σε γενικότερη μορφή από\nαυτή του σχολικού βιβλίου και συνδέει τη μεταβολή της μαγνητικής ροής\nπου οφείλεται σε μεταβολή της μαγνητικής ροής (εξαιτίας της μεταβολής\nτης μαγνητική επαγωγής Β), με το ηλεκτρικό πεδίο που αναπτύσσεται κάθετα\nσ αυτό. Το αποτέλεσμα είναι γύρω από οποιαδήποτε κάθετη στο μαγνητικό\nπεδίο επιφάνεια Α, εφαπτομενικά στην κλειστή διαδρομή πάνω στο\nπερίγραμμά της να εμφανίζεται ΗΕΔ από επαγωγή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}</annotation></semantics></math>\n. Να εμφανίζεται δηλαδή τέτοιο ηλεκτρικό πεδίο που να ρυθμίζει ώστε η\nεμφανιζόμενη\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}</annotation></semantics></math>\nνα «κυκλοφορεί» κατά μήκος της αυθαίρετης κλειστής διαδρομής γύρω από\nτην μαγνητική επαγωγή οι μεταβολές της οποίας την παρήγαγαν."
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Σύνδεση: ΔB ⟂</strong> <strong>σε</strong> τυχαία\n<strong>επιφάνεια</strong> και <strong>E εφαπτομενικό</strong>\n<strong>σε</strong> τυχαία <strong>κλειστή</strong>\n<strong>διαδρομή</strong> πάνω στην επιφάνεια"
+        },
+        {
+          "type": "paragraph",
+          "html": "Συμπέρασμα:"
+        },
+        {
+          "type": "paragraph",
+          "html": "1. Το μεταβαλλόμενο μαγνητικό πεδίο συνδέεται με την εφαπτομενική\nσυνιστώσα του επαγόμενου ηλεκτρικού πεδίου, για τη δημιουργία\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}</annotation></semantics></math>\n<strong>«</strong>κυκλοφορικού» χαρακτήρα γύρω του"
+        },
+        {
+          "type": "paragraph",
+          "html": "2. Το μεταβαλλόμενο B δεν σημαίνει αναγκαστικά ότι οι γραμμές του\nεπαγόμενου E είναι κύκλοι γύρω του. Σημαίνει ότι οργανώνει εφαπτομενικές\nσυνιστώσες του E σε όποιες κλειστές διαδρομές έτσι ώστε το κλειστό\nάθροισμα ∑E∥Δl πάνω σ αυτές να είναι μη μηδενικό. Αυτό το μη μηδενικό\nάθροισμα είναι η επαγωγική ΗΕΔ."
+        },
+        {
+          "type": "section_heading",
+          "title": "Αποσαφηνίσεις\nσχετικά με την ΗΕΔ από επαγωγή"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ο όρος ηλεκτρεγερτική δύναμη (ΗΕΔ) από επαγωγή είναι ιστορικός και\nεύκολα παρεξηγείται. Προφανώς δεν νοείται και δεν είναι δύναμη, με\nμονάδα Newton. Μετριέται σε Volt και εκφράζει έργο ανά μονάδα φορτίου\nγύρω από μια διαδρομή αφού:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo><mspace width=\"0.222em\"></mspace></mrow><mover><mo>⇔</mo><mrow><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><mo mathvariant=\"bold\">=</mo><mfrac><msub><mi>𝐅</mi><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi>𝐪</mi></mfrac></mrow></mover></mrow><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mfrac><msub><mi>𝐅</mi><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi>𝐪</mi></mfrac><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo><mspace width=\"0.222em\"></mspace></mrow><mover><mo>⇔</mo><mrow><msub><mi>𝐅</mi><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo mathvariant=\"script\">=</mo></mrow><msub><msub><mi>𝐖</mi><mi>𝐅</mi></msub><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub></mrow></mover></mrow><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><msub><msub><mi>𝐖</mi><mi>𝐅</mi></msub><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi>𝐪</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟓</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}} = \\sum_{}^{}{\\mathbf{(E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)\\ }\\overset{\\mathbf{E}_{\\mathbf{\\parallel}}\\mathbf{=}\\frac{\\mathbf{F}_{\\mathbf{\\rightarrow q}}}{\\mathbf{q}}}{\\Leftrightarrow}}\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}} = \\sum_{}^{}{\\mathbf{(}\\frac{\\mathbf{F}_{\\mathbf{\\rightarrow q}}}{\\mathbf{q}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)\\ }\\overset{\\mathbf{F}_{\\mathbf{\\rightarrow q}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l =}{\\mathbf{W}_{\\mathbf{F}}}_{\\mathbf{\\rightarrow q}}}{\\Leftrightarrow}}\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}} = \\sum_{}^{}\\left( \\frac{{\\mathbf{W}_{\\mathbf{F}}}_{\\mathbf{\\rightarrow q}}}{\\mathbf{q}} \\right)\\mathbf{(5)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η λέξη “δύναμη” εδώ πρέπει να διαβαστεί με την παλιά έννοια του\n«κινητήριου αιτίου», ως το αίτιο δηλαδή που εγείρει (προκαλεί ή\nσυντηρεί) ηλεκτρικά φαινόμενα."
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-16",
+      "sourcePdfPage": 31,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Η ΗΕΔ από επαγωγή έχει χαρακτηριστικά τάσης, επειδή μετριέται σε Volt\nκαι επειδή κάθε μικρό κομμάτι\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mi>𝓁</mi></mrow><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l}</annotation></semantics></math>\nμοιάζει με μικρή συνεισφορά τάσης (ενέργειας ανά μονάδα φορτίου-σχέση\n(5)). Το πεδίο όμως στο οποίο εμφανίζεται διαφέρει από το συντηρητικό\nπεδίο Coulomb που γνωρίσαμε σε άλλη τάξη. Στο ηλεκτροστατικό εκείνο\nπεδίο μπορούσαμε να πούμε ότι η τάση ανάμεσα σε δύο σημεία Α και Β,\nπροκύπτει από τη διαφορά δυναμικού V<sub>Α</sub> − V<sub>Β</sub> αφού,\nεκεί ορίζεται δυναμικό σημείου του πεδίου που αποτελεί και ιδιότητα του\nσημείου που έχει και σαν συνέπεια αν πάρουμε μια κλειστή διαδρομή μέσα σ\nαυτό, το άθροισμα\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo><mspace width=\"0.222em\"></mspace></mrow></mrow><mo mathvariant=\"bold\">=</mo><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><msub><msub><mi>𝐖</mi><mi>𝐅</mi></msub><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi>𝐪</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo mathvariant=\"bold\">=</mo><msub><mi>𝐕</mi><mrow><mi>𝛂</mi><mi>𝛒</mi><mi>𝛘</mi><mi>𝛊</mi><mi>𝛋</mi><mi mathvariant=\"bold\">ό</mi></mrow></msub><mi mathvariant=\"bold\">−</mi><msub><mi>𝐕</mi><mrow><mi>𝛕</mi><mi>𝛆</mi><mi>𝛌</mi><mi>𝛊</mi><mi>𝛋</mi><mi mathvariant=\"bold\">ό</mi></mrow></msub><mrow><mo mathvariant=\"bold\">=</mo><mn>𝟎</mn><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛗</mi><mi>𝛐</mi><mi mathvariant=\"bold\">ύ</mi><mspace width=\"0.222em\"></mspace></mrow><msub><mi>𝐕</mi><mrow><mi>𝛂</mi><mi>𝛒</mi><mi>𝛘</mi><mi>𝛊</mi><mi>𝛋</mi><mi mathvariant=\"bold\">ό</mi></mrow></msub><mo mathvariant=\"bold\">=</mo><msub><mi>𝐕</mi><mrow><mi>𝛕</mi><mi>𝛆</mi><mi>𝛌</mi><mi>𝛊</mi><mi>𝛋</mi><mi mathvariant=\"bold\">ό</mi></mrow></msub><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">\\sum_{}^{}{\\mathbf{(E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)\\ }}\\mathbf{=}\\sum_{}^{}\\left( \\frac{{\\mathbf{W}_{\\mathbf{F}}}_{\\mathbf{\\rightarrow q}}}{\\mathbf{q}} \\right)\\mathbf{=}\\mathbf{V}_{\\mathbf{\\alpha\\rho\\chi\\iota\\kappa ό}}\\mathbf{-}\\mathbf{V}_{\\mathbf{\\tau\\varepsilon\\lambda\\iota\\kappa ό}}\\mathbf{= 0\\ \\alpha\\varphi ού\\ }\\mathbf{V}_{\\mathbf{\\alpha\\rho\\chi\\iota\\kappa ό}}\\mathbf{=}\\mathbf{V}_{\\mathbf{\\tau\\varepsilon\\lambda\\iota\\kappa ό}}\\mathbf{\\ }</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Στο επαγωγικό πεδίο το άθροισμα στην αντίστοιχη κλειστή διαδρομή δεν\nμηδενίζεται, αφού\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo><mspace width=\"0.222em\"></mspace></mrow></mrow><mo mathvariant=\"bold\">=</mo><msubsup><mo>∑</mo><mrow></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><msub><msub><mi>𝐖</mi><mi>𝐅</mi></msub><mrow><mo mathvariant=\"bold\">→</mo><mi>𝐪</mi></mrow></msub><mi>𝐪</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo mathvariant=\"bold\">=</mo><mrow><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝐁</mi><mspace width=\"0.222em\"></mspace></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mrow><mo mathvariant=\"bold\">≠</mo><mn>𝟎</mn><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace></mrow></mrow><annotation encoding=\"application/x-tex\">\\sum_{}^{}{\\mathbf{(E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)\\ }}\\mathbf{=}\\sum_{}^{}\\left( \\frac{{\\mathbf{W}_{\\mathbf{F}}}_{\\mathbf{\\rightarrow q}}}{\\mathbf{q}} \\right)\\mathbf{=}\\mathbf{- \\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{B\\ }}}{\\mathbf{\\Delta t}}\\mathbf{=}\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}}\\mathbf{\\neq 0\\ \\ }</annotation></semantics></math>\nάρα δεν υπάρχει κάτι σαν δυναμικό που να αποτελεί ιδιότητα του σημείου\nτου πεδίου και η σε Volt μετρούμενη ΗΕΔ από επαγωγή δεν αντιστοιχεί σε\nδιαφορά δυναμικού ανάμεσα σε δύο σημεία"
+        },
+        {
+          "type": "paragraph",
+          "html": "Έτσι η ΗΕΔ από επαγωγή είναι το συνολικό κυκλοφορικό ηλεκτρεγερτικό\nαίτιο ενός μη συντηρητικού ηλεκτρικού πεδίου κατά μήκος μιας κλειστής\nδιαδρομής."
+        },
+        {
+          "type": "section_heading",
+          "title": "Διαπιστώσεις στο νόμο\nFaraday"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-17",
+      "sourcePdfPage": 32,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Παίρνουμε μικρό ορθογώνιο πλαίσιο ΑΒΓΔ σε απόσταση r μέσα στο\nδιαδιδόμενο μεταβαλλόμενο μαγνητικό πεδίο ενός ευθύγραμμου αγωγού με\nδιαστάσεις Δr (πλευρές ΑΒ και ΓΔ) κατά μήκος της ακτίνας r και πλάτους\nΔl κάθετα σ αυτήν (πλευρές ΑΔ και ΒΓ) όπως φαίνεται στο σχήμα. Το\nμεταβαλλόμενο μαγνητικό πεδίο B διαπερνά κάθετα την επιφάνεια του\nπλαισίου. Το επαγόμενο ηλεκτρικό πεδίο E θα είναι κατακόρυφο και με φορά\nπου φαίνεται στο σχήμα εξαρτώμενο από την απόσταση από τον αγωγό, κάθετο\nστη μεταβολή του μαγνητικού πεδίου Β. Η ΗΕΔ από επαγωγή στο πλαίσιο θα\nεξαρτάται από τις κυκλοφορικές συνιστώσες\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝐄</mi><mo mathvariant=\"bold\">∥</mo></msub><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel}}</annotation></semantics></math>\nτου επαγόμενου ηλεκτρικού πεδίου Ε κατά μήκος του πλαισίου, δηλαδή, θα\nέχει την\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub><annotation encoding=\"application/x-tex\">Ε_{\\varepsilon\\pi}</annotation></semantics></math>\nως κυκλοφορικό αποτέλεσμα γύρω από τη μεταβολή του μαγνητικού πεδίου Β\nπου την δημιουργεί και επομένως ΗΕΔ σε ρόλο εφαπτομενικό κατά μήκος του\nπλαισίου ΑΒΓΔ με φορά ΑΔΓΒΑ με βάση τον κανόνα του Lentz. Το παραγόμενο\nΕ όμως έτσι θα είναι"
+        },
+        {
+          "type": "paragraph",
+          "html": "<ul>\n<li><p>κάθετο στις πλευρές ΑΒ και ΓΔ επομένως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚩</mi><mi>𝚨</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo mathvariant=\"bold\">=</mo><mn>0</mn><mspace width=\"0.222em\"></mspace><mi>κ</mi><mi>α</mi><mi>ι</mi><mspace width=\"0.222em\"></mspace><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel ΒΑ}}\\mathbf{.}\\Delta r\\mathbf{=}0\\ \\kappa\\alpha\\iota\\mathbf{\\ }\\mathbf{E}_{\\mathbf{\\parallel \\Gamma\\Delta}}\\mathbf{.}\\Delta r = 0</annotation></semantics></math></p></li>\n<li><p>παράλληλο και σταθερό στις πλευρές ΑΔ και ΒΓ αλλά με</p></li>\n<li><p><math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><msub><mrow><mo mathvariant=\"bold\">&lt;</mo><mi>𝐄</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub></mrow><annotation encoding=\"application/x-tex\">\\mathbf{E}_{\\mathbf{\\parallel \\Gamma Β}}{\\mathbf{&lt;}\\mathbf{E}}_{\\mathbf{\\parallel Α\\Delta}}</annotation></semantics></math>\nλόγω εξασθένησης με την απόσταση και έστω\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mrow><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mo mathvariant=\"bold\">=</mo><mi>𝐄</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><mi mathvariant=\"bold\">+</mi><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub></mrow><annotation encoding=\"application/x-tex\">{\\mathbf{E}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{=}\\mathbf{E}}_{\\mathbf{\\parallel \\Gamma Β}}\\mathbf{+}\\mathbf{\\Delta Ε}_{\\mathbf{r}}</annotation></semantics></math></p></li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-18",
+      "sourcePdfPage": 33,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "για το οποίο:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Ε</mi><mrow><mi>ε</mi><mi>π</mi></mrow></msub><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>Α</mi><mi>Δ</mi><mi>Γ</mi><mi>Β</mi><mi>Α</mi></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>𝓁</mi><mo form=\"postfix\" stretchy=\"false\">)</mo></mrow><mo>=</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚨</mi><mi>𝚫</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Α</mi><mi>Δ</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚫</mi><mi>𝚪</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>Γ</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚪</mi><mi>𝚩</mi></mrow></mrow></msub><mi>.</mi><mi>Γ</mi><mi>Β</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚩</mi><mi>𝚨</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Β</mi><mi>Α</mi><mo>=</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚨</mi><mi>𝚫</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚫</mi><mi>𝚪</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚪</mi><mi>𝚩</mi></mrow></mrow></msub><mi>.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚩</mi><mi>𝚨</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚫</mi><mi>𝚪</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><mi>.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚩</mi><mi>𝚨</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><msub><mi>𝐄</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><msub><mrow><mi mathvariant=\"bold\">−</mi><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">−</mi><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"false\">)</mo><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>=</mo><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi></mrow><annotation encoding=\"application/x-tex\">Ε_{\\varepsilon\\pi} = \\sum_{Α\\Delta\\Gamma ΒΑ}^{}{{\\mathbf{(}\\mathbf{E}}_{\\mathbf{\\parallel}}\\mathbf{.}\\Delta\\mathcal{l})} = \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{Α\\Delta}}\\mathbf{.}Α\\Delta + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{\\Delta\\Gamma}}\\mathbf{.}\\Delta\\Gamma + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{\\Gamma Β}}.\\Gamma Β + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{ΒΑ}}\\mathbf{.}ΒΑ = \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{Α\\Delta}}\\mathbf{.}\\Delta l + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{\\Delta\\Gamma}}\\mathbf{.}\\Delta r + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{\\Gamma Β}}.\\Delta l + \\mathbf{E}_{\\mathbf{\\parallel}\\mathbf{ΒΑ}}\\mathbf{.}\\Delta r = \\mathbf{E}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{.}\\Delta l + \\mathbf{E}_{\\mathbf{\\parallel \\Delta\\Gamma}}\\mathbf{.}\\Delta r + \\mathbf{E}_{\\mathbf{\\parallel \\Gamma Β}}.\\Delta l + \\mathbf{E}_{\\mathbf{\\parallel ΒΑ}}\\mathbf{.}\\Delta r = \\mathbf{E}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{.}\\Delta l\\mathbf{- (E}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{-}\\mathbf{\\Delta Ε}_{\\mathbf{r}}\\mathbf{)}\\mathbf{.}\\Delta l = \\mathbf{\\Delta Ε}_{\\mathbf{r}}\\mathbf{.}\\Delta l</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "επομένως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>𝚨</mi><mi>𝚫</mi><mi>𝚪</mi><mi>𝚩</mi><mi>𝚨</mi></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo></mrow></mrow><mo mathvariant=\"bold\">=</mo><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mrow><mi>𝚫</mi><mi>𝐥</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\sum_{\\mathbf{Α\\Delta\\Gamma ΒΑ}}^{}{\\mathbf{(E}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)}}\\mathbf{=}\\mathbf{\\Delta Ε}_{\\mathbf{r}}\\mathbf{.}\\mathbf{\\Delta l\\ (1)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "r"
+        },
+        {
+          "type": "paragraph",
+          "html": "A"
+        },
+        {
+          "type": "paragraph",
+          "html": "B"
+        },
+        {
+          "type": "paragraph",
+          "html": "Δ"
+        },
+        {
+          "type": "paragraph",
+          "html": "Γ"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>Δ</mi><mi>i</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\Delta i}{\\Delta t}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta r</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>l</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta l</annotation></semantics></math>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-19",
+      "sourcePdfPage": 34,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "B(r))"
+        },
+        {
+          "type": "paragraph",
+          "html": "B(r+Δr))"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ε(r+Δr))"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ε(r)"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν η μαγνητική ροή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>Φ</mi><mi>Β</mi></msub><annotation encoding=\"application/x-tex\">\\Phi_{Β}</annotation></semantics></math>\nμέσα από το πλαίσιο μεταβάλλεται λόγω της μεταβολής ΔΒ του μαγνητικού\nπεδίου που το διαρρέει θα ισχύει:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Φ</mi><mrow><mi>Β</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>t</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></msub><mo>=</mo><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>Α</mi><mi>Β</mi><mi>Γ</mi><mi>Δ</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mspace width=\"0.222em\"></mspace><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Phi_{Β(t)} = Β_{r,t}.\\ (ΑΒ\\Gamma\\Delta) = \\ Β_{r,t}.\\ \\Delta l.\\Delta r</annotation></semantics></math>\nκαι"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Φ</mi><mrow><mi>Β</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></msub><mo>=</mo><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>Α</mi><mi>Β</mi><mi>Γ</mi><mi>Δ</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>+</mo><msub><mrow><mi>Δ</mi><mi>Β</mi></mrow><mi>t</mi></msub><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Phi_{Β(t + \\Delta t)} = Β_{r,t + \\Delta t}.\\ (ΑΒ\\Gamma\\Delta) = (Β_{r,t} + {\\Delta Β}_{t}).\\ \\Delta l.\\Delta r</annotation></semantics></math>\n<em>οπότε</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>η μεταβολή της μαγνητικής ροής στο πλαίσιο θα είναι</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Β</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>=</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>+</mo><msub><mrow><mi>Δ</mi><mi>Β</mi></mrow><mi>t</mi></msub><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mo>−</mo><msub><mi>Β</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><msub><mrow><mi>Δ</mi><mi>Β</mi></mrow><mi>t</mi></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">{\\Delta\\Phi}_{Β,t} = (Β_{r,t} + {\\Delta Β}_{t}).\\ \\Delta l.\\Delta r - Β_{r,t}.\\ \\Delta l.\\Delta r = {\\Delta Β}_{t}.\\ \\Delta l.\\Delta r</annotation></semantics></math>\nκαι ο ρυθμός με τον οποίο αυτή μεταβάλλεται"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚽</mi></mrow><mrow><mi>𝚩</mi><mrow><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow></mrow></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚩</mi></mrow><mi>𝐭</mi></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mi mathvariant=\"bold\">.</mi><mspace width=\"0.222em\"></mspace><mi>𝚫</mi></mrow><mrow><mi>𝐥</mi><mi mathvariant=\"bold\">.</mi></mrow><mi>𝚫</mi><mrow><mi>𝐫</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟐</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta\\Phi}_{\\mathbf{Β}\\mathbf{,t}}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{=}\\frac{\\mathbf{\\Delta Β}_{\\mathbf{t}}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{.\\ \\Delta}\\mathbf{l.}\\mathbf{\\Delta}\\mathbf{r\\ (2)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η εφαρμογή του νόμου Faraday δίνει με τη βοήθεια των (1) και (2):"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-20",
+      "sourcePdfPage": 35,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝚬</mi><mrow><mi>𝛆</mi><mi>𝛑</mi></mrow></msub><mo>=</mo><munderover><mo>∑</mo><mrow><mi>Α</mi><mi>Δ</mi><mi>Γ</mi><mi>Β</mi><mi>Α</mi></mrow><mrow></mrow></munderover><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐄</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>𝓁</mi><mo form=\"postfix\" stretchy=\"false\">)</mo></mrow><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow><mspace width=\"0.222em\"></mspace></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mover><mo>⇔</mo><mrow><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo mathvariant=\"bold\">,</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>𝟐</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></mover><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>=</mo><mi>−</mi><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚩</mi></mrow><mi>𝐭</mi></msub><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow></mrow></mover><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐫</mi></msub><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚩</mi></mrow><mi>t</mi></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{Ε}_{\\mathbf{\\varepsilon\\pi}} = \\sum_{Α\\Delta\\Gamma ΒΑ}^{}{{\\mathbf{(}\\mathbf{E}}_{\\mathbf{\\parallel}}\\mathbf{.}\\Delta\\mathcal{l})}\\mathbf{= - \\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{B}\\mathbf{,t}\\mathbf{\\ }}}{\\mathbf{\\Delta t}}\\overset{\\left( \\mathbf{1} \\right)\\mathbf{,}\\left( \\mathbf{2} \\right)}{\\Leftrightarrow}\\mathbf{\\Delta Ε}_{\\mathbf{r}}\\mathbf{.}\\Delta l = - \\frac{\\mathbf{\\Delta Β}_{\\mathbf{t}}}{\\Delta t}.\\ \\Delta l.\\Delta r\\ \\overset{}{\\Leftrightarrow}\\frac{\\mathbf{\\Delta Ε}_{\\mathbf{r}}}{\\mathbf{\\Delta}\\mathbf{r}}\\mathbf{=}\\mathbf{-}\\frac{\\mathbf{\\Delta Β}_{t}}{\\mathbf{\\Delta}\\mathbf{t}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Άρα ο νόμος του Faraday κατά τη διάδοση του μεταβαλλόμενου μαγνητικού\nπεδίου λέει ότι η χωρική μεταβολή της έντασης E του ηλεκτρικού πεδίου\nπου παράγεται επαγωγικά είναι ανάλογη με τη χρονική μεταβολή του\nμαγνητικού πεδίου B που την παράγει."
+        },
+        {
+          "type": "section_heading",
+          "title": "Ένα σχολικό μονοπάτι προς\nMaxwell"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ξεκινώντας από την έννοια της έντασης για το ηλεκτροστατικό πεδίο\nCoulomb, και σε συγκεκριμένη απόσταση από το φορτίο Q που το παράγει, η\nένταση του ηλεκτρικού πεδίου\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>=</mo><mi>Κ</mi><mfrac><mi>Q</mi><msup><mi>r</mi><mn>2</mn></msup></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε = Κ\\frac{Q}{r^{2}}</annotation></semantics></math>\nείναι ανάλογη του φορτίου Q που την προκαλεί άρα:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mrow><mi>𝚬</mi><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛎</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛌</mi><mi>𝛐</mi><mi>𝛄</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛕</mi><mi>𝛐</mi><mi>𝛖</mi><mspace width=\"0.222em\"></mspace></mrow><mi>𝐐</mi></mrow><annotation encoding=\"application/x-tex\">\\mathbf{Ε\\ \\alpha\\nu ά\\lambda ο\\gamma\\eta\\ \\tau ο\\upsilon\\ }\\mathbf{Q}</annotation></semantics></math>\nΑν το φορτίο Q μεταβάλλεται κατά ΔQ εύκολα συμπεραίνουμε ότι για τη\nμεταβολή ΔE της έντασής του στο σημείο που απέχει απόσταση r και τους\nαντίστοιχους ρυθμούς μεταβολής θα ισχύει :\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mrow></mrow><mi>𝚫</mi><mrow><mi>𝚬</mi><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛎</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛌</mi><mi>𝛐</mi><mi>𝛄</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛕</mi><mi>𝛐</mi><mi>𝛖</mi><mspace width=\"0.222em\"></mspace></mrow><mi>𝚫</mi><mi>𝐐</mi></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\n}\\mathbf{\\Delta}\\mathbf{Ε\\ \\alpha\\nu ά\\lambda ο\\gamma\\eta\\ \\tau ο\\upsilon\\ }\\mathbf{\\Delta}\\mathbf{Q}</annotation></semantics></math>\nκαι\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace><mi>α</mi><mi>ν</mi><mi>ά</mi><mi>λ</mi><mi>ο</mi><mi>γ</mi><mi>η</mi><mspace width=\"0.222em\"></mspace><mi>τ</mi><mi>ο</mi><mi>υ</mi><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>Δ</mi><mi>Q</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow><mi>ε</mi><mi>π</mi><mi>ε</mi><mi>ι</mi><mi>δ</mi><mi>ή</mi><mspace width=\"0.222em\"></mspace><mi>i</mi><mo>=</mo><mfrac><mrow><mi>Δ</mi><mi>Q</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow></mover><mi>𝐢</mi><mrow><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛎</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛌</mi><mi>𝛐</mi><mi>𝛄</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛕</mi><mi>𝛐</mi><mi>𝛖</mi></mrow><mfrac><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">\\frac{\\Delta Ε}{\\Delta t}\\ \\alpha\\nu ά\\lambda ο\\gamma\\eta\\ \\tau ο\\upsilon\\ \\frac{\\Delta Q}{\\Delta t}\\ \\overset{\\varepsilon\\pi\\varepsilon\\iota\\delta ή\\ i = \\frac{\\Delta Q}{\\Delta t}}{\\Leftrightarrow}\\mathbf{i}\\mathbf{\\ \\alpha\\nu ά\\lambda ο\\gamma\\eta\\ \\tau ο\\upsilon}\\frac{\\mathbf{\\Delta}\\mathbf{Ε}}{\\mathbf{\\Delta t}}\\mathbf{\\ }</annotation></semantics></math>\nΔηλαδή ότι η ένταση του ηλεκτρικού ρεύματος είναι ανάλογη του ρυθμού\nμεταβολής της έντασης του ηλεκτρικού πεδίου!"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-21",
+      "sourcePdfPage": 36,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Ως γνωστόν γύρω από ευθύγραμμο ρευματοφόρο αγωγό αναπτύσσεται\nμαγνητικό πεδίο σε επίπεδο κάθετο στον αγωγό και δυναμικές γραμμές\nκυκλικές, με κέντρο τον αγωγό (εφαρμογή νόμου Biot-Savart) και μαγνητική\nεπαγωγή Β σε απόσταση r από τον αγωγό που δίνεται από τη σχέση:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Β</mi><mo>=</mo><msub><mi>μ</mi><mn>0</mn></msub><mfrac><mi>i</mi><mrow><mn>2</mn><mi>π</mi><mi>r</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Β = \\mu_{0}\\frac{i}{2\\pi r}</annotation></semantics></math>\nαπό την οποία προκύπτει\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Β</mi><mn>.2</mn><mi>π</mi><mi>r</mi><mo>=</mo><msub><mi>μ</mi><mn>0</mn></msub><mi>i</mi></mrow><annotation encoding=\"application/x-tex\">Β.2\\pi r = \\mu_{0}i</annotation></semantics></math>\nη οποία για μια κυκλική διαδρομή πάνω σε μια μαγνητική δυναμική γραμμή,\nαν ο κύκλος θεωρηθεί ως άθροισμα μικρών τμημάτων Δℓ, γράφεται και ως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mrow><mi>𝚩</mi><mn mathvariant=\"bold\">.2</mn></mrow><mrow><mi>𝛑</mi><mi>𝐫</mi><mo mathvariant=\"bold\">=</mo></mrow><msubsup><mo>∑</mo><mrow><mrow><mi>𝛔</mi><mi>𝛆</mi><mspace width=\"0.222em\"></mspace><mi>𝛋</mi><mi mathvariant=\"bold\">ύ</mi><mi>𝛋</mi><mi>𝛌</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace></mrow><mi>𝐫</mi></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mi>𝐁</mi><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mi>𝐥</mi><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow><mo mathvariant=\"bold\">=</mo><msub><mi>𝛍</mi><mn>𝟎</mn></msub><mi>𝐢</mi></mrow><annotation encoding=\"application/x-tex\">\\mathbf{Β.2}\\mathbf{\\pi r =}\\sum_{\\mathbf{\\sigma\\varepsilon\\ \\kappa ύ\\kappa\\lambda ο\\ }\\mathbf{r}}^{}\\mathbf{(B.\\Delta l)}\\mathbf{=}\\mathbf{\\mu}_{\\mathbf{0}}\\mathbf{i}</annotation></semantics></math>\nπου αποτελεί τον νόμο του Ampere"
+        },
+        {
+          "type": "paragraph",
+          "html": "Εφόσον το i είναι ανάλογο του ΔE/Δt όπως αναφέραμε πιο πάνω,\nοδηγούμαστε στην ιδέα ότι:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow><mrow><mi>𝛔</mi><mi>𝛆</mi><mspace width=\"0.222em\"></mspace><mi>𝛋</mi><mi mathvariant=\"bold\">ύ</mi><mi>𝛋</mi><mi>𝛌</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace></mrow><mi>𝐫</mi></mrow><mrow></mrow></msubsup><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mi>𝐁</mi><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mi>𝐥</mi><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow><mrow><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛎</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛌</mi><mi>𝛐</mi><mi>𝛄</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝛕</mi><mi>𝛐</mi><mi>𝛖</mi><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">\\sum_{\\mathbf{\\sigma\\varepsilon\\ \\kappa ύ\\kappa\\lambda ο\\ }\\mathbf{r}}^{}\\mathbf{(B.\\Delta l)}\\mathbf{\\ \\alpha\\nu ά\\lambda ο\\gamma ο\\ \\tau ο\\upsilon\\ }\\frac{\\mathbf{\\Delta}\\mathbf{Ε}}{\\mathbf{\\Delta t}}</annotation></semantics></math>\n."
+        },
+        {
+          "type": "paragraph",
+          "html": "Ο Maxwell με τις σωστές σταθερές και εισάγοντας το μέγεθος ηλεκτρική\nροή Φ<sub>Ε</sub>=Ε.Α και για μεταβολές της ηλεκτρικής ροής λόγω\nμεταβολής της έντασης του ηλεκτρικού πεδίου, κατέληξε στο νόμο:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><munderover><mo>∑</mo><mrow><mrow><mi>𝛔</mi><mi>𝛆</mi><mspace width=\"0.222em\"></mspace></mrow><mrow><mi>𝛋</mi><mi>𝛌</mi><mi>𝛆</mi><mi>𝛊</mi><mi>𝛔</mi><mi>𝛕</mi><mi mathvariant=\"bold\">ή</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi>𝛂</mi><mi>𝛅</mi><mi>𝛒</mi><mi>𝛐</mi><mi>𝛍</mi><mi mathvariant=\"bold\">ή</mi></mrow></mrow><mrow></mrow></munderover><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><msub><mi>𝐁</mi><mo>∥</mo></msub><mrow><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mi>𝐥</mi><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"false\">)</mo></mrow></mrow><mo mathvariant=\"bold\">=</mo><msub><mi>𝛍</mi><mn>𝟎</mn></msub><msub><mi>𝛆</mi><mn>𝟎</mn></msub><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mi>𝚬</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">\\sum_{\\mathbf{\\sigma\\varepsilon\\ }\\mathbf{\\kappa\\lambda\\varepsilon\\iota\\sigma\\tau ή\\ \\delta\\iota\\alpha\\delta\\rho ο\\mu ή}}^{}{\\mathbf{(}\\mathbf{B}_{\\parallel}\\mathbf{.\\Delta l)}}\\mathbf{=}\\mathbf{\\mu}_{\\mathbf{0}}\\mathbf{\\varepsilon}_{\\mathbf{0}}\\mathbf{\\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{Ε}}}{\\mathbf{\\Delta t}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η σχέση αποτελεί τον νόμο Ampere-Maxwell και συνδέει τη μεταβολή της\nηλεκτρικής ροής (εξαιτίας της μεταβολής της έντασης Ε του ηλεκτρικού\nπεδίου), με το μαγνητικό πεδίο που αναπτύσσεται γύρω από οποιαδήποτε\nκάθετη στο ηλεκτρικό πεδίο επιφάνεια Α, εφαπτομενικό στην κλειστή\nδιαδρομή πάνω στο περίγραμμά της- στην ουσία μαγνητικό πεδίο που\n«κυκλοφορεί» κατά μήκος της αυθαίρετης κλειστής διαδρομής γύρω από την\nηλεκτρική ροή οι μεταβολές της οποίας το παρήγαγαν."
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Σύνδεση: ΔΕ ⟂</strong> <strong>σε</strong> τυχαία\n<strong>επιφάνεια</strong> και <strong>Β εφαπτομενικό</strong>\n<strong>σε</strong> τυχαία <strong>κλειστή</strong>\n<strong>διαδρομή</strong> πάνω στην επιφάνεια"
+        },
+        {
+          "type": "paragraph",
+          "html": "Συμπέρασμα: Το μεταβαλλόμενο ηλεκτρικό πεδίο οργανώνει το επαγόμενο\nμαγνητικό πεδίο με συνιστώσες κυκλοφορικού χαρακτήρα γύρω του."
+        },
+        {
+          "type": "section_heading",
+          "title": "Διαπιστώσεις στο νόμο\nMaxwell"
+        },
+        {
+          "type": "paragraph",
+          "html": "r"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-22",
+      "sourcePdfPage": 37,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "A"
+        },
+        {
+          "type": "paragraph",
+          "html": "B"
+        },
+        {
+          "type": "paragraph",
+          "html": "Δ"
+        },
+        {
+          "type": "paragraph",
+          "html": "Γ"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>Δ</mi><mi>i</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\Delta i}{\\Delta t}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta r</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Δ</mi><mi>l</mi></mrow><annotation encoding=\"application/x-tex\">\\Delta l</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "B(r))"
+        },
+        {
+          "type": "paragraph",
+          "html": "B(r+Δr))"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ε(r+Δr))"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ε(r)"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Β</strong>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-23",
+      "sourcePdfPage": 38,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Παίρνουμε μικρό ορθογώνιο πλαίσιο ΑΒΓΔ σε απόσταση r μέσα στο\nδιαδιδόμενο μεταβαλλόμενο ηλεκτρικό πεδίο (από επαγωγή) του παραπάνω\nευθύγραμμου αγωγού, πάνω στο επίπεδο των μαγνητικών δυναμικών γραμμών,\nμε διαστάσεις Δr (πλευρές ΑΒ και ΓΔ) κατά μήκος της ακτίνας r και\nπλάτους Δl κάθετα σ αυτήν (πλευρές ΑΔ και ΒΓ) όπως φαίνεται στο σχήμα.\nΤο μεταβαλλόμενο ηλεκτρικό πεδίο Ε διαπερνά κάθετα την επιφάνεια του\nπλαισίου. Το επαγόμενο μαγνητικό πεδίο Β λόγω μεταβολής της ηλεκτρικής\nροής, θα είναι οριζόντιο και με φορά που φαίνεται στο σχήμα δηλαδή σε\nενίσχυση του υπάρχοντος στο ίδιο σημείο (κανόνας τριών δακτύλων του\nδεξιού χεριού για ΔΕ, ΔΒ, διάδοση), εξαρτώμενο από την απόσταση από τον\nαγωγό, κάθετο στη μεταβολή του ηλεκτρικού πεδίου Ε. Να προσέξουμε ότι το\nμαγνητικό πεδίο που προκύπτει από τη Maxwellική σύνδεση Β, έχει την ίδια\nκατεύθυνση με το μαγνητικό πεδίο του ρεύματος της ράβδου Β(r). Δεν\nεμφανίζεται ως νέο πεδίο, αλλά συνεχίζει την ίδια γεωμετρία με το\nυπάρχον και επιτρέπει έτσι στη διαταραχή να αποσπαστεί και να μεταφέρει\nενέργεια προς τα έξω. Η κυκλοφορία του επαγόμενου αυτού πεδίου Β στο\nπλαίσιο, θα εξαρτάται από τις κυκλοφορικές συνιστώσες\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>𝚩</mi><mo mathvariant=\"bold\">∥</mo></msub><annotation encoding=\"application/x-tex\">\\mathbf{Β}_{\\mathbf{\\parallel}}</annotation></semantics></math>\nμε φορά ΑΔΓΒΑ. Το παραγόμενο B όμως έτσι σε σχέση με το πλαίσιο θα\nείναι"
+        },
+        {
+          "type": "paragraph",
+          "html": "<ul>\n<li><p>κάθετο στις πλευρές ΑΒ και ΓΔ επομένως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚩</mi><mi>𝚨</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo mathvariant=\"bold\">=</mo><mn>0</mn><mspace width=\"0.222em\"></mspace><mi>κ</mi><mi>α</mi><mi>ι</mi><mspace width=\"0.222em\"></mspace><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding=\"application/x-tex\">\\mathbf{B}_{\\mathbf{\\parallel ΒΑ}}\\mathbf{.}\\Delta r\\mathbf{=}0\\ \\kappa\\alpha\\iota\\mathbf{\\ }\\mathbf{B}_{\\mathbf{\\parallel \\Gamma\\Delta}}\\mathbf{.}\\Delta r = 0</annotation></semantics></math></p></li>\n<li><p>παράλληλο και σταθερό στις πλευρές ΑΔ και ΒΓ αλλά με</p></li>\n<li><p><math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><msub><mrow><mo mathvariant=\"bold\">&lt;</mo><mi>𝐁</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub></mrow><annotation encoding=\"application/x-tex\">\\mathbf{B}_{\\mathbf{\\parallel \\Gamma Β}}{\\mathbf{&lt;}\\mathbf{B}}_{\\mathbf{\\parallel Α\\Delta}}</annotation></semantics></math>\nλόγω εξασθένησης με την απόσταση και έστω\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mrow><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mo mathvariant=\"bold\">=</mo><mi>𝐁</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><mi mathvariant=\"bold\">+</mi><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub></mrow><annotation encoding=\"application/x-tex\">{\\mathbf{B}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{=}\\mathbf{B}}_{\\mathbf{\\parallel \\Gamma Β}}\\mathbf{+}\\mathbf{\\Delta B}_{\\mathbf{r}}</annotation></semantics></math></p></li>\n</ul>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-24",
+      "sourcePdfPage": 39,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "για το οποίο:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>Α</mi><mi>Δ</mi><mi>Γ</mi><mi>Β</mi><mi>Α</mi></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐁</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>𝓁</mi><mo form=\"postfix\" stretchy=\"false\">)</mo></mrow><mo>=</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚨</mi><mi>𝚫</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Α</mi><mi>Δ</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚫</mi><mi>𝚪</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>Γ</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚪</mi><mi>𝚩</mi></mrow></mrow></msub><mi>.</mi><mi>Γ</mi><mi>Β</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚩</mi><mi>𝚨</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Β</mi><mi>Α</mi><mo>=</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚨</mi><mi>𝚫</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚫</mi><mi>𝚪</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚪</mi><mi>𝚩</mi></mrow></mrow></msub><mi>.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mrow><mi>𝚩</mi><mi>𝚨</mi></mrow></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚫</mi><mi>𝚪</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚪</mi><mi>𝚩</mi></mrow></msub><mi>.</mi><mi>Δ</mi><mi>l</mi><mo>+</mo><msub><mi>𝐁</mi><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚩</mi><mi>𝚨</mi></mrow></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><mi>𝐁</mi><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><msub><mrow><mrow><mi mathvariant=\"bold\">−</mi><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo></mrow><mi>𝐁</mi></mrow><mrow><mo mathvariant=\"bold\">∥</mo><mi>𝚨</mi><mi>𝚫</mi></mrow></msub><mi mathvariant=\"bold\">−</mi><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"false\">)</mo><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>=</mo><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi></mrow><annotation encoding=\"application/x-tex\">\\sum_{Α\\Delta\\Gamma ΒΑ}^{}{{\\mathbf{(}\\mathbf{B}}_{\\mathbf{\\parallel}}\\mathbf{.}\\Delta\\mathcal{l})} = \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{Α\\Delta}}\\mathbf{.}Α\\Delta + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{\\Delta\\Gamma}}\\mathbf{.}\\Delta\\Gamma + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{\\Gamma Β}}.\\Gamma Β + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{ΒΑ}}\\mathbf{.}ΒΑ = \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{Α\\Delta}}\\mathbf{.}\\Delta l + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{\\Delta\\Gamma}}\\mathbf{.}\\Delta r + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{\\Gamma Β}}.\\Delta l + \\mathbf{B}_{\\mathbf{\\parallel}\\mathbf{ΒΑ}}\\mathbf{.}\\Delta r = \\mathbf{B}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{.}\\Delta l + \\mathbf{B}_{\\mathbf{\\parallel \\Delta\\Gamma}}\\mathbf{.}\\Delta r + \\mathbf{B}_{\\mathbf{\\parallel \\Gamma Β}}.\\Delta l + \\mathbf{B}_{\\mathbf{\\parallel ΒΑ}}\\mathbf{.}\\Delta r = \\mathbf{B}\\mathbf{.}\\Delta l{\\mathbf{- (}\\mathbf{B}}_{\\mathbf{\\parallel Α\\Delta}}\\mathbf{-}\\mathbf{\\Delta B}_{\\mathbf{r}}\\mathbf{)}\\mathbf{.}\\Delta l = \\mathbf{\\Delta B}_{\\mathbf{r}}\\mathbf{.}\\Delta l</annotation></semantics></math>\nεπομένως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msubsup><mo>∑</mo><mrow><mrow><mi>𝚨</mi><mi>𝚫</mi><mi>𝚪</mi><mi>𝚩</mi></mrow><mi>𝚨</mi></mrow><mrow></mrow></msubsup><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐁</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>𝚫</mi><mrow><mi>𝓁</mi><mo form=\"postfix\" mathvariant=\"script\" stretchy=\"false\">)</mo></mrow></mrow><mo mathvariant=\"bold\">=</mo><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mrow><mi>𝚫</mi><mi>𝐥</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\sum_{\\mathbf{Α\\Delta\\Gamma Β}\\mathbf{Α}}^{}{{\\mathbf{(}\\mathbf{B}}_{\\mathbf{\\parallel}}\\mathbf{.}\\mathbf{\\Delta}\\mathcal{l)}}\\mathbf{=}\\mathbf{\\Delta B}_{\\mathbf{r}}\\mathbf{.}\\mathbf{\\Delta l\\ (1)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν η ηλεκτρική ροή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>Φ</mi><mi>Ε</mi></msub><annotation encoding=\"application/x-tex\">\\Phi_{Ε}</annotation></semantics></math>\nμέσα από το πλαίσιο μεταβάλλεται λόγω της μεταβολής ΔΕ του ηλεκτρικού\nπεδίου που το διαρρέει θα ισχύει:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Φ</mi><mrow><mi>Ε</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>t</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></msub><mo>=</mo><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>Α</mi><mi>Β</mi><mi>Γ</mi><mi>Δ</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mspace width=\"0.222em\"></mspace><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Phi_{Ε(t)} = Ε_{r,t}.\\ (ΑΒ\\Gamma\\Delta) = \\ Ε_{r,t}.\\ \\Delta l.\\Delta r</annotation></semantics></math>\nκαι"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>Φ</mi><mrow><mi>Ε</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></msub><mo>=</mo><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi><mo>+</mo><mi>Δ</mi><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>Α</mi><mi>Β</mi><mi>Γ</mi><mi>Δ</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>+</mo><msub><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mi>t</mi></msub><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">\\Phi_{Ε(t + \\Delta t)} = Ε_{r,t + \\Delta t}.\\ (ΑΒ\\Gamma\\Delta) = (Ε_{r,t} + {\\Delta Ε}_{t}).\\ \\Delta l.\\Delta r</annotation></semantics></math>\n<em>οπότε</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<em>η μεταβολή της μαγνητικής ροής στο πλαίσιο θα είναι</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Ε</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>=</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mo>+</mo><msub><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mi>t</mi></msub><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mo>−</mo><msub><mi>Ε</mi><mrow><mi>r</mi><mo>,</mo><mi>t</mi></mrow></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mo>=</mo><msub><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mi>t</mi></msub><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi></mrow><annotation encoding=\"application/x-tex\">{\\Delta\\Phi}_{Ε,t} = (Ε_{r,t} + {\\Delta Ε}_{t}).\\ \\Delta l.\\Delta r - Ε_{r,t}.\\ \\Delta l.\\Delta r = {\\Delta Ε}_{t}.\\ \\Delta l.\\Delta r</annotation></semantics></math>\nκαι ο ρυθμός με τον οποίο αυτή μεταβάλλεται"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-25",
+      "sourcePdfPage": 40,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚽</mi></mrow><mrow><mi>𝚬</mi><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><mfrac><msub><mrow><mi>𝚫</mi><mi>𝚬</mi></mrow><mi>𝐭</mi></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mi mathvariant=\"bold\">.</mi><mspace width=\"0.222em\"></mspace><mi>𝚫</mi></mrow><mrow><mi>𝐥</mi><mi mathvariant=\"bold\">.</mi></mrow><mi>𝚫</mi><mrow><mi>𝐫</mi><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟐</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta\\Phi}_{\\mathbf{Ε,t}}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{=}\\frac{{\\mathbf{\\Delta}\\mathbf{Ε}}_{\\mathbf{t}}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{.\\ \\Delta}\\mathbf{l.}\\mathbf{\\Delta}\\mathbf{r\\ (2)}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η εφαρμογή του νόμου Maxwell δίνει με τη βοήθεια των (1) και (2):"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><munderover><mo>∑</mo><mrow><mi>Α</mi><mi>Δ</mi><mi>Γ</mi><mi>Β</mi><mi>Α</mi></mrow><mrow></mrow></munderover><mrow><msub><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo><mi>𝐁</mi></mrow><mo mathvariant=\"bold\">∥</mo></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>𝓁</mi><mo form=\"postfix\" stretchy=\"false\">)</mo></mrow><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mrow><mi>𝐄</mi><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow><mspace width=\"0.222em\"></mspace></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mover><mo>⇔</mo><mrow><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo mathvariant=\"bold\">,</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>𝟐</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow></mover><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub><mi mathvariant=\"bold\">.</mi><mi>Δ</mi><mi>l</mi><mo>=</mo><mi>−</mi><mfrac><msub><mrow><mi>𝚫</mi><mi>𝐄</mi></mrow><mi>𝐭</mi></msub><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mi>.</mi><mspace width=\"0.222em\"></mspace><mi>Δ</mi><mi>l</mi><mi>.</mi><mi>Δ</mi><mi>r</mi><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow></mrow></mover><mfrac><msub><mrow><mi>𝚫</mi><mi>𝐁</mi></mrow><mi>𝐫</mi></msub><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mfrac><msub><mrow><mi>𝚫</mi><mi>𝐄</mi></mrow><mi>t</mi></msub><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">\\sum_{Α\\Delta\\Gamma ΒΑ}^{}{\\mathbf{(B}_{\\mathbf{\\parallel}}\\mathbf{.}\\Delta\\mathcal{l})}\\mathbf{= - \\ }\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{E,t}\\mathbf{\\ }}}{\\mathbf{\\Delta t}}\\overset{\\left( \\mathbf{1} \\right)\\mathbf{,}\\left( \\mathbf{2} \\right)}{\\Leftrightarrow}\\mathbf{\\Delta B}_{\\mathbf{r}}\\mathbf{.}\\Delta l = - \\frac{\\mathbf{\\Delta E}_{\\mathbf{t}}}{\\Delta t}.\\ \\Delta l.\\Delta r\\ \\overset{}{\\Leftrightarrow}\\frac{\\mathbf{\\Delta B}_{\\mathbf{r}}}{\\mathbf{\\Delta}\\mathbf{r}}\\mathbf{=}\\mathbf{-}\\frac{{\\mathbf{\\Delta}\\mathbf{E}}_{t}}{\\mathbf{\\Delta}\\mathbf{t}}</annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Άρα ο νόμος του Maxwell κατά τη διάδοση του μεταβαλλόμενου ηλεκτρικού\nπεδίου λέει ότι η χωρική μεταβολή του μαγνητικού πεδίου B είναι ανάλογη\nμε τη χρονική μεταβολή της έντασης E του ηλεκτρικού πεδίου που την\nπαράγει."
+        },
+        {
+          "type": "section_heading",
+          "title": "Παρενθετικά:\nΚλίσεις γραφημάτων σε τρέχον κύμα και γενικεύσεις"
+        },
+        {
+          "type": "paragraph",
+          "html": "Το γενικό ερώτημα που αφορά τις κλίσεις των γραφημάτων και την μεταξύ\nτους σχέση αλλά και τη σχέση που έχουν με την ταχύτητα ταλάντωσης και\nδιάδοσης στα πλαίσια ενός αρμονικού μηχανικού κύματος διατυπώνεται με\nτρεις τρόπους:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<ol type=\"1\">\n<li><p><em>«Μπορούμε από το γράφημα y-t ενός σημείου του μέσου διάδοσης\nενός αρμονικού κύματος, να προσδιορίσουμε τη φορά κίνησης του σημείου ,\nμια δεδομένη χρονική στιγμή,»;</em> Αλλά και</p></li>\n<li><p>«<em>Μπορούμε από το γράφημα y-x (στιγμιότυπο μια δεδομένης\nχρονικής στιγμής) ενός αρμονικού κύματος, να προσδιορίσουμε τη φορά\nκίνησης ενός σημείου του μέσου διάδοσης, τη δεδομένη χρονική\nστιγμή,</em> <em>αν γνωρίζουμε τη φορά διάδοσης</em>»;</p></li>\n<li><p>«<em>Πώς σχετίζεται η κλίση σε γράφημα y-x με την κλίση του\nγραφήματος y-t για το ίδιο γεγονός y(x,t) που αφορά τη διάδοση ενός\nαρμονικού κύματος</em>»;</p></li>\n</ol>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<strong>Και τα τρία ερωτήματα προφανώς αναφέρονται στον υπολογισμό\nκαι τη σύγκριση των δύο στιγμιαίων ρυθμών μεταβολής</strong>\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}}</annotation></semantics></math>\n<strong>και</strong>\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}</annotation></semantics></math>\n<strong>για το ίδιο γεγονός y(x,t) του κύματος στα γραφήματα y-t και y-x\nαντίστοιχα.</strong>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-26",
+      "sourcePdfPage": 41,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "1. Έστω αρμονικό κύμα με εξίσωση διάδοσης\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>y</mi><mo>=</mo><mi>A</mi><mi>η</mi><mi>μ</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow><annotation encoding=\"application/x-tex\">y = A\\eta\\mu 2\\pi(\\frac{t}{Τ} - \\frac{x}{\\lambda})</annotation></semantics></math>.\nΕίναι γνωστό ότι η ταχύτητα ταλάντωσης είναι η κλίση σε γράφημα y-t\nδηλαδή η\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\Delta y}{\\Delta t}</annotation></semantics></math>\nκαι υπολογίζεται ως\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mrow><mo mathvariant=\"bold\">:</mo><mspace width=\"0.222em\"></mspace></mrow><msub><mi>𝛖</mi><mi>𝐲</mi></msub><mo mathvariant=\"bold\">=</mo><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>Τ</mi></mfrac><mi>A</mi><mi>σ</mi><mi>υ</mi><mi>ν</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mrow><mi>𝛚</mi><mi>𝐀</mi><mi>𝛔</mi><mi>𝛖</mi><mi>𝛎</mi></mrow><mn>𝟐</mn><mi>𝛑</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>𝐭</mi><mi>𝚻</mi></mfrac><mi mathvariant=\"bold\">−</mi><mfrac><mi>𝐱</mi><mi>𝛌</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟏</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{:\\ }\\mathbf{\\upsilon}_{\\mathbf{y}}\\mathbf{=}\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}} = \\frac{2\\pi}{Τ}A\\sigma\\upsilon\\nu 2\\pi\\left( \\frac{t}{Τ} - \\frac{x}{\\lambda} \\right) = \\mathbf{\\omega A\\sigma\\upsilon\\nu}\\mathbf{2}\\mathbf{\\pi}\\left( \\frac{\\mathbf{t}}{\\mathbf{Τ}}\\mathbf{-}\\frac{\\mathbf{x}}{\\mathbf{\\lambda}} \\right)\\mathbf{\\ (1)}</annotation></semantics></math>\n(με συλλογισμό που έλκεται από την Α.Α.Τ.)."
+        },
+        {
+          "type": "paragraph",
+          "html": "Επομένως η απάντηση στο 1<sup>ο</sup> ερώτημα είναι: Ναι, <em>από το\nγράφημα y-t που αφορά το εν λόγω σημείο, προσδιορίζεται η φορά κίνησής\nτου κάθε χρονική στιγμή, από το πρόσημο της ταχύτητας ταλάντωσης δηλαδή,\nτο πρόσημο της κλίσης στο</em> γράφημα y-t <em>τη δεδομένη χρονική\nστιγμή.</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "2. Με παραπάνω σκεπτικό για την κλίση του γραφήματος y-x\n(στιγμιοτύπου) δηλαδή\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>x</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\Delta y}{\\Delta x}</annotation></semantics></math>\nέχουμε:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>−</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>λ</mi></mfrac><mi>A</mi><mi>σ</mi><mi>υ</mi><mi>ν</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>2</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow><annotation encoding=\"application/x-tex\">\\frac{\\Delta y}{\\Delta x} = - \\frac{2\\pi}{\\lambda}A\\sigma\\upsilon\\nu 2\\pi\\left( \\frac{t}{Τ} - \\frac{x}{\\lambda} \\right)(2)</annotation></semantics></math>.\nΌμως για την ταχύτητα διάδοσης του κύματος υ ισχύει :\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>υ</mi><mo>=</mo><mfrac><mi>λ</mi><mi>Τ</mi></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><mi>π</mi><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>Τ</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>ω</mi><mi>λ</mi></mrow><mrow><mn>2</mn><mi>π</mi></mrow></mfrac><mover><mo>⇔</mo><mrow></mrow></mover><mspace width=\"0.222em\"></mspace><mfrac><mrow><mn>𝟐</mn><mi>𝛑</mi></mrow><mi>𝛌</mi></mfrac><mo mathvariant=\"bold\">=</mo><mfrac><mi>𝛚</mi><mi>𝛖</mi></mfrac></mrow><annotation encoding=\"application/x-tex\">\\upsilon = \\frac{\\lambda}{Τ} = \\frac{2\\pi\\lambda}{2\\pi Τ} = \\frac{\\omega\\lambda}{2\\pi}\\overset{}{\\Leftrightarrow}\\ \\frac{\\mathbf{2}\\mathbf{\\pi}}{\\mathbf{\\lambda}}\\mathbf{=}\\frac{\\mathbf{\\omega}}{\\mathbf{\\upsilon}}</annotation></semantics></math>\n<strong>,</strong> οπότε η παραπάνω σχέση (2) γράφεται :\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>−</mi><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>λ</mi></mfrac><mi>A</mi><mi>σ</mi><mi>υ</mi><mi>ν</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mo>=</mo><mi>−</mi><mfrac><mi>𝛚</mi><mi>𝛖</mi></mfrac><mi>A</mi><mi>σ</mi><mi>υ</mi><mi>ν</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>3</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow><annotation encoding=\"application/x-tex\">\\frac{\\Delta y}{\\Delta x} = - \\frac{2\\pi}{\\lambda}A\\sigma\\upsilon\\nu 2\\pi\\left( \\frac{t}{Τ} - \\frac{x}{\\lambda} \\right) = - \\frac{\\mathbf{\\omega}}{\\mathbf{\\upsilon}}A\\sigma\\upsilon\\nu 2\\pi\\left( \\frac{t}{Τ} - \\frac{x}{\\lambda} \\right)\\ (3)</annotation></semantics></math>\nκαι προφανώς η (3) με βάση την (1) γράφεται τελικά:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>−</mi><mfrac><mi>𝛚</mi><mi>υ</mi></mfrac><mrow><mi>𝐀</mi><mi>𝛔</mi><mi>𝛖</mi><mi>𝛎</mi></mrow><mn>𝟐</mn><mi>𝛑</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>𝐭</mi><mi>𝚻</mi></mfrac><mi mathvariant=\"bold\">−</mi><mfrac><mi>𝐱</mi><mi>𝛌</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi></mrow><mfrac><mn>𝟏</mn><mi>𝛖</mi></mfrac><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>Δ</mi><mi>y</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace><mover><mo>⇔</mo><mrow></mrow></mover><msub><mi>𝛖</mi><mi>𝐲</mi></msub><mo>=</mo><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">−</mi><mi>𝛖</mi></mrow><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">(</mo></mrow><mn>𝟒</mn><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"false\">)</mo></mrow><annotation encoding=\"application/x-tex\">\\frac{\\Delta y}{\\Delta x} = - \\frac{\\mathbf{\\omega}}{\\upsilon}\\mathbf{A\\sigma\\upsilon\\nu}\\mathbf{2}\\mathbf{\\pi}\\left( \\frac{\\mathbf{t}}{\\mathbf{Τ}}\\mathbf{-}\\frac{\\mathbf{x}}{\\mathbf{\\lambda}} \\right)\\mathbf{= -}\\frac{\\mathbf{1}}{\\mathbf{\\upsilon}}\\mathbf{\\ }\\frac{\\Delta y}{\\Delta t}\\ \\overset{}{\\Leftrightarrow}\\mathbf{\\upsilon}_{\\mathbf{y}} = \\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}}\\mathbf{= - \\upsilon}\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{\\ (}\\mathbf{4}\\mathbf{)}</annotation></semantics></math>"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-27",
+      "sourcePdfPage": 42,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Αντιλαμβανόμαστε ότι αν το κύμα διαδιδόταν προς τα αριστερά η σχέση\n(4) γράφεται αντίστοιχα"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝛖</mi><mi>𝐲</mi></msub><mo>=</mo><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mo mathvariant=\"bold\">=</mo><mi>𝛖</mi></mrow><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mn>𝟒</mn><mi mathvariant=\"bold\">΄</mi><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\\upsilon}_{\\mathbf{y}} = \\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}}\\mathbf{= \\upsilon}\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{\\ (4΄)}</annotation></semantics></math>\nοπότε καταλήγουμε στη σχέση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝛖</mi><mi>𝐲</mi></msub><mo>=</mo><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">∓</mi><mi>𝛖</mi><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mn>𝟓</mn><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow><mrow><mspace width=\"0.222em\"></mspace><mi>𝛍</mi><mi>𝛆</mi></mrow><mrow><mo form=\"prefix\" stretchy=\"true\">{</mo><mtable><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛆</mi><mi>𝛏</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">+</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛒</mi><mi>𝛊</mi><mi>𝛔</mi><mi>𝛕</mi><mi>𝛆</mi><mi>𝛒</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr></mtable></mrow><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">\\mathbf{\\upsilon}_{\\mathbf{y}} = \\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}}\\mathbf{=}\\mathbf{\\mp}\\mathbf{\\upsilon}\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{\\ }\\left( \\mathbf{5} \\right)\\mathbf{\\ \\mu\\varepsilon}\\left\\{ \\begin{array}{r}\n\\mathbf{- \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\delta\\varepsilon\\xi\\iota ά} \\\\\n\\mathbf{+ \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\alpha\\rho\\iota\\sigma\\tau\\varepsilon\\rho ά}\n\\end{array} \\right.\\ </annotation></semantics></math>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Επομένως η απάντηση στο 2<sup>ο</sup> ερώτημα με βάση την (5) είναι:\nΝαι, <em>από το γράφημα y-x για τη δεδομένη χρονική στιγμή και για το εν\nλόγω σημείο, προσδιορίζεται η φορά κίνησής του τη δεδομένη χρονική\nστιγμή, από το πρόσημο της κλίσης στο</em> γράφημα y-x <em>τη δεδομένη\nχρονική στιγμή παίρνοντας υπόψη τη φορά διάδοσης του κύματος.</em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "3. Η σχέση (4) συσχετίζει τις δύο κλίσεις για το ίδιο γεγονός y(x,t)\nαπαντώντας στο 3<sup>ο</sup> ερώτημα, ως κλίσεις"
+        },
+        {
+          "type": "paragraph",
+          "html": "α. ίδιου ή αντίθετου πρόσημου ανάλογα με τη φορά διάδοσης του\nκύματος"
+        },
+        {
+          "type": "paragraph",
+          "html": "β. με τιμές συνεχώς ανάλογες, όταν αφορούν στο ίδιο γεγονός\ny(x,t)."
+        },
+        {
+          "type": "section_heading",
+          "title": "Συμπερασματικά"
+        },
+        {
+          "type": "paragraph",
+          "html": "Αν αναφερόμαστε σε συγκεκριμένο σημείο Α του μέσου διάδοσης ενός\nγραμμικού αρμονικού κύματος με εξίσωση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>y</mi><mo>=</mo><mi>A</mi><mi>η</mi><mi>μ</mi><mn>2</mn><mi>π</mi><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mfrac><mi>t</mi><mi>Τ</mi></mfrac><mo>−</mo><mfrac><mi>x</mi><mi>λ</mi></mfrac><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mrow><annotation encoding=\"application/x-tex\">y = A\\eta\\mu 2\\pi(\\frac{t}{Τ} - \\frac{x}{\\lambda})</annotation></semantics></math>,\nστη θέση x<sub>A</sub>=3λ/8 τη χρονική στιγμή t<sub>1</sub> = 3T/4 της\nδιάδοσής του, προφανώς χρειαζόμαστε τα δύο γραφήματα (Εικόνα 1)"
+        },
+        {
+          "type": "paragraph",
+          "html": "1. y- x τη χρονική στιγμή t₁ (στιγμιότυπο t₁) και να επικεντρωθούμε\nστο σημείο Α(x<sub>A</sub>), γεγονός y<sub>Α</sub>(x<sub>A</sub>, t₁)\nκαι"
+        },
+        {
+          "type": "paragraph",
+          "html": "2. y<sub>A</sub>-t που αφορά στην ταλάντωση του σημείου Α και να\nεπικεντρωθούμε στη χρονική στιγμή t₁, γεγονός\ny<sub>Α</sub>(x<sub>A</sub>, t₁)"
+        },
+        {
+          "type": "paragraph",
+          "html": "Σ αυτά αναζητάμε (χαράσσουμε), συγκρίνουμε τις κλίσεις για το ίδιο\nγεγονός y<sub>Α</sub>(x<sub>A</sub>, t₁):"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-28",
+      "sourcePdfPage": 43,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<ul>\n<li><p><math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}</annotation></semantics></math>\nστο γράφημα y- x τη χρονική στιγμή t₁ (στιγμιότυπο t₁) στο σημείο\nΑ(x<sub>A</sub>)</p></li>\n<li><p><math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta t}}</annotation></semantics></math>\nστο γράφημα y<sub>A</sub>-t τη χρονική στιγμή t₁</p></li>\n</ul>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Από το πρώτο γράφημα (στιγμιότυπο t<sub>1</sub>) y-x που αφορά στην\nχρονική στιγμή t<sub>1</sub> = 3T/4 για το σημείο A με\nx<sub>A</sub>=3λ/8 η κλίση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>\nτου γραφήματος στο σημείο αυτό προκύπτει θετική. Συμπεραίνουμε ότι η\nφορά κίνησης του σημείου τη χρονική στιγμή t<sub>1</sub> = 3T/4 θα είναι\nαρνητική (με βάση την σχέση (5))."
+        },
+        {
+          "type": "figure",
+          "src": "images/word_import/image10.png",
+          "alt": "Εικόνα 1 Αριστερά: στιγμιότυπο y–x στη στιγμή t 1 = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x A =\n3λ/8. Δεξιά: γράφημα y–t του σημείου A. Το σημείο μένει στο μηδέν μέχρι\nt A = x A /υ = 3T/8. Οι κλίσεις συγκρίνονται στο ίδιο\nγεγονός y A (x A , t 1 ).",
+          "caption": "Εικόνα 1 Αριστερά: στιγμιότυπο y–x στη στιγμή t<sub>1</sub> = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x<sub>A</sub> =\n3λ/8.<br/>Δεξιά: γράφημα y–t του σημείου A. Το σημείο μένει στο μηδέν μέχρι\nt<sub>A</sub> = x<sub>A</sub>/υ = 3T/8. Οι κλίσεις συγκρίνονται στο ίδιο\nγεγονός y<sub>A</sub>(x<sub>A</sub>, t<sub>1</sub>).",
+          "placement": "center",
+          "status": "static_image",
+          "frameWidth": 520,
+          "aspect": "natural",
+          "title": "Εικόνα 1 Αριστερά: στιγμιότυπο y–x στη στιγμή t 1 = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x A =\n3λ/8"
+        },
+        {
+          "type": "paragraph",
+          "html": "Από το δεύτερο γράφημα y-t για το σημείο Α με x<sub>A</sub>=3λ/8 η\nσημειωμένη την κλίση του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>την\nχρονική στιγμή t<sub>1</sub> = 3T/4 που παριστάνει την ταχύτητα\nταλάντωσης τη δεδομένη χρονική στιγμή, προκύπτει επίσης αρνητική."
+        },
+        {
+          "type": "paragraph",
+          "html": "Επομένως για κύμα που διαδίδεται προς τα δεξιά, όπως στο σχήμα,\n<strong>οι δύο κλίσεις, όταν αφορούν το ίδιο γεγονός\ny<sub>A</sub>(x<sub>A</sub>,t<sub>1</sub>),</strong> πρέπει να έχουν\nαντίθετο πρόσημο και κυρίως <strong>είναι ανάλογες, με σταθερά αναλογίας\nτην ταχύτητα διάδοσης υ</strong>."
+        },
+        {
+          "type": "section_heading",
+          "title": "Γενίκευση"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-29",
+      "sourcePdfPage": 44,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Για ηλεκτρομαγνητικό κύμα στο κενό η ταχύτητα διάδοσης είναι c.\nΓενικεύοντας το παραπάνω συμπέρασμα συγκρατούμε ότι <em><strong>«για\nοποιοδήποτε διαδιδόμενο αρμονικά, πεδιακό μέγεθος F, όταν η σύγκριση\nρυθμών μεταβολής γίνεται στο ίδιο γεγονός F<sub>Α</sub>(x<sub>A</sub>,\nt<sub>1</sub>), ισχύει:</strong></em>\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐭</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">∓</mi><mi>𝐜</mi></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐱</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mi>𝛍</mi><mi>𝛆</mi></mrow><mrow><mo form=\"prefix\" stretchy=\"true\">{</mo><mtable><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛆</mi><mi>𝛏</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">+</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛒</mi><mi>𝛊</mi><mi>𝛔</mi><mi>𝛕</mi><mi>𝛆</mi><mi>𝛒</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr></mtable></mrow><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{t}}}{\\mathbf{\\Delta t}}\\mathbf{= \\mp c}\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{x}}}{\\mathbf{\\Delta x}}\\mathbf{\\ \\mu\\varepsilon}\\left\\{ \\begin{array}{r}\n\\mathbf{- \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\delta\\varepsilon\\xi\\iota ά} \\\\\n\\mathbf{+ \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\alpha\\rho\\iota\\sigma\\tau\\varepsilon\\rho ά}\n\\end{array} \\right.\\ </annotation></semantics></math> <em><strong>ή, οι\nδύο ρυθμοί-κλίσεις για το ίδιο γεγονός F<sub>Α</sub>(x<sub>A</sub>,\nt<sub>1</sub>), είναι συνεχώς ανάλογοι!»</strong></em>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Συνδέοντας\nτα μέρη: Συμπεράσματα στα επαγόμενα ηλεκτρικά και μαγνητικά πεδία"
+        },
+        {
+          "type": "section_heading",
+          "title": "Διαπίστωση 1 η :"
+        },
+        {
+          "type": "paragraph",
+          "html": "Από τη γενική ιδιότητα κάθε κύματος, με τη σύγκριση να γίνεται στο\nίδιο γεγονός <em><strong>F<sub>Α</sub>(r<sub>A</sub>,\nt<sub>1</sub>),:</strong></em>"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐭</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mrow><mo mathvariant=\"bold\">=</mo><mi mathvariant=\"bold\">∓</mi><mi>𝐜</mi></mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐫</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mi>𝛍</mi><mi>𝛆</mi></mrow><mrow><mo form=\"prefix\" stretchy=\"true\">{</mo><mtable><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">−</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛆</mi><mi>𝛏</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mrow><mi mathvariant=\"bold\">+</mi><mspace width=\"0.222em\"></mspace><mi>𝛄</mi><mi>𝛊</mi><mi>𝛂</mi><mspace width=\"0.222em\"></mspace><mi>𝛅</mi><mi>𝛊</mi><mi mathvariant=\"bold\">ά</mi><mi>𝛅</mi><mi>𝛐</mi><mi>𝛔</mi><mi>𝛈</mi><mspace width=\"0.222em\"></mspace><mi>𝛂</mi><mi>𝛒</mi><mi>𝛊</mi><mi>𝛔</mi><mi>𝛕</mi><mi>𝛆</mi><mi>𝛒</mi><mi mathvariant=\"bold\">ά</mi></mrow></mtd></mtr></mtable></mrow><mspace width=\"0.222em\"></mspace></mrow><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{t}}}{\\mathbf{\\Delta t}}\\mathbf{= \\mp c}\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{r}}}{\\mathbf{\\Delta r}}\\mathbf{\\ \\mu\\varepsilon}\\left\\{ \\begin{array}{r}\n\\mathbf{- \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\delta\\varepsilon\\xi\\iota ά} \\\\\n\\mathbf{+ \\ \\gamma\\iota\\alpha\\ \\delta\\iota ά\\delta ο\\sigma\\eta\\ \\alpha\\rho\\iota\\sigma\\tau\\varepsilon\\rho ά}\n\\end{array} \\right.\\ </annotation></semantics></math> ή γενικότερα\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐭</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo mathvariant=\"bold\">∝</mo><mfrac><mrow><mi>𝚫</mi><msub><mi>𝐅</mi><mi>𝐫</mi></msub></mrow><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mrow><mspace width=\"0.222em\"></mspace><mrow><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"true\">(</mo><mi>𝛂</mi><mo form=\"postfix\" mathvariant=\"bold\" stretchy=\"true\">)</mo></mrow></mrow></mrow><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{t}}}{\\mathbf{\\Delta t}}\\mathbf{\\propto}\\frac{\\mathbf{\\Delta}\\mathbf{F}_{\\mathbf{r}}}{\\mathbf{\\Delta r}}\\mathbf{\\ (\\alpha)}</annotation></semantics></math>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Διαπίστωση 2 η :"
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-30",
+      "sourcePdfPage": 45,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"block\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Π</mi><mi>α</mi><mi>ν</mi><mi>ο</mi><mi>μ</mi><mi>ο</mi><mi>ι</mi><mi>ό</mi><mi>τ</mi><mi>υ</mi><mi>π</mi><mi>ε</mi><mo>𝜍</mo><mspace width=\"0.222em\"></mspace><mi>σ</mi><mi>χ</mi><mi>έ</mi><mi>σ</mi><mi>ε</mi><mi>ι</mi><mo>𝜍</mo><mo>:</mo><mrow><mo form=\"prefix\" stretchy=\"true\">{</mo><mtable><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝚩</mi><mo mathvariant=\"bold\">,</mo><mi>𝐫</mi></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mo>∝</mo><mover><mo>⇐</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>α</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><mfrac><mrow><mi>Δ</mi><msub><mi>Φ</mi><mrow><mi>Β</mi><mo>,</mo><mi>t</mi></mrow></msub></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mo>∝</mo><mfrac><mrow><mi>Δ</mi><msub><mi>Φ</mi><mrow><mi>Ε</mi><mo>,</mo><mi>r</mi></mrow></msub></mrow><mrow><mi>Δ</mi><mi>r</mi></mrow></mfrac><mover><mo>⇒</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>α</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><mo>∝</mo><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝚬</mi><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mtd></mtr><mtr><mtd columnalign=\"right\" style=\"text-align: right\"><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝚬</mi><mo mathvariant=\"bold\">,</mo><mi>𝐫</mi></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐫</mi></mrow></mfrac><mo>∝</mo><mover><mo>⇐</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>α</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><mfrac><mrow><mi>Δ</mi><msub><mi>Φ</mi><mrow><mi>Ε</mi><mo>,</mo><mi>t</mi></mrow></msub></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac><mo>∝</mo><mfrac><mrow><mi>Δ</mi><msub><mi>Φ</mi><mrow><mi>Β</mi><mo>,</mo><mi>r</mi></mrow></msub></mrow><mrow><mi>Δ</mi><mi>r</mi></mrow></mfrac><mover><mo>⇒</mo><mrow><mo form=\"prefix\" stretchy=\"true\">(</mo><mi>α</mi><mo form=\"postfix\" stretchy=\"true\">)</mo></mrow></mover><mo>∝</mo><mfrac><mrow><mi>𝚫</mi><msub><mi>𝚽</mi><mrow><mi>𝚩</mi><mo mathvariant=\"bold\">,</mo><mi>𝐭</mi></mrow></msub></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac></mtd></mtr></mtable></mrow><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mspace width=\"0.222em\"></mspace><mtable><mtr><mtd columnalign=\"center\" style=\"text-align: center\"><mtable><mtr><mtd columnalign=\"center\" style=\"text-align: center\"><mi>Α</mi><mi>π</mi><mi>ό</mi><mspace width=\"0.222em\"></mspace><mi>F</mi><mi>a</mi><mi>r</mi><mi>a</mi><mi>d</mi><mi>a</mi><mi>y</mi></mtd></mtr><mtr><mtd columnalign=\"center\" style=\"text-align: center\"></mtd></mtr></mtable></mtd></mtr><mtr><mtd columnalign=\"center\" style=\"text-align: center\"><mi>Α</mi><mi>π</mi><mi>ό</mi><mspace width=\"0.222em\"></mspace><mi>M</mi><mi>a</mi><mi>x</mi><mi>w</mi><mi>e</mi><mi>l</mi><mi>l</mi></mtd></mtr></mtable></mrow><annotation encoding=\"application/x-tex\">\\Pi\\alpha\\nu ο\\mu ο\\iota ό\\tau\\upsilon\\pi\\varepsilon\\varsigma\\ \\sigma\\chi έ\\sigma\\varepsilon\\iota\\varsigma:\\left\\{ \\begin{array}{r}\n\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{Β,r}}}{\\mathbf{\\Delta r}} \\propto \\overset{(\\alpha)}{\\Leftarrow}\\frac{\\Delta\\Phi_{Β,t}}{\\Delta t} \\propto \\frac{\\Delta\\Phi_{Ε,r}}{\\Delta r}\\overset{(\\alpha)}{\\Rightarrow} \\propto \\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{Ε,t}}}{\\mathbf{\\Delta t}} \\\\\n\\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{Ε,r}}}{\\mathbf{\\Delta r}} \\propto \\overset{(\\alpha)}{\\Leftarrow}\\frac{\\Delta\\Phi_{Ε,t}}{\\Delta t} \\propto \\frac{\\Delta\\Phi_{Β,r}}{\\Delta r}\\overset{(\\alpha)}{\\Rightarrow} \\propto \\frac{\\mathbf{\\Delta}\\mathbf{\\Phi}_{\\mathbf{Β,t}}}{\\mathbf{\\Delta t}}\n\\end{array} \\right.\\ \\ \\ \\ \\begin{matrix}\n\\begin{matrix}\nΑ\\pi ό\\ Faraday \\\\\n\n\\end{matrix} \\\\\nΑ\\pi ό\\ Maxwell\n\\end{matrix}</annotation></semantics></math>"
+        },
+        {
+          "type": "section_heading",
+          "title": "Συμπέρασμα:"
+        },
+        {
+          "type": "paragraph",
+          "html": "Δηλαδή τα δύο αλληλοεπαγόμενα πεδία έχουν συνεχώς ανάλογους χωρικούς\nκαι τους χρονικούς ρυθμούς μεταβολής τους με πιο απλά λόγια τα γραφήματά\nτους, και τα χωρικά (στιγμιότυπα) και τα χρονικά (η χρονικά\nμεταβαλλόμενη τιμής τους) για κάθε σημείο, κάθε στιγμή έχουν κλίσεις\nίσες ή ανάλογες επομένως είναι συμφασικά. Τα γραφήματα E και cB δηλαδή,\nόταν μπουν στην ίδια κλίμακα, έχουν ανάλογες κλίσεις, ίδια μηδενικά,\nίδια μέγιστα και ίδια ελάχιστα. Αυτό είναι η εικόνα της\nσυμφασικότητας"
+        },
+        {
+          "type": "section_heading",
+          "title": "Γιατί έτσι δεν\nπροκύπτει διαφορά φάσης 90°;"
+        },
+        {
+          "type": "paragraph",
+          "html": "Η διαφορά φάσης 90° θα ήταν φυσικό συμπέρασμα αν συνέβαινε\nγραμμικά-σειριακά:"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Β</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Β \\propto \\frac{\\Delta Ε}{\\Delta t}</annotation></semantics></math>\nΓια την μεταβολή της έντασης του ηλεκτρικού πεδίου στο εσωτερικό Ε της\nράβδου που δημιουργεί το ηλεκτρικό ρεύμα i που συμβάλλει στη δημιουργία\nτου πεδίου Biot-Savart γύρω από αυτήν και στη συνέχεια"
+        },
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Β</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε \\propto \\frac{\\Delta Β}{\\Delta t}</annotation></semantics></math>\nγια το ηλεκτρικό πεδίο και την ΗΕΔ από επαγωγή (Faranday-Lentz) λόγω της\nμεταβολής του μαγνητικού πεδίου Β του προηγούμενου βήματος"
+        },
+        {
+          "type": "paragraph",
+          "html": "Οι σχέσεις όμως Faraday–Maxwell, συμπεραίνουν καθώς εφαρμόζονται,\nσταθερή αναλογία ανάμεσα στη χωρική κλίση του ενός πεδίου με την χρονική\nκλίση του άλλου. Και επειδή σε κάθε κύμα η χρονική κλίση του ίδιου\nμεγέθους είναι δεμένη με τη χωρική κλίση του, οι κλίσεις των E και B\nκλειδώνουν σταθερά μεταξύ τους. Τα γραφήματα E και cB δηλαδή, όταν μπουν\nστην ίδια κλίμακα, έχουν ανάλογες ή ίδιες κλίσεις και οι μεδενικές\nτιμές, τα μέγιστα και τα ελάχιστα συμβαίνουν την ίδια ακριβώς χρονική\nστιγμή. Αυτό όπως τονίστηκε και πιο πάνω είναι η εικόνα της\nσυμφασικότητας."
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-31",
+      "sourcePdfPage": 46,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "figure",
+          "src": "images/word_import/image12.png",
+          "alt": "Εικόνα 2 Αν το B μπει στην ίδια κλίμακα ως cB, τα δύο γραφήματα\nσυμπίπτουν στο καθαρό ακτινοβολούμενο κύμα.",
+          "caption": "Εικόνα 2 Αν το B μπει στην ίδια κλίμακα ως cB, τα δύο γραφήματα\nσυμπίπτουν στο καθαρό ακτινοβολούμενο κύμα.",
+          "placement": "center",
+          "status": "static_image",
+          "frameWidth": 420,
+          "aspect": "natural",
+          "title": "Εικόνα 2 Αν το B μπει στην ίδια κλίμακα ως cB, τα δύο γραφήματα\nσυμπίπτουν στο καθαρό ακτινοβολούμενο κύμα"
+        },
+        {
+          "type": "section_heading",
+          "title": "Συνόψιση"
+        },
+        {
+          "type": "paragraph",
+          "html": "Στο ταλαντούμενο δίπολο δεν εμφανίζεται πρώτα ένα κοντινό φαινόμενο\nκαι ύστερα “γεννιέται” κάτι άλλο μακριά με αποτελεσμα κάπου μακριά να\nεμφανίζεται το ΗΜ κύμα. Οι ακτινοβολούμενες συνιστώσες υπάρχουν εξαρχής\nως μέρος της συνολικής διάδοσης."
+        },
+        {
+          "type": "paragraph",
+          "html": "Κοντά στην πηγή συνυπάρχουν με δεσμευμένα και επαγωγικά πεδία."
+        },
+        {
+          "type": "paragraph",
+          "html": "<ul>\n<li><p>Το ηλεκτροστατικό πεδίο κάθε φορτίου χωριστά έχει Coulombική\nσυμπεριφορά 1/r².</p></li>\n<li><p>Το συνολικό δεσμευμένο διπολικό ηλεκτρικό πεδίο, όταν το δίπολο\nφαίνεται ως σύνολο, έχει κύριο όρο 1/r³.</p></li>\n<li><p>Οι επαγωγικές συνιστώσες πέφτουν ενδιάμεσα, τυπικά ως\n1/r².</p></li>\n<li><p>Η ακτινοβολούμενη συνιστώσα πέφτει πιο αργά, ως 1/r.</p></li>\n</ul>"
+        },
+        {
+          "type": "paragraph",
+          "html": "Άρα κοντά στο δίπολο η συνολική εικόνα δεν είναι συμφασική ούτε\nκαθαρή από πλευράς μορφής, επειδή είναι σύνθεση πολλών συνιστωσών. Καθώς\nαπομακρυνόμαστε, οι δεσμευμένες και επαγωγικές συνιστώσες υποχωρούν πιο\nγρήγορα. Δεν συνδυάζονται πια με την ίδια ισχύ με την ακτινοβολούμενη\nσυνιστώσα οπότε απομένει κυρίαρχη η ακτινοβολούμενη διαταραχή. Σε αυτήν\nτα E και B είναι κάθετα μεταξύ τους, κάθετα στη διεύθυνση διάδοσης,\nσυμφασικά, με E = cB, και μεταφέρουν ενέργεια μακριά από το δίπολο."
+        }
+      ]
+    },
+    {
+      "id": "page-appendix-32",
+      "sourcePdfPage": 47,
+      "header": {
+        "left": "ΜΕΡΟΣ Δ΄",
+        "center": "",
+        "right": "Παραρτήματα",
+        "center_en": "",
+        "left_en": "",
+        "right_en": ""
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
+          "type": "paragraph",
+          "html": "Πόσο γρήγορα μπορεί να αναρωτηθεί κάποιος ή σε πόση απόσταση από το\nδίπολο συμβαίνει αυτό; Η απόσταση στην οποία η ακτινοβολούμενη συνιστώσα\nαρχίζει να ξεχωρίζει εξαρτάται από τη γεωμετρία της πηγής και από το\nμήκος κύματος. Δεν υπάρχει ένα απόλυτο όριο. Σε διδακτική περιγραφή\nμπορούμε να πούμε ότι η καθαρή ακτινοβολούμενη εικόνα αναδεικνύεται όταν\nοι δεσμευμένες και επαγωγικές συνιστώσες έχουν εξασθενήσει αρκετά σε\nσχέση με την 1/r συνιστώσα. Η απόσταση παρόλα αυτά εξαρτάται από το\nμέγεθος του διπόλου και τη σχέση του με το μήκος κύματος της\nακτινοβολούμενης ηλεκτρομαγνητικής ενέργειας ή πιο απλά από τη συχνότητα\nτης εναλλασσόμενης τάσης. Πρακτικά για μια συντονισμένη διπολική κεραία\nη καθαρή ακτινοβολούμενη εικόνα αρχίζει να αναδεικνύεται σε αποστάσεις\nτάξης του μήκους της κεραίας. Η απόσταση αυτή δεν είναι απόλυτο όριο\nαλλά τάξη μεγέθους"
         }
       ]
     }
