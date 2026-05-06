@@ -2209,10 +2209,6 @@
         {
           "type": "paragraph",
           "html": "Η διαφορά φάσης 90° θα ήταν φυσικό συμπέρασμα αν συνέβαινε\nγραμμικά-σειριακά:"
-        },
-        {
-          "type": "paragraph",
-          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Β</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Β \\propto \\frac{\\Delta Ε}{\\Delta t}</annotation></semantics></math>\nΓια την μεταβολή της έντασης του ηλεκτρικού πεδίου στο εσωτερικό Ε της\nράβδου που δημιουργεί το ηλεκτρικό ρεύμα i που συμβάλλει στη δημιουργία\nτου πεδίου Biot-Savart γύρω από αυτήν και στη συνέχεια"
         }
       ]
     },
@@ -2236,6 +2232,10 @@
         "right_en": "{page}"
       },
       "items": [
+        {
+          "type": "paragraph",
+          "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Β</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Ε</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Β \\propto \\frac{\\Delta Ε}{\\Delta t}</annotation></semantics></math>\nΓια την μεταβολή της έντασης του ηλεκτρικού πεδίου στο εσωτερικό Ε της\nράβδου που δημιουργεί το ηλεκτρικό ρεύμα i που συμβάλλει στη δημιουργία\nτου πεδίου Biot-Savart γύρω από αυτήν και στη συνέχεια"
+        },
         {
           "type": "paragraph",
           "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Β</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε \\propto \\frac{\\Delta Β}{\\Delta t}</annotation></semantics></math>\nγια το ηλεκτρικό πεδίο και την ΗΕΔ από επαγωγή (Faranday-Lentz) λόγω της\nμεταβολής του μαγνητικού πεδίου Β του προηγούμενου βήματος"
