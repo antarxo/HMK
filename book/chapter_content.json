@@ -402,7 +402,28 @@
           "type": "paragraph",
           "html": "4. Οι Ampère–Maxwell διαπιστώνουν ότι η μεταβολή του ηλεκτρικού πεδίου, δηλαδή το <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mfrac><mrow><mi>Δ</mi><mi>E</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>, προκαλεί μαγνητικό πεδίο <em>B</em> ακόμη και εκεί όπου δεν υπάρχει τοπικά αγωγός που να διαρρέεται από ρεύμα!",
           "html_en": "4. Ampère–Maxwell state that the change of the electric field, that is <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mfrac><mrow><mi>Δ</mi><mi>E</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>, produces a magnetic field <em>B</em> even where there is locally no conductor carrying current!"
-        },
+        }
+      ]
+    },
+    {
+      "id": "page-4",
+      "header": {
+        "left": "ΜΕΡΟΣ Α΄",
+        "center": "",
+        "right": "Εισαγωγικές έννοιες",
+        "center_en": "",
+        "left_en": "PART A",
+        "right_en": "Introductory concepts"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
         {
           "type": "part_title",
           "label": "ΜΕΡΟΣ Β΄",
@@ -419,6 +440,26 @@
           "type": "paragraph",
           "html": "Ξεκινάμε συνειδητά από το σχολικό αφήγημα. Έτσι, στην αρχική αυτή περιγραφή παίρνουμε υπόψη τον νόμο Coulomb για το ηλεκτρικό πεδίο που συνδέεται με τη φόρτιση των άκρων του διπόλου και τον νόμο Biot–Savart για το μαγνητικό πεδίο που συνδέεται με το ρεύμα που διαρρέει τη ράβδο. Ταυτόχρονα δηλώνουμε εξαρχής ότι σε αυτή την περιγραφή δεν λαμβάνουμε υπόψη την απόσβεση των εντάσεων των πεδίων  <em>E</em> και <em>B</em> λόγω απόστασης από το δίπολο.\n",
           "html_en": "We begin deliberately from the school narrative. Thus, in this initial description we take into account Coulomb’s law for the electric field associated with the charging of the ends of the dipole and Biot–Savart’s law for the magnetic field associated with the current flowing through the rod. At the same time, we state from the outset that in this description we do not take into account the attenuation of the field intensities <em>E</em> and <em>B</em> due to the distance from the dipole.\n"
+        },
+        {
+          "type": "paragraph",
+          "html": "Ακολουθούν στο τέλος περιγραφές του ηλεκτρομαγνητικού πεδίου που παίρνουν υπόψη τόσο την απόσβεση των εντάσεων των πεδίων E και B όσο και τα σημαντικά φαινόμενα επαγωγής όπως περιγράφονται από το Νόμο επαγωγής του Faraday και τον Νόμο Ampere-Maxwell.",
+          "html_en": "Descriptions of the electromagnetic field that do take into account both the attenuation of the intensities of the E and B fields and the important induction phenomena described by Faraday’s law of induction and the Ampère–Maxwell law follow later on."
+        },
+        {
+          "type": "paragraph",
+          "html": "Διδακτικά είναι θεμιτό να ξεκινήσουμε από αυτή την απλουστευμένη διαδικασία γέννησης και διάδοσης του ηλεκτρομαγνητικού κύματος, επιδιώκοντας στη συνέχεια να καλύψουμε τα κενά που αφήνει. Στόχος μας επομένως είναι πρώτα να οργανωθεί καθαρά και να κατανοηθεί σε βάθος η αντίστοιχη περιγραφή που επιχειρεί το σχολικό βιβλίο.",
+          "html_en": "Didactically, it is legitimate to begin from this simplified process of generation and propagation of the electromagnetic wave, aiming then to cover the gaps it leaves. Our goal, therefore, is first to organize clearly and understand in depth the corresponding description attempted by the school textbook."
+        },
+        {
+          "type": "paragraph",
+          "html": "Σε αυτή την πρώτη φάση θα περιγράψουμε τη διάδοση δύο πεδίων που απορρέουν από τις μεταβολές στην κατάσταση του διπόλου: το ηλεκτρικό πεδίο <em>E</em>, που συνδέεται με τη φόρτιση των άκρων της ράβδου, και το μαγνητικό πεδίο <em>B</em>, που συνδέεται με το ρεύμα της ράβδου.",
+          "html_en": "In this first phase we shall describe the propagation of two fields that arise from changes in the state of the dipole: the electric field <em>E</em>, associated with the charging of the ends of the rod, and the magnetic field <em>B</em>, associated with the current in the rod."
+        },
+        {
+          "type": "paragraph",
+          "html": "Τονίζουμε εξαρχής ότι αυτή η αφετηρία που δεν δίνει πλήρη περιγραφή της δημιουργίας και διάδοσης του ηλεκτρομαγνητικού κύματος είναι μια διδακτική αφετηρία, γιατί επιτρέπει να οργανωθεί καθαρά η λεγόμενη \"κοντινή\" εικόνα του πεδίου γύρω από την πηγή και να φανεί αργότερα πού ακριβώς αρχίζουν τα όριά της.",
+          "html_en": "We stress from the outset that this starting point, which does not give a complete description of the creation and propagation of the electromagnetic wave, is a didactic starting point, because it allows the so-called “near” picture of the field around the source to be organized clearly and later makes it possible to see exactly where its limits begin."
         }
       ]
     },
@@ -442,26 +483,6 @@
         "right_en": "{page}"
       },
       "items": [
-        {
-          "type": "paragraph",
-          "html": "Ακολουθούν στο τέλος περιγραφές του ηλεκτρομαγνητικού πεδίου που παίρνουν υπόψη τόσο την απόσβεση των εντάσεων των πεδίων E και B όσο και τα σημαντικά φαινόμενα επαγωγής όπως περιγράφονται από το Νόμο επαγωγής του Faraday και τον Νόμο Ampere-Maxwell.",
-          "html_en": "Descriptions of the electromagnetic field that do take into account both the attenuation of the intensities of the E and B fields and the important induction phenomena described by Faraday’s law of induction and the Ampère–Maxwell law follow later on."
-        },
-        {
-          "type": "paragraph",
-          "html": "Διδακτικά είναι θεμιτό να ξεκινήσουμε από αυτή την απλουστευμένη διαδικασία γέννησης και διάδοσης του ηλεκτρομαγνητικού κύματος, επιδιώκοντας στη συνέχεια να καλύψουμε τα κενά που αφήνει. Στόχος μας επομένως είναι πρώτα να οργανωθεί καθαρά και να κατανοηθεί σε βάθος η αντίστοιχη περιγραφή που επιχειρεί το σχολικό βιβλίο.",
-          "html_en": "Didactically, it is legitimate to begin from this simplified process of generation and propagation of the electromagnetic wave, aiming then to cover the gaps it leaves. Our goal, therefore, is first to organize clearly and understand in depth the corresponding description attempted by the school textbook."
-        },
-        {
-          "type": "paragraph",
-          "html": "Σε αυτή την πρώτη φάση θα περιγράψουμε τη διάδοση δύο πεδίων που απορρέουν από τις μεταβολές στην κατάσταση του διπόλου: το ηλεκτρικό πεδίο <em>E</em>, που συνδέεται με τη φόρτιση των άκρων της ράβδου, και το μαγνητικό πεδίο <em>B</em>, που συνδέεται με το ρεύμα της ράβδου.",
-          "html_en": "In this first phase we shall describe the propagation of two fields that arise from changes in the state of the dipole: the electric field <em>E</em>, associated with the charging of the ends of the rod, and the magnetic field <em>B</em>, associated with the current in the rod."
-        },
-        {
-          "type": "paragraph",
-          "html": "Τονίζουμε εξαρχής ότι αυτή η αφετηρία που δεν δίνει πλήρη περιγραφή της δημιουργίας και διάδοσης του ηλεκτρομαγνητικού κύματος είναι μια διδακτική αφετηρία, γιατί επιτρέπει να οργανωθεί καθαρά η λεγόμενη \"κοντινή\" εικόνα του πεδίου γύρω από την πηγή και να φανεί αργότερα πού ακριβώς αρχίζουν τα όριά της.",
-          "html_en": "We stress from the outset that this starting point, which does not give a complete description of the creation and propagation of the electromagnetic wave, is a didactic starting point, because it allows the so-called “near” picture of the field around the source to be organized clearly and later makes it possible to see exactly where its limits begin."
-        },
         {
           "type": "paragraph",
           "html": "<strong>Σχέσεις μεταξύ των μεγεθών</strong>",
@@ -577,11 +598,6 @@
           "html": "<ul><li>Τη στιγμή t=0 το φορτίο στα άκρα του διπόλου είναι μηδέν. Επομένως η τιμή της έντασης του ηλεκτρικού πεδίου Ε=0</li><li>Την ίδια στιγμή όπως φαίνεται από την κλίση στο διάγραμμα q-t, το ρεύμα i είναι μέγιστο. Αυτό σημαίνει ότι η μαγνητική επαγωγή B θα είναι μέγιστη</li></ul>",
           "label_en": "Snapshot",
           "html_en": "<ul><li>At the instant t=0 the charge at the ends of the dipole is zero. Therefore the value of the electric field intensity is E=0.</li><li>At the same instant, as is seen from the slope of the q-t graph, the current i is maximum. This means that the magnetic induction B is also maximum.</li></ul>"
-        },
-        {
-          "type": "section_heading",
-          "title": "Σχολική Περιγραφή",
-          "title_en": "School description"
         },
         {
           "type": "scene",
@@ -1227,13 +1243,6 @@
           "type": "paragraph",
           "html": "Με άλλα λόγια: δεν πετάμε το σχολικό αφήγημα. Το χρησιμοποιούμε σαν πρώτο σκαλοπάτι και μετά το διορθώνουμε σταδιακά, ώσπου να φτάσουμε σε μια πιο φυσική εικόνα του φαινομένου.",
           "html_en": "In other words: we do not throw away the school narrative. We use it as a first step and then correct it gradually, until we arrive at a more physical picture of the phenomenon."
-        },
-        {
-          "type": "part_title",
-          "label": "ΜΕΡΟΣ Δ΄",
-          "title": "Παραρτήματα",
-          "label_en": "PART D",
-          "title_en": "Appendices"
         }
       ]
     },
@@ -1257,6 +1266,13 @@
         "right_en": "{page}"
       },
       "items": [
+        {
+          "type": "part_title",
+          "label": "ΜΕΡΟΣ Δ΄",
+          "title": "Παραρτήματα",
+          "label_en": "PART D",
+          "title_en": "Appendices"
+        },
         {
           "type": "section_heading",
           "title": "Παράρτημα Α — Η έννοια του πεδίου, η διάδοση και η εγκατάστασή του στον χώρο"
@@ -1807,8 +1823,8 @@
           "type": "figure",
           "src": "images/word_import/eikona7_composite.png",
           "alt": "Εικόνα 7 (α) (β) (γ)",
-          "caption": "Εικόνα 7 (α) (β) (γ)",
-          "placement": "right",
+          "caption": "Εικόνα 7 Ηλεκτροστατικό πεδίο θετικού (α), αρνητικού φορτίου (β) και διπόλου (γ)",
+          "placement": "wide",
           "status": "static_image",
           "frameWidth": 340,
           "aspect": "natural",
