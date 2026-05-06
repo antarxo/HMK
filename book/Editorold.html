@@ -312,26 +312,8 @@ function normalizeData(raw){
 
 function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
-const COMMON_SETUP_BUTTONS = [
-  'I↓',
-  'V-t', 'q-t', 'i-t', 'E-t', 'B-t',
-  'Εδ', 'Βδ',
-  'Eδ', 'Bδ',
-  'E→', 'B→',
-  'Σχολικό', 'Σχολικό+', 'ΗΜ κύμα',
-  'Δίπολο',
-  'Φορτία', 'Ηλεκτρόνια',
-  'Δυναμικές γραμμές E', 'Δυναμικές γραμμές B',
-  'Ευθεία διάδοση',
-  'Απόσβεση',
-  'Κοντά', 'Μακριά'
-];
-const COMMON_PRESS_BUTTONS = [
-  '|◀', '◀', '▶', '▶|',
-  '|◀ ◀', '▶ ▶|',
-  'Αρχή', 'Πίσω', 'Play', 'Μπροστά', 'Τέλος',
-  't=0', 'T/4', 'T/2', '3T/4', 'T'
-];
+const COMMON_SETUP_BUTTONS = ['I↓','V-t','q-t','i-t','E-t','B-t','Εδ','Βδ','E→','B→'];
+const COMMON_PRESS_BUTTONS = ['|◀','◀','▶','▶|','|◀ ◀','▶ ▶|'];
 
 
 function nextPageId(base='page'){
