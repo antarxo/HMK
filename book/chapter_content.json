@@ -2115,10 +2115,10 @@
           "type": "figure",
           "src": "images/word_import/image10.png",
           "alt": "Εικόνα 1 Αριστερά: στιγμιότυπο y–x στη στιγμή t 1 = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x A =\n3λ/8. Δεξιά: γράφημα y–t του σημείου A. Το σημείο μένει στο μηδέν μέχρι\nt A = x A /υ = 3T/8. Οι κλίσεις συγκρίνονται στο ίδιο\nγεγονός y A (x A , t 1 ).",
-          "caption": "Εικόνα 1 Αριστερά: στιγμιότυπο y–x στη στιγμή t<sub>1</sub> = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x<sub>A</sub> =\n3λ/8.<br/>Δεξιά: γράφημα y–t του σημείου A. Το σημείο μένει στο μηδέν μέχρι\nt<sub>A</sub> = x<sub>A</sub>/υ = 3T/8. Οι κλίσεις συγκρίνονται στο ίδιο\nγεγονός y<sub>A</sub>(x<sub>A</sub>, t<sub>1</sub>).",
+          "caption": "",
           "placement": "wide",
           "status": "static_image",
-          "frameWidth": 340,
+          "frameWidth": 300,
           "aspect": "natural",
           "title": "Εικόνα 1",
           "wrapTight": true
@@ -2145,6 +2145,10 @@
         "right_en": "{page}"
       },
       "items": [
+        {
+          "type": "paragraph",
+          "html": "Εικόνα  Αριστερά: στιγμιότυπο y–x στη στιγμή t<sub>1</sub> = 3T/4,\nμε μέτωπο διάδοσης στο x = 3λ/4 και σημείο A στη θέση x<sub>A</sub> =\n3λ/8. Δεξιά: γράφημα y–t του σημείου A. Το σημείο μένει στο μηδέν μέχρι\nt<sub>A</sub> = x<sub>A</sub>/υ = 3T/8. Οι κλίσεις συγκρίνονται στο ίδιο\nγεγονός y<sub>A</sub>(x<sub>A</sub>, t<sub>1</sub>)."
+        },
         {
           "type": "paragraph",
           "html": "Από το πρώτο γράφημα (στιγμιότυπο t<sub>1</sub>) y-x που αφορά στην\nχρονική στιγμή t<sub>1</sub> = 3T/4 για το σημείο A με\nx<sub>A</sub>=3λ/8 η κλίση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>\nτου γραφήματος στο σημείο αυτό προκύπτει θετική. Συμπεραίνουμε ότι η\nφορά κίνησης του σημείου τη χρονική στιγμή t<sub>1</sub> = 3T/4 θα είναι\nαρνητική (με βάση την σχέση (5))."
