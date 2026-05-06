@@ -93,6 +93,14 @@
           "title_en": "How should this Book be read?"
         },
         {
+          "type": "side_note",
+          "label": "Σχόλιο",
+          "title": "",
+          "html": "<ul><li>Διάβαζε πρώτα τη βασική αφήγηση.</li><li>Όπου εμφανίζεται σκηνή, άφησέ τη να υπηρετήσει το σημείο που μόλις διάβασες.</li><li>Όπου εμφανίζεται «Δοκίμασε / Παρατήρησε», χρησιμοποίησέ το σαν μικρό εργαστηριακό διάλειμμα και μετά γύρνα στην αφήγηση.</li></ul>",
+          "placement": "right",
+          "frameWidth": 340
+        },
+        {
           "type": "paragraph",
           "html": "Το ηλεκτρονικό αυτό βιβλίο παρέχει μια υβριδική μορφή μελέτης: κείμενο, σκηνές και \"πειραματικές\" παροτρύνσεις παρατήρησης συνεργάζονται ώστε ο αναγνώστης να μη μένει ούτε σε μια ξερή περιγραφή ούτε σε μια τυφλή οπτική εντύπωση.",
           "html_en": "This electronic book offers a hybrid mode of study: text, scenes, and \"experimental\" prompts for observation work together so that the reader is left with neither a dry description nor a blind visual impression."
@@ -101,13 +109,6 @@
           "type": "paragraph",
           "html": "Μπορεί να διαβαστεί από την αρχή ως το τέλος, σαν ένα μικρό κεφάλαιο. Μπορεί όμως και να μελετηθεί ανά μέρος με βάση τις επιλογές του μενού που υπάρχει στο πάνω μέρος του. Προτείνεται η σειριακή μελέτη του και όπου κρίνεται σημαντικό η ανάγνωση των παραρτημάτων.",
           "html_en": "It can be read from beginning to end like a short chapter. But it can also be studied part by part using the menu at the top. A sequential reading is recommended, and, where it is judged important, the appendices should also be read."
-        },
-        {
-          "type": "note",
-          "label": "Πώς να το χρησιμοποιήσεις",
-          "html": "<ul><li>Διάβαζε πρώτα τη βασική αφήγηση.</li><li>Όπου εμφανίζεται σκηνή, άφησέ τη να υπηρετήσει το σημείο που μόλις διάβασες.</li><li>Όπου εμφανίζεται «Δοκίμασε / Παρατήρησε», χρησιμοποίησέ το σαν μικρό εργαστηριακό διάλειμμα και μετά γύρνα στην αφήγηση.</li></ul>",
-          "label_en": "How to use it",
-          "html_en": "<ul><li>Read the main narrative first.</li><li>Whenever a scene appears, let it serve the point you have just read.</li><li>Whenever a “Try / Observe” block appears, use it as a short laboratory break and then return to the narrative.</li></ul>"
         },
         {
           "type": "section_heading",
@@ -120,16 +121,17 @@
           "html_en": "The central aim is to clarify how we move from an oscillating rod, on which charges appear and through which current flows, to the idea of the electromagnetic wave. It is not enough to say this with a phrase of the form “this is how it follows from Maxwell’s equations.” It has to be explored theoretically and organized didactically."
         },
         {
+          "type": "side_note",
+          "label": "Σχόλιο",
+          "title": "",
+          "html": "Καταβλήθηκε προσπάθεια ώστε το κείμενο να είναι γραμμένο έτσι ώστε να μπορεί να το μελετήσει μαθητής, αλλά και να δώσει τροφή για σκέψη και προβληματισμό στο συνάδελφο φυσικό που θα το επισκεφθεί. Η βασική ροή είναι πιο σχολική, ενώ τα οι επεκτάσεις και τα παραρτήματα φιλοξενούν βαθύτερο αποτύπωμα της φυσικής πραγματικότητας.",
+          "placement": "right",
+          "frameWidth": 340
+        },
+        {
           "type": "paragraph",
           "html": "Γι’ αυτό ξεκινάμε από το σχολικό αφήγημα, όχι επειδή είναι πλήρες, αλλά επειδή δίνει ένα πρώτο καθαρό στήσιμο της κατάστασης. Έπειτα δείχνουμε πού σπάει αυτή η εικόνα, τι αλλάζει όταν λάβουμε υπόψη την απόσβεση όσο απομακρυνόμαστε από το δίπολο, και τελικά πώς γεννιέται και διαδίδεται το πραγματικό ΗΜ κύμα.",
           "html_en": "That is why we begin with the school narrative, not because it is complete, but because it provides a first clear setup of the situation. Then we show where this picture breaks down, what changes when we take attenuation into account as we move away from the dipole, and finally how the real EM wave is generated and propagates."
-        },
-        {
-          "type": "note",
-          "label": "Τι να περιμένεις",
-          "html": "Καταβλήθηκε προσπάθεια ώστε το κείμενο να είναι γραμμένο έτσι ώστε να μπορεί να το μελετήσει μαθητής, αλλά και να δώσει τροφή για σκέψη και προβληματισμό στο συνάδελφο φυσικό που θα το επισκεφθεί. Η βασική ροή είναι πιο σχολική, ενώ τα οι επεκτάσεις και τα παραρτήματα φιλοξενούν βαθύτερο αποτύπωμα της φυσικής πραγματικότητας.",
-          "label_en": "What to expect",
-          "html_en": "An effort has been made to write the text in such a way that it can be studied by a student, but also offer food for thought and reflection to the physics colleague who visits it. The main flow is more school-oriented, while the extensions and appendices host a deeper imprint of physical reality."
         }
       ]
     },
@@ -174,50 +176,24 @@
           "title": "Το ταλαντούμενο ηλεκτρικό δίπολο"
         },
         {
-          "type": "paragraph",
-          "html": "Ένα απλό διδακτικό μοντέλο παραγωγής ηλεκτρομαγνητικού κύματος είναι\nτο ταλαντούμενο ηλεκτρικό δίπολο. Μπορούμε να το φανταστούμε ως δύο\nμεταλλικές ράβδους που συνδέονται με πηγή εναλλασσόμενης τάσης (θα\nαναφέρεται στο εξής η ράβδος ή το δίπολο). Η εναλλασσόμενη τάση προκαλεί\nταλάντωση των ελεύθερων ηλεκτρονίων της ράβδου-διπόλου. Έτσι στα άκρα\nτης εμφανίζονται περιοδικά περιοχές περίσσειας θετικού και αρνητικού\nφορτίου με περίοδο Τ."
-        },
-        {
           "type": "figure",
-          "src": "images/word_import/dipole_equiv_rod.png",
+          "src": "data:image/png;base64,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",
           "alt": "Εικόνα 1 Δίπολο και ισοδύναμη μορφή-ράβδος",
           "caption": "Εικόνα 1 Δίπολο και ισοδύναμη μορφή-ράβδος",
           "placement": "right",
           "status": "static_image",
-          "frameWidth": 340,
+          "frameWidth": 150,
           "aspect": "natural",
           "title": "Εικόνα 1",
           "wrapTight": true
-        }
-      ]
-    },
-    {
-      "id": "page-added-intro-2",
-      "sourcePdfPage": 3,
-      "header": {
-        "left": "ΜΕΡΟΣ Α΄",
-        "center": "",
-        "right": "Εισαγωγικές έννοιες",
-        "center_en": "",
-        "left_en": "",
-        "right_en": ""
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
+        },
+        {
+          "type": "paragraph",
+          "html": "Ένα απλό διδακτικό μοντέλο παραγωγής ηλεκτρομαγνητικού κύματος είναι\nτο ταλαντούμενο ηλεκτρικό δίπολο. Μπορούμε να το φανταστούμε ως δύο\nμεταλλικές ράβδους που συνδέονται με πηγή εναλλασσόμενης τάσης (θα\nαναφέρεται στο εξής η ράβδος ή το δίπολο). Η εναλλασσόμενη τάση προκαλεί\nταλάντωση των ελεύθερων ηλεκτρονίων της ράβδου-διπόλου. Έτσι στα άκρα\nτης εμφανίζονται περιοδικά περιοχές περίσσειας θετικού και αρνητικού\nφορτίου με περίοδο Τ."
+        },
         {
           "type": "paragraph",
           "html": "Για χρόνο Τ/2 το κάτω άκρο μπορεί να γίνεται θετικό και το πάνω\nαρνητικό, ενώ μετά Τ/2 οι ρόλοι αντιστρέφονται. Η ράβδος λειτουργεί έτσι\nως ηλεκτρικό δίπολο του οποίου η διπολική ροπή μεταβάλλεται με τον χρόνο\nκαι το ηλεκτρικό του πεδίο είναι πεδίο Coulomb. <strong>Η περιοδική\nφόρτιση των άκρων δημιουργεί μεταβαλλόμενο ηλεκτρικό πεδίο, το οποίο\nστην απλουστευμένη σχολική περιγραφή παρακολουθεί τη μεταβολή του\nφορτίου.</strong> Ταυτόχρονα, επειδή η κίνηση φορτίων της ράδου συνιστά\nηλεκτρικό ρεύμα, εμφανίζεται και μαγνητικό πεδίο γύρω από τη ράβδο (που\nπεριγράφεται από το Νόμο Biot-Savart). Όταν το ρεύμα μεταβάλλεται,\nμεταβάλλεται και το μαγνητικό πεδίο συνέπεια του οποίου είναι η\nδιαδοχική ενεργοποίηση των Νόμων της επαγωγής, του Faraday και\nAmpere-Maxwell. Από εδώ ξεκινά η φυσική αλυσίδα που θα οδηγήσει στην\nπαραγωγή και διάδοση του ηλεκτρομαγνητικού κύματος."
-        },
-        {
-          "type": "section_heading",
-          "title": "Πώς θα το προσεγγίσουμε στο βιβλίο"
         },
         {
           "type": "figure",
@@ -232,8 +208,16 @@
           "wrapTight": true
         },
         {
+          "type": "section_heading",
+          "title": "Πώς θα το προσεγγίσουμε στο βιβλίο"
+        },
+        {
           "type": "paragraph",
           "html": "Αρχικά, θα ακολουθήσουμε τη σχολική περιγραφή, γιατί δίνει μια πρώτη\nεποπτική εικόνα: τα φορτία του διπόλου ταλαντώνονται, το ηλεκτροστατικό\nπεδίο Coulomb που παράγεται από αυτά μεταβάλλεται καθώς διαδίδεται στο\nχώρο, το μαγνητικό πεδίο (Biot-Savart) που παράγεται από το ρεύμα (που\nδημιουργείται από την κίνηση των φορτίων) παράγεται και διαδίδεται στο\nχώρο με διαφορά φάσης 90<sup>0</sup> και η διαταραχή των δύο πεδίων\nδιαδίδεται στο χώρο γύρω από τη ράβδο, όπως είναι φυσικό και\nαναμενόμενο, με την ταχύτητα φωτός."
+        },
+        {
+          "type": "paragraph",
+          "html": "Τα πεδία αυτά όπως είναι γνωστό εξασθενούν με την απόσταση από το\nδίπολο, με αποτέλεσμα οι δυναμικές τους γραμμές (η εικόνα τους) να\nεμφανίζουν αραίωση όσο απομακρυνόμαστε από το δίπολο. Παρότι πρακτικά σε\nπολύ μικρή απόσταση (μικρότερη από το μήκος του διπόλου!) και σύντομα\n(σε χρόνο μικρότερο του Τ/2) εξασθενούν έως μηδενισμού τους (πρακτικά)\nμε πρώτο το ηλεκτρικό και μετά το μαγνητικό, στο σχολικό βιβλίο\nθεωρείται ότι δεν υφίστανται καμιά εξασθένηση.  Στο πρώτο διδακτικό\nμοντέλο κρατάμε σταθερά τα πλάτη, ώστε να παρακολουθήσουμε καθαρά τη\nχρονική αλληλουχία των μεταβολών. Στη συνέχεια θα επανέλθουμε στα όρια\nαυτής της περιγραφής."
         }
       ]
     },
@@ -259,7 +243,7 @@
       "items": [
         {
           "type": "paragraph",
-          "html": "Τα πεδία αυτά όπως είναι γνωστό εξασθενούν με την απόσταση από το\nδίπολο, με αποτέλεσμα οι δυναμικές τους γραμμές (η εικόνα τους) να\nεμφανίζουν αραίωση όσο απομακρυνόμαστε από το δίπολο. Παρότι πρακτικά σε\nπολύ μικρή απόσταση (μικρότερη από το μήκος του διπόλου!) και σύντομα\n(σε χρόνο μικρότερο του Τ/2) εξασθενούν έως μηδενισμού τους (πρακτικά)\nμε πρώτο το ηλεκτρικό και μετά το μαγνητικό, στο σχολικό βιβλίο\nθεωρείται ότι δεν υφίστανται καμιά εξασθένηση. Στο πρώτο διδακτικό\nμοντέλο κρατάμε σταθερά τα πλάτη, ώστε να παρακολουθήσουμε καθαρά τη\nχρονική αλληλουχία των μεταβολών. Στη συνέχεια θα επανέλθουμε στα όρια\nαυτής της περιγραφής. Για αυτό το λόγο, περιγράφεται η διάδοσή τους με\nσταθερό το πλάτος της ταλάντωσης των εντάσεών τους Ε και Β! Θα\nακολουθήσουμε τη σύμβαση αυτή αλλά επιφυλασσόμαστε στη συνέχεια να\nεπαναφέρουμε τόσο την αφήγηση αυτή στα πραγματικά της όρια, όσο και την\nπραγματικότητα της γέννησης και της διάδοσης με πραγματικούς όρους του\nπαραγόμενου ηλεκτρομαγνητικού κύματος. Αφού, κοντά στην πηγή συνυπάρχουν\nπεδιακά κομμάτια διαφορετικής φύσης (ηλεκτροστατικά, μαγνητικά και\nεπαγωγικά), τα οποία εξασθενούν διαφορετικά με την απόσταση. Η\nπραγματικότητα δηλαδή επιτάσσει, καθώς απομακρυνόμαστε, τα μη\nακτινοβολούμενα κομμάτια σβήνουν γρήγορα και παραμένει κυρίως το\nακτινοβολούμενο ηλεκτρομαγνητικό κύμα, στο οποίο το ηλεκτρικό και το\nμαγνητικό πεδίο είναι εγκάρσια και συμφασικά και μεταφέρουν ενέργεια\nστον χώρο."
+          "html": " Για αυτό το λόγο, περιγράφεται η διάδοσή τους με\nσταθερό το πλάτος της ταλάντωσης των εντάσεών τους Ε και Β! Θα\nακολουθήσουμε τη σύμβαση αυτή αλλά επιφυλασσόμαστε στη συνέχεια να\nεπαναφέρουμε τόσο την αφήγηση αυτή στα πραγματικά της όρια, όσο και την\nπραγματικότητα της γέννησης και της διάδοσης με πραγματικούς όρους του\nπαραγόμενου ηλεκτρομαγνητικού κύματος. Αφού, κοντά στην πηγή συνυπάρχουν\nπεδιακά κομμάτια διαφορετικής φύσης (ηλεκτροστατικά, μαγνητικά και\nεπαγωγικά), τα οποία εξασθενούν διαφορετικά με την απόσταση. Η\nπραγματικότητα δηλαδή επιτάσσει, καθώς απομακρυνόμαστε, τα μη\nακτινοβολούμενα κομμάτια σβήνουν γρήγορα και παραμένει κυρίως το\nακτινοβολούμενο ηλεκτρομαγνητικό κύμα, στο οποίο το ηλεκτρικό και το\nμαγνητικό πεδίο είναι εγκάρσια και συμφασικά και μεταφέρουν ενέργεια\nστον χώρο."
         },
         {
           "type": "figure",
@@ -2844,5 +2828,11 @@
         }
       ]
     }
-  ]
+  ],
+  "nav": {
+    "mode": "auto",
+    "showApp": true,
+    "showPrint": true,
+    "groups": []
+  }
 }
