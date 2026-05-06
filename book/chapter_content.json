@@ -2122,14 +2122,6 @@
           "aspect": "natural",
           "title": "Εικόνα 1",
           "wrapTight": true
-        },
-        {
-          "type": "paragraph",
-          "html": "Από το πρώτο γράφημα (στιγμιότυπο t<sub>1</sub>) y-x που αφορά στην\nχρονική στιγμή t<sub>1</sub> = 3T/4 για το σημείο A με\nx<sub>A</sub>=3λ/8 η κλίση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>\nτου γραφήματος στο σημείο αυτό προκύπτει θετική. Συμπεραίνουμε ότι η\nφορά κίνησης του σημείου τη χρονική στιγμή t<sub>1</sub> = 3T/4 θα είναι\nαρνητική (με βάση την σχέση (5))."
-        },
-        {
-          "type": "paragraph",
-          "html": "Από το δεύτερο γράφημα y-t για το σημείο Α με x<sub>A</sub>=3λ/8 η\nσημειωμένη την κλίση του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>την\nχρονική στιγμή t<sub>1</sub> = 3T/4 που παριστάνει την ταχύτητα\nταλάντωσης τη δεδομένη χρονική στιγμή, προκύπτει επίσης αρνητική."
         }
       ]
     },
@@ -2153,6 +2145,14 @@
         "right_en": "{page}"
       },
       "items": [
+        {
+          "type": "paragraph",
+          "html": "Από το πρώτο γράφημα (στιγμιότυπο t<sub>1</sub>) y-x που αφορά στην\nχρονική στιγμή t<sub>1</sub> = 3T/4 για το σημείο A με\nx<sub>A</sub>=3λ/8 η κλίση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐱</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{x}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>\nτου γραφήματος στο σημείο αυτό προκύπτει θετική. Συμπεραίνουμε ότι η\nφορά κίνησης του σημείου τη χρονική στιγμή t<sub>1</sub> = 3T/4 θα είναι\nαρνητική (με βάση την σχέση (5))."
+        },
+        {
+          "type": "paragraph",
+          "html": "Από το δεύτερο γράφημα y-t για το σημείο Α με x<sub>A</sub>=3λ/8 η\nσημειωμένη την κλίση του\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mrow><mspace width=\"0.222em\"></mspace><mfrac><mrow><mi>𝚫</mi><mi>𝐲</mi></mrow><mrow><mi>𝚫</mi><mi>𝐭</mi></mrow></mfrac><mo form=\"prefix\" mathvariant=\"bold\" stretchy=\"false\">|</mo></mrow><mrow><msub><mi>𝐱</mi><mi>𝐀</mi></msub><mo mathvariant=\"bold\">,</mo><msub><mi>𝐭</mi><mn>𝟏</mn></msub></mrow></msub><annotation encoding=\"application/x-tex\">{\\mathbf{\\ }\\frac{\\mathbf{\\Delta y}}{\\mathbf{\\Delta}\\mathbf{t}}\\mathbf{|}}_{\\mathbf{x}_{\\mathbf{A}}\\mathbf{,}\\mathbf{t}_{\\mathbf{1}}}</annotation></semantics></math>την\nχρονική στιγμή t<sub>1</sub> = 3T/4 που παριστάνει την ταχύτητα\nταλάντωσης τη δεδομένη χρονική στιγμή, προκύπτει επίσης αρνητική."
+        },
         {
           "type": "paragraph",
           "html": "Επομένως για κύμα που διαδίδεται προς τα δεξιά, όπως στο σχήμα,\n<strong>οι δύο κλίσεις, όταν αφορούν το ίδιο γεγονός\ny<sub>A</sub>(x<sub>A</sub>,t<sub>1</sub>),</strong> πρέπει να έχουν\nαντίθετο πρόσημο και κυρίως <strong>είναι ανάλογες, με σταθερά αναλογίας\nτην ταχύτητα διάδοσης υ</strong>."
@@ -2212,10 +2212,6 @@
         {
           "type": "paragraph",
           "html": "<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><mi>Ε</mi><mo>∝</mo><mfrac><mrow><mi>Δ</mi><mi>Β</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></mrow><annotation encoding=\"application/x-tex\">Ε \\propto \\frac{\\Delta Β}{\\Delta t}</annotation></semantics></math>\nγια το ηλεκτρικό πεδίο και την ΗΕΔ από επαγωγή (Faranday-Lentz) λόγω της\nμεταβολής του μαγνητικού πεδίου Β του προηγούμενου βήματος"
-        },
-        {
-          "type": "paragraph",
-          "html": "Οι σχέσεις όμως Faraday–Maxwell, συμπεραίνουν καθώς εφαρμόζονται,\nσταθερή αναλογία ανάμεσα στη χωρική κλίση του ενός πεδίου με την χρονική\nκλίση του άλλου. Και επειδή σε κάθε κύμα η χρονική κλίση του ίδιου\nμεγέθους είναι δεμένη με τη χωρική κλίση του, οι κλίσεις των E και B\nκλειδώνουν σταθερά μεταξύ τους. Τα γραφήματα E και cB δηλαδή, όταν μπουν\nστην ίδια κλίμακα, έχουν ανάλογες ή ίδιες κλίσεις και οι μεδενικές\nτιμές, τα μέγιστα και τα ελάχιστα συμβαίνουν την ίδια ακριβώς χρονική\nστιγμή. Αυτό όπως τονίστηκε και πιο πάνω είναι η εικόνα της\nσυμφασικότητας."
         }
       ]
     },
@@ -2239,6 +2235,10 @@
         "right_en": "{page}"
       },
       "items": [
+        {
+          "type": "paragraph",
+          "html": "Οι σχέσεις όμως Faraday–Maxwell, συμπεραίνουν καθώς εφαρμόζονται,\nσταθερή αναλογία ανάμεσα στη χωρική κλίση του ενός πεδίου με την χρονική\nκλίση του άλλου. Και επειδή σε κάθε κύμα η χρονική κλίση του ίδιου\nμεγέθους είναι δεμένη με τη χωρική κλίση του, οι κλίσεις των E και B\nκλειδώνουν σταθερά μεταξύ τους. Τα γραφήματα E και cB δηλαδή, όταν μπουν\nστην ίδια κλίμακα, έχουν ανάλογες ή ίδιες κλίσεις και οι μεδενικές\nτιμές, τα μέγιστα και τα ελάχιστα συμβαίνουν την ίδια ακριβώς χρονική\nστιγμή. Αυτό όπως τονίστηκε και πιο πάνω είναι η εικόνα της\nσυμφασικότητας."
+        },
         {
           "type": "figure",
           "src": "images/word_import/image12.png",
