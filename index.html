@@ -442,9 +442,13 @@ function deepMerge(base, extra){
   return out;
 }
 async function loadExternalPresetData(){
+  const params = new URLSearchParams(window.location.search);
+  const explicitPresetsUrl = params.get('presets');
+  // Το εξωτερικό scene_presets.json είναι πλέον προαιρετικό.
+  // Αν δεν ζητηθεί ρητά με ?presets=..., δεν γίνεται fetch, άρα δεν έχουμε 404-θόρυβο.
+  if(!explicitPresetsUrl || ['0','false','none','off'].includes(String(explicitPresetsUrl).trim().toLowerCase())) return;
   try{
-    const presetsUrl = new URLSearchParams(window.location.search).get('presets') || 'scene_presets.json';
-    const res = await fetch(presetsUrl, { cache:'no-store' });
+    const res = await fetch(explicitPresetsUrl, { cache:'no-store' });
     if(!res.ok) return;
     const data = await res.json();
     EXTERNAL_PRESET_DATA = {
@@ -453,7 +457,7 @@ async function loadExternalPresetData(){
       framePresets: data.framePresets || {}
     };
   }catch(err){
-    console.warn('scene_presets.json not loaded', err);
+    console.warn('External scene presets not loaded', err);
   }
 }
 function normalizeControlsMode(value){
@@ -969,7 +973,7 @@ function toggleReceiverLinearOverlay(){
   refreshVisualsForSelection();
 }
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp', preserveDrawingBuffer:true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.setSize(Math.max(100, stage.clientWidth), Math.max(100, stage.clientHeight), false);
@@ -3955,21 +3959,121 @@ async function stabilizeBookPrintScene(){
     if(enough && exact) break;
   }
 }
+
+function isPrintableCanvasVisible(canvas, sourceRoot){
+  if(!(canvas instanceof HTMLCanvasElement)) return false;
+  const rect = canvas.getBoundingClientRect();
+  const rootRect = sourceRoot.getBoundingClientRect();
+  if(rect.width < 4 || rect.height < 4) return false;
+  if(rect.right <= rootRect.left || rect.left >= rootRect.right || rect.bottom <= rootRect.top || rect.top >= rootRect.bottom) return false;
+  let el = canvas;
+  while(el && el !== document.documentElement){
+    const cs = getComputedStyle(el);
+    if(cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity || 1) === 0) return false;
+    if(el === sourceRoot) break;
+    el = el.parentElement;
+  }
+  return true;
+}
+function usableCssFill(el, fallback){
+  if(!el) return fallback;
+  const cs = getComputedStyle(el);
+  const bg = cs.backgroundColor || '';
+  if(bg && !/^rgba?\(\s*0\s*,\s*0\s*,\s*0\s*(?:,\s*0\s*)?\)$/i.test(bg) && bg !== 'transparent') return bg;
+  return fallback;
+}
+function drawRoundedPanelBackground(ctx, panel, sourceRoot, scale, fallback){
+  if(!panel) return;
+  const rootRect = sourceRoot.getBoundingClientRect();
+  const r = panel.getBoundingClientRect();
+  if(r.width < 4 || r.height < 4) return;
+  const x = (r.left - rootRect.left) * scale;
+  const y = (r.top - rootRect.top) * scale;
+  const w = r.width * scale;
+  const h = r.height * scale;
+  const radius = Math.min(12 * scale, w * 0.18, h * 0.18);
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + w - radius, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+  ctx.lineTo(x + w, y + h - radius);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+  ctx.lineTo(x + radius, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fillStyle = usableCssFill(panel, fallback);
+  ctx.fill();
+  ctx.restore();
+}
+function captureViewportCanvasesAsPng(sourceRoot){
+  const rect = sourceRoot.getBoundingClientRect();
+  const scale = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  const width = Math.max(1, Math.round(rect.width));
+  const height = Math.max(1, Math.round(rect.height));
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(width * scale));
+  out.height = Math.max(1, Math.round(height * scale));
+  const ctx = out.getContext('2d');
+  const theme = VIEW_THEMES[activeViewTheme] || VIEW_THEMES.screen;
+  ctx.fillStyle = activeViewTheme === 'printSharp' ? '#ffffff' : (theme.graphBg || '#0b0f14');
+  ctx.fillRect(0, 0, out.width, out.height);
+
+  const canvases = Array.from(sourceRoot.querySelectorAll('canvas'))
+    .filter(c => isPrintableCanvasVisible(c, sourceRoot))
+    .sort((a,b) => {
+      const ar = a.getBoundingClientRect();
+      const br = b.getBoundingClientRect();
+      // Πρώτα το stage/WebGL, μετά τα overlay graph canvases, ώστε τα γραφήματα να κάθονται από πάνω.
+      const az = a === renderer.domElement ? 0 : 1;
+      const bz = b === renderer.domElement ? 0 : 1;
+      if(az !== bz) return az - bz;
+      return ar.top - br.top || ar.left - br.left;
+    });
+
+  const paintedPanels = new Set();
+  for(const canvas of canvases){
+    const panel = canvas.closest('.graphPanel');
+    if(panel && !paintedPanels.has(panel)){
+      paintedPanels.add(panel);
+      drawRoundedPanelBackground(ctx, panel, sourceRoot, scale, activeViewTheme === 'printSharp' ? 'rgba(255,255,255,0.96)' : 'rgba(10,14,20,0.72)');
+    }
+    const r = canvas.getBoundingClientRect();
+    const x = Math.round((r.left - rect.left) * scale);
+    const y = Math.round((r.top - rect.top) * scale);
+    const w = Math.round(r.width * scale);
+    const h = Math.round(r.height * scale);
+    if(w <= 0 || h <= 0) continue;
+    ctx.drawImage(canvas, x, y, w, h);
+  }
+  return out.toDataURL('image/png');
+}
+
 async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
   await stabilizeBookPrintScene();
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  const rect = sourceRoot.getBoundingClientRect();
-  const width = Math.max(1, Math.round(rect.width));
-  const height = Math.max(1, Math.round(rect.height));
-  const clone = buildViewportSnapshotClone(sourceRoot);
-  clone.style.width = `${width}px`;
-  clone.style.height = `${height}px`;
-  const serialized = new XMLSerializer().serializeToString(clone);
-  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  try{
+    applyUI();
+    drawGraphs(true);
+    renderer.render(scene, camera);
+    return captureViewportCanvasesAsPng(sourceRoot);
+  }catch(err){
+    console.warn('PNG print snapshot failed; falling back to SVG clone', err);
+    const rect = sourceRoot.getBoundingClientRect();
+    const width = Math.max(1, Math.round(rect.width));
+    const height = Math.max(1, Math.round(rect.height));
+    const clone = buildViewportSnapshotClone(sourceRoot);
+    clone.style.width = `${width}px`;
+    clone.style.height = `${height}px`;
+    const serialized = new XMLSerializer().serializeToString(clone);
+    const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  }
 }
 window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
