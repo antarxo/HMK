@@ -344,7 +344,7 @@ const printSandbox=document.getElementById('printSandbox');
 const langElBtn=document.getElementById('langElBtn');
 const langEnBtn=document.getElementById('langEnBtn');
 let printPageStyleEl = null;
-const JSON_CANDIDATES=['chapter_content_bilingual.json','chapter_content.json'];
+const JSON_CANDIDATES=['chapter_content.json'];
 let contentLang = localStorage.getItem('hmkContentLang') || 'el';
 function locKey(key){ return contentLang === 'en' ? `${key}_en` : key; }
 function getLoc(obj,key,fallback=''){
