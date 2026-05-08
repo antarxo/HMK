@@ -75,6 +75,39 @@
   body.bookMode .row.transport button{height:24px;min-height:24px}
   body.bookMode .label{font-size:8.5px;margin-bottom:2px}
 
+
+  /* Book embedding: compact bottom dock, centered scene, low visual weight. */
+  body.bookMode .app{grid-template-rows:1fr;height:100dvh}
+  body.bookMode .top{display:none!important}
+  body.bookMode .main{position:relative;min-height:0}
+  body.bookMode .overlay{
+    left:6px;right:6px;top:auto;bottom:5px;width:auto;max-height:none;
+    display:grid;grid-template-columns:0.95fr 0.90fr 1.12fr;gap:4px;
+    padding:0;overflow:visible;align-items:stretch;pointer-events:auto;
+  }
+  body.bookMode .overlay>.note,
+  body.bookMode .overlay>.auxHud{display:none!important}
+  body.bookMode .hud{
+    background:rgba(8,12,18,.58);border-color:rgba(255,255,255,.12);
+    backdrop-filter:blur(4px);border-radius:8px;padding:3px;
+  }
+  body.bookMode .label{display:none!important}
+  body.bookMode .stackTwo{display:grid;grid-template-columns:1fr;gap:4px}
+  body.bookMode .row{gap:3px}
+  body.bookMode #sourceRow{grid-template-columns:repeat(3,1fr)}
+  body.bookMode #sourceRow button,
+  body.bookMode #modeRow button,
+  body.bookMode #fieldArrowRow button{
+    min-height:21px;height:21px;font-size:8.5px;padding:1px 4px;border-radius:7px;line-height:1;
+  }
+  body.bookMode .row.transport{grid-template-columns:24px 24px 30px 24px 24px;gap:3px;justify-content:center}
+  body.bookMode .row.transport button{height:22px;min-height:22px;font-size:11px;border-radius:7px;padding:0}
+  body.bookMode .row.transport #btnPlay{font-size:12px}
+  body.bookMode .row.monoRealMove{margin-top:3px}
+  body.bookMode #btnMonoRealMove{min-height:19px;height:19px;font-size:8px;padding:1px 4px;border-radius:7px}
+  body.bookMode button{box-shadow:none}
+  body.bookMode #etGraphWrap{bottom:54px}
+
 </style>
 </head>
 <body>
@@ -306,7 +339,10 @@ function applyLanguage(){
   ui.zoomOut.title = t.zoomOutTitle;
   ui.speedUp.title = t.speedUpTitle;
   ui.speedDown.title = t.speedDownTitle;
-  if(ui.btnMonoRealMove){ ui.btnMonoRealMove.textContent = t.monoRealMove; ui.btnMonoRealMove.title = t.monoRealMoveTitle; }
+  if(ui.btnMonoRealMove){
+    ui.btnMonoRealMove.textContent = document.body.classList.contains('bookMode') ? (state.lang === 'en' ? 'Move now' : 'Κίνηση τώρα') : t.monoRealMove;
+    ui.btnMonoRealMove.title = t.monoRealMoveTitle;
+  }
   ui.camUp.title = t.camUpTitle;
   ui.camDown.title = t.camDownTitle;
   ui.camLeft.title = t.camLeftTitle;
@@ -363,17 +399,17 @@ const state = {
 const qs = new URLSearchParams(window.location.search);
 const qPreset = (qs.get('p') || qs.get('bookScene') || '').toLowerCase();
 const BOOK_PRESETS = {
-  charge: {source:'plus', mode:'appear', controls:'book', field_arrows:'off'},
-  charge_appear: {source:'plus', mode:'appear', controls:'book', field_arrows:'off'},
-  charge_vanish: {source:'plus', mode:'disappear', controls:'book', field_arrows:'off'},
-  charge_disappear: {source:'plus', mode:'disappear', controls:'book', field_arrows:'off'},
-  charge_move: {source:'plus', mode:'appear', controls:'book', field_arrows:'off'},
-  plus: {source:'plus', mode:'appear', controls:'book', field_arrows:'off'},
-  minus: {source:'minus', mode:'appear', controls:'book', field_arrows:'off'},
-  dipole: {source:'dipole', mode:'appear', controls:'book', field_arrows:'on'},
-  dipole_appear: {source:'dipole', mode:'appear', controls:'book', field_arrows:'on'},
-  dipole_vanish: {source:'dipole', mode:'disappear', controls:'book', field_arrows:'on'},
-  dipole_disappear: {source:'dipole', mode:'disappear', controls:'book', field_arrows:'on'}
+  charge: {source:'plus', mode:'appear', controls:'book', field_arrows:'off', distance:'13.8'},
+  charge_appear: {source:'plus', mode:'appear', controls:'book', field_arrows:'off', distance:'13.8'},
+  charge_vanish: {source:'plus', mode:'disappear', controls:'book', field_arrows:'off', distance:'13.8'},
+  charge_disappear: {source:'plus', mode:'disappear', controls:'book', field_arrows:'off', distance:'13.8'},
+  charge_move: {source:'plus', mode:'appear', controls:'book', field_arrows:'off', distance:'13.8'},
+  plus: {source:'plus', mode:'appear', controls:'book', field_arrows:'off', distance:'13.8'},
+  minus: {source:'minus', mode:'appear', controls:'book', field_arrows:'off', distance:'13.8'},
+  dipole: {source:'dipole', mode:'appear', controls:'book', field_arrows:'on', distance:'13.8'},
+  dipole_appear: {source:'dipole', mode:'appear', controls:'book', field_arrows:'on', distance:'13.8'},
+  dipole_vanish: {source:'dipole', mode:'disappear', controls:'book', field_arrows:'on', distance:'13.8'},
+  dipole_disappear: {source:'dipole', mode:'disappear', controls:'book', field_arrows:'on', distance:'13.8'}
 };
 const preset = BOOK_PRESETS[qPreset] || null;
 let qSource = qs.get('source') || qs.get('scene') || preset?.source || '';
@@ -413,6 +449,11 @@ if(qControls === 'minimal') {
 if(qControls === 'book') {
   document.body.classList.add('bookMode');
   const noteEl = document.getElementById('note'); if(noteEl) noteEl.style.display = 'none';
+  focus.set(0, 0, 0);
+  cameraPan.set(0, 0, 0);
+  state.distance = Number.isFinite(parseFloat(qs.get('distance') || preset?.distance || ''))
+    ? parseFloat(qs.get('distance') || preset?.distance || '')
+    : 13.8;
 }
 if(qLang === 'en' || qLang === 'el' || qLang === 'gr') state.lang = qLang === 'en' ? 'en' : 'el';
 if(qFieldArrows === '0' || qFieldArrows === 'hide' || qFieldArrows === 'off') state.showFieldArrows = false;
@@ -997,6 +1038,10 @@ function applyButtons(){
 
   ui.fieldArrowsToggle.classList.toggle('active', state.showFieldArrows && !monoMotionGraphBlocked);
   ui.fieldArrowsToggle.textContent = state.showFieldArrows ? t.hideVectors : t.showVectors;
+  if(document.body.classList.contains('bookMode')){
+    ui.fieldArrowsToggle.textContent = state.source === 'dipole' ? 'Βέλη E' : 'E(t)';
+    ui.modeToggle.textContent = state.mode === 'appear' ? 'Σβήσιμο' : 'Εμφάνιση';
+  }
   if(ui.viewRow) [...ui.viewRow.querySelectorAll('button')].forEach(b=>b.classList.toggle('active', b.dataset.view === state.view));
   if(ui.btnMonoRealMove){
     const monoRealRow = ui.btnMonoRealMove.closest('.monoRealMove');
