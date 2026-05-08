@@ -126,7 +126,7 @@
     .media-frame img{object-fit:cover}
     .media-frame.natural{aspect-ratio:auto;overflow:visible;background:#fff}
     .media-frame.natural img{position:static;inset:auto;width:100%;height:auto;display:block;object-fit:contain}
-    figcaption{padding:12px 14px 14px;font:500 12px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5e6d79;border-top:1px solid rgba(0,0,0,.07)}
+    figcaption{padding:10px 12px;font:500 12px/1.4 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5e6d79;border-top:1px solid rgba(0,0,0,.07)}
     .callout{margin:8px 0;padding:8px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 12px/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
     .callout-title{margin:0 0 6px;font:800 10px/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
     .callout-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
@@ -138,28 +138,11 @@
     .callout-observe li{margin:4px 0;font-style:italic}
     .item-highlight{outline:3px solid rgba(249,115,22,.45);outline-offset:3px}
     .meta-line{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a3b1c2}
-    .scene-frame{background:#fff;color:#111}
+    .scene-frame{margin-top:8px;border:1px solid #243244;border-radius:12px;overflow:hidden;background:#fff;color:#111}
     .scene-frame.float{width:min(var(--fw,340px),100%)}
-    .scene-preview-reserve{position:relative;width:100%;min-height:0!important}
+    .scene-preview-reserve{position:relative;width:100%}
     .scene-media-frame{background:#fff;overflow:hidden}
     .scene-media-frame iframe{background:#fff}
-
-
-    /* Book renderer parity: οι παρακάτω κλάσεις αντιγράφουν τη λογική του book/index.html
-       ώστε το preview του editor να αποδίδει τα ίδια blocks με το βιβλίο. */
-    .page-preview .hero{margin:0 0 22px}
-    .page-preview .hero .eyebrow{margin:0 0 10px;font:800 var(--hero-eyebrow-font-size,12px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#1f5f8b}
-    .page-preview .hero h1{margin:0 0 10px;font:760 var(--hero-title-font-size,28px)/1.06 var(--hero-title-font-family,Georgia,"Times New Roman",serif);color:#1b506f}
-    .page-preview .hero .subtitle{margin:0;color:#5e6d79;font-size:var(--hero-subtitle-font-size,16px);line-height:1.35}
-    .page-preview .part-head{margin:18px 0 14px;padding-top:2px}
-    .page-preview .paragraph{margin:0 0 var(--para-gap,7px);text-align:justify;text-justify:inter-word;hyphens:auto}
-    .page-preview .note{margin:var(--note-gap,10px) 0;padding:10px 12px;border-radius:14px;background:var(--note);border:1px solid #e4d7ae;font:500 var(--note-font-size,14px)/var(--note-line-height,1.42) system-ui,-apple-system,Segoe UI,Arial,sans-serif}
-    .page-preview .note .label{display:block;margin:0 0 5px;font:800 var(--note-label-font-size,10px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
-    .page-preview .callout{margin:var(--callout-gap,8px) 0;padding:8px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 var(--callout-font-size,12px)/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
-    .page-preview .callout-title{margin:0 0 6px;font:800 var(--callout-title-font-size,10px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
-    .page-preview .callout-label{font:700 var(--callout-label-font-size,10px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:3px 6px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
-    .page-preview .callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 var(--callout-chip-font-size,10px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}
-    .page-preview .callout-observe-title{font:700 var(--callout-observe-title-font-size,10px)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
     .danger-note{padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.28);color:#fecaca;font-size:11px}
     .editor-help{padding:8px 10px;border-radius:10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#bae6fd;font-size:11px}
     .link-tool{margin:7px 0 10px;padding:8px;border:1px dashed #31506d;border-radius:10px;background:#031323}
@@ -328,77 +311,6 @@ function normalizeData(raw){
 }
 
 function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
-
-function placementClass(item){
-  const p=String(item?.placement || '').trim().toLowerCase();
-  if(p==='left' || p==='float-left') return 'float-left';
-  if(p==='right' || p==='float-right') return 'float-right';
-  return 'wide';
-}
-function parseAspectLike(value){
-  if(value == null || value === '' || value === 'natural') return null;
-  if(typeof value === 'number' && Number.isFinite(value) && value > 0) return value;
-  const txt = String(value).trim();
-  const frac = txt.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
-  if(frac){
-    const a = Number(frac[1]), b = Number(frac[2]);
-    if(a > 0 && b > 0) return a / b;
-  }
-  const n = Number(txt);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-function sceneAspect(item){
-  const frameWidth = Math.max(120, Number(item?.frameWidth || 340) || 340);
-  const explicitHeight = Number(item?.sceneHeight ?? item?.frameHeight ?? item?.height);
-  if(Number.isFinite(explicitHeight) && explicitHeight > 0) return frameWidth / explicitHeight;
-
-  const customAspect = parseAspectLike(item?.aspectRatio ?? item?.sceneAspect ?? item?.aspect);
-  if(customAspect) return customAspect;
-
-  const src = String(item?.singleSrc || '');
-  let layout = String(item?.layout || '').toLowerCase();
-  try{
-    const u = new URL(src, window.location.href);
-    layout = layout || String(u.searchParams.get('layout') || '').toLowerCase();
-  }catch(_e){
-    try{
-      const u = new URL(src, 'https://local.invalid/');
-      layout = layout || String(u.searchParams.get('layout') || '').toLowerCase();
-    }catch(_e2){}
-  }
-  const g = 146.2, r = 219.3, c = 34;
-  if(layout==='rod_only') return 340/(r+c);
-  if(layout==='rod_1graph') return 340/(r+g+c);
-  if(layout==='rod_2graphs') return 340/(r+g*2+c);
-  if(layout==='rod_3graphs') return 340/(r+g*3+c);
-  return 16/9;
-}
-function applyBookPreviewVars(page, defs){
-  const setPx=(name,val)=>{ if(val != null && val !== '') page.style.setProperty(name, `${Number(val)}px`); };
-  const setRaw=(name,val)=>{ if(val != null && val !== '') page.style.setProperty(name, String(val)); };
-  setPx('--para-gap', defs.paragraphGap ?? 7);
-  setPx('--section-gap', defs.sectionGap ?? 20);
-  setPx('--note-gap', defs.noteGap ?? 10);
-  setPx('--callout-gap', defs.calloutGap ?? 8);
-  setPx('--hero-eyebrow-font-size', defs.heroEyebrowFontSize ?? 12);
-  setPx('--hero-title-font-size', defs.heroTitleFontSize ?? 28);
-  setPx('--hero-subtitle-font-size', defs.heroSubtitleFontSize ?? 16);
-  if(defs.heroTitleFontFamily) page.style.setProperty('--hero-title-font-family', fontPresetValue(defs.heroTitleFontFamily, defs.heroTitleFontFamily));
-  setPx('--part-kicker-font-size', defs.partKickerFontSize ?? 11);
-  setPx('--part-title-font-size', defs.partTitleFontSize ?? 24);
-  if(defs.partTitleFontFamily) page.style.setProperty('--part-title-font-family', fontPresetValue(defs.partTitleFontFamily, defs.partTitleFontFamily));
-  setPx('--section-heading-font-size', defs.sectionHeadingFontSize ?? 18);
-  if(defs.sectionHeadingFontFamily) page.style.setProperty('--section-heading-font-family', fontPresetValue(defs.sectionHeadingFontFamily, defs.sectionHeadingFontFamily));
-  setPx('--note-font-size', defs.noteFontSize ?? 14);
-  setRaw('--note-line-height', defs.noteLineHeight ?? 1.42);
-  setPx('--note-label-font-size', defs.noteLabelFontSize ?? 10);
-  setPx('--caption-font-size', defs.captionFontSize ?? 12);
-  setPx('--callout-font-size', defs.calloutFontSize ?? 12);
-  setPx('--callout-title-font-size', defs.calloutTitleFontSize ?? 10);
-  setPx('--callout-label-font-size', defs.calloutLabelFontSize ?? 10);
-  setPx('--callout-chip-font-size', defs.calloutChipFontSize ?? 10);
-  setPx('--callout-observe-title-font-size', defs.calloutObserveTitleFontSize ?? 10);
-}
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
 const COMMON_SETUP_BUTTONS = [
   'I↓',
@@ -690,115 +602,6 @@ function createItemByType(type='paragraph'){
   if(type==='interactive_callout') return {type:'interactive_callout', title:'Δοκίμασε', title_en:'Try', setupLabel:'Ρύθμισε', setupLabel_en:'Set', setupChips:[], pressLabel:'Πίεσε', pressLabel_en:'Press', pressChips:[], observeTitle:'Παρατήρησε', observeTitle_en:'Observe', observeItems:[]};
   if(type==='clear') return {type:'clear'};
   return {type:'paragraph', html:''};
-}
-
-function stripHtmlForTypeConversion(value=''){
-  const div = document.createElement('div');
-  div.innerHTML = String(value || '');
-  return (div.textContent || div.innerText || '').trim();
-}
-function firstNonEmpty(...values){
-  for(const v of values){
-    if(v !== undefined && v !== null && String(v).trim() !== '') return v;
-  }
-  return '';
-}
-function convertItemTypePreservingContent(oldItem, newType){
-  const old = JSON.parse(JSON.stringify(oldItem || {}));
-  const fresh = createItemByType(newType);
-
-  // Κρατάμε δομικά/μενού πεδία, γιατί δεν είναι περιεχόμενο του τύπου αλλά θέση στο βιβλίο.
-  ['id','navLabel','navLabel_en','showInNav','className','style'].forEach(k => {
-    if(old[k] !== undefined) fresh[k] = old[k];
-  });
-
-  // Κρατάμε κοινά πεδία όταν υπάρχουν και στους δύο τύπους.
-  Object.keys(fresh).forEach(k => {
-    if(k !== 'type' && old[k] !== undefined) fresh[k] = old[k];
-  });
-
-  const html = firstNonEmpty(old.html, old.caption, old.title, old.subtitle, old.label, old.alt);
-  const htmlEn = firstNonEmpty(old.html_en, old.caption_en, old.title_en, old.subtitle_en, old.label_en, old.alt_en);
-  const plain = stripHtmlForTypeConversion(html);
-  const plainEn = stripHtmlForTypeConversion(htmlEn);
-
-  if(['paragraph','note','side_note'].includes(newType)){
-    fresh.html = firstNonEmpty(old.html, old.caption, old.title, old.subtitle, old.label, old.alt);
-    if(htmlEn) fresh.html_en = firstNonEmpty(old.html_en, old.caption_en, old.title_en, old.subtitle_en, old.label_en, old.alt_en);
-    if(newType === 'note') fresh.label = firstNonEmpty(old.label, old.title && old.html ? old.title : '');
-    if(newType === 'side_note'){
-      fresh.title = firstNonEmpty(old.title, old.label, old.caption && old.html ? old.caption : '');
-      if(old.placement) fresh.placement = old.placement;
-      if(old.frameWidth) fresh.frameWidth = old.frameWidth;
-    }
-  }
-
-  if(newType === 'section_heading'){
-    fresh.title = firstNonEmpty(old.title, plain, old.caption, old.label);
-    if(htmlEn) fresh.title_en = firstNonEmpty(old.title_en, plainEn, old.caption_en, old.label_en);
-  }
-
-  if(newType === 'part_title'){
-    fresh.label = firstNonEmpty(old.label, fresh.label);
-    fresh.title = firstNonEmpty(old.title, plain, old.caption);
-    if(old.label_en) fresh.label_en = old.label_en;
-    if(htmlEn) fresh.title_en = firstNonEmpty(old.title_en, plainEn, old.caption_en);
-  }
-
-  if(newType === 'hero'){
-    fresh.eyebrow = firstNonEmpty(old.eyebrow, old.label, '');
-    fresh.title = firstNonEmpty(old.title, plain, old.caption);
-    fresh.subtitle = firstNonEmpty(old.subtitle, old.caption && old.title ? old.caption : '');
-    if(old.eyebrow_en) fresh.eyebrow_en = old.eyebrow_en;
-    if(htmlEn) fresh.title_en = firstNonEmpty(old.title_en, plainEn, old.caption_en);
-    if(old.subtitle_en) fresh.subtitle_en = old.subtitle_en;
-  }
-
-  if(newType === 'figure'){
-    fresh.src = firstNonEmpty(old.src, old.singleSrc, '');
-    fresh.alt = firstNonEmpty(old.alt, plain, old.title);
-    fresh.title = firstNonEmpty(old.title, old.label, '');
-    fresh.caption = firstNonEmpty(old.caption, old.html, old.subtitle, old.title);
-    if(htmlEn) fresh.caption_en = firstNonEmpty(old.caption_en, old.html_en, old.subtitle_en, old.title_en);
-    if(old.placement) fresh.placement = old.placement;
-    if(old.frameWidth) fresh.frameWidth = old.frameWidth;
-    if(old.aspect) fresh.aspect = old.aspect;
-    if(old.hideCaption !== undefined) fresh.hideCaption = old.hideCaption;
-    if(old.wrapTight !== undefined) fresh.wrapTight = old.wrapTight;
-  }
-
-  if(newType === 'scene'){
-    fresh.singleSrc = firstNonEmpty(old.singleSrc, old.src, '');
-    fresh.title = firstNonEmpty(old.title, old.label, '');
-    fresh.caption = firstNonEmpty(old.caption, old.html, old.subtitle, old.title);
-    if(htmlEn) fresh.caption_en = firstNonEmpty(old.caption_en, old.html_en, old.subtitle_en, old.title_en);
-    if(old.placement) fresh.placement = old.placement;
-    if(old.frameWidth) fresh.frameWidth = old.frameWidth;
-    if(old.aspect) fresh.aspect = old.aspect;
-    if(old.hideCaption !== undefined) fresh.hideCaption = old.hideCaption;
-    if(old.wrapTight !== undefined) fresh.wrapTight = old.wrapTight;
-  }
-
-  if(newType === 'interactive_callout'){
-    if(old.type === 'interactive_callout') return {...old, type:newType};
-    fresh.title = firstNonEmpty(old.title, 'Δοκίμασε');
-    const obs = stripHtmlForTypeConversion(firstNonEmpty(old.html, old.caption, old.subtitle));
-    if(obs) fresh.observeItems = [obs];
-    if(htmlEn){
-      fresh.title_en = firstNonEmpty(old.title_en, 'Try');
-      const obsEn = stripHtmlForTypeConversion(firstNonEmpty(old.html_en, old.caption_en, old.subtitle_en));
-      if(obsEn) fresh.observeItems_en = [obsEn];
-    }
-  }
-
-  if(newType === 'nav_anchor'){
-    fresh.id = firstNonEmpty(old.id, old.anchorId, '');
-    fresh.title = firstNonEmpty(old.title, plain, old.caption, old.navLabel, 'Σημείο μενού');
-    fresh.navLabel = firstNonEmpty(old.navLabel, old.title, plain, old.caption);
-    fresh.showInNav = old.showInNav !== undefined ? old.showInNav : true;
-  }
-
-  return fresh;
 }
 function insertItemAt(pageIndex, insertIndex, type='paragraph'){
   const page = data.pages?.[pageIndex]; if(!page) return;
@@ -1265,7 +1068,7 @@ function renderItemEditor(item, pageIndex, itemIndex){
   const typeSel = document.getElementById('itemType');
   typeSel.value = item.type || 'paragraph';
   typeSel.onchange = ()=>{
-    const fresh = convertItemTypePreservingContent(item, typeSel.value);
+    const fresh = createItemByType(typeSel.value);
     Object.keys(item).forEach(k => delete item[k]);
     Object.assign(item, fresh);
     renderAll();
@@ -1438,20 +1241,12 @@ function renderTypeFields(item){
           </select>
         </label>
         <label><span>frameWidth</span><input type="number" id="scWidth"></label>
-        <label><span>sceneHeight / frameHeight (προαιρετικό)</span><input type="number" id="scHeight"></label>
-        <label><span>layout</span><input type="text" id="scLayout" placeholder="rod_1graph, electrostatic..."></label>
-        <label><span>reserveMaxHeight</span><select id="scReserve"><option value="0">false</option><option value="1">true</option></select></label>
         <label><span>hideCaption</span><select id="scHide"><option value="0">false</option><option value="1">true</option></select></label>
       </div>`;
     bindTextInput(document.getElementById('scTitle'), item, 'title');
     bindTextarea(document.getElementById('scCaption'), item, 'caption');
     bindTextarea(document.getElementById('scSrc'), item, 'singleSrc');
     bindNumberInput(document.getElementById('scWidth'), item, 'frameWidth');
-    bindNumberInput(document.getElementById('scHeight'), item, 'sceneHeight');
-    bindTextInput(document.getElementById('scLayout'), item, 'layout');
-    const reserveSel = document.getElementById('scReserve');
-    reserveSel.value = item.reserveMaxHeight ? '1' : '0';
-    reserveSel.onchange = ()=>{ item.reserveMaxHeight = reserveSel.value === '1'; renderTree(); renderPreview(); };
     const pl = document.getElementById('scPlacement');
     pl.value = item.placement || 'right';
     pl.onchange = ()=>{ item.placement = pl.value; renderTree(); renderPreview(); };
@@ -2166,7 +1961,6 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   page.style.lineHeight = String(lineHeight);
   page.style.fontSize = `${bodyFontSize}px`;
   page.style.fontFamily = bodyFamily;
-  applyBookPreviewVars(page, defs);
 
   const header = document.createElement('div');
   header.className = 'page-header';
@@ -2213,9 +2007,9 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
       if(defs.sectionHeadingFontSize) node.style.fontSize = `${Number(defs.sectionHeadingFontSize)}px`;
     }
     if(item?.type === 'hero'){
-      const eyebrowEl = node.querySelector('.hero-eyebrow, .hero .eyebrow');
-      const titleEl = node.querySelector('.hero-title, .hero h1');
-      const subtitleEl = node.querySelector('.hero-subtitle, .hero .subtitle');
+      const eyebrowEl = node.querySelector('.hero-eyebrow');
+      const titleEl = node.querySelector('.hero-title');
+      const subtitleEl = node.querySelector('.hero-subtitle');
       if(eyebrowEl && defs.heroEyebrowFontSize){
         eyebrowEl.style.setProperty('font-size', `${Number(defs.heroEyebrowFontSize)}px`);
       }
@@ -2266,122 +2060,182 @@ function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
   return page;
 }
 
-// Scene aspect is now computed by the same book-renderer logic used in book/index.html.
+const SCENE_BASE_WIDTH = 340;
+const SCENE_GRAPH_HEIGHT = 146.2;
+const SCENE_ROD_HEIGHT = 219.3;
+const SCENE_CONTROLS_RESERVE = 98;
+const SCENE_MAX_ROD_GRAPH_COUNT = 3;
+
+function readUrlParams(url=''){
+  try{
+    return new URL(url, window.location.href).searchParams;
+  }catch(_e){
+    try{ return new URL(url, 'https://local.invalid/').searchParams; }
+    catch(_e2){ return new URLSearchParams(''); }
+  }
+}
+function sceneLayoutKey(item){
+  const params = readUrlParams(item?.singleSrc || '');
+  return String(item?.layout || params.get('layout') || '').toLowerCase();
+}
+function sceneNaturalMetrics(item){
+  const frameWidth = Math.max(120, Number(item?.frameWidth || SCENE_BASE_WIDTH) || SCENE_BASE_WIDTH);
+  const scale = frameWidth / SCENE_BASE_WIDTH;
+  const layout = sceneLayoutKey(item);
+  let graphCount = 0;
+  let hasRod = true;
+
+  if(layout === 'rod_only') graphCount = 0;
+  else if(layout === 'rod_1graph') graphCount = 1;
+  else if(layout === 'rod_2graphs') graphCount = 2;
+  else if(layout === 'rod_3graphs') graphCount = 3;
+  else if(layout === 'graphs_qieb'){ graphCount = 4; hasRod = false; }
+  else{
+    const params = readUrlParams(item?.singleSrc || '');
+    const graphsParam = (params.get('graphs') || '').split(',').map(s=>s.trim()).filter(Boolean);
+    graphCount = graphsParam.length || 2;
+    const layersParam = (params.get('layers') || '').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    hasRod = layersParam.includes('rod');
+    if(!layersParam.length) hasRod = true;
+  }
+
+  const naturalHeight = ((hasRod ? SCENE_ROD_HEIGHT : 0) + graphCount * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+  const reservedHeight = (SCENE_ROD_HEIGHT + SCENE_MAX_ROD_GRAPH_COUNT * SCENE_GRAPH_HEIGHT + SCENE_CONTROLS_RESERVE) * scale;
+
+  return {
+    frameWidth,
+    naturalHeight: Math.max(180, naturalHeight),
+    reservedHeight: Math.max(naturalHeight, reservedHeight)
+  };
+}
+
 function renderStandaloneItem(item){
+  const wrap = document.createElement('div');
   const t = item?.type || 'paragraph';
+  const paraGap = Number(data.layoutDefaults?.paragraphGap ?? 7);
+  const sectionGap = Number(data.layoutDefaults?.sectionGap ?? 20);
+  const noteGap = Number(data.layoutDefaults?.noteGap ?? 10);
+  const calloutGap = Number(data.layoutDefaults?.calloutGap ?? 10);
+
   if(t === 'hero'){
-    const wrap=document.createElement('section');
-    wrap.className='hero';
-    wrap.innerHTML=`${getLoc(item,'eyebrow','')?`<p class="eyebrow">${getLoc(item,'eyebrow','')}</p>`:''}${getLoc(item,'title','')?`<h1>${getLoc(item,'title','')}</h1>`:''}${getLoc(item,'subtitle','')?`<p class="subtitle">${getLoc(item,'subtitle','')}</p>`:''}`;
+    wrap.className = 'hero-block';
+    wrap.innerHTML = `${getLoc(item,'eyebrow','') ? `<p class="hero-eyebrow">${esc(getLoc(item,'eyebrow',''))}</p>` : ''}${getLoc(item,'title','') ? `<h1 class="hero-title">${esc(getLoc(item,'title',''))}</h1>` : ''}${getLoc(item,'subtitle','') ? `<p class="hero-subtitle">${esc(getLoc(item,'subtitle',''))}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
     return wrap;
   }
   if(t === 'part_title'){
-    const d=document.createElement('section');
-    d.className='part-head';
-    d.innerHTML=`${getLoc(item,'label','')?`<p class="part-kicker">${getLoc(item,'label','')}</p>`:''}${getLoc(item,'title','')?`<h2 class="part-main part-title-main">${getLoc(item,'title','')}</h2>`:''}`;
-    return d;
+    wrap.className = 'part-title';
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<p class="part-kicker">${esc(getLoc(item,'label',''))}</p>` : ''}${getLoc(item,'title','') ? `<p class="part-main">${esc(getLoc(item,'title',''))}</p>` : ''}`;
+    wrap.style.marginBottom = `${Math.max(12, sectionGap)}px`;
+    return wrap;
   }
   if(t === 'section_heading'){
-    const h=document.createElement('h2');
-    h.className='section-heading';
-    h.textContent=getLoc(item,'title','');
-    return h;
+    wrap.className = 'section-heading';
+    wrap.textContent = getLoc(item,'title','');
+    wrap.style.marginTop = `${Math.max(8, sectionGap)}px`;
+    wrap.style.marginBottom = `${Math.max(6, Math.round(sectionGap * 0.4))}px`;
+    return wrap;
   }
   if(t === 'paragraph'){
-    const p=document.createElement('p');
-    p.className='paragraph';
-    p.innerHTML=getLoc(item,'html','') || '<em>(κενό)</em>';
-    return p;
+    wrap.className = 'page-paragraph';
+    wrap.style.marginBottom = `${paraGap}px`;
+    wrap.innerHTML = getLoc(item,'html','') || '<em>(κενό)</em>';
+    return wrap;
   }
   if(t === 'note'){
-    const d=document.createElement('div');
-    d.className='note';
-    d.innerHTML=`${getLoc(item,'label','')?`<span class="label">${getLoc(item,'label','')}</span>`:''}${getLoc(item,'html','')||'<em>(κενό)</em>'}`;
-    return d;
+    wrap.className = 'page-note';
+    wrap.style.marginTop = `${Math.max(4, Math.round(noteGap * 0.6))}px`;
+    wrap.style.marginBottom = `${noteGap}px`;
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<span class="label">${esc(getLoc(item,'label',''))}</span>` : ''}${getLoc(item,'html','') || '<em>(κενό)</em>'}`;
+    return wrap;
   }
   if(t === 'side_note'){
-    const d=document.createElement('aside');
-    d.className=`side-note ${placementClass(item)}`;
-    if(item.frameWidth) d.style.setProperty('--figure-width', `${item.frameWidth}px`);
-    const label=getLoc(item,'label','');
-    const title=getLoc(item,'title','');
-    d.innerHTML=`${label?`<span class="label">${label}</span>`:''}${title?`<span class="title">${title}</span>`:''}${getLoc(item,'html','')||'<em>(κενό)</em>'}`;
-    return d;
+    wrap.className = `side-note ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    wrap.innerHTML = `${getLoc(item,'label','') ? `<span class="label">${esc(getLoc(item,'label',''))}</span>` : ''}${getLoc(item,'title','') ? `<span class="title">${esc(getLoc(item,'title',''))}</span>` : ''}${getLoc(item,'html','') || '<em>(ÎºÎµÎ½Ï)</em>'}`;
+    return wrap;
   }
   if(t === 'figure'){
-    const fig=document.createElement('figure');
-    fig.className=`media ${placementClass(item)}`;
-    if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
-    const frame=document.createElement('div');
-    frame.className=`media-frame ${item.aspect==='natural'?'natural':''}`.trim();
-    if(item.src){
-      const img=document.createElement('img');
-      img.alt=getLoc(item,'alt','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
-      img.src=item.src;
-      frame.appendChild(img);
-    } else {
-      const ph=document.createElement('div');
-      ph.className='media-placeholder';
-      ph.innerHTML=`<div><strong>${esc(getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα'))}</strong><br>${contentLang==='en' ? 'No image source.' : 'Χωρίς src.'}</div>`;
-      frame.appendChild(ph);
-    }
-    fig.appendChild(frame);
-    if(!item.hideCaption){
-      const cap=document.createElement('figcaption');
-      cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
-      fig.appendChild(cap);
-    }
-    return fig;
+    wrap.className = `media ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    wrap.innerHTML = `
+      <figure class="${wrap.className}" style="--figure-width:${item.frameWidth || 340}px">
+        <div class="media-frame natural">
+          ${item.src ? `<img src="${item.src}" alt="${esc(getLoc(item,'alt',''))}">` : `<div class="media-placeholder" style="position:static;display:grid;place-items:center;padding:14px;color:#465666;min-height:140px">Χωρίς src</div>`}
+        </div>
+        ${item.hideCaption ? '' : `<figcaption>${esc(getLoc(item,'caption','') || getLoc(item,'title',''))}</figcaption>`}
+      </figure>`;
+    return wrap.firstElementChild;
   }
   if(t === 'scene'){
-    const fig=document.createElement('figure');
-    fig.className=`media ${placementClass(item)}`;
-    if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
-    const frame=document.createElement('div');
-    frame.className='media-frame scene-frame';
-    frame.style.aspectRatio=String(sceneAspect(item));
+    wrap.className = `media ${item.placement === 'left' ? 'float-left' : item.placement === 'wide' ? 'wide' : 'float-right'}`;
+    wrap.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+    const metrics = sceneNaturalMetrics(item);
+    const fig = document.createElement('figure');
+    fig.className = wrap.className;
+    fig.style.setProperty('--figure-width', `${item.frameWidth || 340}px`);
+
+    const reserve = document.createElement('div');
+    reserve.className = 'scene-preview-reserve';
+    reserve.style.minHeight = `${Math.round(metrics.reservedHeight)}px`;
+
+    const frame = document.createElement('div');
+    frame.className = 'media-frame scene-media-frame';
+    frame.style.aspectRatio = `${metrics.frameWidth} / ${metrics.naturalHeight}`;
+
     if(item.singleSrc){
-      const iframe=document.createElement('iframe');
-      iframe.loading='lazy';
-      iframe.referrerPolicy='no-referrer';
-      iframe.allow='fullscreen';
-      iframe.src=item.singleSrc;
-      frame.appendChild(iframe);
+      const ifr = document.createElement('iframe');
+      ifr.loading = 'lazy';
+      ifr.referrerPolicy = 'no-referrer';
+      ifr.allow = 'fullscreen';
+      ifr.src = item.singleSrc;
+      frame.appendChild(ifr);
     } else {
-      const ph=document.createElement('div');
-      ph.className='media-placeholder';
-      ph.textContent='Χωρίς singleSrc';
-      frame.appendChild(ph);
+      frame.innerHTML = '<div class="media-placeholder" style="display:grid;place-items:center;padding:14px;color:#465666">Χωρίς singleSrc</div>';
     }
-    fig.appendChild(frame);
+
+    reserve.appendChild(frame);
+    fig.appendChild(reserve);
+
     if(!item.hideCaption){
-      const cap=document.createElement('figcaption');
-      cap.textContent=getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Scene' : 'Σκηνή');
+      const cap = document.createElement('figcaption');
+      cap.textContent = getLoc(item,'caption','') || getLoc(item,'title','') || (contentLang==='en' ? 'Scene' : 'Σκηνή');
       fig.appendChild(cap);
     }
     return fig;
   }
   if(t === 'nav_anchor'){
-    const s=document.createElement('span');
-    s.className='nav-anchor-preview';
-    s.textContent = `Σημείο μενού: ${itemNavTitle(item, item.id || 'χωρίς τίτλο')}`;
-    return s;
+    wrap.className = 'nav-anchor-preview';
+    wrap.textContent = `Σημείο μενού: ${itemNavTitle(item, item.id || 'χωρίς τίτλο')}`;
+    return wrap;
   }
   if(t === 'interactive_callout'){
-    const d=document.createElement('div');
-    d.className='callout';
-    const setup=(item.setupChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'setupLabel', contentLang==='en' ? 'Set' : 'Ρύθμισε')}</span>${(item.setupChips||[]).map(t=>`<span class="callout-chip">${esc(t)}</span>`).join('')}</div>` : '';
-    const press=(item.pressChips||[]).length ? `<div class="callout-row"><span class="callout-label">${getLoc(item,'pressLabel', contentLang==='en' ? 'Press' : 'Πίεσε')}</span>${(item.pressChips||[]).map(t=>`<span class="callout-chip">${esc(t)}</span>`).join('')}</div>` : '';
-    const observe=getLocArray(item,'observeItems').length ? `<div class="callout-observe"><span class="callout-observe-title">${getLoc(item,'observeTitle', contentLang==='en' ? 'Observe' : 'Παρατήρησε')}</span><ul>${getLocArray(item,'observeItems').map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>` : '';
-    d.innerHTML=`<div class="callout-title">${getLoc(item,'title', contentLang==='en' ? 'Try' : 'Δοκίμασε')}</div>${setup}${press}${observe}`;
-    return d;
+    wrap.className = 'callout';
+    wrap.style.marginTop = `${Math.max(4, Math.round(calloutGap * 0.6))}px`;
+    wrap.style.marginBottom = `${calloutGap}px`;
+    const setup = (item.setupChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
+    const press = (item.pressChips || []).map(ch => `<span class="callout-chip">${esc(ch)}</span>`).join('');
+    const observe = getLocArray(item,'observeItems').map(ch => `<li>${esc(ch)}</li>`).join('');
+    wrap.innerHTML = `
+      <div class="callout-title">${esc(item.title || 'Δοκίμασε')}</div>
+      <div class="callout-row">
+        ${setup ? `<span class="callout-label">${esc(item.setupLabel || 'Ρύθμισε')}</span>${setup}` : ''}
+        ${press ? `<span class="callout-label">${esc(item.pressLabel || 'Πίεσε')}</span>${press}` : ''}
+      </div>
+      ${observe ? `<div class="callout-observe"><span class="callout-observe-title">${esc(item.observeTitle || 'Παρατήρησε')}</span><ul>${observe}</ul></div>` : ''}`;
+    return wrap;
   }
-  const fallback=document.createElement('div');
-  fallback.className='paragraph';
-  fallback.textContent=`Άγνωστος τύπος: ${t}`;
-  return fallback;
-}
+  if(t === 'clear'){
+    wrap.style.clear = 'both';
+    wrap.style.height = '0';
+    return wrap;
+  }
 
+  wrap.className = 'page-paragraph';
+  wrap.style.marginBottom = `${paraGap}px`;
+  wrap.textContent = `[Άγνωστο item: ${t}]`;
+  return wrap;
+}
 </script>
 </body>
 </html>

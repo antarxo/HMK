@@ -654,24 +654,32 @@ window.addEventListener('afterprint', ()=>{
   setStatus('');
 });
 
-function sceneAspect(item){
-  const customAspect = item?.aspectRatio || item?.sceneAspect || item?.aspect;
-  if(customAspect && customAspect !== 'natural'){
-    if(typeof customAspect === 'number' && Number.isFinite(customAspect) && customAspect > 0) return customAspect;
-    const txt = String(customAspect).trim();
-    const frac = txt.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
-    if(frac){
-      const a = Number(frac[1]), c = Number(frac[2]);
-      if(a > 0 && c > 0) return a / c;
-    }
-    const n = Number(txt);
-    if(Number.isFinite(n) && n > 0) return n;
+function parseAspectLike(value){
+  if(value == null || value === '' || value === 'natural') return null;
+  if(typeof value === 'number' && Number.isFinite(value) && value > 0) return value;
+  const txt = String(value).trim();
+  const frac = txt.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  if(frac){
+    const a = Number(frac[1]), b = Number(frac[2]);
+    if(a > 0 && b > 0) return a / b;
   }
+  const n = Number(txt);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function sceneAspect(item){
+  // Ίδια λογική με τον Editor: πρώτα ρητό ύψος, μετά aspect, μετά layout preset.
+  const frameWidth = Math.max(120, Number(item?.frameWidth || 340) || 340);
+  const explicitHeight = Number(item?.sceneHeight ?? item?.frameHeight ?? item?.height);
+  if(Number.isFinite(explicitHeight) && explicitHeight > 0) return frameWidth / explicitHeight;
+
+  const customAspect = parseAspectLike(item?.aspectRatio ?? item?.sceneAspect ?? item?.aspect);
+  if(customAspect) return customAspect;
+
   const src=String(item.singleSrc||'');
-  let layout='';
+  let layout=String(item?.layout || '').toLowerCase();
   try{
     const u=new URL(normalizeAppSrc(src), window.location.href);
-    layout=(u.searchParams.get('layout')||'').toLowerCase();
+    layout=layout || (u.searchParams.get('layout')||'').toLowerCase();
   }catch(_e){}
   const g=146.2, r=219.3, c=34;
   if(layout==='rod_only') return 340/(r+c);
