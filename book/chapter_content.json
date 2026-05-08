@@ -1999,7 +1999,7 @@
         },
         {
           "type": "paragraph",
-          "html": "για το οποίο:<div style=\"margin:4px 0 6px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.42;\"><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">Ε<sub>επ</sub> = ∑<sub>ΑΔΓΒΑ</sub>(E<sub>∥</sub>·Δℓ)</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= E<sub>∥ΑΔ</sub>·ΑΔ + E<sub>∥ΔΓ</sub>·ΔΓ</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">+ E<sub>∥ΓΒ</sub>·ΓΒ + E<sub>∥ΒΑ</sub>·ΒΑ</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= E<sub>∥ΑΔ</sub>·Δl + E<sub>∥ΔΓ</sub>·Δr</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">+ E<sub>∥ΓΒ</sub>·Δl + E<sub>∥ΒΑ</sub>·Δr</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= E<sub>∥ΑΔ</sub>·Δl − (E<sub>∥ΑΔ</sub> − ΔE<sub>r</sub>)·Δl</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= ΔE<sub>r</sub>·Δl</span></div>"
+          "html": "για το οποίο: <span style=\"font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.35; white-space:normal; overflow-wrap:normal; word-break:normal;\">Ε<sub>επ</sub> = ∑<sub>ΑΔΓΒΑ</sub>(E<sub>∥</sub>·Δℓ) = E<sub>∥ΑΔ</sub>·ΑΔ + E<sub>∥ΔΓ</sub>·ΔΓ + E<sub>∥ΓΒ</sub>·ΓΒ + E<sub>∥ΒΑ</sub>·ΒΑ = E<sub>∥ΑΔ</sub>·Δl + E<sub>∥ΔΓ</sub>·Δr + E<sub>∥ΓΒ</sub>·Δl + E<sub>∥ΒΑ</sub>·Δr = E<sub>∥ΑΔ</sub>·Δl − (E<sub>∥ΑΔ</sub> − ΔE<sub>r</sub>)·Δl = ΔE<sub>r</sub>·Δl</span>"
         },
         {
           "type": "paragraph",
@@ -2048,7 +2048,7 @@
         },
         {
           "type": "paragraph",
-          "html": "<div style=\"margin:4px 0 6px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.42;\"><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">Ε<sub>επ</sub> = ∑<sub>ΑΔΓΒΑ</sub>(E<sub>∥</sub>·Δℓ) = − ΔΦ<sub>B,t</sub>/Δt</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">⇔<sub>(1),(2)</sub></span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">ΔE<sub>r</sub>·Δl = − (ΔB<sub>t</sub>/Δt)·Δl·Δr</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">⇔</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">ΔE<sub>r</sub>/Δr = − ΔB<sub>t</sub>/Δt</span></div>"
+          "html": "<div style=\"margin:3px 0 5px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.35; white-space:normal; overflow-wrap:normal; word-break:normal;\">Ε<sub>επ</sub> = ∑<sub>ΑΔΓΒΑ</sub>(E<sub>∥</sub>·Δℓ) = − ΔΦ<sub>B,t</sub>/Δt ⇔<sub>(1),(2)</sub><br>ΔE<sub>r</sub>·Δl = − (ΔB<sub>t</sub>/Δt)·Δl·Δr ⇔ ΔE<sub>r</sub>/Δr = − ΔB<sub>t</sub>/Δt</div>"
         },
         {
           "type": "paragraph",
@@ -2161,7 +2161,7 @@
         },
         {
           "type": "paragraph",
-          "html": "για το οποίο:<div style=\"margin:4px 0 6px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.42;\"><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ)</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= B<sub>∥ΑΔ</sub>·ΑΔ + B<sub>∥ΔΓ</sub>·ΔΓ</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">+ B<sub>∥ΓΒ</sub>·ΓΒ + B<sub>∥ΒΑ</sub>·ΒΑ</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= B<sub>∥ΑΔ</sub>·Δl + B<sub>∥ΔΓ</sub>·Δr</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">+ B<sub>∥ΓΒ</sub>·Δl + B<sub>∥ΒΑ</sub>·Δr</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= B·Δl − (B<sub>∥ΑΔ</sub> − ΔB<sub>r</sub>)·Δl</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">= ΔB<sub>r</sub>·Δl</span></div>επομένως<div style=\"margin:4px 0 6px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.42;\"><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ) = ΔB<sub>r</sub>·Δl&nbsp;&nbsp;(1)</span></div>"
+          "html": "για το οποίο: <span style=\"font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.35; white-space:normal; overflow-wrap:normal; word-break:normal;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ) = B<sub>∥ΑΔ</sub>·ΑΔ + B<sub>∥ΔΓ</sub>·ΔΓ + B<sub>∥ΓΒ</sub>·ΓΒ + B<sub>∥ΒΑ</sub>·ΒΑ = B<sub>∥ΑΔ</sub>·Δl + B<sub>∥ΔΓ</sub>·Δr + B<sub>∥ΓΒ</sub>·Δl + B<sub>∥ΒΑ</sub>·Δr = B·Δl − (B<sub>∥ΑΔ</sub> − ΔB<sub>r</sub>)·Δl = ΔB<sub>r</sub>·Δl</span> επομένως <span style=\"font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.35; white-space:normal; overflow-wrap:normal; word-break:normal;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ) = ΔB<sub>r</sub>·Δl&nbsp;&nbsp;(1)</span>"
         },
         {
           "type": "paragraph",
@@ -2193,7 +2193,7 @@
         },
         {
           "type": "paragraph",
-          "html": "<div style=\"margin:4px 0 6px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.42;\"><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ) = − ΔΦ<sub>E,t</sub>/Δt</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">⇔<sub>(1),(2)</sub></span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">ΔB<sub>r</sub>·Δl = − (ΔE<sub>t</sub>/Δt)·Δl·Δr</span><span style=\"display:block; padding-left:1.2em; text-indent:-1.2em;\">⇔</span><span style=\"display:block; padding-left:2.7em; text-indent:0;\">ΔB<sub>r</sub>/Δr = − ΔE<sub>t</sub>/Δt</span></div>"
+          "html": "<div style=\"margin:3px 0 5px 0; font-family:'Cambria Math','STIX Two Math','Times New Roman',serif; font-size:0.96em; line-height:1.35; white-space:normal; overflow-wrap:normal; word-break:normal;\">∑<sub>ΑΔΓΒΑ</sub>(B<sub>∥</sub>·Δℓ) = − ΔΦ<sub>E,t</sub>/Δt ⇔<sub>(1),(2)</sub><br>ΔB<sub>r</sub>·Δl = − (ΔE<sub>t</sub>/Δt)·Δl·Δr ⇔ ΔB<sub>r</sub>/Δr = − ΔE<sub>t</sub>/Δt</div>"
         },
         {
           "type": "paragraph",
