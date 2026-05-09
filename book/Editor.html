@@ -179,6 +179,120 @@
     .image-thumb.empty{color:var(--soft);font-size:11px;padding:10px;text-align:center}
     .image-thumb img{display:block;max-width:100%;max-height:220px;width:100%;height:auto;object-fit:contain;background:#fff}
   .nav-anchor-preview{display:block;border:1px dashed #38bdf8;border-radius:10px;padding:6px 8px;margin:8px 0;color:#bae6fd;background:#031323;font:800 11px/1.2 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+
+
+    /* === Book-exact preview renderer: same sheet DOM/CSS as book/index.html === */
+    .page-preview-scale{transform-origin:top center; width:max-content; height:max-content;}
+    .page-preview-scale .sheet-wrap{
+      --screen-scale:1;
+      width:calc(var(--sheet-width) * var(--screen-scale));
+      min-height:calc(var(--sheet-height) * var(--screen-scale));
+      position:relative;
+    }
+    .page-preview-scale .sheet{
+      width:var(--sheet-width);
+      height:var(--sheet-height);
+      min-height:var(--sheet-height);
+      transform:scale(var(--screen-scale));
+      transform-origin:top left;
+      background:var(--paper);
+      border:1px solid var(--line);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      position:absolute;left:0;top:0;
+      overflow:hidden;
+      color:var(--paperText);
+      font-family:var(--body-font-family);
+      font-size:var(--body-font-size);
+      line-height:var(--body-leading);
+    }
+    .page-preview-scale .sheet-inner{
+      position:relative;
+      height:100%;
+      min-height:100%;
+      padding:var(--sheet-pad-top) var(--sheet-pad-right) var(--sheet-pad-bottom) var(--sheet-pad-left);
+    }
+    .page-preview-scale .sheet-header{
+      position:absolute;
+      left:var(--sheet-pad-left);
+      right:var(--sheet-pad-right);
+      top:var(--header-top);
+      height:var(--header-h);
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      align-items:center;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      padding-bottom:8px;
+      font:700 var(--header-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      letter-spacing:.04em;
+      text-transform:none;
+      color:#7f8890;
+    }
+    .page-preview-scale .sheet-header .c{text-align:center}
+    .page-preview-scale .sheet-header .r{text-align:right}
+    .page-preview-scale .sheet-header.hidden{display:none}
+    .page-preview-scale .sheet-body{display:flow-root}
+    .page-preview-scale .sheet-footer{
+      position:absolute;
+      left:var(--sheet-pad-left);
+      right:var(--sheet-pad-right);
+      bottom:var(--footer-bottom);
+      height:var(--footer-h);
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      align-items:center;
+      padding-top:8px;
+      border-top:1px solid rgba(0,0,0,.08);
+      font:600 var(--footer-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      color:#7b8791;
+    }
+    .page-preview-scale .sheet-footer .c{text-align:center}
+    .page-preview-scale .sheet-footer .r{text-align:right}
+    .page-preview-scale .sheet-footer.hidden{display:none}
+
+    .page-preview-scale .hero{margin:0 0 var(--section-gap)}
+    .page-preview-scale .eyebrow{margin:0 0 10px;font:800 var(--hero-eyebrow-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#1f5f8b}
+    .page-preview-scale h1{margin:0 0 10px;font-family:var(--hero-title-font-family);font-size:var(--hero-title-font-size);line-height:1.06;letter-spacing:-.016em;font-weight:760;color:#1b506f}
+    .page-preview-scale .subtitle{margin:0;color:#5e6d79;font-size:var(--hero-subtitle-font-size);line-height:1.35;max-width:56ch}
+    .page-preview-scale .part-head{margin:18px 0 14px;padding-top:2px}
+    .page-preview-scale .part-kicker{margin:0 0 5px;font:800 var(--part-kicker-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.11em;color:#8a6a32}
+    .page-preview-scale .part-title-main{margin:0;font:780 var(--part-title-font-size)/1.08 var(--part-title-font-family);letter-spacing:-.022em;color:#2f627f}
+    .page-preview-scale .section-heading{margin:20px 0 8px;padding-top:6px;border-top:1px solid rgba(0,0,0,.06);font:700 var(--section-heading-font-size)/1.18 var(--section-heading-font-family);letter-spacing:-.008em;color:#5d7281}
+    .page-preview-scale .paragraph{margin:0 0 var(--para-gap);text-align:justify;text-justify:inter-word;hyphens:auto}
+    .page-preview-scale .note{margin:var(--note-gap) 0;padding:10px 12px;border-radius:14px;background:var(--note);border:1px solid #e4d7ae;font:500 var(--note-font-size)/var(--note-line-height) system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-preview-scale .note .label{display:block;margin:0 0 5px;font:800 var(--note-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8d6d1c}
+    .page-preview-scale .side-note{margin:4px 0 12px;padding:10px 12px;border-radius:16px;background:#f7fafc;border:1px solid #d6e2eb;color:#29414f;font:500 var(--note-font-size)/var(--note-line-height) system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-preview-scale .side-note.float-right,.page-preview-scale .side-note.float-left{width:min(var(--figure-width, var(--shape-width)),42%)}
+    .page-preview-scale .side-note.float-right{float:right;margin:4px 0 10px 18px}
+    .page-preview-scale .side-note.float-left{float:left;margin:4px 18px 10px 0}
+    .page-preview-scale .side-note.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
+    .page-preview-scale .side-note .label{display:block;margin:0 0 6px;font:800 var(--note-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#2f698f}
+    .page-preview-scale .side-note .title{display:block;margin:0 0 6px;font:800 13px/1.25 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#1f5f8b}
+    .page-preview-scale .side-note p{margin:0 0 6px}
+    .page-preview-scale .side-note p:last-child{margin-bottom:0}
+    .page-preview-scale figure.media{margin:4px 0 12px;background:var(--figure);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+    .page-preview-scale figure.media.float-right,.page-preview-scale figure.media.float-left{width:min(var(--figure-width, var(--shape-width)),42%)}
+    .page-preview-scale figure.media.float-right{float:right;margin:4px 0 10px 18px}
+    .page-preview-scale figure.media.float-left{float:left;margin:4px 18px 10px 0}
+    .page-preview-scale figure.media.wide{clear:both;width:100%;max-width:100%;margin:14px 0}
+    .page-preview-scale .media-frame{position:relative;width:100%;background:#dde7ee;overflow:hidden;aspect-ratio:16/9}
+    .page-preview-scale .media-frame.natural{aspect-ratio:auto;background:#fff;overflow:visible}
+    .page-preview-scale .media-frame iframe,.page-preview-scale .media-frame img,.page-preview-scale .media-placeholder{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+    .page-preview-scale .media-frame img{object-fit:cover}
+    .page-preview-scale .media-frame.natural img{position:static;inset:auto;width:100%;height:auto;object-fit:contain;display:block}
+    .page-preview-scale .media-placeholder{display:grid;place-items:center;text-align:center;padding:22px;background:linear-gradient(135deg,#f7fbfd,#e1ebf1);color:#465666;font:600 15px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    .page-preview-scale figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5e6d79;border-top:1px solid rgba(0,0,0,.07)}
+    .page-preview-scale .callout{margin:var(--callout-gap) 0;padding:8px 9px;border:1px solid #d6e2eb;border-radius:12px;background:#f8fbfd;font:500 var(--callout-font-size)/1.35 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#29414f}
+    .page-preview-scale .callout-title{margin:0 0 6px;font:800 var(--callout-title-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#2f698f}
+    .page-preview-scale .callout-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 6px}
+    .page-preview-scale .callout-label{font:700 var(--callout-label-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#5a7386;padding:3px 6px;border-radius:999px;background:#eef4f8;border:1px solid #d7e4ec}
+    .page-preview-scale .callout-chip{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 7px;border-radius:999px;background:#fff;border:1px solid #d6e2eb;font:700 var(--callout-chip-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#203848}
+    .page-preview-scale .callout-observe{margin-top:4px;padding-top:5px;border-top:1px dashed #cfdbe3}
+    .page-preview-scale .callout-observe-title{font:700 var(--callout-observe-title-font-size)/1 system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#7b5c2a;margin-right:6px}
+    .page-preview-scale .callout-observe ul{margin:6px 0 0 18px;padding:0}
+    .page-preview-scale .callout-observe li{margin:4px 0;font-style:italic}
+    .page-preview-scale .clear{clear:both}
+    .page-preview-scale .nav-anchor{display:block;position:relative;height:0;overflow:hidden;scroll-margin-top:120px}
+
 </style>
 </head>
 <body>
@@ -374,8 +488,34 @@ function sceneAspect(item){
   return 16/9;
 }
 function applyBookPreviewVars(page, defs){
+  defs = defs || {};
   const setPx=(name,val)=>{ if(val != null && val !== '') page.style.setProperty(name, `${Number(val)}px`); };
   const setRaw=(name,val)=>{ if(val != null && val !== '') page.style.setProperty(name, String(val)); };
+  setPx('--sheet-width', defs.pageWidthPx ?? 794);
+  setPx('--sheet-height', defs.pageHeightPx ?? 1123);
+  setPx('--sheet-pad-top', defs.pagePaddingTopPx ?? 54);
+  setPx('--sheet-pad-right', defs.pagePaddingRightPx ?? 44);
+  setPx('--sheet-pad-bottom', defs.pagePaddingBottomPx ?? 54);
+  setPx('--sheet-pad-left', defs.pagePaddingLeftPx ?? 44);
+  setPx('--header-top', defs.headerTopPx ?? 20);
+  setPx('--header-h', defs.headerHeightPx ?? 16);
+  setPx('--footer-bottom', defs.footerBottomPx ?? 18);
+  setPx('--footer-h', defs.footerHeightPx ?? 16);
+  setPx('--header-font-size', defs.headerFontSize ?? 11);
+  setPx('--footer-font-size', defs.footerFontSize ?? 11);
+  setPx('--body-font-size', defs.bodyFontSize ?? 18);
+  setRaw('--body-leading', defs.lineHeight ?? 1.34);
+  page.style.setProperty('--body-font-family', fontPresetValue(defs.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif'));
+  page.style.setProperty('--heading-font-family', fontPresetValue(defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif'));
+  page.style.setProperty('--paper', '#fffdf9');
+  page.style.setProperty('--paperText', '#1d2730');
+  page.style.setProperty('--line', '#ddd3c3');
+  page.style.setProperty('--muted', '#5e6d79');
+  page.style.setProperty('--note', '#f6efdc');
+  page.style.setProperty('--figure', '#f6f8fa');
+  page.style.setProperty('--shape-width', '340px');
+  page.style.setProperty('--screen-scale', '1');
+
   setPx('--para-gap', defs.paragraphGap ?? 7);
   setPx('--section-gap', defs.sectionGap ?? 20);
   setPx('--note-gap', defs.noteGap ?? 10);
@@ -383,12 +523,12 @@ function applyBookPreviewVars(page, defs){
   setPx('--hero-eyebrow-font-size', defs.heroEyebrowFontSize ?? 12);
   setPx('--hero-title-font-size', defs.heroTitleFontSize ?? 28);
   setPx('--hero-subtitle-font-size', defs.heroSubtitleFontSize ?? 16);
-  if(defs.heroTitleFontFamily) page.style.setProperty('--hero-title-font-family', fontPresetValue(defs.heroTitleFontFamily, defs.heroTitleFontFamily));
+  page.style.setProperty('--hero-title-font-family', fontPresetValue(defs.heroTitleFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Times New Roman",serif'));
   setPx('--part-kicker-font-size', defs.partKickerFontSize ?? 11);
   setPx('--part-title-font-size', defs.partTitleFontSize ?? 24);
-  if(defs.partTitleFontFamily) page.style.setProperty('--part-title-font-family', fontPresetValue(defs.partTitleFontFamily, defs.partTitleFontFamily));
+  page.style.setProperty('--part-title-font-family', fontPresetValue(defs.partTitleFontFamily || defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif'));
   setPx('--section-heading-font-size', defs.sectionHeadingFontSize ?? 18);
-  if(defs.sectionHeadingFontFamily) page.style.setProperty('--section-heading-font-family', fontPresetValue(defs.sectionHeadingFontFamily, defs.sectionHeadingFontFamily));
+  page.style.setProperty('--section-heading-font-family', fontPresetValue(defs.sectionHeadingFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif'));
   setPx('--note-font-size', defs.noteFontSize ?? 14);
   setRaw('--note-line-height', defs.noteLineHeight ?? 1.42);
   setPx('--note-label-font-size', defs.noteLabelFontSize ?? 10);
@@ -399,8 +539,44 @@ function applyBookPreviewVars(page, defs){
   setPx('--callout-chip-font-size', defs.calloutChipFontSize ?? 10);
   setPx('--callout-observe-title-font-size', defs.calloutObserveTitleFontSize ?? 10);
 }
+function replaceTokens(value, ctx){
+  return String(value || '')
+    .replace(/\{page\}/g, String(ctx.page || ''))
+    .replace(/\{pages\}/g, String(ctx.pages || ''));
+}
+function normalizeEditorBookSrc(src=''){
+  const raw = String(src || '').trim();
+  // Editor.html και index.html του βιβλίου βρίσκονται και τα δύο μέσα στο /book/.
+  // Άρα τα relative paths πρέπει να ερμηνεύονται ακριβώς με τον ίδιο τρόπο και στα δύο.
+  // Δεν μεταφράζουμε πια ../index.html σε ./index.html ούτε images/... σε ./book/images/...
+  return raw;
+}
+function editorImageSrcCandidates(src=''){
+  const raw=String(src||'').trim();
+  if(!raw) return [];
+  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
+  const list=[]; const push=v=>{ if(v && !list.includes(v)) list.push(v); };
+  push(raw);
+  // Μικρά fallbacks μόνο για παλιά/λανθασμένα paths, χωρίς να αλλάζει το canonical path.
+  if(raw.startsWith('./book/images/')) push(raw.replace(/^\.\/book\//,'./'));
+  if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
+  if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
+  return list;
+}
+function applyEditorImageWithFallback(img, rawSrc=''){
+  const candidates=editorImageSrcCandidates(rawSrc);
+  let i=0;
+  const tryNext=()=>{
+    if(i>=candidates.length){ img.dispatchEvent(new CustomEvent('imagefallbackfailed')); return; }
+    img.src=candidates[i++];
+  };
+  img.addEventListener('error', tryNext);
+  tryNext();
+}
+
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
 const COMMON_SETUP_BUTTONS = [
+  // Κοινά / ΗΜ κύμα
   'I↓',
   'V-t', 'q-t', 'i-t', 'E-t', 'B-t',
   'Εδ', 'Βδ',
@@ -412,13 +588,28 @@ const COMMON_SETUP_BUTTONS = [
   'Δυναμικές γραμμές E', 'Δυναμικές γραμμές B',
   'Ευθεία διάδοση',
   'Απόσβεση',
-  'Κοντά', 'Μακριά'
+  'Κοντά', 'Μακριά',
+
+  // Ηλεκτροστατική εφαρμογή
+  '+q', '-q', '+ / -',
+  'q+', 'q−', 'q-',
+  'θετικό φορτίο', 'αρνητικό φορτίο',
+  'Μονό φορτίο', 'Ηλεκτρικό δίπολο',
+  'Πηγή του ηλεκτροστατικού πεδίου',
+  'Κατάσταση φορτίων',
+  'Εμφάνιση', 'Εξαφάνιση',
+  'Βέλη έντασης στον +x',
+  'Γράφημα E–x',
+  'Βέλη E',
+  'Μέτωπο διάδοσης',
+  'Πραγματική κίνηση τώρα'
 ];
 const COMMON_PRESS_BUTTONS = [
-  '|◀', '◀', '▶', '▶|',
+  '|◀', '◀', '⏴', '▶', '⏵', '▶|',
   '|◀ ◀', '▶ ▶|',
   'Αρχή', 'Πίσω', 'Play', 'Μπροστά', 'Τέλος',
-  't=0', 'T/4', 'T/2', '3T/4', 'T'
+  't=0', 'T/4', 'T/2', '3T/4', 'T',
+  'Πραγματική κίνηση τώρα'
 ];
 
 
@@ -2135,135 +2326,44 @@ function renderNavCandidateList(host){
 
 
 function renderPageNode(pageObj, highlightedIndex=-1, pageNumber=1){
-  const page = document.createElement('div');
-  page.className = 'page-preview';
-
   const defs = data.layoutDefaults || {};
-  const bodyFontSize = Number(defs.bodyFontSize || 18);
-  const lineHeight = Number(defs.lineHeight || 1.34);
-  const headerFontSize = Number(defs.headerFontSize ?? 11);
-  const footerFontSize = Number(defs.footerFontSize ?? 11);
-  const bodyFamily = fontPresetValue(defs.bodyFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
-  const headingFamily = fontPresetValue(defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
-  const heroFamily = fontPresetValue(defs.heroTitleFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Times New Roman",serif');
-  const partFamily = fontPresetValue(defs.partTitleFontFamily || defs.headingFontFamily || 'classic', '"Avenir Next","Segoe UI",system-ui,-apple-system,Arial,sans-serif');
-  const sectionFamily = fontPresetValue(defs.sectionHeadingFontFamily || defs.headingFontFamily || 'serif', 'Georgia,"Noto Serif","Times New Roman",serif');
+  const totalPages = Array.isArray(data?.pages) ? data.pages.length : pageNumber;
 
-  const pageWidthPx = Number(defs.pageWidthPx || 794);
-  const pageHeightPx = Number(defs.pageHeightPx || 1123);
-  const pagePaddingTopPx = Number(defs.pagePaddingTopPx || 54);
-  const pagePaddingRightPx = Number(defs.pagePaddingRightPx || 44);
-  const pagePaddingBottomPx = Number(defs.pagePaddingBottomPx || 54);
-  const pagePaddingLeftPx = Number(defs.pagePaddingLeftPx || 44);
-  const headerTopPx = Number(defs.headerTopPx || 20);
-  const headerHeightPx = Number(defs.headerHeightPx || 16);
-  const footerBottomPx = Number(defs.footerBottomPx || 18);
-  const footerHeightPx = Number(defs.footerHeightPx || 16);
+  const wrap = document.createElement('div');
+  wrap.className = 'sheet-wrap editor-preview-sheet-wrap';
+  if(pageObj.id) wrap.id = pageObj.id;
+  applyBookPreviewVars(wrap, defs);
 
-  page.style.width = `${pageWidthPx}px`;
-  page.style.minHeight = `${pageHeightPx}px`;
-  page.style.padding = `${pagePaddingTopPx}px ${pagePaddingRightPx}px ${pagePaddingBottomPx}px ${pagePaddingLeftPx}px`;
-  page.style.lineHeight = String(lineHeight);
-  page.style.fontSize = `${bodyFontSize}px`;
-  page.style.fontFamily = bodyFamily;
-  applyBookPreviewVars(page, defs);
+  const sheet = document.createElement('section');
+  sheet.className = 'sheet';
+  const inner = document.createElement('div');
+  inner.className = 'sheet-inner';
 
   const header = document.createElement('div');
-  header.className = 'page-header';
-  header.style.left = `${pagePaddingLeftPx}px`;
-  header.style.right = `${pagePaddingRightPx}px`;
-  header.style.top = `${headerTopPx}px`;
-  header.style.height = `${headerHeightPx}px`;
-  header.style.fontSize = `${headerFontSize}px`;
-  header.style.textTransform = 'none';
-  if(headerFontSize <= 0) header.style.display = 'none';
-  header.innerHTML = `<span>${esc(getLoc(pageObj.header,'left',''))}</span><span>${esc(getLoc(pageObj.header,'center',''))}</span><span>${esc(getLoc(pageObj.header,'right',''))}</span>`;
-  page.appendChild(header);
+  header.className = 'sheet-header';
+  if(Number(defs.headerFontSize) <= 0) header.classList.add('hidden');
+  header.innerHTML = `<div class="l">${replaceTokens(getLoc(pageObj.header,'left',''), {page:pageNumber,pages:totalPages})}</div><div class="c">${replaceTokens(getLoc(pageObj.header,'center',''), {page:pageNumber,pages:totalPages})}</div><div class="r">${replaceTokens(getLoc(pageObj.header,'right',''), {page:pageNumber,pages:totalPages})}</div>`;
+  inner.appendChild(header);
 
-  const footerRight = String(getLoc(pageObj.footer,'right','')).replace('{page}', pageNumber);
-  const footerCenter = String(getLoc(pageObj.footer,'center','')).replace('{page}', pageNumber);
-  const footerLeft = String(getLoc(pageObj.footer,'left','')).replace('{page}', pageNumber);
-  const footer = document.createElement('div');
-  footer.className = 'page-footer';
-  footer.style.left = `${pagePaddingLeftPx}px`;
-  footer.style.right = `${pagePaddingRightPx}px`;
-  footer.style.bottom = `${footerBottomPx}px`;
-  footer.style.height = `${footerHeightPx}px`;
-  footer.style.fontSize = `${footerFontSize}px`;
-  footer.style.textTransform = 'none';
-  if(footerFontSize <= 0) footer.style.display = 'none';
-  footer.innerHTML = `<span>${esc(footerLeft)}</span><span>${esc(footerCenter)}</span><span>${esc(footerRight)}</span>`;
-  page.appendChild(footer);
-
-  pageObj.items.forEach((item, idx) => {
+  const body = document.createElement('div');
+  body.className = 'sheet-body';
+  (pageObj.items || []).forEach((item, idx) => {
     const node = renderStandaloneItem(item);
     if(idx === highlightedIndex) node.classList.add('item-highlight');
-
-    if(item?.type === 'part_title'){
-      const kickerEl = node.querySelector('.part-kicker');
-      const el = node.querySelector('.part-main');
-      if(kickerEl && defs.partKickerFontSize) kickerEl.style.setProperty('font-size', `${Number(defs.partKickerFontSize)}px`);
-      if(el){
-        el.style.setProperty('font-family', partFamily);
-        if(defs.partTitleFontSize) el.style.setProperty('font-size', `${Number(defs.partTitleFontSize)}px`);
-      }
-    }
-    if(item?.type === 'section_heading'){
-      node.style.fontFamily = sectionFamily;
-      if(defs.sectionHeadingFontSize) node.style.fontSize = `${Number(defs.sectionHeadingFontSize)}px`;
-    }
-    if(item?.type === 'hero'){
-      const eyebrowEl = node.querySelector('.hero-eyebrow, .hero .eyebrow');
-      const titleEl = node.querySelector('.hero-title, .hero h1');
-      const subtitleEl = node.querySelector('.hero-subtitle, .hero .subtitle');
-      if(eyebrowEl && defs.heroEyebrowFontSize){
-        eyebrowEl.style.setProperty('font-size', `${Number(defs.heroEyebrowFontSize)}px`);
-      }
-      if(titleEl){
-        titleEl.style.setProperty('font-family', heroFamily);
-        if(defs.heroTitleFontSize) titleEl.style.setProperty('font-size', `${Number(defs.heroTitleFontSize)}px`);
-      }
-      if(subtitleEl && defs.heroSubtitleFontSize){
-        subtitleEl.style.setProperty('font-size', `${Number(defs.heroSubtitleFontSize)}px`);
-      }
-    }
-    if(item?.type === 'note'){
-      if(defs.noteFontSize) node.style.setProperty('font-size', `${Number(defs.noteFontSize)}px`);
-      if(defs.noteLineHeight) node.style.setProperty('line-height', String(defs.noteLineHeight));
-      if(defs.noteLabelFontSize){
-        node.querySelector('.label')?.style.setProperty('font-size', `${Number(defs.noteLabelFontSize)}px`);
-      }
-    }
-    if(item?.type === 'side_note'){
-      if(defs.noteFontSize) node.style.setProperty('font-size', `${Number(defs.noteFontSize)}px`);
-      if(defs.noteLineHeight) node.style.setProperty('line-height', String(defs.noteLineHeight));
-      if(defs.noteLabelFontSize){
-        node.querySelector('.label')?.style.setProperty('font-size', `${Number(defs.noteLabelFontSize)}px`);
-      }
-    }
-    if(item?.type === 'interactive_callout'){
-      if(defs.calloutFontSize) node.style.setProperty('font-size', `${Number(defs.calloutFontSize)}px`);
-      if(defs.calloutTitleFontSize){
-        node.querySelector('.callout-title')?.style.setProperty('font-size', `${Number(defs.calloutTitleFontSize)}px`);
-      }
-      if(defs.calloutChipFontSize){
-        node.querySelectorAll('.callout-chip').forEach(el=>el.style.setProperty('font-size', `${Number(defs.calloutChipFontSize)}px`));
-      }
-      if(defs.calloutLabelFontSize){
-        node.querySelectorAll('.callout-label').forEach(el=>el.style.setProperty('font-size', `${Number(defs.calloutLabelFontSize)}px`));
-      }
-      if(defs.calloutObserveTitleFontSize){
-        node.querySelector('.callout-observe-title')?.style.setProperty('font-size', `${Number(defs.calloutObserveTitleFontSize)}px`);
-      }
-    }
-    if((item?.type === 'figure' || item?.type === 'scene') && defs.captionFontSize){
-      node.querySelector('figcaption')?.style.setProperty('font-size', `${Number(defs.captionFontSize)}px`);
-    }
-
-    page.appendChild(node);
+    body.appendChild(node);
   });
+  inner.appendChild(body);
 
-  return page;
+  const footer = document.createElement('div');
+  footer.className = 'sheet-footer';
+  if(Number(defs.footerFontSize) <= 0) footer.classList.add('hidden');
+  const rightValue = defs.showPageNumbers === false ? '' : getLoc(pageObj.footer,'right','');
+  footer.innerHTML = `<div class="l">${replaceTokens(getLoc(pageObj.footer,'left',''), {page:pageNumber,pages:totalPages})}</div><div class="c">${replaceTokens(getLoc(pageObj.footer,'center',''), {page:pageNumber,pages:totalPages})}</div><div class="r">${replaceTokens(rightValue, {page:pageNumber,pages:totalPages})}</div>`;
+  inner.appendChild(footer);
+
+  sheet.appendChild(inner);
+  wrap.appendChild(sheet);
+  return wrap;
 }
 
 // Scene aspect is now computed by the same book-renderer logic used in book/index.html.
@@ -2317,7 +2417,14 @@ function renderStandaloneItem(item){
     if(item.src){
       const img=document.createElement('img');
       img.alt=getLoc(item,'alt','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
-      img.src=item.src;
+      img.addEventListener('imagefallbackfailed', ()=>{
+        img.remove();
+        const ph=document.createElement('div');
+        ph.className='media-placeholder';
+        ph.innerHTML=`<div><strong>${esc(getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα'))}</strong><br>${contentLang==='en' ? 'Image file not found.' : 'Το αρχείο εικόνας δεν βρέθηκε.'}</div>`;
+        frame.appendChild(ph);
+      }, {once:true});
+      applyEditorImageWithFallback(img, item.src || '');
       frame.appendChild(img);
     } else {
       const ph=document.createElement('div');
@@ -2342,10 +2449,10 @@ function renderStandaloneItem(item){
     frame.style.aspectRatio=String(sceneAspect(item));
     if(item.singleSrc){
       const iframe=document.createElement('iframe');
-      iframe.loading='lazy';
+      iframe.loading='eager';
       iframe.referrerPolicy='no-referrer';
       iframe.allow='fullscreen';
-      iframe.src=item.singleSrc;
+      iframe.src=normalizeEditorBookSrc(item.singleSrc);
       frame.appendChild(iframe);
     } else {
       const ph=document.createElement('div');
