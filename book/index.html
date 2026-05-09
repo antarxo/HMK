@@ -702,6 +702,14 @@ function parseAspectLike(value){
   const n = Number(txt);
   return Number.isFinite(n) && n > 0 ? n : null;
 }
+function figureAspect(item){
+  // Για κανονικές εικόνες το ύψος πρέπει να ακολουθεί το φυσικό aspect ratio.
+  // Ρητό aspect/height χρησιμοποιείται μόνο αν δοθεί συνειδητά στο JSON.
+  const frameWidth = Math.max(120, Number(item?.frameWidth || 340) || 340);
+  const explicitHeight = Number(item?.figureHeight ?? item?.frameHeight ?? item?.height);
+  if(Number.isFinite(explicitHeight) && explicitHeight > 0) return frameWidth / explicitHeight;
+  return parseAspectLike(item?.aspectRatio ?? item?.figureAspect ?? item?.aspect);
+}
 function sceneAspect(item){
   // Ίδια λογική με τον Editor: πρώτα ρητό ύψος, μετά aspect, μετά layout preset.
   const frameWidth = Math.max(120, Number(item?.frameWidth || 340) || 340);
@@ -844,7 +852,9 @@ function renderFigure(item){
   fig.className=`media ${placementClass(item)}`;
   if(item.frameWidth) fig.style.setProperty('--figure-width', `${item.frameWidth}px`);
   const frame=document.createElement('div');
-  frame.className=`media-frame ${item.aspect==='natural'?'natural':''}`.trim();
+  const figAspect = figureAspect(item);
+    frame.className=`media-frame ${figAspect ? '' : 'natural'}`.trim();
+    if(figAspect) frame.style.aspectRatio = String(figAspect);
   const img=document.createElement('img');
   img.alt=getLoc(item,'alt','') || getLoc(item,'title','') || (contentLang==='en' ? 'Figure' : 'Εικόνα');
   img.addEventListener('imagefallbackfailed', ()=>{
