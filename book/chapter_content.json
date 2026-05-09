@@ -340,90 +340,20 @@
       },
       "items": [
         {
-          "type": "section_heading",
-          "title": "Να θυμηθούμε!",
-          "title_en": "Let us recall!"
-        },
-        {
-          "type": "paragraph",
-          "html": "<strong>Από τον ηλεκτρισμό:</strong>",
-          "html_en": "<strong>From electricity:</strong>"
-        },
-        {
-          "type": "paragraph",
-          "html": "1. Ηλεκτρικό ρεύμα που διαρρέει ένα αγωγό είναι η προσανατολισμένη κίνηση των ηλεκτρικών φορτίων του.",
-          "html_en": "1. Electric current flowing through a conductor is the directed motion of its electric charges."
-        },
-        {
-          "type": "paragraph",
-          "html": "2. Ένταση ηλεκτρικού ρεύματος είναι ο ρυθμός με τον οποίο περνάνε τα ηλεκτρικά φορτία από μια διατομή του αγωγού, δηλαδή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>q</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></math></span>.",
-          "html_en": "2. Electric current intensity is the rate at which electric charges pass through a cross-section of the conductor, that is <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>q</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></math></span>."
-        },
-        {
-          "type": "paragraph",
-          "html": "3. Η σχέση (1) μας λέει επίσης ότι σε διάγραμμα q-t η κλίση παριστάνει την ένταση i του ρεύματος.",
-          "html_en": "3. Relation (1) also tells us that on a q-t graph the slope represents the current intensity i."
-        },
-        {
-          "type": "paragraph",
-          "html": "4. Φορά του ηλεκτρικού ρεύματος (δηλαδή συμβατική) είναι η φορά κίνησης των θετικών φορτίων ή ισοδύναμα η αντίθετη της φοράς κίνησης των ηλεκτρονίων σε μεταλλικό αγωγό.",
-          "html_en": "4. The direction of the electric current (that is, the conventional one) is the direction of motion of positive charges or, equivalently, the opposite of the direction of motion of electrons in a metallic conductor."
-        },
-        {
-          "type": "clear"
-        },
-        {
-          "type": "paragraph",
-          "html": "<strong>Από τον ηλεκτρομαγνητισμό:</strong>",
-          "html_en": "<strong>From electromagnetism:</strong>"
-        },
-        {
-          "type": "paragraph",
-          "html": "1. Οι Biot–Savart (αλλά και η εφαρμογή του Νόμου του Ampere) συνδέουν το ρεύμα <em>I</em> που διαρρέει έναν αγωγό με το μαγνητικό πεδίο <em>B</em> που δημιουργεί γύρω του. Υπολογίζουν μάλιστα το μέτρο του σε οποιαδήποτε απόσταση <em>α</em> από τον αγωγό από τη σχέση <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>I</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac></math></span> και τη φορά του με τον κανόνα του δεξιού χεριού.",
-          "html_en": "1. Biot–Savart (as well as the application of Ampère’s law) connects the current <em>I</em> flowing through a conductor with the magnetic field <em>B</em> it creates around it. It even gives its magnitude at any distance <em>α</em> from the conductor through the relation <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>I</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac></math></span> and its direction by the right-hand rule."
-        },
-        {
-          "type": "paragraph",
-          "html": "2. Ο Faraday λέει ότι μεταβολή του μαγνητικού πεδίου (ευρύτερα, η μεταβολή της μαγνητικής ροής) δημιουργεί επαγωγικό ηλεκτρικό πεδίο ή ισοδύναμα ΗΕΔ από επαγωγή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><msub><mi>E</mi><mtext>επ</mtext></msub><mo>=</mo><mo>−</mo><mfrac><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>.",
-          "html_en": "2. Faraday tells us that a change in the magnetic field (more broadly, a change in magnetic flux) creates an induced electric field or, equivalently, an induced emf <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><msub><mi>E</mi><mtext>επ</mtext></msub><mo>=</mo><mo>−</mo><mfrac><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>."
-        },
-        {
-          "type": "paragraph",
-          "html": "3. Ο κανόνας του Lenz καθορίζει τη φορά αυτής της επαγωγικής τάσης (το – της προηγούμενης σχέσης) και συνακόλουθα τη φορά του παραγόμενου ηλεκτρικού πεδίου από επαγωγή.",
-          "html_en": "3. Lenz’s rule determines the direction of this induced voltage (the – sign in the previous relation) and therefore the direction of the induced electric field that is produced."
-        },
-        {
-          "type": "paragraph",
-          "html": "4. Οι Ampère–Maxwell διαπιστώνουν ότι η μεταβολή του ηλεκτρικού πεδίου, δηλαδή το <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mfrac><mrow><mi>Δ</mi><mi>E</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>, προκαλεί μαγνητικό πεδίο <em>B</em> ακόμη και εκεί όπου δεν υπάρχει τοπικά αγωγός που να διαρρέεται από ρεύμα!",
-          "html_en": "4. Ampère–Maxwell state that the change of the electric field, that is <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mfrac><mrow><mi>Δ</mi><mi>E</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>, produces a magnetic field <em>B</em> even where there is locally no conductor carrying current!"
-        }
-      ]
-    },
-    {
-      "id": "page-4",
-      "header": {
-        "left": "ΜΕΡΟΣ Α΄",
-        "center": "",
-        "right": "Εισαγωγικές έννοιες",
-        "center_en": "",
-        "left_en": "PART A",
-        "right_en": "Introductory concepts"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
           "type": "part_title",
           "label": "ΜΕΡΟΣ Β΄",
           "title": "Σχολικά!",
           "label_en": "PART B",
           "title_en": "School version!"
+        },
+        {
+          "type": "side_note",
+          "label": "Να θυμηθούμε 1ον",
+          "title": "",
+          "html": "<strong>Από τον ηλεκτρισμό:</strong></br>\n1. Ηλεκτρικό ρεύμα που διαρρέει ένα αγωγό είναι η προσανατολισμένη κίνηση των ηλεκτρικών φορτίων του.</br>\n2. Ένταση ηλεκτρικού ρεύματος είναι ο ρυθμός με τον οποίο περνάνε τα ηλεκτρικά φορτία από μια διατομή του αγωγού, δηλαδή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mo>=</mo><mfrac><mrow><mi>d</mi><mi>q</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac></math></span>.</br>\n3. Η σχέση (1) μας λέει επίσης ότι σε διάγραμμα q-t η κλίση παριστάνει την ένταση i του ρεύματος.</br>\n4. Φορά του ηλεκτρικού ρεύματος (δηλαδή συμβατική) είναι η φορά κίνησης των θετικών φορτίων ή ισοδύναμα η αντίθετη της φοράς κίνησης των ηλεκτρονίων σε μεταλλικό αγωγό.",
+          "placement": "right",
+          "frameWidth": 340,
+          "html_en": "<strong>From electricity:</strong>"
         },
         {
           "type": "section_heading",
@@ -444,6 +374,15 @@
           "type": "paragraph",
           "html": "Διδακτικά είναι θεμιτό να ξεκινήσουμε από αυτή την απλουστευμένη διαδικασία γέννησης και διάδοσης του ηλεκτρομαγνητικού κύματος, επιδιώκοντας στη συνέχεια να καλύψουμε τα κενά που αφήνει. Στόχος μας επομένως είναι πρώτα να οργανωθεί καθαρά και να κατανοηθεί σε βάθος η αντίστοιχη περιγραφή που επιχειρεί το σχολικό βιβλίο.",
           "html_en": "Didactically, it is legitimate to begin from this simplified process of generation and propagation of the electromagnetic wave, aiming then to cover the gaps it leaves. Our goal, therefore, is first to organize clearly and understand in depth the corresponding description attempted by the school textbook."
+        },
+        {
+          "type": "side_note",
+          "label": "Να θυμηθούμε 2ον",
+          "title": "",
+          "html": "<strong>Από τον ηλεκτρομαγνητισμό:</strong></br>\n1. Οι Biot–Savart (αλλά και η εφαρμογή του Νόμου του Ampere) συνδέουν το ρεύμα <em>I</em> που διαρρέει έναν αγωγό με το μαγνητικό πεδίο <em>B</em> που δημιουργεί γύρω του. Υπολογίζουν μάλιστα το μέτρο του σε οποιαδήποτε απόσταση <em>α</em> από τον αγωγό από τη σχέση <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>I</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac></math></span> και τη φορά του με τον κανόνα του δεξιού χεριού.</br>\n2. Ο Faraday λέει ότι μεταβολή του μαγνητικού πεδίου (ευρύτερα, η μεταβολή της μαγνητικής ροής) δημιουργεί επαγωγικό ηλεκτρικό πεδίο ή ισοδύναμα ΗΕΔ από επαγωγή <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><msub><mi>E</mi><mtext>επ</mtext></msub><mo>=</mo><mo>−</mo><mfrac><mrow><mi>Δ</mi><mi>Φ</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>.</br>\n3. Ο κανόνας του Lenz καθορίζει τη φορά αυτής της επαγωγικής τάσης (το – της προηγούμενης σχέσης) και συνακόλουθα τη φορά του παραγόμενου ηλεκτρικού πεδίου από επαγωγή.</br>\n4. Οι Ampère–Maxwell διαπιστώνουν ότι η μεταβολή του ηλεκτρικού πεδίου, δηλαδή το <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mfrac><mrow><mi>Δ</mi><mi>E</mi></mrow><mrow><mi>Δ</mi><mi>t</mi></mrow></mfrac></math></span>, προκαλεί μαγνητικό πεδίο <em>B</em> ακόμη και εκεί όπου δεν υπάρχει τοπικά αγωγός που να διαρρέεται από ρεύμα!",
+          "placement": "right",
+          "frameWidth": 340,
+          "html_en": "<strong>From electromagnetism:</strong>"
         },
         {
           "type": "paragraph",
@@ -502,9 +441,65 @@
           "caption_en": "Scene 1"
         },
         {
+          "type": "interactive_callout",
+          "title": "Δοκίμασε",
+          "setupLabel": "Ρύθμισε",
+          "setupChips": [
+            "I↓",
+            "q-t",
+            "i-t"
+          ],
+          "pressLabel": "Πίεσε",
+          "pressChips": [
+            "|◀",
+            "▶"
+          ],
+          "observeTitle": "Παρατήρησε",
+          "observeItems": [
+            "Δες το q–t. Σύγκρινε την κλίση του q–t με το i–t.",
+            "Δες ότι το q ξεκινά από το μηδέν, ενώ το ρεύμα είναι μέγιστο."
+          ],
+          "title_en": "Try",
+          "setupLabel_en": "Set",
+          "pressLabel_en": "Press",
+          "observeTitle_en": "Observe",
+          "observeItems_en": [
+            "Look at q–t. Compare the slope of q–t with i–t.",
+            "See that q starts from zero, while the current is maximum."
+          ]
+        },
+        {
           "type": "paragraph",
           "html": "2. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>q</mi><mo>=</mo><mi>Q</mi><mtext>ημ</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> Το εμφανιζόμενο φορτίο στα άκρα του δίπολου εξαιτίας της εφαρμοζόμενης τάσης (<span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>V</mi><mo>=</mo><msub><mi>V</mi><mn>0</mn></msub><mtext>ημ</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span>) στα άκρα του. (Παρατήρησε πώς αλλάζουν τα φορτία στα άκρα του δίπολου.)",
           "html_en": "2. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>q</mi><mo>=</mo><mi>Q</mi><mtext>ημ</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> The charge appearing at the ends of the dipole because of the applied voltage (<span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>V</mi><mo>=</mo><msub><mi>V</mi><mn>0</mn></msub><mtext>ημ</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span>) at its ends. (Observe how the charges at the ends of the dipole change.)"
+        },
+        {
+          "type": "interactive_callout",
+          "title": "Δοκίμασε",
+          "setupLabel": "Ρύθμισε",
+          "setupChips": [
+            "I↓",
+            "q-t",
+            "i-t"
+          ],
+          "pressLabel": "Πίεσε",
+          "pressChips": [
+            "|◀",
+            "▶"
+          ],
+          "observeTitle": "Παρατήρησε",
+          "observeItems": [
+            "Δες το q–t. Σύγκρινε την κλίση του q–t με το i–t.",
+            "Δες ότι το q ξεκινά από το μηδέν, ενώ το ρεύμα είναι μέγιστο."
+          ],
+          "title_en": "Try",
+          "setupLabel_en": "Set",
+          "pressLabel_en": "Press",
+          "observeTitle_en": "Observe",
+          "observeItems_en": [
+            "Look at q–t. Compare the slope of q–t with i–t.",
+            "See that q starts from zero, while the current is maximum."
+          ]
         },
         {
           "type": "paragraph",
@@ -545,9 +540,86 @@
           "html_en": "4. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>E</mi><mo>=</mo><msub><mi>E</mi><mtext>max</mtext></msub><mtext>ημ</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> The intensity of the Coulomb electrostatic field that develops from the charged rod and is therefore proportional to the electric charges q at its ends."
         },
         {
+          "type": "interactive_callout",
+          "title": "Δοκίμασε",
+          "setupLabel": "Ρύθμισε",
+          "setupChips": [
+            "I↓",
+            "q-t",
+            "i-t"
+          ],
+          "pressLabel": "Πίεσε",
+          "pressChips": [
+            "|◀",
+            "▶"
+          ],
+          "observeTitle": "Παρατήρησε",
+          "observeItems": [
+            "Δες το q–t. Σύγκρινε την κλίση του q–t με το i–t.",
+            "Δες ότι το q ξεκινά από το μηδέν, ενώ το ρεύμα είναι μέγιστο."
+          ],
+          "title_en": "Try",
+          "setupLabel_en": "Set",
+          "pressLabel_en": "Press",
+          "observeTitle_en": "Observe",
+          "observeItems_en": [
+            "Look at q–t. Compare the slope of q–t with i–t.",
+            "See that q starts from zero, while the current is maximum."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "page-4",
+      "header": {
+        "left": "ΜΕΡΟΣ Β΄",
+        "center": "",
+        "right": "Σχολικό αφήγημα",
+        "center_en": "",
+        "left_en": "PART B",
+        "right_en": "School narrative"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
+        {
           "type": "paragraph",
           "html": "5. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>i</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mn>0</mn></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><msub><mi>B</mi><mtext>max</mtext></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> Η μαγνητική επαγωγή που προκαλείται από το ρεύμα στον αγωγό. Είναι σαφής η διαφορά φάσης π/2 ανάμεσα στα E και B (δες και μελέτησε την τετράδα γραφημάτων, εστιάζοντας τελικά στη μορφή των E, B για τη συνέχεια).",
           "html_en": "5. <span class=\"math-inline\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>B</mi><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><mi>i</mi></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><msub><mi>μ</mi><mn>0</mn></msub><msub><mi>I</mi><mn>0</mn></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></mrow><mrow><mn>2</mn><mi>π</mi><mi>α</mi></mrow></mfrac><mo>=</mo><msub><mi>B</mi><mtext>max</mtext></msub><mtext>συν</mtext><mo>(</mo><mi>ω</mi><mi>t</mi><mo>)</mo></math></span> The magnetic induction produced by the current in the conductor. The phase difference π/2 between E and B is clear (look at and study the set of four graphs, ultimately focusing on the form of E and B for what follows)."
+        },
+        {
+          "type": "interactive_callout",
+          "title": "Δοκίμασε",
+          "setupLabel": "Ρύθμισε",
+          "setupChips": [
+            "I↓",
+            "q-t",
+            "i-t"
+          ],
+          "pressLabel": "Πίεσε",
+          "pressChips": [
+            "|◀",
+            "▶"
+          ],
+          "observeTitle": "Παρατήρησε",
+          "observeItems": [
+            "Δες το q–t. Σύγκρινε την κλίση του q–t με το i–t.",
+            "Δες ότι το q ξεκινά από το μηδέν, ενώ το ρεύμα είναι μέγιστο."
+          ],
+          "title_en": "Try",
+          "setupLabel_en": "Set",
+          "pressLabel_en": "Press",
+          "observeTitle_en": "Observe",
+          "observeItems_en": [
+            "Look at q–t. Compare the slope of q–t with i–t.",
+            "See that q starts from zero, while the current is maximum."
+          ]
         }
       ]
     },
@@ -995,7 +1067,28 @@
           "html": "Η παραπάνω αφήγηση είναι χρήσιμη επειδή επιτρέπει στον μαθητή να οργανώσει πρώτα καθαρά τη σχέση ανάμεσα στη φόρτιση των άκρων, στο ρεύμα και στις πρώτες εικόνες του ηλεκτρικού και του μαγνητικού πεδίου κοντά στη ράβδο. Δεν είναι όμως όλη η ιστορία.",
           "label_en": "Didactic remark",
           "html_en": "The previous narrative is useful because it allows the student first to organize clearly the relation among the charging of the ends, the current, and the first pictures of the electric and magnetic field near the rod. But it is not the whole story."
-        },
+        }
+      ]
+    },
+    {
+      "id": "page-14",
+      "header": {
+        "left": "ΜΕΡΟΣ Γ΄",
+        "center": "",
+        "right": "Η σχολική εικόνα με απόσβεση",
+        "center_en": "",
+        "left_en": "PART C",
+        "right_en": "The school picture with attenuation"
+      },
+      "footer": {
+        "left": " © antarxo 2026",
+        "center": "",
+        "right": "{page}",
+        "left_en": " © antarxo 2026",
+        "center_en": "",
+        "right_en": "{page}"
+      },
+      "items": [
         {
           "type": "part_title",
           "label": "ΜΕΡΟΣ Γ΄",
@@ -1005,7 +1098,7 @@
         },
         {
           "type": "section_heading",
-          "title": "Η σχολική εικόνα με απόσβεση",
+          "title": "Α. Η σχολική εικόνα με απόσβεση",
           "title_en": "The school picture with attenuation"
         },
         {
@@ -1102,7 +1195,7 @@
       "items": [
         {
           "type": "section_heading",
-          "title": "Το πραγματικό ΗΜ κύμα",
+          "title": "Β. Το πραγματικό ΗΜ κύμα",
           "title_en": "The actual EM wave"
         },
         {
@@ -1510,54 +1603,6 @@
         {
           "type": "paragraph",
           "html": "Χρειαζόμαστε λοιπόν και νέο φυσικό μέγεθος, με μονάδα J/C, το οποίο\nνα χαρακτηρίζει το ίδιο το σημείο A, πριν ακόμη καταφτάσει εκεί ένα έστω\nθετικό φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nκαι το οποίο να εξασφαλίζει ότι η δυναμική ενέργεια που θα αποδωθεί στο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msup><mi>q</mi><mo>+</mo></msup><annotation encoding=\"application/x-tex\">q^{+}</annotation></semantics></math>\nείναι όση σε τιμή, ο Νόμος του Coulomb προβλέπει. Για ένα φορτίο\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup><annotation encoding=\"application/x-tex\">\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}</annotation></semantics></math>\nστο σημείο Α σε απόσταση\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><msub><mi>r</mi><mi>A</mi></msub><annotation encoding=\"application/x-tex\">r_{A}</annotation></semantics></math>\nαπό το Q η δυναμική ενέργεια U που πρέπει να αποκτήσει δίνεται από τη\nσχέση:\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><mrow><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi></mrow><mfrac><mrow><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac><mover><mo>⇔</mo><mrow></mrow></mover><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><mo mathvariant=\"bold\">=</mo><mi>𝐊</mi><mfrac><mrow><mo form=\"prefix\" stretchy=\"true\">|</mo><mi>𝐐</mi><mo form=\"postfix\" stretchy=\"true\">|</mo></mrow><msub><mi>𝐫</mi><mi>𝐀</mi></msub></mfrac></mrow><annotation encoding=\"application/x-tex\">\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{= K}\\frac{\\left| \\mathbf{Q} \\right|\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}{\\mathbf{r}_{\\mathbf{A}}}\\overset{}{\\Leftrightarrow}\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}\\mathbf{=}\\mathbf{K}\\frac{\\left| \\mathbf{Q} \\right|}{\\mathbf{r}_{\\mathbf{A}}}</annotation></semantics></math>\nΤο μέγεθος\n<math display=\"inline\" xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mfrac><msub><mi>𝐔</mi><mrow><mrow><mi>𝐐</mi><mo mathvariant=\"bold\">→</mo></mrow><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mrow></msub><msubsup><mi>𝐪</mi><mrow><mi>𝛔</mi><mi>𝛕</mi><mi>𝛐</mi><mspace width=\"0.222em\"></mspace><mi>𝐀</mi></mrow><mi mathvariant=\"bold\">+</mi></msubsup></mfrac><annotation encoding=\"application/x-tex\">\\frac{\\mathbf{U}_{\\mathbf{Q \\rightarrow}\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}}{\\mathbf{q}_{\\mathbf{\\sigma\\tau ο\\ A}}^{\\mathbf{+}}}</annotation></semantics></math>\nπαρατηρούμε ότι περιγράφει την τιμή της δυναμικής "
-        }
-      ]
-    },
-    {
-      "id": "page-electrostatic-scenes-charge-v2",
-      "header": {
-        "left": "ΜΕΡΟΣ Δ΄",
-        "center": "",
-        "right": "Παράρτημα Α",
-        "center_en": "",
-        "left_en": "APPENDIX",
-        "right_en": "Electrostatic field scenes"
-      },
-      "footer": {
-        "left": " © antarxo 2026",
-        "center": "",
-        "right": "{page}",
-        "left_en": " © antarxo 2026",
-        "center_en": "",
-        "right_en": "{page}"
-      },
-      "items": [
-        {
-          "type": "section_heading",
-          "title": "Σκηνή Α1 — εγκατάσταση, εξαφάνιση και μετατόπιση πεδίου από μονό φορτίο"
-        },
-        {
-          "type": "paragraph",
-          "html": "Η σκηνή αυτή λειτουργεί ως μικρό εργαστηριακό ένθετο για την ιδέα ότι το ηλεκτροστατικό πεδίο δεν εμφανίζεται παντού ακαριαία. Η πληροφορία της ύπαρξης, της εξαφάνισης ή της μετατόπισης της πηγής διαδίδεται στον χώρο και ο χώρος «ξέρει» μόνο ό,τι έχει προλάβει να του φτάσει."
-        },
-        {
-          "type": "interactive_callout",
-          "title": "Δοκίμασε",
-          "setupLabel": "Ρύθμισε",
-          "setupChips": [
-            "+q",
-            "Κίνηση τώρα"
-          ],
-          "pressLabel": "Πίεσε",
-          "pressChips": [
-            "▶"
-          ],
-          "observeTitle": "Παρατήρησε",
-          "observeItems": [
-            "Η νέα θέση του φορτίου δεν ξαναγράφει ακαριαία όλο το προηγούμενο πεδίο.",
-            "Η νέα πληροφορία ξεκινά από την πηγή και προχωρά προς τα έξω.",
-            "Η εικόνα κρατά την ιστορία του πεδίου μέχρι να φτάσει η νεότερη πληροφορία."
-          ]
         }
       ]
     },
