@@ -293,6 +293,60 @@
     .page-preview-scale .clear{clear:both}
     .page-preview-scale .nav-anchor{display:block;position:relative;height:0;overflow:hidden;scroll-margin-top:120px}
 
+
+
+  /* 1:1 book text rules: full justification + browser hyphenation for all text objects.
+     Labels/chips/titles stay compact and are excluded. */
+  .page-preview-scale .paragraph,
+  .page-preview-scale .note,
+  .page-preview-scale .note p,
+  .page-preview-scale .note li,
+  .page-preview-scale .side-note,
+  .page-preview-scale .side-note p,
+  .page-preview-scale .side-note li,
+  .page-preview-scale .callout,
+  .page-preview-scale .callout-observe,
+  .page-preview-scale .callout-observe li,
+  .page-preview-scale figure.media figcaption,
+  .page-preview .paragraph,
+  .page-preview .note,
+  .page-preview .note p,
+  .page-preview .note li,
+  .page-preview .side-note,
+  .page-preview .side-note p,
+  .page-preview .side-note li,
+  .page-preview .callout,
+  .page-preview .callout-observe,
+  .page-preview .callout-observe li,
+  .page-preview figure.media figcaption{
+    text-align:justify;
+    text-justify:inter-word;
+    hyphens:auto;
+    -webkit-hyphens:auto;
+    overflow-wrap:break-word;
+    word-break:normal;
+  }
+  .page-preview-scale .note .label,
+  .page-preview-scale .side-note .label,
+  .page-preview-scale .side-note .title,
+  .page-preview-scale .callout-title,
+  .page-preview-scale .callout-row,
+  .page-preview-scale .callout-label,
+  .page-preview-scale .callout-chip,
+  .page-preview .note .label,
+  .page-preview .side-note .label,
+  .page-preview .side-note .title,
+  .page-preview .callout-title,
+  .page-preview .callout-row,
+  .page-preview .callout-label,
+  .page-preview .callout-chip{
+    text-align:initial;
+    text-justify:auto;
+    hyphens:manual;
+    -webkit-hyphens:manual;
+    overflow-wrap:normal;
+  }
+
 </style>
 </head>
 <body>

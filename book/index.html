@@ -316,6 +316,42 @@ figcaption{padding:12px 14px 14px;font:500 var(--caption-font-size)/1.55 system-
   .media-frame.scene-frame.print-ready::after{content:none !important}
   .print-scene-snapshot{display:block !important; object-fit:contain !important; background:#fff !important}
 }
+
+
+/* Book text rules: full justification + browser hyphenation for all text objects.
+   Labels/chips/titles stay compact and are excluded. */
+.paragraph,
+.note,
+.note p,
+.note li,
+.side-note,
+.side-note p,
+.side-note li,
+.callout,
+.callout-observe,
+.callout-observe li,
+figure.media figcaption{
+  text-align:justify;
+  text-justify:inter-word;
+  hyphens:auto;
+  -webkit-hyphens:auto;
+  overflow-wrap:break-word;
+  word-break:normal;
+}
+.note .label,
+.side-note .label,
+.side-note .title,
+.callout-title,
+.callout-row,
+.callout-label,
+.callout-chip{
+  text-align:initial;
+  text-justify:auto;
+  hyphens:manual;
+  -webkit-hyphens:manual;
+  overflow-wrap:normal;
+}
+
 </style>
 </head>
 <body>
