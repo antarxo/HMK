@@ -34,8 +34,6 @@
   select{width:min(190px,34vw);background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 6px}
   .viewport{position:relative;min-height:0;height:100%}
   #stage{position:absolute;inset:0}
-  #stage canvas{cursor:grab}
-  #stage canvas.dragging{cursor:grabbing}
   .leftOverlayStack{position:absolute;left:4px;top:2px;bottom:2px;z-index:20;display:flex;flex-direction:column;gap:1px;align-items:flex-start;pointer-events:none;width:min(248px,25vw);min-height:0}
   .machineHud{position:relative;left:auto;top:auto;bottom:auto;z-index:20;display:flex;flex-direction:column;gap:2px;align-items:flex-start;pointer-events:none;max-width:none;width:100%;margin-top:auto}
   .machineHud .dpad,.machineHud button,.machineHud input,.machineHud label{pointer-events:auto}
@@ -51,17 +49,16 @@
   .controlGrid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
   .controlGrid button{min-width:0;padding:4px 6px;font-size:16px;line-height:1;white-space:nowrap;border-radius:9px;display:flex;align-items:center;justify-content:center;min-height:30px}
   .controlGrid .span2{grid-column:1 / span 2}
-  .modeGrid{display:flex;flex-direction:column;gap:4px}
-  .modeGrid .layerRow{display:grid;gap:3px;align-items:center}
-  .modeGrid .layerRow2{grid-template-columns:1fr .58fr}
-  .modeGrid .layerRow3{grid-template-columns:1fr 0.58fr 0.58fr}
-  .modeGrid .layerRow4{grid-template-columns:repeat(4,1fr)}
-  .modeGrid .layerRow1{grid-template-columns:1fr}
-  .modeGrid button{min-width:0;padding:5px 6px;font-size:10px;white-space:nowrap;border-radius:9px;display:flex;align-items:center;justify-content:center;min-height:30px}
+  .modeGrid{display:grid;grid-template-columns:auto minmax(0,.82fr) minmax(0,1.18fr);gap:3px}
+  .modeGrid button{min-width:0;padding:5px 6px;font-size:10px;white-space:nowrap;border-radius:9px}
   .modeGrid .compactModeBtn{padding:5px 4px;font-size:10px}
   .modeGrid .currentMiniBtn{display:flex;align-items:center;justify-content:center;gap:3px;padding:5px 7px;font-size:12px;min-width:40px}
   .modeGrid .currentMiniBtn .currentGlyph{font-weight:700;letter-spacing:-0.01em}
   .modeGrid .currentMiniBtn .dirGlyph{font-size:10px;transform:translateY(1px)}
+  .modeRowWide{grid-column:1 / span 3;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px;align-items:center}
+  .modeGrid .modeHalf{grid-column:span 1}
+  .modeGrid .modeHalfLeft{grid-column:1 / span 1}
+  .modeGrid .modeHalfRight{grid-column:2 / span 2}
   .miniCheck{display:flex;align-items:center;gap:3px;padding:0 2px;font-size:11px;color:var(--text)}
   .miniCheck input{margin:0}
   .displayGrid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
@@ -289,28 +286,23 @@
             <button id="qBack" data-i18n-title="back_T8" data-i18n-aria="back_T8" title="Πίσω κατά T/8" aria-label="Πίσω κατά T/8">⏪</button>
             <button id="stepBack" data-i18n-title="step_back" data-i18n-aria="step_back" title="Βήμα πίσω" aria-label="Βήμα πίσω">⏴</button>
             <button id="playBtn" data-i18n-title="play_pause" data-i18n-aria="play_pause" title="Έναρξη / Παύση" aria-label="Έναρξη / Παύση">❚❚</button>
-            <button id="resetBtn" data-i18n-title="reset" data-i18n-aria="reset" title="Reset" aria-label="Reset">↻</button>
+            <button id="resetBtn" data-i18n-title="reset" data-i18n-aria="reset" title="Reset" aria-label="Reset">⏮</button>
             <button id="stepFwd" data-i18n-title="step_forward" data-i18n-aria="step_forward" title="Βήμα μπροστά" aria-label="Βήμα μπροστά">⏵</button>
             <button id="qFwd" data-i18n-title="forward_T8" data-i18n-aria="forward_T8" title="Μπροστά κατά T/8" aria-label="Μπροστά κατά T/8">⏩</button>
           </div>
         </div>
         <div class="hudGroup">
           <div class="modeGrid">
-            <div class="layerRow layerRow2">
-              <button id="modeRod" class="compactModeBtn" data-i18n="mode_dipole">Δίπολο</button>
-              <button id="toggleCurrentBtn" class="currentMiniBtn" type="button" title="Βέλος ρεύματος" aria-label="Βέλος ρεύματος"><span class="currentGlyph">Ι</span><span class="dirGlyph">↓</span></button>
+            <button id="toggleCurrentBtn" class="currentMiniBtn" type="button" title="Βέλος ρεύματος" aria-label="Βέλος ρεύματος"><span class="currentGlyph">Ι</span><span class="dirGlyph">↓</span></button>
+            <button id="modeRod" class="compactModeBtn" data-i18n="mode_dipole">Δίπολο</button>
+            <button id="waveModeArrows" class="compactModeBtn" data-i18n="mode_arrows">Ευθεία Διάδοση</button>
+            <div class="modeRowWide">
+              <button id="modeSource" data-i18n="mode_lines_eb">Δυναμικές γραμμές</button>
+              <label class="miniCheck"><input id="showE" type="checkbox" checked> E</label>
+              <label class="miniCheck"><input id="showB" type="checkbox" checked> B</label>
             </div>
-            <div class="layerRow layerRow4">
-              <button id="eLinesBtn" type="button" data-i18n="layer_e_lines" title="Δυναμικές γραμμές ηλεκτρικού πεδίου" aria-label="Δυναμικές γραμμές ηλεκτρικού πεδίου">Eδ</button>
-              <button id="bLinesBtn" type="button" data-i18n="layer_b_lines" title="Δυναμικές γραμμές μαγνητικού πεδίου" aria-label="Δυναμικές γραμμές μαγνητικού πεδίου">Bδ</button>
-              <button id="eLinearBtn" type="button" data-i18n="layer_e_linear" title="Ευθεία διάδοση ηλεκτρικής διαταραχής" aria-label="Ευθεία διάδοση ηλεκτρικής διαταραχής">E→</button>
-              <button id="bLinearBtn" type="button" data-i18n="layer_b_linear" title="Ευθεία διάδοση μαγνητικής διαταραχής" aria-label="Ευθεία διάδοση μαγνητικής διαταραχής">B→</button>
-            </div>
-            <div class="layerRow layerRow1">
-              <button id="modeReceive" type="button" data-i18n="mode_receiver">Δέκτης</button>
-            </div>
-            <input id="showE" type="checkbox" checked hidden>
-            <input id="showB" type="checkbox" checked hidden>
+            <button id="modeReceive" class="modeHalf modeHalfLeft" data-i18n="mode_receiver_lines">Δέκτης στο πεδίο</button>
+            <button id="waveModeFronts" class="modeHalf modeHalfRight" data-i18n="mode_receiver_arrows">Δέκτης σε ευθεία</button>
           </div>
         </div>
         <div class="hudGroup">
@@ -370,7 +362,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
 
 const stage = document.getElementById('stage');
-const ids = ['langEl','langEn','regionNear','regionNearAtt','regionFar','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','toggleCurrentBtn','modeRod','eLinesBtn','bLinesBtn','eLinearBtn','bLinearBtn','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn','focusMiniControls','miniStartBtn','miniStepBackBtn','miniPlayBtn','miniStepFwdBtn','miniEndBtn','miniOptionRow','miniExtraControls'];
+const ids = ['langEl','langEn','regionNear','regionNearAtt','regionFar','zoom','zoomIn','zoomOut','zoomPct','speed','speedUp','speedDown','speedPct','emitPeriods','autoFit','eAlpha','bAlpha','eAlphaUp','eAlphaDown','eAlphaPct','bAlphaUp','bAlphaDown','bAlphaPct','showAxes','showPlanes','showE','showB','showFieldMode','fieldFillAlpha','showParticles','showCurrent','receiverX','toggleCurrentBtn','modeRod','modeSource','modeReceive','waveModeFronts','waveModeArrows','up','down','left','right','resetView','playBtn','resetBtn','stepBack','stepFwd','qBack','qFwd','screenBtn','printBtn','focusMiniControls','miniStartBtn','miniStepBackBtn','miniPlayBtn','miniStepFwdBtn','miniEndBtn','miniOptionRow','miniExtraControls'];
 const ui = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 ui.langEl?.addEventListener('click', () => applyLanguage('el'));
 ui.langEn?.addEventListener('click', () => applyLanguage('en'));
@@ -640,28 +632,56 @@ function toggleAllowedBookControl(key){
       break;
     case 'toggleE':
     case 'toggleELines': {
-      ui.showE.checked = !ui.showE.checked;
-      syncAppModeFromSwitches();
+      bookLinearState.showE = false;
+      bookLinearState.showB = false;
+      ui.showFieldMode.checked = false;
+      const next = !ui.showE.checked;
+      ui.showE.checked = next;
+      if(next){
+        applyMainMode('lines', true);
+      } else if(!ui.showB.checked){
+        applyMainMode('rod', true);
+      }
       break;
     }
     case 'toggleB':
     case 'toggleBLines': {
-      ui.showB.checked = !ui.showB.checked;
-      syncAppModeFromSwitches();
+      bookLinearState.showE = false;
+      bookLinearState.showB = false;
+      ui.showFieldMode.checked = false;
+      const next = !ui.showB.checked;
+      ui.showB.checked = next;
+      if(next){
+        applyMainMode('lines', true);
+      } else if(!ui.showE.checked){
+        applyMainMode('rod', true);
+      }
       break;
     }
     case 'toggleELinear': {
+      ui.showE.checked = false;
+      ui.showB.checked = false;
       bookLinearState.showE = !bookLinearState.showE;
-      if(bookLinearState.showE || bookLinearState.showB) viewSwitches.sourceLinear = true;
-      else if(!viewSwitches.receiverLinear) viewSwitches.sourceLinear = false;
-      syncAppModeFromSwitches();
+      if(bookLinearState.showE || bookLinearState.showB){
+        applyMainMode('arrows', true);
+        ui.showFieldMode.checked = true;
+      } else {
+        ui.showFieldMode.checked = false;
+        applyMainMode('rod', true);
+      }
       break;
     }
     case 'toggleBLinear': {
+      ui.showE.checked = false;
+      ui.showB.checked = false;
       bookLinearState.showB = !bookLinearState.showB;
-      if(bookLinearState.showE || bookLinearState.showB) viewSwitches.sourceLinear = true;
-      else if(!viewSwitches.receiverLinear) viewSwitches.sourceLinear = false;
-      syncAppModeFromSwitches();
+      if(bookLinearState.showE || bookLinearState.showB){
+        applyMainMode('arrows', true);
+        ui.showFieldMode.checked = true;
+      } else {
+        ui.showFieldMode.checked = false;
+        applyMainMode('rod', true);
+      }
       break;
     }
     default:
@@ -715,7 +735,6 @@ function syncMiniExtraControls(){
   const graphToggleMap = { toggleGraphV:'V', toggleGraphQ:'Q', toggleGraphI:'I', toggleGraphE:'E', toggleGraphB:'B' };
   let added = 0;
   for(const key of activeBookSceneState.allowedControls || []){
-    if(key === 'toggleCharges') continue;
     const graphKey = graphToggleMap[key];
     if(graphKey && !(activeBookSceneState.availableGraphs || []).includes(graphKey)) continue;
     const btn = document.createElement('button');
@@ -749,22 +768,13 @@ function invalidateGraphs(staticToo=false){
 }
 const RECEIVER_NAT_RATIO = 1.34;
 const appModes = { main:'rod' };
-// Τα παλιά \"modes\" μένουν μόνο ως εσωτερική συμβατότητα rendering.
-// Στο UI δουλεύουμε πλέον με ανεξάρτητους διακόπτες.
-const viewSwitches = {
-  dipole:true,          // ράβδος/δίπολο ως οπτική στρώση
-  sourceLinear:false,  // ευθεία διάδοση από πηγή ως ανεξάρτητη στρώση
-  receiverField:false, // δέκτης που ανταποκρίνεται στο πεδίο
-  receiverLinear:false // δέκτης μαζί με ευθεία διάδοση
-};
-// E/B συστατικά της ευθείας διάδοσης. Είναι ανεξάρτητα από τα showE/showB των δυναμικών γραμμών.
 const bookLinearState = { showE:false, showB:false };
 const RECEIVER_X_LIMITS = {
   normal:{ min:0.5, max:9.5 },
   receive:{ min:0.8, max:4.0 }
 };
-function isReceiveMode(){ return !!(viewSwitches.receiverField || viewSwitches.receiverLinear); }
-function isRodMode(){ return !!(viewSwitches.dipole && !lineCurvesAreActive() && !linearPropagationIsActive() && !isReceiveMode()); }
+function isReceiveMode(){ return appModes.main === 'receiveFronts' || appModes.main === 'receiveArrows'; }
+function isRodMode(){ return appModes.main === 'rod'; }
 function clampReceiverXToMode(){
   if(!ui.receiverX) return;
   const lim = isReceiveMode() ? RECEIVER_X_LIMITS.receive : RECEIVER_X_LIMITS.normal;
@@ -776,199 +786,64 @@ function clampReceiverXToMode(){
 function activeWaveMaxX(){
   return Infinity;
 }
-function lineCurvesAreActive(){
-  if(regionMode === 'far') return false;
-  return !!(ui.showE?.checked || ui.showB?.checked);
-}
-function linearFieldComponentsAreSelected(){
-  return !!(bookLinearState.showE || bookLinearState.showB);
-}
-function linearPropagationIsActive(){
-  return !!((viewSwitches.sourceLinear || viewSwitches.receiverLinear) && linearFieldComponentsAreSelected());
-}
 function syncModeToCheckboxes(){
-  // Compatibility no-op: οι διακόπτες είναι πλέον η πηγή αλήθειας.
-  syncAppModeFromSwitches();
-}
-function syncAppModeFromSwitches(){
-  const hasLines = lineCurvesAreActive();
-  const hasLinear = linearPropagationIsActive();
-  if(ui.showFieldMode) ui.showFieldMode.checked = hasLinear;
-  // Το appModes.main κρατιέται μόνο για συμβατότητα με παλιά presets/URL.
-  // Δεν αποφασίζει πλέον ποιες στρώσεις επιτρέπεται να συνυπάρχουν.
-  if(isReceiveMode()) appModes.main = hasLinear && !hasLines && !viewSwitches.receiverField ? 'receiveArrows' : 'receiveFronts';
-  else if(hasLinear && !hasLines) appModes.main = 'arrows';
-  else if(hasLines) appModes.main = 'lines';
-  else appModes.main = 'rod';
-  clampReceiverXToMode();
-  applyFieldFillDefault();
-  updateModeLocks();
-}
-function ensureLinearComponents(showBoth=true){
-  if(!bookLinearState.showE && !bookLinearState.showB){
-    bookLinearState.showE = true;
-    bookLinearState.showB = !!showBoth;
+  if(appModes.main === 'rod'){
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = false;
+  } else if(appModes.main === 'lines'){
+    if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
+    ui.showFieldMode.checked = false;
+  } else if(appModes.main === 'arrows'){
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = true;
+  } else if(appModes.main === 'receiveFronts'){
+    ui.showE.checked = true;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = false;
+  } else {
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+    ui.showFieldMode.checked = true;
   }
 }
 function markOperationalButtons(){
-  ui.modeRod?.classList.toggle('presetActive', !!viewSwitches.dipole);
-  ui.toggleChargesBtn?.classList.toggle('presetActive', !!ui.showParticles?.checked);
   ui.toggleCurrentBtn?.classList.toggle('presetActive', !!ui.showCurrent?.checked);
-  ui.eLinesBtn?.classList.toggle('presetActive', regionMode !== 'far' && !!ui.showE?.checked);
-  ui.bLinesBtn?.classList.toggle('presetActive', regionMode !== 'far' && !!ui.showB?.checked);
-  ui.eLinearBtn?.classList.toggle('presetActive', !!(viewSwitches.sourceLinear && bookLinearState.showE));
-  ui.bLinearBtn?.classList.toggle('presetActive', !!(viewSwitches.sourceLinear && bookLinearState.showB));
-  ui.modeSource?.classList.toggle('presetActive', lineCurvesAreActive());
-  ui.waveModeArrows?.classList.toggle('presetActive', !!viewSwitches.sourceLinear && linearFieldComponentsAreSelected());
-  ui.modeReceive?.classList.toggle('presetActive', isReceiveMode());
-  ui.waveModeFronts?.classList.toggle('presetActive', !!viewSwitches.receiverLinear && linearFieldComponentsAreSelected());
+  ui.modeRod?.classList.toggle('presetActive', appModes.main === 'rod');
+  ui.modeSource?.classList.toggle('presetActive', appModes.main === 'lines');
+  ui.waveModeArrows?.classList.toggle('presetActive', appModes.main === 'arrows');
+  ui.modeReceive?.classList.toggle('presetActive', appModes.main === 'receiveFronts');
+  ui.waveModeFronts?.classList.toggle('presetActive', appModes.main === 'receiveArrows');
 }
 function updateModeLocks(){
-  // Τα κουμπιά δεν είναι πλέον αμοιβαία αποκλειόμενα modes αλλά διακόπτες.
-  if(ui.receiverX) ui.receiverX.disabled = !isReceiveMode();
-  if(ui.showE) ui.showE.disabled = regionMode === 'far';
-  if(ui.showB) ui.showB.disabled = regionMode === 'far';
+  const receive = isReceiveMode();
+  const farModeLocked = regionMode === 'far';
+  if(ui.receiverX) ui.receiverX.disabled = !receive;
+  if(ui.showE) ui.showE.disabled = appModes.main !== 'lines';
+  if(ui.showB) ui.showB.disabled = appModes.main !== 'lines';
   if(ui.showFieldMode) ui.showFieldMode.disabled = true;
   const eRow = ui.showE?.closest('.row');
   const bRow = ui.showB?.closest('.row');
   const fieldRow = ui.showFieldMode?.closest('.row');
-  if(eRow) eRow.style.display = '';
-  if(bRow) bRow.style.display = '';
+  if(eRow) eRow.style.display = appModes.main === 'lines' ? '' : 'none';
+  if(bRow) bRow.style.display = appModes.main === 'lines' ? '' : 'none';
   if(fieldRow) fieldRow.style.display = 'none';
-  if(ui.modeRod) ui.modeRod.disabled = false;
-  if(ui.toggleChargesBtn) ui.toggleChargesBtn.disabled = false;
-  if(ui.toggleCurrentBtn) ui.toggleCurrentBtn.disabled = false;
-  if(ui.eLinesBtn) ui.eLinesBtn.disabled = regionMode === 'far';
-  if(ui.bLinesBtn) ui.bLinesBtn.disabled = regionMode === 'far';
-  if(ui.eLinearBtn) ui.eLinearBtn.disabled = false;
-  if(ui.bLinearBtn) ui.bLinearBtn.disabled = false;
-  if(ui.modeSource) ui.modeSource.disabled = false;
-  if(ui.modeReceive) ui.modeReceive.disabled = false;
-  if(ui.waveModeFronts) ui.waveModeFronts.disabled = false;
-  if(ui.waveModeArrows) ui.waveModeArrows.disabled = false;
+  ui.modeRod.disabled = farModeLocked;
+  ui.modeSource.disabled = farModeLocked;
+  ui.modeReceive.disabled = farModeLocked;
+  ui.waveModeFronts.disabled = farModeLocked;
+  ui.waveModeArrows.disabled = farModeLocked;
   markOperationalButtons();
 }
 function applyMainMode(mode, skipApply=false){
   const allowed = new Set(['rod','lines','arrows','receiveFronts','receiveArrows']);
-  const m = allowed.has(mode) ? mode : 'rod';
-  if(m === 'rod'){
-    viewSwitches.dipole = true;
-    viewSwitches.sourceLinear = false;
-    viewSwitches.receiverField = false;
-    viewSwitches.receiverLinear = false;
-    ui.showE.checked = false;
-    ui.showB.checked = false;
-    bookLinearState.showE = false;
-    bookLinearState.showB = false;
-  } else if(m === 'lines'){
-    viewSwitches.dipole = true;
-    viewSwitches.sourceLinear = false;
-    viewSwitches.receiverField = false;
-    viewSwitches.receiverLinear = false;
-    if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
-    bookLinearState.showE = false;
-    bookLinearState.showB = false;
-  } else if(m === 'arrows'){
-    viewSwitches.dipole = true;
-    viewSwitches.sourceLinear = true;
-    viewSwitches.receiverField = false;
-    viewSwitches.receiverLinear = false;
-    ui.showE.checked = false;
-    ui.showB.checked = false;
-    ensureLinearComponents(true);
-  } else if(m === 'receiveFronts'){
-    viewSwitches.dipole = true;
-    viewSwitches.receiverField = true;
-    viewSwitches.receiverLinear = false;
-    viewSwitches.sourceLinear = false;
-    if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
-    bookLinearState.showE = false;
-    bookLinearState.showB = false;
-  } else if(m === 'receiveArrows'){
-    viewSwitches.dipole = true;
-    viewSwitches.receiverField = false;
-    viewSwitches.receiverLinear = true;
-    viewSwitches.sourceLinear = false;
-    ui.showE.checked = false;
-    ui.showB.checked = false;
-    ensureLinearComponents(true);
-  }
-  syncAppModeFromSwitches();
-  if(!skipApply){ refreshVisualsForSelection(); }
-}
-function ensureLineCurvesVisible(showBoth=false){
-  if(!lineCurvesAreActive()){
-    ui.showE.checked = true;
-    ui.showB.checked = !!showBoth;
-  }
-}
-function toggleSourceLinesSwitch(){
-  const next = !lineCurvesAreActive();
-  ui.showE.checked = next;
-  ui.showB.checked = next;
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function toggleELinesSwitch(){
-  if(regionMode === 'far') return;
-  ui.showE.checked = !ui.showE.checked;
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function toggleBLinesSwitch(){
-  if(regionMode === 'far') return;
-  ui.showB.checked = !ui.showB.checked;
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function toggleELinearSwitch(){
-  bookLinearState.showE = !bookLinearState.showE;
-  viewSwitches.sourceLinear = linearFieldComponentsAreSelected();
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function toggleBLinearSwitch(){
-  bookLinearState.showB = !bookLinearState.showB;
-  viewSwitches.sourceLinear = linearFieldComponentsAreSelected();
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function setSourceLinesMode({ preserveLinear=false, restart=true } = {}){
-  ensureLineCurvesVisible(!!preserveLinear);
-  if(preserveLinear){
-    viewSwitches.sourceLinear = true;
-    ensureLinearComponents(true);
-  }
-  syncAppModeFromSwitches();
-  if(restart) refreshVisualsForSelection();
-}
-function toggleSourceLinearOverlay(){
-  const next = !viewSwitches.sourceLinear;
-  viewSwitches.sourceLinear = next;
-  if(next) ensureLinearComponents(true);
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function toggleReceiverFieldSwitch(){
-  viewSwitches.receiverField = !viewSwitches.receiverField;
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
-}
-function setReceiverFrontsMode({ preserveLinear=false, restart=true } = {}){
-  viewSwitches.receiverField = true;
-  if(preserveLinear){
-    viewSwitches.receiverLinear = true;
-    ensureLinearComponents(true);
-  }
-  syncAppModeFromSwitches();
-  if(restart) refreshVisualsForSelection();
-}
-function toggleReceiverLinearOverlay(){
-  const next = !viewSwitches.receiverLinear;
-  viewSwitches.receiverLinear = next;
-  if(next) ensureLinearComponents(true);
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
+  appModes.main = allowed.has(mode) ? mode : 'rod';
+  syncModeToCheckboxes();
+  clampReceiverXToMode();
+  applyFieldFillDefault();
+  updateModeLocks();
+  if(!skipApply){ restartEvolutionForSelection(); }
 }
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false, powerPreference:'high-performance', precision:'highp' });
@@ -1218,12 +1093,6 @@ const I18N = {
     mode_lines_eb:'Δυναμικές γραμμές',
     mode_receiver_lines:'Δέκτης στο πεδίο',
     mode_receiver_arrows:'Δέκτης σε ευθεία',
-    mode_receiver:'Δέκτης',
-    layer_charge:'q',
-    layer_e_lines:'Eδ',
-    layer_b_lines:'Bδ',
-    layer_e_linear:'E→',
-    layer_b_linear:'B→',
     e_planes:'Επίπεδο Ε',
     b_planes:'Επίπεδο Β',
     screen:'Οθόνη',
@@ -1256,12 +1125,6 @@ const I18N = {
     mode_lines_eb:'Dynamic lines',
     mode_receiver_lines:'Receiver in field',
     mode_receiver_arrows:'Receiver on line',
-    mode_receiver:'Receiver',
-    layer_charge:'q',
-    layer_e_lines:'E lines',
-    layer_b_lines:'B lines',
-    layer_e_linear:'E→',
-    layer_b_linear:'B→',
     e_planes:'E plane',
     b_planes:'B plane',
     screen:'Screen',
@@ -1284,7 +1147,6 @@ const I18N = {
 };
 let currentLang = 'el';
 let regionMode = 'near';
-let savedLineSwitchesBeforeFar = null;
 function isNearAttenuatedMode(){ return regionMode === 'nearAtt'; }
 function markRegionButtons(){
   if(ui.regionNear) ui.regionNear.classList.toggle('active', regionMode === 'near');
@@ -1292,29 +1154,25 @@ function markRegionButtons(){
   if(ui.regionFar) ui.regionFar.classList.toggle('active', regionMode === 'far');
 }
 function setRegionMode(mode, opts={}){
-  const nextMode = mode === 'far' ? 'far' : (mode === 'nearAtt' ? 'nearAtt' : 'near');
-  const wasFar = regionMode === 'far';
-  const enteringFar = nextMode === 'far' && !wasFar;
-  const leavingFar = nextMode !== 'far' && wasFar;
-  if(enteringFar){
-    savedLineSwitchesBeforeFar = { showE:!!ui.showE?.checked, showB:!!ui.showB?.checked };
-    if(ui.showE) ui.showE.checked = false;
-    if(ui.showB) ui.showB.checked = false;
-  }
-  regionMode = nextMode;
-  if(leavingFar && savedLineSwitchesBeforeFar){
-    if(ui.showE) ui.showE.checked = !!savedLineSwitchesBeforeFar.showE;
-    if(ui.showB) ui.showB.checked = !!savedLineSwitchesBeforeFar.showB;
-    savedLineSwitchesBeforeFar = null;
-  }
+  regionMode = mode === 'far' ? 'far' : (mode === 'nearAtt' ? 'nearAtt' : 'near');
   markRegionButtons();
   if(opts.applyDefaults){
-    // Η αλλαγή Σχολικό / Σχολικό+ / ΗΜ κύμα αλλάζει το φυσικό καθεστώς,
-    // όχι τις ενεργές οπτικές επιλογές και όχι τον χρόνο. Τα κουμπιά του πάνελ
-    // μένουν διακόπτες και δεν γίνονται αφορμή για αυτόματο reset.
-    ui.emitPeriods.value = regionMode === 'far' ? '5' : '3';
-    syncAppModeFromSwitches();
-    refreshVisualsForSelection();
+    if(regionMode === 'far'){
+      ui.emitPeriods.value = '5';
+      bookLinearState.showE = true;
+      bookLinearState.showB = true;
+      applyMainMode('arrows', true);
+      ui.showFieldMode.checked = true;
+      ui.showE.checked = false;
+      ui.showB.checked = false;
+      restartEvolutionForSelection();
+    } else {
+      ui.emitPeriods.value = '3';
+      bookLinearState.showE = false;
+      bookLinearState.showB = false;
+      applyMainMode('rod', true);
+      restartEvolutionForSelection();
+    }
   }
 }
 function applyLanguage(lang){
@@ -1805,22 +1663,6 @@ function getPulseScaleY(age){ return (ROD_LENGTH + (E_TARGET_TOTAL_HEIGHT - ROD_
 function localToWorldXY(scaleX, scaleY, xLocal, yLocal){
   return new THREE.Vector3(xLocal * WORLD_PER_LOCAL * scaleX, yLocal * WORLD_PER_LOCAL * scaleY, 0);
 }
-const E_ENDPOINT_PIN_BLEND_POINTS = 18;
-const E_RELEASE_LOCK_POINTS = 8;
-const E_ENDPOINT_PIN_TRANSITION_POINTS = 42;
-const E_VERTICAL_TANGENT_POINTS = 24;
-const E_MOVING_ANCHOR_SPEED = 0.5 * E_TARGET_TOTAL_WIDTH;
-function eFrontAttachDuration(localEmit){
-  const t = ((localEmit % 1) + 1) % 1;
-  return t < 0.5 ? (0.5 - t) : (1.0 - t);
-}
-function getEFrontAnchorTravel(front){
-  const localEmit = front?.localEmit ?? 0;
-  const age = Math.max(0, front?.age ?? 0);
-  const releaseAge = Math.max(0, front?.attachDuration ?? eFrontAttachDuration(localEmit));
-  if(age <= releaseAge + 1e-9) return 0;
-  return E_MOVING_ANCHOR_SPEED * (age - releaseAge);
-}
 function cubicPoint(p0,c1,c2,p3,t){
   const mt = 1 - t;
   return [
@@ -1828,93 +1670,24 @@ function cubicPoint(p0,c1,c2,p3,t){
     mt*mt*mt*p0[1] + 3*mt*mt*t*c1[1] + 3*mt*t*t*c2[1] + t*t*t*p3[1]
   ];
 }
-function smoothstep01(x){
-  const t = Math.max(0, Math.min(1, x));
-  return t * t * (3 - 2 * t);
-}
-function enforceVerticalTangentNearAnchor(pts, fixed, count=E_VERTICAL_TANGENT_POINTS){
-  if(!pts || pts.length < 2) return pts;
-  const n = Math.min(count, pts.length - 1);
-  for(let i=1; i<=n; i++){
-    const raw = pts[i].clone();
-    const t = i / (n + 1);
-    const s = smoothstep01(t);
-    const sx = Math.pow(s, 2.75);
-    const sy = Math.pow(s, 1.05);
-    pts[i].x = fixed.x + (raw.x - fixed.x) * sx;
-    pts[i].y = fixed.y + (raw.y - fixed.y) * sy;
-    pts[i].z = fixed.z + (raw.z - fixed.z) * sx;
-  }
-  return pts;
-}
-function makeLobePoints(scaleX, scaleY, sx, sy, anchorTravel=0, pinToAnchor=false){
+function makeLobePoints(scaleX, scaleY, sx, sy){
   const pts = [];
   const steps = LOBE_STEPS;
-  const firstEndX = 40;
-  const firstEndY = -182;
-  const p3 = [firstEndX * sx, firstEndY * sy];
-  const d1 = [92 * sx, -182 * sy];
-  const d2 = [159 * sx, -128 * sy];
+  const p0 = [0 * sx, -142 * sy];
+  const c1 = [18 * sx, -158 * sy];
+  const c2 = [45 * sx, -178 * sy];
+  const p3 = [63 * sx, -178 * sy];
+  const d1 = [112 * sx, -178 * sy];
+  const d2 = [159 * sx, -122 * sy];
   const p6 = [159 * sx, 0 * sy];
   for(let i=0;i<=steps;i++){
     const t = i / steps;
     let x, y;
-    if(t <= 0.5){
-      const u = t / 0.5;
-      const xBase = firstEndX * Math.pow(u, 3.45);
-      const yEase = smoothstep01(Math.pow(u, 1.08));
-      const yBase = -142 - (Math.abs(firstEndY) - 142) * yEase;
-      x = sx * xBase;
-      y = sy * yBase;
-    } else {
-      [x,y] = cubicPoint(p3, d1, d2, p6, (t - 0.5) / 0.5);
-    }
+    if(t <= 0.5){ [x,y] = cubicPoint(p0, c1, c2, p3, t / 0.5); }
+    else { [x,y] = cubicPoint(p3, d1, d2, p6, (t - 0.5) / 0.5); }
     pts.push(localToWorldXY(scaleX, scaleY, x, y));
   }
-  if(pinToAnchor && pts.length){
-    const fixed = new THREE.Vector3(0, -sy * (ROD_HALF_LENGTH + anchorTravel), 0);
-    const blendCount = Math.min(E_ENDPOINT_PIN_BLEND_POINTS, pts.length - 1);
-    pts[0] = fixed.clone();
-    for(let i=1; i<=blendCount; i++){
-      const t = i / (blendCount + 1);
-      const a = Math.pow(t, 2.35);
-      pts[i] = fixed.clone().lerp(pts[i], a);
-    }
-  }
   return pts;
-}
-
-function makeEAnchoredLobePoints(front, scaleX, scaleY, sx, sy){
-  const anchorTravel = getEFrontAnchorTravel(front);
-  if(anchorTravel <= 1e-9){
-    return makeLobePoints(scaleX, scaleY, sx, sy, 0, true);
-  }
-  const currentPts = makeLobePoints(scaleX, scaleY, sx, sy, 0, false);
-  const releaseAge = Math.max(0, front?.attachDuration ?? eFrontAttachDuration(front?.localEmit ?? 0));
-  const frozenScaleX = getPulseScaleX(releaseAge);
-  const frozenScaleY = getPulseScaleY(releaseAge);
-  const frozenPinnedPts = makeLobePoints(frozenScaleX, frozenScaleY, sx, sy, 0, true);
-  const yShift = -sy * anchorTravel;
-  const fixed = new THREE.Vector3(0, -sy * (ROD_HALF_LENGTH + anchorTravel), 0);
-  const lockCount = Math.min(E_RELEASE_LOCK_POINTS, currentPts.length - 1, frozenPinnedPts.length - 1);
-  const transitionCount = Math.min(E_ENDPOINT_PIN_TRANSITION_POINTS, currentPts.length - 1 - lockCount, frozenPinnedPts.length - 1 - lockCount);
-
-  currentPts[0] = fixed.clone();
-
-  for(let i=1; i<=lockCount; i++){
-    currentPts[i] = frozenPinnedPts[i].clone();
-    currentPts[i].y += yShift;
-  }
-
-  for(let j=1; j<=transitionCount; j++){
-    const idx = lockCount + j;
-    const anchored = frozenPinnedPts[idx].clone();
-    anchored.y += yShift;
-    const s = Math.pow(smoothstep01(j / (transitionCount + 1)), 0.72);
-    currentPts[idx] = anchored.lerp(currentPts[idx], s);
-  }
-
-  return currentPts;
 }
 
 function findDiagonalAnchorData(pts, scaleX, scaleY){
@@ -2354,30 +2127,24 @@ function buildBFieldSequence(targetGroup, samples){
     targetGroup.add(buildFieldCurve([p1.clone(), p2.clone()], ((p1.z + p2.z) * 0.5) >= 0 ? COLORS.bNeg : COLORS.bPos, lineRadius * 0.86, true));
   }
 }
-function rebuildFieldVectorMode(u, eFronts, bFronts, includeE=true, includeB=true){
+function rebuildFieldVectorMode(u, eFronts, bFronts){
   disposeGroup(bFieldBackGroup);
   disposeGroup(eFieldGroup);
   disposeGroup(bFieldFrontGroup);
+  const eSamples = collectFieldSamplesE(eFronts);
   const totalPeriods = getEmitPeriods();
   const waveMaxX = activeWaveMaxX();
 
-  if(includeB){
-    for(let k=0; k<totalPeriods; k++){
-      buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q2, u, k, waveMaxX));
-      buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q3, u, k, waveMaxX));
-    }
+  for(let k=0; k<totalPeriods; k++){
+    buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q2, u, k, waveMaxX));
+    buildBFieldSequence(bFieldBackGroup, collectBQuarterSamples(B_Q3, u, k, waveMaxX));
   }
 
-  if(includeE){
-    const eSamples = collectFieldSamplesE(eFronts);
-    buildEFieldSequence(eSamples);
-  }
+  buildEFieldSequence(eSamples);
 
-  if(includeB){
-    for(let k=0; k<totalPeriods; k++){
-      buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q1, u, k, waveMaxX));
-      buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q4, u, k, waveMaxX));
-    }
+  for(let k=0; k<totalPeriods; k++){
+    buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q1, u, k, waveMaxX));
+    buildBFieldSequence(bFieldFrontGroup, collectBQuarterSamples(B_Q4, u, k, waveMaxX));
   }
 }
 
@@ -2472,8 +2239,8 @@ function updateDirectEFrontPools(eFronts){
     const opacity = Math.min(fr.birthOpacity ?? 1, visualOpacityFromStrength(strength));
     const halfWidth = lineRadius * 1.08 * visualWidthFromStrength(strength);
     for(const sx of [1, -1]){
-      if(iu < directFrontPools.eUpper.length) updatePooledFrontRibbon(directFrontPools.eUpper[iu++], makeEAnchoredLobePoints(fr, scaleX, scaleY, sx, -1), color, opacity, halfWidth);
-      if(il < directFrontPools.eLower.length) updatePooledFrontRibbon(directFrontPools.eLower[il++], makeEAnchoredLobePoints(fr, scaleX, scaleY, sx, 1), color, opacity, halfWidth);
+      if(iu < directFrontPools.eUpper.length) updatePooledFrontRibbon(directFrontPools.eUpper[iu++], makeLobePoints(scaleX, scaleY, sx, -1), color, opacity, halfWidth);
+      if(il < directFrontPools.eLower.length) updatePooledFrontRibbon(directFrontPools.eLower[il++], makeLobePoints(scaleX, scaleY, sx, 1), color, opacity, halfWidth);
     }
   });
 }
@@ -2708,8 +2475,6 @@ function seededEFrontsAbsolute(u){
       const eAtBirth = -SOURCE_SIGNAL_AMPLITUDE * Math.sin(phaseEmit);
       fronts.push({
         t0: tEmit,
-        localEmit,
-        attachDuration: eFrontAttachDuration(localEmit),
         age,
         sign,
         reverseArrows: sign > 0,
@@ -2771,7 +2536,7 @@ function addEFront3D(group, front, which, drawArrows=false){
   const signY = which === 'upper' ? -1 : 1;
   const lobes = [[1, signY], [-1, signY]];
   for(const [sx, sy] of lobes){
-    const pts = makeEAnchoredLobePoints(front, scaleX, scaleY, sx, sy);
+    const pts = makeLobePoints(scaleX, scaleY, sx, sy);
     group.add(buildCurve(pts, color, lineRadius, 0.78, 144, opacity));
   }
   if(drawArrows && (front.arrowLen || 0) > 0.25){
@@ -2970,15 +2735,19 @@ function showDirectArrowArtifacts(){
   setGroupVisibleSafe(bFieldFrontDirectGroup, true);
 }
 function enterArrowAutonomousPipeline(){
-  // Layer logic: η ευθεία διάδοση είναι ανεξάρτητη στρώση.
-  // Δεν κρύβει πλέον δυναμικές γραμμές ούτε άλλα ορατά layers.
+  if(wavePipelineMode === 'arrows') return;
+  hideLegacyArrowOnlyArtifacts();
+  disposeGroup(bFieldBackGroup);
+  disposeGroup(eFieldGroup);
+  disposeGroup(bFieldFrontGroup);
   showDirectArrowArtifacts();
-  wavePipelineMode = 'mixed';
+  wavePipelineMode = 'arrows';
 }
 function enterLinePipeline(){
-  // Layer logic: οι δυναμικές γραμμές είναι ανεξάρτητη στρώση.
-  // Δεν κρύβουν πλέον την ευθεία διάδοση.
-  wavePipelineMode = 'mixed';
+  if(wavePipelineMode === 'lines') return;
+  hideDirectArrowArtifacts();
+  showLegacyWaveArtifacts();
+  wavePipelineMode = 'lines';
 }
 function rebuildArrowAutonomousFields(u, includeE=true, includeB=true){
   if(regionMode === 'far'){
@@ -3003,15 +2772,27 @@ function rebuildArrowAutonomousFields(u, includeE=true, includeB=true){
   }
 }
 function rebuildFields(u){
-  // Νέα λογική: δεν υπάρχει αμοιβαία αποκλειόμενο mode.
-  // Κάθε αναπαράσταση είναι ξεχωριστή στρώση: δυναμικές γραμμές, ευθεία διάδοση, δέκτης, δίπολο.
-  const showEFronts = regionMode !== 'far' && !!(ui.showE && ui.showE.checked);
-  const showBFronts = regionMode !== 'far' && !!(ui.showB && ui.showB.checked);
-  const linearActive = !!(ui.showFieldMode && ui.showFieldMode.checked && linearFieldComponentsAreSelected());
-  const linearE = !!(linearActive && bookLinearState.showE);
-  const linearB = !!(linearActive && bookLinearState.showB);
+  const needFieldMode = !!(ui.showFieldMode && ui.showFieldMode.checked);
+  const showEFronts = !!(ui.showE && ui.showE.checked);
+  const showBFronts = !!(ui.showB && ui.showB.checked);
+  const arrowOnlyMode = appModes.main === 'arrows' || appModes.main === 'receiveArrows';
 
-  // Καθαρίζουμε μόνο τις στρώσεις που ξαναχτίζονται. Δεν κρύβουμε άλλη αναπαράσταση λόγω mode.
+  if(arrowOnlyMode){
+    hideDirectFrontPools();
+    hideDirectCirclePools();
+    if(needFieldMode) rebuildArrowAutonomousFields(u, !!bookLinearState.showE, !!bookLinearState.showB);
+    else {
+      enterArrowAutonomousPipeline();
+      if(directFieldPools.inited){
+        hideFieldSequencePool(directFieldPools.e);
+        hideFieldSequencePool(directFieldPools.bBack);
+        hideFieldSequencePool(directFieldPools.bFront);
+      }
+    }
+    return;
+  }
+
+  enterLinePipeline();
   disposeGroup(eUpperGroup);
   disposeGroup(eArrowGroup);
   disposeGroup(eLowerGroup);
@@ -3023,9 +2804,6 @@ function rebuildFields(u){
   disposeGroup(bFieldFrontGroup);
 
   const waveMaxX = activeWaveMaxX();
-
-  if(showEFronts || showBFronts) enterLinePipeline();
-
   const eFronts = showEFronts ? seededEFrontsAbsolute(u)
     .map((fr, sampleIndex) => {
       const x = 0.5 * E_TARGET_TOTAL_WIDTH * fr.age;
@@ -3034,7 +2812,6 @@ function rebuildFields(u){
     })
     .filter(fr => fr.xDistance <= waveMaxX && fr.birthOpacity > 0.03)
     .map((fr, renderIndex) => ({ ...fr, renderIndex })) : [];
-
   const bFronts = showBFronts ? seededBFrontsAbsolute(u)
     .map((fr, sampleIndex) => {
       const x = B_RADIUS_FINAL * fr.age;
@@ -3050,22 +2827,26 @@ function rebuildFields(u){
   } else {
     hideDirectFrontPools();
   }
-
   if(showBFronts){
     updateDirectBFrontPools(bFronts);
     bFronts.forEach(fr => addBArrowCones(fr));
   } else {
     hideDirectCirclePools();
   }
-
-  if(linearActive){
-    rebuildArrowAutonomousFields(u, linearE, linearB);
+  if(needFieldMode){
+    if(directFieldPools.inited){
+      hideFieldSequencePool(directFieldPools.e);
+      hideFieldSequencePool(directFieldPools.bBack);
+      hideFieldSequencePool(directFieldPools.bFront);
+    }
+    rebuildFieldVectorMode(u, eFronts, bFronts);
   } else if(directFieldPools.inited){
     hideFieldSequencePool(directFieldPools.e);
     hideFieldSequencePool(directFieldPools.bBack);
     hideFieldSequencePool(directFieldPools.bFront);
   }
 }
+
 
 
 function chargeAndCurrent(u){
@@ -3082,12 +2863,9 @@ function receiverFieldAttenuation(receiverX){
   if(!isNearAttenuatedMode()) return 1;
   return attenuateEByDistance(Math.max(0, receiverX));
 }
-function receiverEInputActive(){
-  return !!(isReceiveMode() && (ui.showE?.checked || (viewSwitches.sourceLinear && bookLinearState.showE) || (viewSwitches.receiverLinear && bookLinearState.showE)));
-}
 
 function receiverFieldState(localU, emitPeriods, receiverX=0){
-  const wavePresent = receiverEInputActive() && localU > 0 && localU <= emitPeriods;
+  const wavePresent = localU > 0 && localU <= emitPeriods;
   if(!wavePresent){
     return { wavePresent:false, envelope:0, eSigned:0, forceSigned:0, attenuation:0 };
   }
@@ -3131,13 +2909,8 @@ function receiverDriveState(u){
   const paramsKey = receiverParamsKey();
   const targetU = Math.max(0, u);
 
-  if(!receiverSim.initialized || targetU < receiverSim.lastU - 1e-9){
+  if(!receiverSim.initialized || receiverSim.paramsKey !== paramsKey || targetU < receiverSim.lastU - 1e-9){
     resetReceiverSim();
-  } else if(receiverSim.paramsKey !== paramsKey){
-    // Αλλαγές σε Σχολικό/Σχολικό+, θέση δέκτη ή διάρκεια εκπομπής δεν μηδενίζουν
-    // την ήδη υπάρχουσα ταλάντωση του ηλεκτρονίου. Από εδώ και πέρα απλώς
-    // ολοκληρώνεται με τη νέα διέγερση.
-    receiverSim.paramsKey = paramsKey;
   }
   receiverSim.initialized = true;
 
@@ -3438,35 +3211,30 @@ function applyUI(){
   updateXAxisForEmitPeriods();
   axes.visible = ui.showAxes.checked && !isRodMode();
   planes.visible = ui.showPlanes.checked && !isRodMode();
-  const lineEActive = !!ui.showE.checked;
-  const lineBActive = !!ui.showB.checked;
-  const linearActive = !!(ui.showFieldMode.checked && linearFieldComponentsAreSelected());
-  const linearEActive = !!(linearActive && bookLinearState.showE);
-  const linearBActive = !!(linearActive && bookLinearState.showB);
-
-  // Δυναμικές γραμμές: ανεξάρτητη στρώση.
-  eUpperGroup.visible = eLowerGroup.visible = false;
-  eUpperDirectGroup.visible = eLowerDirectGroup.visible = lineEActive;
-  eArrowGroup.visible = lineEActive;
-  bBackGroup.visible = bFrontGroup.visible = false;
-  bBackDirectCurveGroup.visible = bFrontDirectCurveGroup.visible = lineBActive;
-  bArrowGroup.visible = lineBActive;
-
-  // Ευθεία διάδοση: ανεξάρτητη στρώση. Χρησιμοποιεί τα direct field pools και δεν αποκλείει τις γραμμές.
-  bFieldBackGroup.visible = false;
-  eFieldGroup.visible = false;
-  bFieldFrontGroup.visible = false;
-  bFieldBackDirectGroup.visible = linearBActive;
-  eFieldDirectGroup.visible = linearEActive;
-  bFieldFrontDirectGroup.visible = linearBActive;
-  rodGroup.visible = !!viewSwitches.dipole;
-  particleGroup.visible = !!viewSwitches.dipole && ui.showParticles.checked;
-  topGlow.visible = botGlow.visible = !!viewSwitches.dipole && ui.showParticles.checked;
-  topChargeSign.visible = botChargeSign.visible = !!viewSwitches.dipole && ui.showParticles.checked;
+  const directFrontMode = ui.showE.checked && (appModes.main === 'lines' || appModes.main === 'receiveFronts');
+  const directCircleMode = ui.showB.checked && (appModes.main === 'lines' || appModes.main === 'receiveFronts');
+  eUpperGroup.visible = eLowerGroup.visible = ui.showE.checked && !directFrontMode;
+  eUpperDirectGroup.visible = eLowerDirectGroup.visible = directFrontMode;
+  eArrowGroup.visible = ui.showE.checked;
+  bBackGroup.visible = bFrontGroup.visible = ui.showB.checked && !directCircleMode;
+  bBackDirectCurveGroup.visible = bFrontDirectCurveGroup.visible = directCircleMode;
+  bArrowGroup.visible = ui.showB.checked;
+  // field-vector mode is an independent representation: it can stand alone
+  // even when the E/B curve fronts are hidden.
+  const directArrowMode = ui.showFieldMode.checked && (appModes.main === 'arrows' || appModes.main === 'receiveArrows');
+  bFieldBackGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  eFieldGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  bFieldFrontGroup.visible = ui.showFieldMode.checked && !directArrowMode;
+  bFieldBackDirectGroup.visible = directArrowMode;
+  eFieldDirectGroup.visible = directArrowMode;
+  bFieldFrontDirectGroup.visible = directArrowMode;
+  particleGroup.visible = ui.showParticles.checked;
+  topGlow.visible = botGlow.visible = ui.showParticles.checked;
+  topChargeSign.visible = botChargeSign.visible = ui.showParticles.checked;
   receiverGroup.visible = isReceiveMode();
   receiverElectron.visible = receiverGroup.visible && ui.showParticles.checked;
   if(!receiverGroup.visible || !ui.showParticles.checked){ receiverVelocityArrow.visible = false; }
-  currentGroup.visible = !!viewSwitches.dipole && ui.showCurrent.checked;
+  currentGroup.visible = ui.showCurrent.checked && !isReceiveMode();
   updateModeLocks();
   updateReceiverPlacement();
   updatePlanes(phaseU);
@@ -3479,7 +3247,7 @@ for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','show
   if(key === 'showE' || key === 'showB' || key === 'showFieldMode'){
     el.addEventListener('input', () => { applyFieldFillDefault(); invalidateGraphs(true); applyUI(); });
   } else if(key === 'receiverX'){
-    el.addEventListener('input', () => { invalidateGraphs(true); applyUI(); });
+    el.addEventListener('input', () => { resetReceiverSim(); invalidateGraphs(true); applyUI(); });
   } else {
     el.addEventListener('input', () => { invalidateGraphs(true); applyUI(); });
   }
@@ -3487,7 +3255,7 @@ for(const key of ['zoom','speed','eAlpha','bAlpha','showAxes','showPlanes','show
 
 let playing = true;
 let phaseU = 0;
-function togglePlayPause(){
+ui.playBtn.addEventListener('click', () => {
   if(!playing && phaseU >= getEmitPeriods()){
     phaseU = getBookSceneStartPhase();
     lastPhaseBucket = -1;
@@ -3497,9 +3265,6 @@ function togglePlayPause(){
   }
   playing = !playing;
   updatePlayButtons();
-}
-ui.playBtn.addEventListener('click', () => {
-  togglePlayPause();
 });
 ui.resetBtn.addEventListener('click', () => {
   forcePause();
@@ -3534,19 +3299,6 @@ function restartEvolutionForSelection(){
   syncPhase();
   invalidateGraphs(true);
   applyUI();
-}
-function refreshVisualsForSelection(){
-  // Αλλαγή επιλογών χωρίς αυτόματο reset χρόνου/φάσης και χωρίς παύση.
-  // Κρατάμε την τρέχουσα χρονική στιγμή και απλώς ξαναχτίζουμε την οπτική αναπαράσταση.
-  phaseU = Math.max(0, Math.min(getEmitPeriods(), phaseU));
-  autoFitApplied = false;
-  lastPhaseBucket = -1;
-  rebuildFields(phaseU);
-  updatePlanes(phaseU);
-  updateParticles(phaseU);
-  invalidateGraphs(true);
-  applyUI();
-  updateTopReadouts();
 }
 function syncPhase(){
   phaseU = Math.max(0, Math.min(getEmitPeriods(), phaseU));
@@ -3766,15 +3518,28 @@ function applyBookMultisceneState(state={}){
   ui.showParticles.checked = layers.has('charges') || layers.has('electronMotion');
   const currentEnabled = parseBoolLike(state.currentEnabled);
   ui.showCurrent.checked = currentEnabled != null ? currentEnabled : layers.has('currentArrow');
-  viewSwitches.dipole = layers.has('rod');
-  viewSwitches.sourceLinear = hasLinear;
-  viewSwitches.receiverField = layers.has('receiverField') || layers.has('receiver');
-  viewSwitches.receiverLinear = layers.has('receiverLinear');
-  ui.showE.checked = hasE;
-  ui.showB.checked = hasB;
-  bookLinearState.showE = hasLinear;
-  bookLinearState.showB = hasLinear;
-  syncAppModeFromSwitches();
+  if(hasLinear){
+    bookLinearState.showE = true;
+    bookLinearState.showB = true;
+    applyMainMode('arrows', true);
+    ui.showFieldMode.checked = true;
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+  } else if(hasE || hasB){
+    bookLinearState.showE = false;
+    bookLinearState.showB = false;
+    applyMainMode('lines', true);
+    ui.showFieldMode.checked = false;
+    ui.showE.checked = hasE;
+    ui.showB.checked = hasB;
+  } else {
+    bookLinearState.showE = false;
+    bookLinearState.showB = false;
+    applyMainMode('rod', true);
+    ui.showFieldMode.checked = false;
+    ui.showE.checked = false;
+    ui.showB.checked = false;
+  }
   const rawPreset = state.timePreset || state.phasePreset || state.phaseKey;
   activeBookInterval = bookIntervalFromPreset(rawPreset);
   const phasePreset = phaseFromTimePreset(rawPreset);
@@ -3791,7 +3556,6 @@ function getExternalState(){
   return {
     scene:null,
     mode:appModes.main,
-    switches:{ ...viewSwitches },
     phase:phaseU,
     play:playing,
     showE:!!ui.showE?.checked,
@@ -3823,12 +3587,6 @@ function applyExternalState(rawState={}, options={}){
   const region = state.region === 'far' ? 'far' : (state.region === 'nearAtt' ? 'nearAtt' : (state.region === 'near' ? 'near' : null));
   if(region) setRegionMode(region, { applyDefaults:false });
 
-  if(state.switches && typeof state.switches === 'object'){
-    for(const k of ['dipole','sourceLinear','receiverField','receiverLinear']){
-      if(typeof state.switches[k] === 'boolean') viewSwitches[k] = state.switches[k];
-    }
-  }
-
   if(String(state.scene || '').trim() === 'book_multiscene') applyBookMultisceneState(state);
   else { activeBookSceneState = null; activeBookInterval = null; }
 
@@ -3850,12 +3608,13 @@ function applyExternalState(rawState={}, options={}){
   const linearShowB = parseBoolLike(state.linearShowB ?? state.directShowB);
   if(linearShowE != null) bookLinearState.showE = linearShowE;
   if(linearShowB != null) bookLinearState.showB = linearShowB;
-  if(showFieldMode === true) viewSwitches.sourceLinear = true;
   if((mode === 'arrows' || mode === 'receiveArrows' || showFieldMode === true) && !bookLinearState.showE && !bookLinearState.showB){
     bookLinearState.showE = true;
     bookLinearState.showB = true;
   }
-  syncAppModeFromSwitches();
+  if(appModes.main === 'lines' && !ui.showE.checked && !ui.showB.checked){
+    ui.showE.checked = true;
+  }
 
   const receiverX = parseNumberLike(state.receiverX);
   if(receiverX != null) ui.receiverX.value = String(receiverX);
@@ -4131,8 +3890,11 @@ ui.eAlphaDown?.addEventListener('click', () => { ui.eAlpha.value = String(Math.m
 ui.bAlphaUp?.addEventListener('click', () => { ui.bAlpha.value = String(Math.min(100, (+ui.bAlpha.value||0) + 5)); applyUI(); });
 ui.bAlphaDown?.addEventListener('click', () => { ui.bAlpha.value = String(Math.max(0, (+ui.bAlpha.value||0) - 5)); applyUI(); });
 ui.emitPeriods.addEventListener('change', () => {
+  forcePause();
+  autoFitApplied = false;
   phaseU = Math.min(phaseU, getEmitPeriods());
-  refreshVisualsForSelection();
+  resetReceiverSim();
+  syncPhase();
 });
 ui.autoFit.addEventListener('input', () => {
   autoFitApplied = false;
@@ -4141,79 +3903,6 @@ ui.autoFit.addEventListener('input', () => {
 ui.screenBtn.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
 ui.printBtn.addEventListener('click', () => { applyViewPreset(VIEW_PRINT); });
 ui.resetView.addEventListener('click', () => { applyViewPreset(VIEW_SCREEN); });
-
-const stageCanvas = renderer.domElement;
-stageCanvas.style.touchAction = 'none';
-
-function clampZoomValue(v){
-  return Math.max(0, Math.min(ZOOM_MAX, v));
-}
-
-const stageMouse = {
-  active:false,
-  moved:false,
-  pointerId:null,
-  startX:0,
-  startY:0,
-  lastX:0,
-  lastY:0
-};
-
-stageCanvas.addEventListener('wheel', (ev) => {
-  ev.preventDefault();
-  const delta = ev.deltaY;
-  const step = Math.max(18, Math.min(120, Math.abs(delta) * 0.12));
-  const next = clampZoomValue((+ui.zoom.value || 0) + (delta < 0 ? step : -step));
-  ui.zoom.value = String(next);
-  applyUI();
-}, { passive:false });
-
-stageCanvas.addEventListener('pointerdown', (ev) => {
-  if(ev.button !== 0) return;
-  stageMouse.active = true;
-  stageMouse.moved = false;
-  stageMouse.pointerId = ev.pointerId;
-  stageMouse.startX = stageMouse.lastX = ev.clientX;
-  stageMouse.startY = stageMouse.lastY = ev.clientY;
-  stageCanvas.classList.add('dragging');
-  stageCanvas.setPointerCapture?.(ev.pointerId);
-});
-
-stageCanvas.addEventListener('pointermove', (ev) => {
-  if(!stageMouse.active || ev.pointerId !== stageMouse.pointerId) return;
-  const dx = ev.clientX - stageMouse.lastX;
-  const dy = ev.clientY - stageMouse.lastY;
-  const totalDx = ev.clientX - stageMouse.startX;
-  const totalDy = ev.clientY - stageMouse.startY;
-  if(!stageMouse.moved && Math.hypot(totalDx, totalDy) > 4) stageMouse.moved = true;
-  if(stageMouse.moved){
-    root.rotation.y += dx * 0.0065;
-    root.rotation.x += dy * 0.0048;
-    root.rotation.x = Math.max(-1.25, Math.min(1.25, root.rotation.x));
-    camera.lookAt(focusPoint);
-    invalidateGraphs(true);
-    drawGraphs(true);
-  }
-  stageMouse.lastX = ev.clientX;
-  stageMouse.lastY = ev.clientY;
-});
-
-function endStagePointer(ev){
-  if(!stageMouse.active || (ev && ev.pointerId !== stageMouse.pointerId)) return;
-  const wasMoved = stageMouse.moved;
-  stageMouse.active = false;
-  stageMouse.moved = false;
-  stageCanvas.classList.remove('dragging');
-  if(ev && stageMouse.pointerId != null){
-    stageCanvas.releasePointerCapture?.(stageMouse.pointerId);
-  }
-  stageMouse.pointerId = null;
-  if(!wasMoved){
-    togglePlayPause();
-  }
-}
-stageCanvas.addEventListener('pointerup', endStagePointer);
-stageCanvas.addEventListener('pointercancel', endStagePointer);
 
 function bindHold(button, fn){
   let timer = null;
@@ -4241,23 +3930,20 @@ window.addEventListener('resize', () => {
 });
 
 ui.toggleCurrentBtn?.addEventListener('click', () => { ui.showCurrent.checked = !ui.showCurrent.checked; applyUI(); });
-ui.modeRod?.addEventListener('click', () => { viewSwitches.dipole = !viewSwitches.dipole; syncAppModeFromSwitches(); applyUI(); });
-ui.eLinesBtn?.addEventListener('click', () => { toggleELinesSwitch(); });
-ui.bLinesBtn?.addEventListener('click', () => { toggleBLinesSwitch(); });
-ui.eLinearBtn?.addEventListener('click', () => { toggleELinearSwitch(); });
-ui.bLinearBtn?.addEventListener('click', () => { toggleBLinearSwitch(); });
-ui.modeReceive?.addEventListener('click', () => { toggleReceiverFieldSwitch(); });
-// Backward compatibility for old hidden/URL controls, if present.
-ui.modeSource?.addEventListener('click', () => { toggleSourceLinesSwitch(); });
-ui.waveModeArrows?.addEventListener('click', () => { toggleSourceLinearOverlay(); });
-ui.waveModeFronts?.addEventListener('click', () => { toggleReceiverLinearOverlay(); });
+ui.modeRod?.addEventListener('click', () => { bookLinearState.showE = false; bookLinearState.showB = false; applyMainMode('rod'); });
+ui.modeSource?.addEventListener('click', () => { bookLinearState.showE = false; bookLinearState.showB = false; applyMainMode('lines'); });
+ui.waveModeArrows?.addEventListener('click', () => { bookLinearState.showE = true; bookLinearState.showB = true; applyMainMode('arrows'); });
+ui.modeReceive?.addEventListener('click', () => { bookLinearState.showE = false; bookLinearState.showB = false; applyMainMode('receiveFronts'); });
+ui.waveModeFronts?.addEventListener('click', () => { bookLinearState.showE = true; bookLinearState.showB = true; applyMainMode('receiveArrows'); });
 ui.showE?.addEventListener('input', () => {
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
+  if(appModes.main !== 'lines') return;
+  if(!ui.showE.checked && !ui.showB.checked) ui.showB.checked = true;
+  restartEvolutionForSelection();
 });
 ui.showB?.addEventListener('input', () => {
-  syncAppModeFromSwitches();
-  refreshVisualsForSelection();
+  if(appModes.main !== 'lines') return;
+  if(!ui.showE.checked && !ui.showB.checked) ui.showE.checked = true;
+  restartEvolutionForSelection();
 });
 
 let last = performance.now();
