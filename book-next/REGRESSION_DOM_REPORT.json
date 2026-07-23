@@ -1,0 +1,35 @@
+{
+  "date": "2026-07-23",
+  "type": "diagnostic-only / integration probe",
+  "fixture": "chapter_content.json",
+  "legacyRenderer": "legacy-baseline.html",
+  "currentRenderer": "index.html + book-core.js + book-core.css",
+  "domComparison": {
+    "pass": true,
+    "pagesLegacy": 28,
+    "pagesCurrent": 28,
+    "itemsLegacy": 293,
+    "itemsCurrent": 293,
+    "scenesLegacy": 10,
+    "scenesCurrent": 10,
+    "failedPages": [],
+    "javascriptErrors": 0
+  },
+  "editorComparison": {
+    "sampleLoaded": true,
+    "pages": 28,
+    "previewSheets": 1,
+    "pageOneItemsEditor": 16,
+    "pageOneItemsViewer": 16,
+    "pageOneStructuralMatch": true,
+    "rendererVersion": "0.1.0",
+    "javascriptErrors": 0
+  },
+  "notValidated": {
+    "chromiumPixelGeometry": true,
+    "printCssInRealBrowser": true,
+    "pdfPageBreaks": true,
+    "liveSceneSnapshots": true
+  },
+  "note": "Το περιβάλλον διέθετε Playwright αλλά όχι Chromium binary και το CDN λήψης ήταν αποκλεισμένο. Το compare.html εκτελεί τις πραγματικές μετρήσεις στον τοπικό browser."
+}

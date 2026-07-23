@@ -1,0 +1,26 @@
+{
+  "name": "Γενικός συγγραφέας βιβλίων",
+  "version": "0.1.0",
+  "releaseType": "infrastructure-checkpoint",
+  "releaseType_el": "σταθμός υποδομής",
+  "date": "2026-07-23",
+  "schemaVersion": "pages-v1",
+  "rendererVersion": "0.1.0",
+  "regressionBook": "Γέννηση και διάδοση του ΗΜ κύματος",
+  "integration": {
+    "repository": "antarxo/HMK",
+    "path": "book-next",
+    "kind": "diagnostic-regression-probe",
+    "productionBookUnchanged": true,
+    "validation": {
+      "domEquivalent": true,
+      "pages": 28,
+      "items": 293,
+      "scenes": 10,
+      "editorViewerPageOneEquivalent": true,
+      "javascriptErrors": 0,
+      "chromiumGeometryValidated": false,
+      "printPdfValidated": false
+    }
+  }
+}
