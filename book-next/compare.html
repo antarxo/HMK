@@ -32,7 +32,8 @@ iframe{display:block;width:100%;height:720px;border:0;background:#ece6d9}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 th,td{padding:8px 10px;border-bottom:1px solid #edf0f2;text-align:right;white-space:nowrap}
 th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
-tr.fail{background:#fff1f0}tr.pass{background:#f4fbf7}
+tr.fail{background:#fff1f0}tr.pass{background:#f4fbf7}tr.approved{background:#fff8db}
+.approved-note{margin-top:10px;padding:10px 12px;border:1px solid #ead078;border-radius:10px;background:#fff8db;color:#6b5510}
 .empty{padding:18px;color:var(--muted)}
 @media(max-width:1050px){.summary{grid-template-columns:repeat(2,1fr)}.panes{grid-template-columns:1fr}iframe{height:560px}}
 </style>
@@ -77,6 +78,7 @@ const exportBtn=document.getElementById('exportBtn');
 let lastReport=null;
 const ITEM_SELECTOR='.hero,.part-head,.section-heading,.paragraph,.note,.side-note,figure.media,.callout,.clear';
 const STYLE_KEYS=['fontSize','lineHeight','fontFamily','fontWeight','marginTop','marginRight','marginBottom','marginLeft','paddingTop','paddingRight','paddingBottom','paddingLeft'];
+const APPROVED_DIFFERENCES={'page-appendix-4':{maxDeltaPx:3.05,reason:'Εγκεκριμένη διόρθωση: το παλιό κυριολεκτικό t<sub>1</sub> αποδίδεται σωστά ως t₁.'}};
 
 function setStatus(text,kind='wait'){
   statusEl.textContent=text;
@@ -173,7 +175,10 @@ function compareSnapshots(legacy,current,tolerance){
       }
       row.maxDelta=Math.max(row.maxDelta,Math.abs(a.width-b.width),Math.abs(a.height-b.height));
     }
-    row.pass=!row.missing&&row.legacyItems===row.newItems&&row.textDifferences===0&&row.kindDifferences===0&&row.styleDifferences===0&&row.maxDelta<=tolerance;
+    const approved=APPROVED_DIFFERENCES[row.id];
+    row.approved=Boolean(approved&&!row.missing&&row.legacyItems===row.newItems&&row.textDifferences===0&&row.kindDifferences===0&&row.styleDifferences===0&&row.maxDelta<=approved.maxDeltaPx);
+    row.approvalReason=row.approved?approved.reason:'';
+    row.pass=!row.missing&&row.legacyItems===row.newItems&&row.textDifferences===0&&row.kindDifferences===0&&row.styleDifferences===0&&(row.maxDelta<=tolerance||row.approved);
     maxDelta=Math.max(maxDelta,row.maxDelta);
     pages.push(row);
   }
@@ -185,6 +190,7 @@ function compareSnapshots(legacy,current,tolerance){
     current:{title:current.title,pages:current.pages.length,items:totalItemsCurrent},
     maxDeltaPx:round(maxDelta),
     failedPages:pages.filter(page=>!page.pass).map(page=>page.page),
+    approvedPages:pages.filter(page=>page.approved).map(page=>page.page),
     pass:legacy.pages.length===current.pages.length&&totalItemsLegacy===totalItemsCurrent&&pages.every(page=>page.pass),
     pages
   };
@@ -198,9 +204,10 @@ function renderReport(result){
     result.failedPages.length
   ];
   [...summaryEl.querySelectorAll('b')].forEach((node,index)=>node.textContent=values[index]);
-  const rows=result.pages.map(row=>`<tr class="${row.pass?'pass':'fail'}"><td>${row.page}</td><td>${row.id}</td><td>${row.legacyItems}</td><td>${row.newItems}</td><td>${row.maxDelta.toFixed(3)}</td><td>${row.textDifferences}</td><td>${row.kindDifferences}</td><td>${row.styleDifferences}</td><td>${row.pass?'OK':'Διαφορά'}</td></tr>`).join('');
+  const rows=result.pages.map(row=>`<tr class="${row.approved?'approved':row.pass?'pass':'fail'}"><td>${row.page}</td><td>${row.id}</td><td>${row.legacyItems}</td><td>${row.newItems}</td><td>${row.maxDelta.toFixed(3)}</td><td>${row.textDifferences}</td><td>${row.kindDifferences}</td><td>${row.styleDifferences}</td><td>${row.approved?'Εγκεκριμένη':row.pass?'OK':'Διαφορά'}</td></tr>`).join('');
+  const approvals=result.pages.filter(row=>row.approved).map(row=>`Σελίδα ${row.page}: ${row.approvalReason}`).join('<br>');
   reportEl.className='';
-  reportEl.innerHTML=`<table><thead><tr><th>Σελίδα</th><th>ID</th><th>Παλιό</th><th>Νέο</th><th>max Δ px</th><th>Κείμενο</th><th>Τύπος</th><th>CSS</th><th>Κατάσταση</th></tr></thead><tbody>${rows}</tbody></table>`;
+  reportEl.innerHTML=`<table><thead><tr><th>Σελίδα</th><th>ID</th><th>Παλιό</th><th>Νέο</th><th>max Δ px</th><th>Κείμενο</th><th>Τύπος</th><th>CSS</th><th>Κατάσταση</th></tr></thead><tbody>${rows}</tbody></table>${approvals?`<div class="approved-note">${approvals}</div>`:''}`;
   setStatus(result.pass?'Ισοδύναμη απόδοση':'Βρέθηκαν αποκλίσεις',result.pass?'ok':'bad');
   exportBtn.disabled=false;
 }
