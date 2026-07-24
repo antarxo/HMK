@@ -675,6 +675,16 @@ async function preparePrintSnapshots(force=false){
   printSnapshotsPrepared = true;
   return readyCount;
 }
+window.BOOK_PRINT_DIAGNOSTICS = Object.freeze({
+  prepare: (force=true)=>preparePrintSnapshots(force),
+  cleanup: cleanupPrintSnapshots,
+  status: ()=>({
+    pages: document.querySelectorAll('.sheet-wrap').length,
+    scenes: document.querySelectorAll('.media-frame.scene-frame').length,
+    preparedSnapshots: document.querySelectorAll('.media-frame.scene-frame.print-ready .print-scene-snapshot').length,
+    ready: printSnapshotsPrepared
+  })
+});
 async function beginPrintFlow(){
   if(printFlowRunning) return;
   printFlowRunning = true;
