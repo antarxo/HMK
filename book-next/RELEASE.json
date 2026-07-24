@@ -19,8 +19,34 @@
       "scenes": 10,
       "editorViewerPageOneEquivalent": true,
       "javascriptErrors": 0,
-      "chromiumGeometryValidated": false,
-      "printPdfValidated": false
+      "chromiumGeometryValidated": true,
+      "chromiumGeometryApprovedDifference": {
+        "page": 19,
+        "id": "page-appendix-4",
+        "maxDeltaPx": 2.99,
+        "reason": "Correct semantic rendering of t₁ instead of the legacy literal HTML tag."
+      },
+      "postCleanupComparison": {
+        "tolerancePx": 0,
+        "pagesWithUnapprovedDifference": 0,
+        "duplicateEditorCssRemovedLines": 165
+      },
+      "printPdfValidated": true,
+      "printPdf": {
+        "pages": 28,
+        "paper": "A4",
+        "orientation": "portrait",
+        "sceneSnapshots": "10/10",
+        "fontsEmbedded": true,
+        "browserHeadersAndFooters": false
+      },
+      "sceneSnapshotExecutionPath": {
+        "directWindowGetBookPrintSnapshot": 10,
+        "bookSceneApi": 0,
+        "bookSceneV1Message": 0,
+        "legacyHmPrintSnapshotMessage": 0,
+        "cloneFallback": 0
+      }
     }
   }
 }
