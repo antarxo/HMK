@@ -1,16 +1,16 @@
 {
   "name": "Γενικός συγγραφέας βιβλίων",
-  "version": "0.1.0",
-  "releaseType": "infrastructure-checkpoint",
-  "releaseType_el": "σταθμός υποδομής",
-  "date": "2026-07-23",
+  "version": "0.1.1-candidate",
+  "releaseType": "diagnostic-only",
+  "releaseType_el": "υποψήφια αποκοπή compatibility",
+  "date": "2026-07-24",
   "schemaVersion": "pages-v1",
   "rendererVersion": "0.1.0",
   "regressionBook": "Γέννηση και διάδοση του ΗΜ κύματος",
   "integration": {
     "repository": "antarxo/HMK",
     "path": "book-next",
-    "kind": "diagnostic-regression-probe",
+    "kind": "canonical-transport-cutover",
     "productionBookUnchanged": true,
     "validation": {
       "domEquivalent": true,
@@ -20,18 +20,12 @@
       "editorViewerPageOneEquivalent": true,
       "javascriptErrors": 0,
       "chromiumGeometryValidated": true,
-      "chromiumGeometryApprovedDifference": {
-        "page": 19,
-        "id": "page-appendix-4",
-        "maxDeltaPx": 2.99,
-        "reason": "Correct semantic rendering of t₁ instead of the legacy literal HTML tag."
-      },
       "postCleanupComparison": {
         "tolerancePx": 0,
         "pagesWithUnapprovedDifference": 0,
         "duplicateEditorCssRemovedLines": 165
       },
-      "printPdfValidated": true,
+      "printPdfValidatedBeforeCutover": true,
       "printPdf": {
         "pages": 28,
         "paper": "A4",
@@ -40,12 +34,33 @@
         "fontsEmbedded": true,
         "browserHeadersAndFooters": false
       },
-      "sceneSnapshotExecutionPath": {
-        "directWindowGetBookPrintSnapshot": 10,
-        "bookSceneApi": 0,
-        "bookSceneV1Message": 0,
-        "legacyHmPrintSnapshotMessage": 0,
-        "cloneFallback": 0
+      "forcedPathProbeBeforeRemoval": {
+        "status": "passed-in-user-browser",
+        "pathsPassed": 6,
+        "snapshotsPerPath": 10,
+        "fallbacks": 0
+      },
+      "canonicalCutoverCandidate": {
+        "status": "code-validated-awaiting-browser-execution",
+        "type": "diagnostic-only",
+        "onlyProductionPath": "book-scene-v1",
+        "removedPaths": [
+          "book-scene-direct",
+          "window-direct",
+          "em-wave-direct",
+          "hm-print-snapshot",
+          "degraded-clone"
+        ],
+        "activeLegacyHooks": 0,
+        "unitTestsPassed": 6,
+        "requiredSnapshots": 10,
+        "printGateRequiresCanonicalPath": true
+      },
+      "knownPreexistingVisualDefect": {
+        "page": 28,
+        "description": "Η ένδειξη «ίδια μέγιστα» επικαλύπτει τον τίτλο του γραφήματος.",
+        "transportRegression": false,
+        "samePixelsAcrossThreePdfVersions": true
       }
     }
   }

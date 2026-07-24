@@ -376,9 +376,8 @@ figure.media figcaption{
       <input type="file" id="localBookInput" accept="application/json,.json">
     </div>
   </main>
-  <div id="printSandbox" aria-hidden="true" style="position:fixed;left:-20000px;top:0;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0"></div>
-
 <script src="book-core.js"></script>
+<script src="snapshot-transport.js"></script>
 <script>
 'use strict';
 const pageStack=document.getElementById('pageStack');
@@ -386,7 +385,6 @@ const megaNav=document.getElementById('megaNav');
 const statusEl=document.getElementById('status');
 const localBookLoader=document.getElementById('localBookLoader');
 const localBookInput=document.getElementById('localBookInput');
-const printSandbox=document.getElementById('printSandbox');
 const langElBtn=document.getElementById('langElBtn');
 const langEnBtn=document.getElementById('langEnBtn');
 let printPageStyleEl = null;
@@ -521,150 +519,110 @@ async function waitForFigureImages(){
   const imgs = Array.from(document.querySelectorAll('.media-frame img:not(.print-scene-snapshot)'));
   for(const img of imgs) await waitForImage(img);
 }
-function cleanupPrintSandbox(){
-  if(printSandbox) printSandbox.innerHTML = '';
-}
-async function buildSceneSnapshotFromClone(src='', sourceFrame=null){
-  if(!printSandbox || !src) return null;
-  cleanupPrintSandbox();
+const SNAPSHOT_PATHS = BookSnapshotTransport.PATHS;
+let lastSnapshotReport = null;
 
-  const liveRect = sourceFrame?.getBoundingClientRect ? sourceFrame.getBoundingClientRect() : null;
-  const liveW = Math.max(1, Math.round(liveRect?.width || 340));
-  const liveH = Math.max(1, Math.round(liveRect?.height || Math.round(liveW * 1.15)));
-
-  const maxSandboxW = 1600;
-  const maxSandboxH = 2200;
-  const scale = Math.max(2, Math.min(4, Math.floor(maxSandboxW / liveW) || 2));
-  let cloneW = Math.max(liveW * scale, liveW);
-  let cloneH = Math.max(liveH * scale, liveH);
-
-  if(cloneW > maxSandboxW){
-    const k = maxSandboxW / cloneW;
-    cloneW = Math.round(cloneW * k);
-    cloneH = Math.round(cloneH * k);
-  }
-  if(cloneH > maxSandboxH){
-    const k = maxSandboxH / cloneH;
-    cloneW = Math.round(cloneW * k);
-    cloneH = Math.round(cloneH * k);
-  }
-
-  printSandbox.style.width = `${cloneW}px`;
-  printSandbox.style.height = `${cloneH}px`;
-
-  const holder = document.createElement('div');
-  holder.style.cssText = `width:${cloneW}px;height:${cloneH}px;overflow:hidden;background:#fff;display:block`;
-
-  const iframe = document.createElement('iframe');
-  iframe.loading = 'eager';
-  iframe.referrerPolicy = 'no-referrer';
-  iframe.allow = 'fullscreen';
-  iframe.style.cssText = `width:${cloneW}px;height:${cloneH}px;border:0;display:block;background:#fff`;
-  iframe.src = withCacheBust(src);
-
-  holder.appendChild(iframe);
-  printSandbox.appendChild(holder);
-
-  await waitForIframeLoad(iframe);
-  await wait(650);
-
-  let shot = await requestIframePrintSnapshotWithRetry(iframe, 4);
-  if(!shot){
-    await wait(450);
-    shot = await requestIframePrintSnapshotWithRetry(iframe, 3);
-  }
-
-  holder.remove();
-  printSandbox.style.width = '1px';
-  printSandbox.style.height = '1px';
-  return shot;
-}
-async function requestIframePrintSnapshot(iframe){
-  if(!iframe) return null;
-  const win=iframe.contentWindow;
-  const directCandidates=[
-    [win?.BookScene?.getPrintSnapshot, win?.BookScene],
-    [win?.getBookPrintSnapshot, win],
-    [win?.EMWaveApp?.getPrintSnapshot, win?.EMWaveApp]
-  ];
-  for(const [direct, owner] of directCandidates){
-    try{
-      if(typeof direct==='function'){
-        const result=await Promise.resolve(direct.call(owner));
-        if(result) return result;
-      }
-    }catch(_e){}
-  }
-  return await new Promise(resolve=>{
-    const requestId=`snap_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    let settled=false;
-    const cleanup=()=>{
-      if(settled) return;
-      settled=true;
-      window.removeEventListener('message',onMessage);
-      clearTimeout(timer);
-    };
-    const onMessage=(event)=>{
-      if(event.source!==win) return;
-      const message=event.data;
-      const isGeneric=message?.type==='book-scene:print-snapshot';
-      const isLegacy=message?.type==='hm_print_snapshot';
-      if((!isGeneric && !isLegacy) || message.requestId!==requestId) return;
-      cleanup();
-      resolve(message.dataUrl || message.snapshot || null);
-    };
-    const timer=setTimeout(()=>{ cleanup(); resolve(null); },4800);
-    window.addEventListener('message',onMessage);
-    try{
-      win?.postMessage({type:'book-scene:capture-print-snapshot',requestId,protocol:'book-scene-v1'},'*');
-      win?.postMessage({type:'capturePrintSnapshot',requestId},'*');
-    }catch(_e){
-      cleanup();
-      resolve(null);
+async function captureIframeWithRetry(iframe, options={}){
+  const maxAttempts = Math.max(1, Number(options.attempts) || 1);
+  const mergedAttempts = [];
+  let lastResult = null;
+  for(let attemptIndex=0; attemptIndex<maxAttempts; attemptIndex++){
+    lastResult = await BookSnapshotTransport.capture(iframe, {
+      timeoutMs:options.timeoutMs
+    });
+    mergedAttempts.push(...lastResult.attempts.map(attempt=>({
+      ...attempt,
+      attemptIndex:attemptIndex+1
+    })));
+    if(lastResult.result === 'success'){
+      return { ...lastResult, attempts:mergedAttempts };
     }
-  });
-}
-async function requestIframePrintSnapshotWithRetry(iframe, attempts=3){
-  for(let i=0;i<attempts;i++){
-    const shot = await requestIframePrintSnapshot(iframe);
-    if(shot) return shot;
-    await new Promise(resolve => setTimeout(resolve, 220));
+    if(attemptIndex < maxAttempts-1) await wait(220);
   }
-  return null;
+  return {
+    ...(lastResult || {
+      requestedPath:SNAPSHOT_PATHS.BOOK_SCENE_V1,
+      executedPath:null,
+      result:'failure',
+      reason:'no-attempt',
+      fallbackUsed:false,
+      dataUrl:null
+    }),
+    attempts:mergedAttempts
+  };
+}
+
+async function captureSceneFrame(frame){
+  const liveIframe = frame?.querySelector('iframe');
+  if(!liveIframe){
+    return {
+      requestedPath:SNAPSHOT_PATHS.BOOK_SCENE_V1,
+      executedPath:null,
+      result:'failure',
+      reason:'live-iframe-unavailable',
+      fallbackUsed:false,
+      attempts:[],
+      dataUrl:null
+    };
+  }
+  await waitForIframeLoad(liveIframe);
+  return captureIframeWithRetry(liveIframe, {
+    attempts:2,
+    timeoutMs:4800
+  });
 }
 let printSnapshotsPrepared = false;
 let printFlowRunning = false;
 let bookData = null;
 
-function cleanupPrintSnapshots(){
+function clearPrintSnapshots(){
   document.querySelectorAll('.print-scene-snapshot').forEach(img=>img.remove());
   document.querySelectorAll('.media-frame.print-ready').forEach(el=>el.classList.remove('print-ready'));
-  cleanupPrintSandbox();
   printSnapshotsPrepared = false;
+}
+function cleanupPrintSnapshots(){
+  clearPrintSnapshots();
   printFlowRunning = false;
 }
-async function preparePrintSnapshots(force=false){
-  if(printSnapshotsPrepared && !force) return 0;
-  cleanupPrintSnapshots();
+async function preparePrintSnapshots(forceOrOptions=false){
+  const force = forceOrOptions && typeof forceOrOptions === 'object'
+    ? forceOrOptions.force !== false
+    : Boolean(forceOrOptions);
+  const requestedPath = SNAPSHOT_PATHS.BOOK_SCENE_V1;
+  if(printSnapshotsPrepared && !force){
+    return lastSnapshotReport.successes;
+  }
+  clearPrintSnapshots();
   await waitForFigureImages();
 
   const frames = Array.from(document.querySelectorAll('.media-frame.scene-frame'));
   let readyCount = 0;
+  const sceneReports = [];
 
-  for(const frame of frames){
+  for(let sceneIndex=0; sceneIndex<frames.length; sceneIndex++){
+    const frame = frames[sceneIndex];
     const liveIframe = frame.querySelector('iframe');
     if(!liveIframe) continue;
 
-    let dataUrl = await requestIframePrintSnapshotWithRetry(liveIframe, 5);
-    if(!dataUrl){
-      dataUrl = await buildSceneSnapshotFromClone(liveIframe.src || normalizeAppSrc(liveIframe.getAttribute('src') || ''), frame);
-    }
-    if(!dataUrl) continue;
+    const capture = await captureSceneFrame(frame);
+    const exactPath = capture.executedPath === requestedPath;
+    const sceneReport = {
+      sceneIndex:sceneIndex+1,
+      source:liveIframe.getAttribute('src') || '',
+      requestedPath,
+      executedPath:capture.executedPath,
+      attempts:capture.attempts,
+      result:capture.result,
+      fallbackUsed:Boolean(capture.fallbackUsed),
+      pass:capture.result === 'success' && exactPath
+    };
+    sceneReports.push(sceneReport);
+    if(!capture.dataUrl) continue;
 
     const img = document.createElement('img');
     img.className = 'print-scene-snapshot';
     img.alt = 'Στιγμιότυπο σκηνής';
-    img.src = dataUrl;
+    img.src = capture.dataUrl;
     frame.appendChild(img);
     await waitForImage(img);
     frame.classList.add('print-ready');
@@ -672,17 +630,44 @@ async function preparePrintSnapshots(force=false){
   }
 
   await wait(120);
-  printSnapshotsPrepared = true;
+  const byExecutedPath = {};
+  sceneReports.forEach(scene=>{
+    const key = scene.executedPath || 'none';
+    byExecutedPath[key] = (byExecutedPath[key] || 0) + 1;
+  });
+  const mismatches = sceneReports.filter(scene=>!scene.pass).length;
+  const fallbacksUsed = sceneReports.filter(scene=>scene.fallbackUsed).length;
+  lastSnapshotReport = {
+    generatedAt:new Date().toISOString(),
+    requestedPath,
+    expectedPath:SNAPSHOT_PATHS.BOOK_SCENE_V1,
+    fallbacksDisabled:true,
+    scenes:frames.length,
+    successes:readyCount,
+    failures:frames.length-readyCount,
+    mismatches,
+    fallbacksUsed,
+    byExecutedPath,
+    sceneReports,
+    pass:readyCount === frames.length && mismatches === 0 && fallbacksUsed === 0
+  };
+  printSnapshotsPrepared = lastSnapshotReport.pass;
   return readyCount;
 }
 window.BOOK_PRINT_DIAGNOSTICS = Object.freeze({
   prepare: (force=true)=>preparePrintSnapshots(force),
+  runCanonical: async ()=>{
+    await preparePrintSnapshots({ force:true });
+    return lastSnapshotReport;
+  },
+  paths: ()=>[...BookSnapshotTransport.SUPPORTED_PATHS],
   cleanup: cleanupPrintSnapshots,
   status: ()=>({
     pages: document.querySelectorAll('.sheet-wrap').length,
     scenes: document.querySelectorAll('.media-frame.scene-frame').length,
     preparedSnapshots: document.querySelectorAll('.media-frame.scene-frame.print-ready .print-scene-snapshot').length,
-    ready: printSnapshotsPrepared
+    ready: printSnapshotsPrepared,
+    lastReport:lastSnapshotReport
   })
 });
 async function beginPrintFlow(){
@@ -691,8 +676,14 @@ async function beginPrintFlow(){
   setStatus('Ετοιμάζονται στατικά στιγμιότυπα για την εκτύπωση…');
   try{
     await preparePrintSnapshots(true);
+    if(!lastSnapshotReport?.pass){
+      throw new Error('Το book-scene-v1 δεν παρήγαγε όλα τα στιγμιότυπα.');
+    }
   }catch(err){
     console.warn(err);
+    printFlowRunning = false;
+    setStatus('Η εκτύπωση σταμάτησε: απέτυχε το book-scene-v1.');
+    return;
   }
   setStatus('');
   window.print();

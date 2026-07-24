@@ -11,7 +11,7 @@ h1{margin:0 0 4px;font-size:21px}p{margin:0;color:var(--muted)}.tools{display:fl
 button,a.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #9aa8b5;border-radius:9px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;font:700 14px/1.2 system-ui;text-decoration:none}
 button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button:disabled{opacity:.55;cursor:wait}
 .badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-weight:800}.wait{background:#edf1f4;color:#52616d}.ok{background:#e6f5ee;color:var(--ok)}.bad{background:#fdebea;color:var(--bad)}
-main{padding:16px;max-width:1400px;margin:auto}.checks{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+main{padding:16px;max-width:1400px;margin:auto}.checks{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:10px;margin-bottom:16px}
 .check{padding:13px;background:#fff;border:1px solid var(--line);border-radius:12px}.check span{display:block;color:var(--muted);font-size:12px}.check b{display:block;margin-top:4px;font-size:20px}.check.good b{color:var(--ok)}.check.problem b{color:var(--bad)}
 .note{padding:13px 15px;border:1px solid #bed7e6;border-radius:12px;background:#eef8fd;color:#244d64;margin-bottom:16px}
 iframe{display:block;width:100%;height:760px;border:1px solid var(--line);border-radius:14px;background:#ece6d9}
@@ -21,8 +21,8 @@ iframe{display:block;width:100%;height:760px;border:1px solid var(--line);border
 <header><h1>Έλεγχος εκτύπωσης / PDF</h1><p>Ελέγχει τον νέο κοινό renderer πριν ανοίξει το παράθυρο εκτύπωσης.</p>
 <div class="tools"><button class="primary" id="runBtn">Έλεγχος και προετοιμασία</button><button id="printBtn" disabled>Εκτύπωση / Αποθήκευση PDF</button><a class="button" href="compare.html">Πίσω στη σύγκριση</a><span id="status" class="badge wait">Αναμονή φόρτωσης</span></div></header>
 <main><section class="checks">
-<article class="check" id="pages"><span>Σελίδες</span><b>—</b></article><article class="check" id="size"><span>Μέγεθος φύλλου</span><b>—</b></article><article class="check" id="breaks"><span>Αλλαγές σελίδας</span><b>—</b></article><article class="check" id="scenes"><span>Ζωντανές σκηνές</span><b>—</b></article><article class="check" id="shots"><span>Στιγμιότυπα εκτύπωσης</span><b>—</b></article>
-</section><div class="note">Όταν όλα γίνουν πράσινα, πάτησε <b>«Εκτύπωση / Αποθήκευση PDF»</b>. Στο παράθυρο του Chrome διάλεξε <b>Αποθήκευση ως PDF</b>, χαρτί <b>A4</b>, κλίμακα <b>100%</b>, περιθώρια <b>Κανένα</b> και ενεργά <b>Γραφικά φόντου</b>.</div>
+<article class="check" id="pages"><span>Σελίδες</span><b>—</b></article><article class="check" id="size"><span>Μέγεθος φύλλου</span><b>—</b></article><article class="check" id="breaks"><span>Αλλαγές σελίδας</span><b>—</b></article><article class="check" id="scenes"><span>Ζωντανές σκηνές</span><b>—</b></article><article class="check" id="shots"><span>Στιγμιότυπα εκτύπωσης</span><b>—</b></article><article class="check" id="path"><span>Πραγματικό execution path</span><b>—</b></article>
+</section><div class="note">Το PDF ενεργοποιείται μόνο αν και οι 10 σκηνές εκτελέσουν το κύριο <b>book-scene-v1</b> με <b>0 fallbacks</b>. Έπειτα, στο παράθυρο του Chrome διάλεξε <b>Αποθήκευση ως PDF</b>, χαρτί <b>A4</b>, κλίμακα <b>100%</b>, περιθώρια <b>Κανένα</b> και ενεργά <b>Γραφικά φόντου</b>.</div>
 <iframe id="bookFrame" src="index.html" title="Νέο βιβλίο για έλεγχο εκτύπωσης"></iframe></main>
 <script>
 'use strict';
@@ -37,10 +37,11 @@ function hasPrintPageBreakRule(doc){function scan(rules){for(const rule of [...(
 async function run(){
  runBtn.disabled=true;printBtn.disabled=true;setStatus('Προετοιμασία στιγμιοτύπων…');
  try{const doc=await waitForBook(),pages=[...doc.querySelectorAll('.sheet-wrap')],first=pages[0].querySelector('.sheet').getBoundingClientRect(),width=pxToMm(first.width),height=pxToMm(first.height);
- const sizeOK=Math.abs(width-expected.widthMm)<.35&&Math.abs(height-expected.heightMm)<.35,breakOK=hasPrintPageBreakRule(doc),diag=frame.contentWindow.BOOK_PRINT_DIAGNOSTICS,readyCount=await diag.prepare(true),state=diag.status();
+ const sizeOK=Math.abs(width-expected.widthMm)<.35&&Math.abs(height-expected.heightMm)<.35,breakOK=hasPrintPageBreakRule(doc),diag=frame.contentWindow.BOOK_PRINT_DIAGNOSTICS,readyCount=await diag.prepare({force:true}),state=diag.status(),transport=state.lastReport;
  const pagesOK=state.pages===expected.pages,scenesOK=state.scenes===expected.scenes,shotsOK=readyCount===expected.scenes&&state.preparedSnapshots===expected.scenes;
- setCheck('pages',`${state.pages} / ${expected.pages}`,pagesOK);setCheck('size',`${width.toFixed(1)} × ${height.toFixed(1)} mm`,sizeOK);setCheck('breaks',breakOK?'28 χωριστά φύλλα':'Πρόβλημα',breakOK);setCheck('scenes',`${state.scenes} / ${expected.scenes}`,scenesOK);setCheck('shots',`${state.preparedSnapshots} / ${expected.scenes}`,shotsOK);
- const pass=pagesOK&&sizeOK&&breakOK&&scenesOK&&shotsOK;window.__PRINT_REGRESSION_REPORT__={generatedAt:new Date().toISOString(),pass,pages:state.pages,sizeMm:{width,height},pageBreaks:breakOK,scenes:state.scenes,preparedSnapshots:state.preparedSnapshots};setStatus(pass?'Έτοιμο για PDF':'Βρέθηκε πρόβλημα',pass?'ok':'bad');printBtn.disabled=!pass
+ const primaryCount=transport?.byExecutedPath?.['book-scene-v1']||0,pathOK=primaryCount===expected.scenes&&transport?.fallbacksUsed===0&&transport?.mismatches===0;
+ setCheck('pages',`${state.pages} / ${expected.pages}`,pagesOK);setCheck('size',`${width.toFixed(1)} × ${height.toFixed(1)} mm`,sizeOK);setCheck('breaks',breakOK?'28 χωριστά φύλλα':'Πρόβλημα',breakOK);setCheck('scenes',`${state.scenes} / ${expected.scenes}`,scenesOK);setCheck('shots',`${state.preparedSnapshots} / ${expected.scenes}`,shotsOK);setCheck('path',pathOK?`${primaryCount}/10 · 0 fallback`:`${primaryCount}/10 · ${transport?.fallbacksUsed??'—'} fallback`,pathOK);
+ const pass=pagesOK&&sizeOK&&breakOK&&scenesOK&&shotsOK&&pathOK;window.__PRINT_REGRESSION_REPORT__={generatedAt:new Date().toISOString(),pass,pages:state.pages,sizeMm:{width,height},pageBreaks:breakOK,scenes:state.scenes,preparedSnapshots:state.preparedSnapshots,transport};setStatus(pass?'Έτοιμο για PDF · book-scene-v1':'Βρέθηκε πρόβλημα',pass?'ok':'bad');printBtn.disabled=!pass
  }catch(error){console.error(error);setStatus('Αποτυχία ελέγχου','bad')}finally{runBtn.disabled=false}}
 printBtn.addEventListener('click',()=>frame.contentWindow.print());runBtn.addEventListener('click',run);frame.addEventListener('load',()=>setTimeout(run,300));
 </script></body></html>

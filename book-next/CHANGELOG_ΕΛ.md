@@ -17,3 +17,23 @@
   μεταβολή.
 - Καταγράφηκε ότι το δοκιμασμένο print path χρησιμοποιεί ακόμη το άμεσο
   `window.getBookPrintSnapshot()` και όχι το ουδέτερο `book-scene-v1`.
+
+## Diagnostic candidate — forced snapshot paths — 2026-07-24
+
+- Καταργήθηκε η ταυτόχρονη αποστολή νέου και legacy snapshot message.
+- Το `book-scene-v1` έγινε το πρώτο, σειριακό production candidate.
+- Προστέθηκε forced-path probe για έξι απομονωμένες διαδρομές σε 10 σκηνές.
+- Ο έλεγχος PDF αποτυγχάνει αν χρησιμοποιηθεί έστω και ένα fallback.
+- Ο πραγματικός browser έλεγχος πέρασε 6/6 paths και η εκτύπωση πέρασε
+  10/10 από `book-scene-v1` με μηδέν fallback.
+
+## Diagnostic candidate — canonical transport cutover — 2026-07-24
+
+- Αφαιρέθηκαν οι κλάδοι `book-scene-direct`, `window-direct`,
+  `em-wave-direct`, `hm-print-snapshot` και `degraded-clone`.
+- Αφαιρέθηκαν από τις εφαρμογές τα `window.getBookPrintSnapshot()`,
+  `EMWaveApp.getPrintSnapshot()` και το legacy message handler.
+- Το `BookScene.getPrintSnapshot()` παραμένει μόνο ως ο μοναδικός παραγωγός
+  μέσα στη σκηνή· ο reader επικοινωνεί αποκλειστικά με `book-scene-v1`.
+- Η εκτύπωση σταματά αν αποτύχει το canonical transport.
+- Ο νέος έλεγχος απαιτεί `1/1 path · 0 legacy hooks`.

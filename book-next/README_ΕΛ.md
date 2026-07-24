@@ -120,7 +120,17 @@ http://localhost:8000/book-next/compare.html
 legacy cleanup με ανοχή 0 px και δεν βρέθηκε μη εγκεκριμένη διαφορά. Το τελικό
 PDF πέρασε με 28 πραγματικές σελίδες A4 και 10/10 στιγμιότυπα σκηνών.
 
-Το δοκιμασμένο print path χρησιμοποίησε και στις 10 σκηνές το άμεσο same-origin
-`window.getBookPrintSnapshot()`. Η πλήρης μετάβαση των εφαρμογών στο ουδέτερο
-`BookScene` / `book-scene-v1` παραμένει επόμενος σταθμός πριν αποσπαστεί ο
-Συγγραφέας ως ανεξάρτητη εφαρμογή.
+Το πρώτο δοκιμασμένο print path χρησιμοποίησε και στις 10 σκηνές το παλιό
+same-origin `window.getBookPrintSnapshot()`. Ακολούθησε forced-path probe:
+πέρασαν χωριστά και οι έξι τότε διαθέσιμοι δρόμοι και η κανονική εκτύπωση
+πέρασε 10/10 από `book-scene-v1` με μηδέν fallback.
+
+Μετά από αυτή την απόδειξη αφαιρέθηκαν όλοι οι compatibility κλάδοι. Ο reader
+χρησιμοποιεί μόνο `book-scene-v1`. Οι εφαρμογές εκθέτουν μόνο το ουδέτερο
+`BookScene.getPrintSnapshot()` ως εσωτερικό παραγωγό για τον message handler.
+Δεν υπάρχουν άμεσο window API, app-specific snapshot API, legacy message ή
+κρυφό clone. Αν το canonical transport αποτύχει, η εκτύπωση σταματά.
+
+Το νέο diagnostic gate απαιτεί `1/1 path · 0 legacy hooks` και ο έλεγχος
+εκτύπωσης απαιτεί `10/10 · 0 fallback`. Η αποκοπή παραμένει diagnostic candidate
+μέχρι να περάσουν ξανά αυτά τα δύο κριτήρια στον πραγματικό browser.

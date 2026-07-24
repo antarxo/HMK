@@ -1,6 +1,6 @@
 {
   "date": "2026-07-24",
-  "type": "diagnostic-only / integration probe",
+  "type": "diagnostic-only / canonical transport cutover",
   "fixture": "chapter_content.json",
   "legacyRenderer": "legacy-baseline.html",
   "currentRenderer": "index.html + book-core.js + book-core.css",
@@ -32,7 +32,7 @@
     "rendererVersion": "0.1.0",
     "javascriptErrors": 0
   },
-  "printComparison": {
+  "printComparisonBeforeCanonicalCutover": {
     "pass": true,
     "pages": 28,
     "paper": "A4",
@@ -41,16 +41,36 @@
     "fontsEmbedded": true,
     "browserHeadersAndFooters": false
   },
-  "sceneSnapshotProtocolAudit": {
-    "directWindowGetBookPrintSnapshot": 10,
-    "bookSceneApi": 0,
-    "bookSceneV1Message": 0,
-    "legacyHmPrintSnapshotMessage": 0,
-    "cloneFallback": 0
+  "forcedPathProbeBeforeRemoval": {
+    "status": "passed-in-user-browser",
+    "pathsPassed": 6,
+    "requiredSnapshotsPerPath": 10,
+    "fallbacks": 0,
+    "primaryPrintPath": "book-scene-v1"
+  },
+  "canonicalCutoverCandidate": {
+    "status": "code-validated-awaiting-browser-execution",
+    "onlyProductionPath": "book-scene-v1",
+    "activeLegacyHooks": 0,
+    "removedPaths": [
+      "book-scene-direct",
+      "window-direct",
+      "em-wave-direct",
+      "hm-print-snapshot",
+      "degraded-clone"
+    ],
+    "unitTestsPassed": 6,
+    "requiredBrowserGate": "1/1 path · 0 legacy hooks",
+    "requiredPrintGate": "10/10 · 0 fallback"
   },
   "legacyCleanup": {
     "duplicateEditorCssRemovedLines": 165,
     "postCleanupRegressionPass": true
   },
-  "note": "Η γεωμετρία ελέγχθηκε στον πραγματικό Chrome και το τελικό PDF αποδόθηκε και επιθεωρήθηκε σε όλες τις 28 σελίδες."
+  "knownPreexistingVisualDefect": {
+    "page": 28,
+    "samePixelsAcrossThreePdfVersions": true,
+    "transportRegression": false
+  },
+  "note": "Το legacy-baseline.html παραμένει μόνο ως παγωμένο fixture γεωμετρικής σύγκρισης και δεν συμμετέχει στην εκτύπωση."
 }

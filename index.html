@@ -4047,7 +4047,7 @@ async function stabilizeBookPrintScene(){
     if(enough && exact) break;
   }
 }
-async function getBookPrintSnapshot(){
+const captureBookSceneSnapshot = async ()=>{
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
   await stabilizeBookPrintScene();
@@ -4062,8 +4062,11 @@ async function getBookPrintSnapshot(){
   const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:#ffffff;">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-window.getBookPrintSnapshot = getBookPrintSnapshot;
+};
+window.BookScene = Object.freeze({
+  protocol:'book-scene-v1',
+  getPrintSnapshot:captureBookSceneSnapshot
+});
 window.EMWaveApp = {
   scenes: () => Object.keys(SCENES),
   focuses: () => Object.keys(FOCUS_PRESETS),
@@ -4075,8 +4078,7 @@ window.EMWaveApp = {
   play: () => setPlayingState(true),
   pause: () => setPlayingState(false),
   reset: () => { phaseU = getBookSceneStartPhase(); syncPhase(); setPlayingState(false); return getExternalState(); },
-  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); },
-  getPrintSnapshot: () => getBookPrintSnapshot()
+  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); }
 };
 window.addEventListener('message', (event) => {
   const data = event.data;
@@ -4094,9 +4096,20 @@ window.addEventListener('message', (event) => {
     case 'setRegion':
       if(data.region) window.EMWaveApp.setRegion(data.region, data.overrides || {});
       break;
-    case 'capturePrintSnapshot':
-      Promise.resolve(getBookPrintSnapshot()).then((dataUrl) => {
-        try{ if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*'); }catch(_e){}
+    case 'book-scene:capture-print-snapshot':
+      if(data.protocol !== 'book-scene-v1') break;
+      Promise.resolve(window.BookScene.getPrintSnapshot()).then((dataUrl) => {
+        try{
+          if(event.source && typeof event.source.postMessage === 'function'){
+            event.source.postMessage({
+              type:'book-scene:print-snapshot',
+              protocol:'book-scene-v1',
+              requestId:data.requestId,
+              executedPath:'book-scene-v1',
+              dataUrl
+            }, '*');
+          }
+        }catch(_e){}
       });
       break;
     case 'play':

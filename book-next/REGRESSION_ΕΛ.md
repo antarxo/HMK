@@ -85,6 +85,42 @@ same-origin `window.getBookPrintSnapshot()`. Το `BookScene`, το μήνυμα
 `book-scene-v1`, το legacy `hm_print_snapshot` και το clone fallback παρέμειναν
 ανενεργές εφεδρείες σε αυτή τη διαδρομή.
 
+## Forced-path transport probe — πέρασε
+
+Το `snapshot-path-check.html` ελέγχει χωριστά τα `book-scene-v1`,
+`book-scene-direct`, `window-direct`, `em-wave-direct`, `hm-print-snapshot` και
+`degraded-clone`. Για κάθε path απαιτεί:
+
+- 10/10 επιτυχημένα snapshots,
+- μηδέν fallbacks,
+- μηδέν mismatches,
+- ίδιο requested, expected και executed path.
+
+Ο πραγματικός browser έλεγχος πέρασε 6/6 paths. Η κανονική εκτύπωση εκτέλεσε
+`book-scene-v1` και στις 10 σκηνές με μηδέν fallback.
+
+## Canonical transport cutover — εκκρεμεί επανέλεγχος browser
+
+Μετά την παραπάνω απόδειξη αφαιρέθηκαν από τον ενεργό κώδικα:
+
+- `book-scene-direct`,
+- `window-direct`,
+- `em-wave-direct`,
+- `hm-print-snapshot`,
+- `degraded-clone`.
+
+Ο νέος έλεγχος δεν ζητά πια να περάσουν οι παλιοί δρόμοι. Απαιτεί:
+
+- 10/10 από το μοναδικό `book-scene-v1`,
+- μηδέν compatibility global APIs,
+- μηδέν απαντήσεις στο legacy message,
+- απουσία clone engine,
+- διακοπή της εκτύπωσης αν αποτύχει το canonical transport.
+
+Η σελίδα 28 έχει προϋπάρχουσα επικάλυψη μέσα στο τελικό γράφημα. Η ίδια περιοχή
+ήταν pixel-identical και στα τρία διαδοχικά PDF, άρα δεν είναι regression του
+transport ή του cleanup.
+
 ## Τι απαιτεί οπτικό έλεγχο
 
 - πραγματική εμφάνιση των 10 ζωντανών σκηνών,
