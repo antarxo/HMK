@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canonical snapshot gate</title>
+<style>
+:root{color-scheme:light;--ink:#17212b;--muted:#5d6b78;--line:#d7dee5;--paper:#fff;--ok:#16734a;--bad:#b42318;--blue:#175f8c}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f7;color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:18px}
+h1{font-size:22px;margin:0 0 5px}p{margin:0;color:var(--muted)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:13px}
+button,a.button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #9aa8b5;border-radius:9px;background:#fff;color:var(--ink);padding:9px 13px;cursor:pointer;font:700 14px/1.2 system-ui;text-decoration:none}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button:disabled{opacity:.55;cursor:wait}
+.badge{display:inline-flex;border-radius:999px;padding:6px 10px;font-weight:800}.wait{background:#edf1f4;color:#52616d}.ok{background:#e6f5ee;color:var(--ok)}.bad{background:#fdebea;color:var(--bad)}
+main{padding:16px;max-width:1400px;margin:auto}.note{padding:13px 15px;border:1px solid #bed7e6;border-radius:12px;background:#eef8fd;color:#244d64;margin-bottom:16px}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:16px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--muted);background:#f8fafb}tr:last-child td{border-bottom:0}
+td code{font-size:12px}.result{font-weight:800}.result.good{color:var(--ok)}.result.problem{color:var(--bad)}
+iframe{display:block;width:100%;height:720px;border:1px solid var(--line);border-radius:14px;background:#ece6d9}
+@media(max-width:850px){iframe{height:600px}th,td{padding:9px 8px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Canonical snapshot gate</h1>
+  <p>Ένα production transport: <code>book-scene-v1</code>. Καμία εφεδρική διαδρομή.</p>
+  <div class="tools">
+    <button class="primary" id="runBtn">Εκτέλεση ελέγχου</button>
+    <a class="button" href="print-check.html">Έλεγχος εκτύπωσης</a>
+    <span id="status" class="badge wait">Αναμονή φόρτωσης</span>
+  </div>
+</header>
+<main>
+  <div class="note"><b>Αυστηρό κριτήριο:</b> 10/10 στιγμιότυπα από <code>book-scene-v1</code>, μηδέν fallback, απουσία παλιών global APIs, καμία απάντηση στο legacy message και απουσία clone engine.</div>
+  <table>
+    <thead><tr><th>Έλεγχος</th><th>Αποτέλεσμα</th><th>Απόδειξη</th></tr></thead>
+    <tbody>
+      <tr><td><code>book-scene-v1</code></td><td class="result" id="canonicalResult">Αναμονή</td><td id="canonicalEvidence">—</td></tr>
+      <tr><td>Παλιές global θύρες</td><td class="result" id="globalsResult">Αναμονή</td><td id="globalsEvidence">—</td></tr>
+      <tr><td>Legacy message</td><td class="result" id="messageResult">Αναμονή</td><td id="messageEvidence">—</td></tr>
+      <tr><td>Clone engine</td><td class="result" id="cloneResult">Αναμονή</td><td id="cloneEvidence">—</td></tr>
+    </tbody>
+  </table>
+  <iframe id="bookFrame" src="index.html" title="Βιβλίο για έλεγχο της μοναδικής snapshot διαδρομής"></iframe>
+</main>
+<script>
+'use strict';
+const frame=document.getElementById('bookFrame');
+const runBtn=document.getElementById('runBtn');
+const statusEl=document.getElementById('status');
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function setStatus(text,kind='wait'){statusEl.textContent=text;statusEl.className=`badge ${kind}`}
+function setResult(id,text,pass,evidence){
+  const result=document.getElementById(`${id}Result`);
+  result.textContent=text;
+  result.className=`result ${pass?'good':'problem'}`;
+  document.getElementById(`${id}Evidence`).textContent=evidence;
+}
+async function waitForBook(){
+  const deadline=Date.now()+30000;
+  while(Date.now()<deadline){
+    const doc=frame.contentDocument;
+    const diag=frame.contentWindow?.BOOK_PRINT_DIAGNOSTICS;
+    const scenes=[...(doc?.querySelectorAll('.media-frame.scene-frame iframe')||[])];
+    if(scenes.length===10&&diag){
+      try{await doc.fonts?.ready}catch(_error){}
+      await Promise.all(scenes.map(scene=>new Promise(resolve=>{
+        if(scene.contentDocument?.readyState==='complete'){resolve();return}
+        scene.addEventListener('load',resolve,{once:true});
+        setTimeout(resolve,8000);
+      })));
+      await wait(400);
+      return {diag,doc,scenes};
+    }
+    await wait(100);
+  }
+  throw new Error('Το βιβλίο δεν ολοκλήρωσε τη φόρτωση.');
+}
+function inspectGlobalHooks(scenes){
+  return scenes.map((scene,index)=>{
+    const win=scene.contentWindow;
+    const canonical=typeof win?.BookScene?.getPrintSnapshot==='function'
+      && win.BookScene.protocol==='book-scene-v1';
+    const oldWindow=typeof win?.getBookPrintSnapshot==='function';
+    const oldEm=typeof win?.EMWaveApp?.getPrintSnapshot==='function';
+    const oldElectrostatic=typeof win?.ElectrostaticFieldApp?.getPrintSnapshot==='function';
+    return {scene:index+1,canonical,oldWindow,oldEm,oldElectrostatic};
+  });
+}
+function probeLegacyMessage(scene){
+  return new Promise(resolve=>{
+    const requestId=`removed_legacy_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    let answered=false;
+    const onMessage=event=>{
+      if(event.source!==scene.contentWindow) return;
+      if(event.data?.requestId!==requestId) return;
+      if(event.data?.type!=='hm_print_snapshot') return;
+      answered=true;
+    };
+    window.addEventListener('message',onMessage);
+    try{scene.contentWindow.postMessage({type:'capturePrintSnapshot',requestId},'*')}catch(_error){}
+    setTimeout(()=>{
+      window.removeEventListener('message',onMessage);
+      resolve(!answered);
+    },350);
+  });
+}
+async function run(){
+  runBtn.disabled=true;
+  setStatus('Ελέγχεται ο μοναδικός δρόμος…');
+  try{
+    const {diag,doc,scenes}=await waitForBook();
+    const report=await diag.runCanonical();
+    const canonicalCount=report?.byExecutedPath?.['book-scene-v1']||0;
+    const canonicalPass=Boolean(report?.pass&&report?.successes===10
+      &&report?.failures===0&&report?.mismatches===0&&report?.fallbacksUsed===0
+      &&canonicalCount===10);
+    setResult('canonical',canonicalPass?'10/10 · PASS':'FAIL',canonicalPass,
+      `${canonicalCount}/10 · ${report?.fallbacksUsed??'—'} fallback`);
+
+    const globals=inspectGlobalHooks(scenes);
+    const globalsPass=globals.length===10&&globals.every(item=>item.canonical
+      &&!item.oldWindow&&!item.oldEm&&!item.oldElectrostatic);
+    const legacyGlobalCount=globals.filter(item=>item.oldWindow||item.oldEm||item.oldElectrostatic).length;
+    setResult('globals',globalsPass?'0/10 · PASS':'FAIL',globalsPass,
+      `${legacyGlobalCount} σκηνές με παλιό snapshot API`);
+
+    const legacySilence=await Promise.all(scenes.map(probeLegacyMessage));
+    const silentCount=legacySilence.filter(Boolean).length;
+    const messagePass=silentCount===10;
+    setResult('message',messagePass?'10/10 σιωπηλές · PASS':'FAIL',messagePass,
+      `${10-silentCount} legacy απαντήσεις`);
+
+    const clonePass=!doc.getElementById('printSandbox')
+      &&typeof frame.contentWindow?.buildSceneSnapshotFromClone!=='function';
+    setResult('clone',clonePass?'Απουσιάζει · PASS':'FAIL',clonePass,
+      clonePass?'Δεν υπάρχει κρυφό iframe/clone path':'Βρέθηκε clone engine');
+
+    const pass=canonicalPass&&globalsPass&&messagePass&&clonePass;
+    window.__SNAPSHOT_PATH_PROBE_REPORT__={
+      generatedAt:new Date().toISOString(),
+      type:'model checkpoint / canonical transport cutover',
+      pass,
+      canonicalPath:'book-scene-v1',
+      canonicalReport:report,
+      globalHookAudit:globals,
+      legacyMessageSilent:legacySilence,
+      cloneEngineAbsent:clonePass
+    };
+    setStatus(pass?'1/1 path · 0 legacy hooks':'Βρέθηκε παλιός ή σπασμένος κλάδος',pass?'ok':'bad');
+  }catch(error){
+    console.error(error);
+    window.__SNAPSHOT_PATH_PROBE_REPORT__={
+      generatedAt:new Date().toISOString(),
+      type:'model checkpoint / canonical transport cutover',
+      pass:false,
+      error:String(error?.message||error)
+    };
+    setStatus('Αποτυχία ελέγχου','bad');
+  }finally{
+    runBtn.disabled=false;
+  }
+}
+runBtn.addEventListener('click',run);
+frame.addEventListener('load',()=>setTimeout(run,500),{once:true});
+</script>
+</body>
+</html>
