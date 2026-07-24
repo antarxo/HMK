@@ -1,5 +1,5 @@
 {
-  "date": "2026-07-23",
+  "date": "2026-07-24",
   "type": "diagnostic-only / integration probe",
   "fixture": "chapter_content.json",
   "legacyRenderer": "legacy-baseline.html",
@@ -13,6 +13,13 @@
     "scenesLegacy": 10,
     "scenesCurrent": 10,
     "failedPages": [],
+    "tolerancePx": 0,
+    "maximumApprovedDeltaPx": 2.99,
+    "approvedDifference": {
+      "page": 19,
+      "id": "page-appendix-4",
+      "reason": "Σωστή σημασιολογική απόδοση του t₁ αντί του κυριολεκτικού legacy HTML tag."
+    },
     "javascriptErrors": 0
   },
   "editorComparison": {
@@ -25,11 +32,25 @@
     "rendererVersion": "0.1.0",
     "javascriptErrors": 0
   },
-  "notValidated": {
-    "chromiumPixelGeometry": true,
-    "printCssInRealBrowser": true,
-    "pdfPageBreaks": true,
-    "liveSceneSnapshots": true
+  "printComparison": {
+    "pass": true,
+    "pages": 28,
+    "paper": "A4",
+    "sceneSnapshotsPrepared": 10,
+    "sceneSnapshotsExpected": 10,
+    "fontsEmbedded": true,
+    "browserHeadersAndFooters": false
   },
-  "note": "Το περιβάλλον διέθετε Playwright αλλά όχι Chromium binary και το CDN λήψης ήταν αποκλεισμένο. Το compare.html εκτελεί τις πραγματικές μετρήσεις στον τοπικό browser."
+  "sceneSnapshotProtocolAudit": {
+    "directWindowGetBookPrintSnapshot": 10,
+    "bookSceneApi": 0,
+    "bookSceneV1Message": 0,
+    "legacyHmPrintSnapshotMessage": 0,
+    "cloneFallback": 0
+  },
+  "legacyCleanup": {
+    "duplicateEditorCssRemovedLines": 165,
+    "postCleanupRegressionPass": true
+  },
+  "note": "Η γεωμετρία ελέγχθηκε στον πραγματικό Chrome και το τελικό PDF αποδόθηκε και επιθεωρήθηκε σε όλες τις 28 σελίδες."
 }
