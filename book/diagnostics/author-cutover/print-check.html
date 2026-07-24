@@ -23,7 +23,7 @@ iframe{display:block;width:100%;height:760px;border:1px solid var(--line);border
 <main><section class="checks">
 <article class="check" id="pages"><span>Σελίδες</span><b>—</b></article><article class="check" id="size"><span>Μέγεθος φύλλου</span><b>—</b></article><article class="check" id="breaks"><span>Αλλαγές σελίδας</span><b>—</b></article><article class="check" id="scenes"><span>Ζωντανές σκηνές</span><b>—</b></article><article class="check" id="shots"><span>Στιγμιότυπα εκτύπωσης</span><b>—</b></article><article class="check" id="path"><span>Πραγματικό execution path</span><b>—</b></article>
 </section><div class="note">Το PDF ενεργοποιείται μόνο αν και οι 10 σκηνές εκτελέσουν το κύριο <b>book-scene-v1</b> με <b>0 fallbacks</b>. Έπειτα, στο παράθυρο του Chrome διάλεξε <b>Αποθήκευση ως PDF</b>, χαρτί <b>A4</b>, κλίμακα <b>100%</b>, περιθώρια <b>Κανένα</b> και ενεργά <b>Γραφικά φόντου</b>.</div>
-<iframe id="bookFrame" src="index.html" title="Νέο βιβλίο για έλεγχο εκτύπωσης"></iframe></main>
+<iframe id="bookFrame" src="../../../author/index.html?book=../book/chapter_content.json" title="Νέο βιβλίο για έλεγχο εκτύπωσης"></iframe></main>
 <script>
 'use strict';
 const frame=document.getElementById('bookFrame'),runBtn=document.getElementById('runBtn'),printBtn=document.getElementById('printBtn'),statusEl=document.getElementById('status');

@@ -380,7 +380,8 @@ const printSandbox=document.getElementById('printSandbox');
 const langElBtn=document.getElementById('langElBtn');
 const langEnBtn=document.getElementById('langEnBtn');
 let printPageStyleEl = null;
-const JSON_CANDIDATES=['chapter_content.json'];
+const BOOK_URL='../../chapter_content.json';
+const BOOK_BASE_URL=new URL('../../', window.location.href);
 let contentLang = localStorage.getItem('hmkContentLang') || 'el';
 function locKey(key){ return contentLang === 'en' ? `${key}_en` : key; }
 function getLoc(obj,key,fallback=''){
@@ -445,7 +446,7 @@ function placementClass(item){
 }
 function withCacheBust(url){
   try{
-    const u=new URL(url, window.location.href);
+    const u=new URL(url, BOOK_BASE_URL);
     u.searchParams.set('_cb', String(Date.now()));
     return u.toString();
   }catch(_e){ return url; }
@@ -453,43 +454,12 @@ function withCacheBust(url){
 function normalizeAppSrc(url=''){
   const raw=String(url || '').trim();
   if(!raw) return raw;
-  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return raw;
-  const path=(window.location.pathname || '').replace(/\\/g,'/').toLowerCase();
-  // Diagnostic path adapter: book-next must resolve scenes exactly like book/.
-  const inBook=/\/book(?:-next)?(\/|$)/.test(path);
-  const appEntry=inBook ? '../index.html' : './index.html';
-  return raw
-    .replace(/^\.\.\/index_printmatch\.html/i, appEntry)
-    .replace(/^\.\.\/index\.html/i, appEntry)
-    .replace(/^\.\.\/app\/em_wave_app\.html/i, appEntry)
-    .replace(/^\.\//, './')
-    .replace(/\.\.\/index_printmatch\.html/g, appEntry)
-    .replace(/\.\.\/index\.html/g, appEntry)
-    .replace(/\.\.\/app\/em_wave_app\.html/g, appEntry);
+  try{return new URL(raw, BOOK_BASE_URL).toString();}catch(_e){return raw;}
 }
 function imageSrcCandidates(src=''){
   const raw=String(src||'').trim();
   if(!raw) return [];
-  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
-  const path=(window.location.pathname||'').replace(/\\/g,'/').toLowerCase();
-  // Diagnostic path adapter: book-next must resolve assets exactly like book/.
-  const inBook=/\/book(?:-next)?(\/|$)/.test(path);
-  const list=[];
-  const push=v=>{ if(v && !list.includes(v)) list.push(v); };
-  push(raw);
-  if(inBook){
-    if(raw.startsWith('images/')) push(`./${raw}`);
-    if(raw.startsWith('./images/')) push(raw.slice(2));
-    if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
-    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
-  }else{
-    if(raw.startsWith('images/')) push(`./book/${raw}`);
-    if(raw.startsWith('./images/')) push(`./book/${raw.slice(2)}`);
-    if(raw.startsWith('/images/')) push(`./book${raw}`);
-    if(raw.startsWith('book/images/')) push(`./${raw}`);
-    if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\//,'./'));
-  }
-  return list;
+  return [normalizeAppSrc(raw)];
 }
 function applyImageWithFallback(img, rawSrc=''){
   const candidates=imageSrcCandidates(rawSrc);
@@ -678,9 +648,7 @@ async function beginPrintFlow(){
   window.print();
 }
 function resolveAppHref(){
-  const path = (window.location.pathname || '').replace(/\\/g,'/');
-  if(/\/book(\/|$)/i.test(path)) return '../index.html';
-  return 'index.html';
+  return new URL('../index.html', BOOK_BASE_URL).toString();
 }
 window.addEventListener('beforeprint', ()=>{
   if(!printSnapshotsPrepared){
@@ -1273,17 +1241,9 @@ function updateActiveNav(){
 window.addEventListener('scroll', updateActiveNav, {passive:true});
 
 async function loadData(){
-  let lastErr=null;
-  for(const name of JSON_CANDIDATES){
-    try{
-      const res=await fetch(name, {cache:'no-store'});
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    }catch(err){
-      lastErr=err;
-    }
-  }
-  throw lastErr || new Error('Δεν βρέθηκε JSON');
+  const res=await fetch(BOOK_URL, {cache:'no-store'});
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
 }
 function fontPresetValue(key, fallback){
   const presets = {

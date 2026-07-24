@@ -37,3 +37,18 @@
   μέσα στη σκηνή· ο reader επικοινωνεί αποκλειστικά με `book-scene-v1`.
 - Η εκτύπωση σταματά αν αποτύχει το canonical transport.
 - Ο νέος έλεγχος απαιτεί `1/1 path · 0 legacy hooks`.
+
+## v0.2.0 integration candidate — shared author folder — 2026-07-24
+
+- Ο κοινός runtime μεταφέρθηκε από το προσωρινό `book-next/` στο μόνιμο
+  `author/`.
+- Το πραγματικό ΗΜ βιβλίο και τα assets του παραμένουν στο `book/`.
+- Ο reader και ο editor δέχονται πλέον ρητά
+  `?book=<διεύθυνση-json>`.
+- Εικόνες, σκηνές και `appHref` επιλύονται σε σχέση με το JSON του βιβλίου και
+  όχι σε σχέση με τον φάκελο του Συγγραφέα.
+- Τα `book/index.html` και `book/Editor.html` έγιναν λεπτοί launchers χωρίς
+  renderer.
+- Τα HMK-specific regression fixtures μεταφέρθηκαν έξω από τον κοινό runtime,
+  στο `book/diagnostics/author-cutover/`.
+- Δεν προστέθηκε δεύτερο transport ή fallback.

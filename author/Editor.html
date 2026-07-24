@@ -228,6 +228,11 @@
 'use strict';
 let data = null;
 let selection = null;
+const BOOK_QUERY_PARAM='book';
+const DEFAULT_BOOK_URL='../book/chapter_content.json';
+const initialParams=new URLSearchParams(window.location.search);
+let bookSourceUrl=null;
+let bookBaseUrl=new URL('.', window.location.href);
 
 const jsonInput = document.getElementById('jsonInput');
 const newBookBtn = document.getElementById('newBookBtn');
@@ -292,6 +297,8 @@ jsonInput.addEventListener('change', async e => {
   const file = e.target.files?.[0]; if(!file) return;
   const text = await file.text();
   try{
+    bookSourceUrl=null;
+    bookBaseUrl=new URL('.', window.location.href);
     const parsed = JSON.parse(text);
     data = normalizeData(parsed);
     selection = {kind:'meta'};
@@ -329,18 +336,41 @@ newBookBtn.addEventListener('click', ()=>{
   renderAll();
 });
 
-loadDefaultBtn.addEventListener('click', async ()=>{
+function configuredBookUrl(){
+  const raw=String(initialParams.get(BOOK_QUERY_PARAM) || DEFAULT_BOOK_URL).trim() || DEFAULT_BOOK_URL;
+  return new URL(raw, window.location.href);
+}
+function setBookSourceUrl(url){
+  bookSourceUrl=new URL(url, window.location.href);
+  bookBaseUrl=new URL('.', bookSourceUrl);
+}
+function resolveBookResource(url=''){
+  const raw=String(url || '').trim();
+  if(!raw || raw.startsWith('#')) return raw;
+  try{return new URL(raw, bookBaseUrl).toString();}catch(_e){return raw;}
+}
+async function loadConfiguredBook({alertOnFailure=false}={}){
   try{
-    const res = await fetch('chapter_content.json?ts='+Date.now());
+    const source=configuredBookUrl();
+    setBookSourceUrl(source);
+    const requestUrl=new URL(source);
+    requestUrl.searchParams.set('_ts', String(Date.now()));
+    const res = await fetch(requestUrl, {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const parsed = await res.json();
     data = normalizeData(parsed);
     selection = {kind:'meta'};
     renderAll();
+    return true;
   }catch(err){
-    alert('Το δείγμα δεν μπορεί να ανοίξει αυτόματα από file://. Επίλεξε το chapter_content.json από το πεδίο «Αρχείο βιβλίου».');
+    console.error(err);
+    if(alertOnFailure){
+      alert('Το βιβλίο δεν μπορεί να ανοίξει αυτόματα. Επίλεξε το JSON από το πεδίο «Αρχείο βιβλίου».');
+    }
+    return false;
   }
-});
+}
+loadDefaultBtn.addEventListener('click', ()=>loadConfiguredBook({alertOnFailure:true}));
 
 exportBtn.addEventListener('click', ()=>{
   if(!data) return;
@@ -363,23 +393,12 @@ function normalizeData(raw){
 function esc(s=''){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
 function normalizeEditorBookSrc(src=''){
-  const raw = String(src || '').trim();
-  // Editor.html και index.html του βιβλίου βρίσκονται και τα δύο μέσα στο /book/.
-  // Άρα τα relative paths πρέπει να ερμηνεύονται ακριβώς με τον ίδιο τρόπο και στα δύο.
-  // Δεν μεταφράζουμε πια ../index.html σε ./index.html ούτε images/... σε ./book/images/...
-  return raw;
+  return resolveBookResource(src);
 }
 function editorImageSrcCandidates(src=''){
   const raw=String(src||'').trim();
   if(!raw) return [];
-  if(/^https?:\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) return [raw];
-  const list=[]; const push=v=>{ if(v && !list.includes(v)) list.push(v); };
-  push(raw);
-  // Μικρά fallbacks μόνο για παλιά/λανθασμένα paths, χωρίς να αλλάζει το canonical path.
-  if(raw.startsWith('./book/images/')) push(raw.replace(/^\.\/book\//,'./'));
-  if(raw.startsWith('book/images/')) push(raw.replace(/^book\//,''));
-  if(raw.startsWith('../book/images/')) push(raw.replace(/^\.\.\/book\//,''));
-  return list;
+  return [resolveBookResource(raw)];
 }
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
 const COMMON_SETUP_BUTTONS = ['Εμφάνιση','Απόκρυψη','Ενεργό','Ανενεργό'];
@@ -2144,6 +2163,7 @@ function renderStandaloneItem(item){
   });
 }
 
+loadConfiguredBook();
 </script>
 </body>
 </html>
