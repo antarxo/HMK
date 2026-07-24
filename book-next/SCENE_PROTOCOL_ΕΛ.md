@@ -83,3 +83,29 @@ window.BookScene = {
 Ο αναγνώστης v0.1 δοκιμάζει πρώτα το ουδέτερο `BookScene` και το μήνυμα
 `book-scene-v1`. Προσωρινά διατηρεί και τον παλιό μηχανισμό στιγμιότυπου του
 υπάρχοντος βιβλίου ΗΜ κύματος, ώστε η μετάβαση να γίνει χωρίς σπάσιμο.
+
+## 6. Πραγματικό execution path του HMK checkpoint
+
+Στον έλεγχο εκτύπωσης της 24ης Ιουλίου 2026 προετοιμάστηκαν επιτυχώς και τα
+10/10 στιγμιότυπα και ελέγχθηκε το πραγματικό PDF των 28 σελίδων.
+
+| Εφαρμογή σκηνής | Πλήθος εμφανίσεων | Κλάδος που έδωσε το στιγμιότυπο |
+|---|---:|---|
+| `index-hmk.html` | 7 | `window.getBookPrintSnapshot()` |
+| `electrostatic_field_book_ready.html` | 3 | `window.getBookPrintSnapshot()` |
+| **Σύνολο** | **10** | **άμεσο same-origin API** |
+
+Η σειρά δοκιμής του reader είναι:
+
+1. `BookScene.getPrintSnapshot()`,
+2. `window.getBookPrintSnapshot()`,
+3. `EMWaveApp.getPrintSnapshot()`,
+4. ουδέτερο μήνυμα `book-scene-v1`,
+5. παλιό μήνυμα `capturePrintSnapshot` / `hm_print_snapshot`,
+6. κρυφό clone της σκηνής ως τελευταία εφεδρεία.
+
+Στο συγκεκριμένο checkpoint ο δεύτερος κλάδος πέτυχε και στις 10 σκηνές. Άρα
+το PDF αποδεικνύει τη λειτουργία του άμεσου compatibility hook, όχι ακόμη του
+`BookScene` ή του cross-origin `book-scene-v1`. Οι δύο μηχανισμοί μηνυμάτων και
+το clone fallback παραμένουν διαθέσιμα, αλλά δεν εκτελέστηκαν στη δοκιμασμένη
+διαδρομή.
