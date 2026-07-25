@@ -1,0 +1,198 @@
+name: Apply shared book core alignment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-shared-book-core.yml'
+      - '.github/shared-book-core.trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    if: ${{ !contains(github.event.head_commit.message || '', '[shared-core]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Remove preset subsystem and align canonical print protocol
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, found {count}')
+              return text.replace(old, new, 1)
+
+          index_path = Path('index.html')
+          text = index_path.read_text(encoding='utf-8')
+
+          text = replace_once(
+              text,
+              "let EXTERNAL_PRESET_DATA = { focusPresets:{}, scenes:{}, framePresets:{} };\n",
+              "",
+              'remove EXTERNAL_PRESET_DATA declaration'
+          )
+          text = replace_once(
+              text,
+              "  return EXTERNAL_PRESET_DATA.focusPresets?.[key] || FOCUS_PRESETS[key] || null;",
+              "  return FOCUS_PRESETS[key] || null;",
+              'focus preset lookup'
+          )
+          text = replace_once(
+              text,
+              "  return EXTERNAL_PRESET_DATA.scenes?.[key] || SCENES[key] || null;",
+              "  return SCENES[key] || null;",
+              'scene lookup'
+          )
+
+          loader_pattern = re.compile(
+              r"async function loadExternalPresetData\(\)\{\n"
+              r".*?\n\}\n"
+              r"(?=function normalizeControlsMode)",
+              re.S,
+          )
+          text, count = loader_pattern.subn('', text, count=1)
+          if count != 1:
+              raise SystemExit(f'remove preset loader: expected one block, found {count}')
+
+          text = replace_once(
+              text,
+              "async function initializeApp(){\n  await loadExternalPresetData();\n",
+              "async function initializeApp(){\n",
+              'remove preset load from startup'
+          )
+
+          text = text.replace('getBookPrintSnapshot', 'captureBookSceneSnapshot')
+          text = replace_once(
+              text,
+              "window.captureBookSceneSnapshot = captureBookSceneSnapshot;\n",
+              "",
+              'remove legacy global snapshot export'
+          )
+          text = replace_once(
+              text,
+              "  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); },\n  getPrintSnapshot: () => captureBookSceneSnapshot()\n};\nwindow.addEventListener('message', (event) => {",
+              "  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); }\n};\nwindow.BookScene = Object.freeze({\n  protocol:'book-scene-v1',\n  getPrintSnapshot:captureBookSceneSnapshot\n});\nwindow.addEventListener('message', (event) => {",
+              'replace legacy app snapshot hook with BookScene'
+          )
+          text = replace_once(
+              text,
+              "    case 'capturePrintSnapshot':\n      Promise.resolve(captureBookSceneSnapshot()).then((dataUrl) => {\n        try{ if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*'); }catch(_e){}\n      });\n      break;",
+              "    case 'book-scene:capture-print-snapshot':\n      if(data.protocol !== 'book-scene-v1') break;\n      Promise.resolve(window.BookScene.getPrintSnapshot()).then((dataUrl) => {\n        try{\n          if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({\n            type:'book-scene:print-snapshot',\n            protocol:'book-scene-v1',\n            requestId:data.requestId,\n            executedPath:'book-scene-v1',\n            dataUrl\n          }, '*');\n        }catch(_e){}\n      });\n      break;",
+              'canonical HMK message transport'
+          )
+
+          forbidden_index = [
+              'scene_presets.json',
+              'loadExternalPresetData',
+              'EXTERNAL_PRESET_DATA',
+              'window.getBookPrintSnapshot',
+              "case 'capturePrintSnapshot'",
+              "type:'hm_print_snapshot'",
+              'getPrintSnapshot: () => captureBookSceneSnapshot()'
+          ]
+          for token in forbidden_index:
+              if token in text:
+                  raise SystemExit(f'index.html still contains forbidden token: {token}')
+          required_index = [
+              'window.BookScene = Object.freeze',
+              "protocol:'book-scene-v1'",
+              "case 'book-scene:capture-print-snapshot'",
+              "type:'book-scene:print-snapshot'",
+              "executedPath:'book-scene-v1'"
+          ]
+          for token in required_index:
+              if token not in text:
+                  raise SystemExit(f'index.html missing canonical token: {token}')
+          index_path.write_text(text, encoding='utf-8')
+
+          electro_path = Path('electrostatic_field_book_ready.html')
+          electro = electro_path.read_text(encoding='utf-8')
+          old_block = """function captureBookSnapshot(){
+  renderStillFrame();
+  try{
+    return renderer.domElement.toDataURL('image/png');
+  }catch(err){
+    console.warn('Print snapshot failed', err);
+    return null;
+  }
+}
+window.getBookPrintSnapshot = captureBookSnapshot;
+window.ElectrostaticFieldApp = { getPrintSnapshot:captureBookSnapshot, state };
+window.EMWaveApp = window.EMWaveApp || {};
+window.EMWaveApp.getPrintSnapshot = captureBookSnapshot;
+window.addEventListener('message', event => {
+  const data = event.data || {};
+  if(data.type !== 'capturePrintSnapshot') return;
+  const dataUrl = captureBookSnapshot();
+  event.source?.postMessage({type:'hm_print_snapshot', requestId:data.requestId, dataUrl}, '*');
+});
+"""
+          new_block = """const captureBookSceneSnapshot = ()=>{
+  renderStillFrame();
+  try{
+    return renderer.domElement.toDataURL('image/png');
+  }catch(err){
+    console.warn('Print snapshot failed', err);
+    return null;
+  }
+};
+window.BookScene = Object.freeze({
+  protocol:'book-scene-v1',
+  getPrintSnapshot:captureBookSceneSnapshot
+});
+window.addEventListener('message', event => {
+  const data = event.data || {};
+  if(data.type !== 'book-scene:capture-print-snapshot'
+    || data.protocol !== 'book-scene-v1') return;
+  const dataUrl = window.BookScene.getPrintSnapshot();
+  event.source?.postMessage({
+    type:'book-scene:print-snapshot',
+    protocol:'book-scene-v1',
+    requestId:data.requestId,
+    executedPath:'book-scene-v1',
+    dataUrl
+  }, '*');
+});
+"""
+          electro = replace_once(electro, old_block, new_block, 'electrostatic canonical snapshot block')
+          forbidden_electro = [
+              'captureBookSnapshot',
+              'getBookPrintSnapshot',
+              'ElectrostaticFieldApp',
+              'EMWaveApp.getPrintSnapshot',
+              "type !== 'capturePrintSnapshot'",
+              "type:'hm_print_snapshot'"
+          ]
+          for token in forbidden_electro:
+              if token in electro:
+                  raise SystemExit(f'electrostatic file still contains forbidden token: {token}')
+          for token in required_index:
+              normalized = token.replace("case '", "'") if token.startswith("case '") else token
+              if token == "case 'book-scene:capture-print-snapshot'":
+                  normalized = "'book-scene:capture-print-snapshot'"
+              if normalized not in electro:
+                  raise SystemExit(f'electrostatic file missing canonical token: {normalized}')
+          electro_path.write_text(electro, encoding='utf-8')
+          PY
+
+      - name: Commit aligned runtime
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html electrostatic_field_book_ready.html
+          git diff --cached --check
+          git commit -m '[shared-core] Remove preset subsystem and enforce book-scene-v1'
+          git push origin main
