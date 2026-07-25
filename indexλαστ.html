@@ -408,6 +408,7 @@ const graphPanelHomes = Object.fromEntries(
 );
 let activeFocus = 'default';
 let activeControlsMode = 'full';
+let EXTERNAL_PRESET_DATA = { focusPresets:{}, scenes:{}, framePresets:{} };
 const FOCUS_PRESETS = {
   default: { focusMode:false, controls:'full', showTop:true, showStage:true, graphs:{ V:true, Q:true, I:true, E:true, B:true } },
   rod_v: { focusMode:true, controls:'minimal', showTop:false, showStage:true, graphs:{ V:true, Q:false, I:false, E:false, B:false } },
@@ -421,12 +422,12 @@ const FOCUS_PRESETS = {
 function getFocusPresetConfig(name){
   if(!name) return null;
   const key = String(name).trim();
-  return FOCUS_PRESETS[key] || null;
+  return EXTERNAL_PRESET_DATA.focusPresets?.[key] || FOCUS_PRESETS[key] || null;
 }
 function getSceneConfig(name){
   if(!name) return null;
   const key = String(name).trim();
-  return SCENES[key] || null;
+  return EXTERNAL_PRESET_DATA.scenes?.[key] || SCENES[key] || null;
 }
 function normalizeFocusName(name){
   if(!name) return 'default';
@@ -441,6 +442,21 @@ function deepMerge(base, extra){
     else out[k] = v;
   }
   return out;
+}
+async function loadExternalPresetData(){
+  try{
+    const presetsUrl = new URLSearchParams(window.location.search).get('presets') || 'scene_presets.json';
+    const res = await fetch(presetsUrl, { cache:'no-store' });
+    if(!res.ok) return;
+    const data = await res.json();
+    EXTERNAL_PRESET_DATA = {
+      focusPresets: data.focusPresets || {},
+      scenes: data.scenes || {},
+      framePresets: data.framePresets || {}
+    };
+  }catch(err){
+    console.warn('scene_presets.json not loaded', err);
+  }
 }
 function normalizeControlsMode(value){
   const v = String(value || '').trim().toLowerCase();
@@ -4031,7 +4047,7 @@ async function stabilizeBookPrintScene(){
     if(enough && exact) break;
   }
 }
-async function captureBookSceneSnapshot(){
+async function getBookPrintSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
   await stabilizeBookPrintScene();
@@ -4047,6 +4063,7 @@ async function captureBookSceneSnapshot(){
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
+window.getBookPrintSnapshot = getBookPrintSnapshot;
 window.EMWaveApp = {
   scenes: () => Object.keys(SCENES),
   focuses: () => Object.keys(FOCUS_PRESETS),
@@ -4058,12 +4075,9 @@ window.EMWaveApp = {
   play: () => setPlayingState(true),
   pause: () => setPlayingState(false),
   reset: () => { phaseU = getBookSceneStartPhase(); syncPhase(); setPlayingState(false); return getExternalState(); },
-  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); }
+  step: (delta=1/8) => { stepPhase(delta); return getExternalState(); },
+  getPrintSnapshot: () => getBookPrintSnapshot()
 };
-window.BookScene = Object.freeze({
-  protocol:'book-scene-v1',
-  getPrintSnapshot:captureBookSceneSnapshot
-});
 window.addEventListener('message', (event) => {
   const data = event.data;
   if(!data || typeof data !== 'object') return;
@@ -4080,18 +4094,9 @@ window.addEventListener('message', (event) => {
     case 'setRegion':
       if(data.region) window.EMWaveApp.setRegion(data.region, data.overrides || {});
       break;
-    case 'book-scene:capture-print-snapshot':
-      if(data.protocol !== 'book-scene-v1') break;
-      Promise.resolve(window.BookScene.getPrintSnapshot()).then((dataUrl) => {
-        try{
-          if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({
-            type:'book-scene:print-snapshot',
-            protocol:'book-scene-v1',
-            requestId:data.requestId,
-            executedPath:'book-scene-v1',
-            dataUrl
-          }, '*');
-        }catch(_e){}
+    case 'capturePrintSnapshot':
+      Promise.resolve(getBookPrintSnapshot()).then((dataUrl) => {
+        try{ if(event.source && typeof event.source.postMessage === 'function') event.source.postMessage({ type:'hm_print_snapshot', requestId:data.requestId, dataUrl }, '*'); }catch(_e){}
       });
       break;
     case 'play':
@@ -4258,6 +4263,7 @@ ui.showB?.addEventListener('input', () => {
 let last = performance.now();
 var lastPhaseBucket = -1;
 async function initializeApp(){
+  await loadExternalPresetData();
   applyMainMode('rod', true);
   setRegionMode('near', { applyDefaults:false });
   invalidateGraphs(true);
