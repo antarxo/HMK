@@ -1928,7 +1928,7 @@ function renderStillFrame(){
   animateFrame(0);
   state.playing = wasPlaying;
 }
-function captureBookSnapshot(){
+function captureBookSceneSnapshot(){
   renderStillFrame();
   try{
     return renderer.domElement.toDataURL('image/png');
@@ -1937,15 +1937,22 @@ function captureBookSnapshot(){
     return null;
   }
 }
-window.getBookPrintSnapshot = captureBookSnapshot;
-window.ElectrostaticFieldApp = { getPrintSnapshot:captureBookSnapshot, state };
-window.EMWaveApp = window.EMWaveApp || {};
-window.EMWaveApp.getPrintSnapshot = captureBookSnapshot;
+window.ElectrostaticFieldApp = { state };
+window.BookScene = Object.freeze({
+  protocol:'book-scene-v1',
+  getPrintSnapshot:captureBookSceneSnapshot
+});
 window.addEventListener('message', event => {
   const data = event.data || {};
-  if(data.type !== 'capturePrintSnapshot') return;
-  const dataUrl = captureBookSnapshot();
-  event.source?.postMessage({type:'hm_print_snapshot', requestId:data.requestId, dataUrl}, '*');
+  if(data.type !== 'book-scene:capture-print-snapshot' || data.protocol !== 'book-scene-v1') return;
+  const dataUrl = window.BookScene.getPrintSnapshot();
+  event.source?.postMessage({
+    type:'book-scene:print-snapshot',
+    protocol:'book-scene-v1',
+    requestId:data.requestId,
+    executedPath:'book-scene-v1',
+    dataUrl
+  }, '*');
 });
 
 ui.sourceRow.addEventListener('click', e => { const b = e.target.closest('button[data-source]'); if(!b) return; switchSource(b.dataset.source); });
