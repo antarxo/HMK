@@ -416,6 +416,8 @@ let qSource = qs.get('source') || qs.get('scene') || preset?.source || '';
 let qMode = qs.get('mode') || preset?.mode || '';
 const qSpeed = parseFloat(qs.get('speed') || preset?.speed || '');
 const qAutoplay = qs.get('autoplay') || preset?.autoplay || '';
+const qInitialTime = parseFloat(qs.get('t') || qs.get('clock') || '');
+const qDisappearAt = parseFloat(qs.get('disappearAt') || qs.get('disappear_at') || '');
 let qControls = qs.get('controls') || preset?.controls || '';
 const qLang = (qs.get('lang') || '').toLowerCase();
 let qFieldArrows = (qs.get('field_arrows') || preset?.field_arrows || '').toLowerCase();
@@ -2031,6 +2033,17 @@ function loop(now){
 }
 
 resetTimelineForMode(state.mode);
+if(Number.isFinite(qDisappearAt) && qDisappearAt >= 0){
+  state.mode = 'disappear';
+  clearMonoRealMotion();
+  state.events = [
+    { type:'appear', source: state.source, start: 0 },
+    { type:'disappear', source: state.source, start: qDisappearAt }
+  ];
+}
+if(Number.isFinite(qInitialTime) && qInitialTime >= 0){
+  state.clock = qInitialTime;
+}
 setViewPreset('2d');
 applyButtons();
 updateNote();
