@@ -4073,6 +4073,70 @@ function getBookPrintSnapshotScale(){
   const raw = Number(params.get('printScale') || 3);
   return Math.min(4, Math.max(1, Number.isFinite(raw) ? raw : 3));
 }
+function loadSnapshotImage(src){
+  return new Promise((resolve,reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('snapshot-image-load-failed'));
+    img.src = src;
+  });
+}
+async function rasterizeSnapshotSvg(svgDataUrl, width, height, background){
+  const scale = getBookPrintSnapshotScale();
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext('2d');
+  if(!ctx) throw new Error('snapshot-canvas-context-unavailable');
+  ctx.fillStyle = background || '#0b0f14';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = await loadSnapshotImage(svgDataUrl);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return {
+    dataUrl:canvas.toDataURL('image/png'),
+    scale
+  };
+}
+function drawElementCanvasToSnapshot(ctx, sourceCanvas, sourceRect, rootRect, scale){
+  if(!sourceCanvas || !sourceRect || sourceRect.width <= 0 || sourceRect.height <= 0) return false;
+  const dx = Math.round((sourceRect.left - rootRect.left) * scale);
+  const dy = Math.round((sourceRect.top - rootRect.top) * scale);
+  const dw = Math.round(sourceRect.width * scale);
+  const dh = Math.round(sourceRect.height * scale);
+  try{
+    ctx.drawImage(sourceCanvas, dx, dy, dw, dh);
+    return true;
+  }catch(_error){
+    return false;
+  }
+}
+function captureBookSceneCanvasComposite(sourceRoot, width, height, background){
+  const scale = getBookPrintSnapshotScale();
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+  const ctx = canvas.getContext('2d');
+  if(!ctx) throw new Error('snapshot-canvas-context-unavailable');
+  ctx.fillStyle = background || '#0b0f14';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const rootRect = sourceRoot.getBoundingClientRect();
+  const graphsDrawn = [];
+  for(const key of getVisibleBookGraphKeys()){
+    const panel = domRefs.graphPanels[key];
+    const graphCanvas = graphPapers[key];
+    if(drawElementCanvasToSnapshot(ctx, graphCanvas, panel?.getBoundingClientRect?.(), rootRect, scale)) graphsDrawn.push(key);
+  }
+  const stageCanvas = renderer?.domElement || null;
+  const stageRect = domRefs.stage?.getBoundingClientRect?.();
+  const stageDrawn = drawElementCanvasToSnapshot(ctx, stageCanvas, stageRect, rootRect, scale);
+  return {
+    dataUrl:canvas.toDataURL('image/png'),
+    scale,
+    stageDrawn,
+    graphsDrawn
+  };
+}
 async function captureBookSceneSnapshot(){
   const sourceRoot = document.querySelector('.card.viewport');
   if(!sourceRoot) return null;
@@ -4085,18 +4149,41 @@ async function captureBookSceneSnapshot(){
   clone.style.width = `${width}px`;
   clone.style.height = `${height}px`;
   const sceneBackground = getComputedStyle(document.body).backgroundColor || '#0b0f14';
+  const composite = captureBookSceneCanvasComposite(sourceRoot, width, height, sceneBackground);
+  if(composite.stageDrawn && composite.graphsDrawn.length){
+    const dataUrl = composite.dataUrl;
+    window.__BOOK_PRINT_SNAPSHOT_LAST__ = Object.freeze({
+      renderer:'canvas-composite-png',
+      format:'image/png',
+      cssWidth:width,
+      cssHeight:height,
+      scale:composite.scale,
+      stageDrawn:composite.stageDrawn,
+      visibleGraphKeys:getVisibleBookGraphKeys(),
+      expectedGraphKeys:getExpectedPrintGraphKeys(),
+      graphsDrawn:composite.graphsDrawn,
+      dataUrlBytes:dataUrl.length,
+      backgroundPolicy:'scene-background',
+      protocol:'book-scene-v1'
+    });
+    return dataUrl;
+  }
   clone.style.background = sceneBackground;
   const serialized = new XMLSerializer().serializeToString(clone);
   const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${sceneBackground};">${serialized}</div>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
-  const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  const rasterized = await rasterizeSnapshotSvg(svgDataUrl, width, height, sceneBackground);
+  const dataUrl = rasterized.dataUrl;
   window.__BOOK_PRINT_SNAPSHOT_LAST__ = Object.freeze({
-    renderer:'serialized-dom-svg',
-    format:'image/svg+xml',
+    renderer:'serialized-dom-svg-rasterized-png',
+    format:'image/png',
     cssWidth:width,
     cssHeight:height,
+    scale:rasterized.scale,
     visibleGraphKeys:getVisibleBookGraphKeys(),
     expectedGraphKeys:getExpectedPrintGraphKeys(),
+    svgDataUrlBytes:svgDataUrl.length,
     dataUrlBytes:dataUrl.length,
     backgroundPolicy:'scene-background',
     protocol:'book-scene-v1'
