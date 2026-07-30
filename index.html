@@ -3969,6 +3969,11 @@ function getExpectedPrintGraphCount(expectedKeys=[]){
   if(expectedKeys.length) return Math.min(3, expectedKeys.length);
   return Math.min(3, activeBookSceneState?.graphs?.length || 0);
 }
+function getCurrentPrintSnapshotGraphKeys(){
+  const visible = getVisibleBookGraphKeys();
+  if(visible.length) return visible;
+  return (activeBookSceneState?.graphs || []).slice(0, 3);
+}
 function getVisibleBookGraphKeys(){
   const keys = [];
   for(const key of ['V','Q','I','E','B']){
@@ -4038,14 +4043,8 @@ function forceBookPrintGraphState(expectedKeys=[]){
 }
 async function stabilizeBookPrintScene(){
   if(!(activeFocus === 'book_multiscene' || activeBookSceneState)) return;
-  const params = getPrintSceneUrlParams();
-  if(params.size){
-    const raw = {};
-    for(const [k,v] of params.entries()) raw[k] = v;
-    applyExternalState(raw, { announce:false, forcePause:false });
-  }
-  const expectedKeys = getExpectedPrintGraphKeys();
-  const expectedCount = getExpectedPrintGraphCount(expectedKeys);
+  const expectedKeys = getCurrentPrintSnapshotGraphKeys();
+  const expectedCount = expectedKeys.length;
   for(let attempt = 0; attempt < 12; attempt++){
     forceBookPrintGraphState(expectedKeys);
     try{ scheduleRendererResize(); }catch(_e){}
@@ -4160,7 +4159,7 @@ async function captureBookSceneSnapshot(){
       scale:composite.scale,
       stageDrawn:composite.stageDrawn,
       visibleGraphKeys:getVisibleBookGraphKeys(),
-      expectedGraphKeys:getExpectedPrintGraphKeys(),
+      expectedGraphKeys:getCurrentPrintSnapshotGraphKeys(),
       graphsDrawn:composite.graphsDrawn,
       dataUrlBytes:dataUrl.length,
       backgroundPolicy:'scene-background',
@@ -4182,7 +4181,7 @@ async function captureBookSceneSnapshot(){
     cssHeight:height,
     scale:rasterized.scale,
     visibleGraphKeys:getVisibleBookGraphKeys(),
-    expectedGraphKeys:getExpectedPrintGraphKeys(),
+    expectedGraphKeys:getCurrentPrintSnapshotGraphKeys(),
     svgDataUrlBytes:svgDataUrl.length,
     dataUrlBytes:dataUrl.length,
     backgroundPolicy:'scene-background',
