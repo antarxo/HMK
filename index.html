@@ -3949,7 +3949,7 @@ function buildViewportSnapshotClone(sourceRoot){
   clone.style.boxShadow = 'none';
   clone.style.border = '0';
   clone.style.overflow = 'hidden';
-  clone.style.background = '#ffffff';
+  clone.style.background = getComputedStyle(document.body).backgroundColor || '#0b0f14';
   return clone;
 }
 
