@@ -89,7 +89,7 @@
   .graphPanel{border:1px solid rgba(255,255,255,.10);border-radius:12px;background:rgba(10,14,20,.22);backdrop-filter:blur(2px);overflow:hidden;pointer-events:none}
 
   .bookGraphStack{position:absolute;left:0;top:0;z-index:22;display:none;gap:1px;pointer-events:none}
-  .bookGraphStack .graphPanel{width:100%;max-width:none;height:auto;min-height:0;background:rgba(10,14,20,.22);backdrop-filter:blur(2px)}
+  .bookGraphStack .graphPanel{width:100%;max-width:none;height:100%;min-height:0;background:rgba(10,14,20,.22);backdrop-filter:blur(2px)}
   .graphPanel canvas{opacity:.96}
   .vqiOverlay{width:100%;display:grid;flex:1 1 auto;min-height:0;grid-template-rows:repeat(3,minmax(0,1fr));gap:1px}
   .topWaveOverlay{position:absolute;left:50%;right:auto;top:2px;transform:translateX(-50%);z-index:18;display:grid;grid-template-columns:repeat(2,minmax(0,248px));gap:6px;pointer-events:none;width:min(502px,52vw)}
@@ -366,7 +366,6 @@
   <div class="foot"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js';
@@ -3985,6 +3984,36 @@ function getVisibleBookGraphKeys(){
   }
   return keys;
 }
+function bookGraphPanelReady(key){
+  const panel = domRefs.graphPanels[key];
+  const canvas = graphPapers[key];
+  if(!panel || !canvas) return false;
+  const panelRect = panel.getBoundingClientRect();
+  const wrapRect = canvas.parentElement?.getBoundingClientRect?.();
+  const cs = getComputedStyle(panel);
+  return cs.display !== 'none'
+    && cs.visibility !== 'hidden'
+    && panelRect.width >= 80
+    && panelRect.height >= 36
+    && wrapRect
+    && wrapRect.width >= 80
+    && wrapRect.height >= 36
+    && canvas.width >= 80
+    && canvas.height >= 36;
+}
+async function waitForBookPrintGraphs(expectedKeys=[], expectedCount=0){
+  const wanted = expectedKeys.length ? expectedKeys : (activeBookSceneState?.graphs || []).slice(0, expectedCount || 3);
+  for(let attempt = 0; attempt < 10; attempt++){
+    drawGraphs(true);
+    const visible = getVisibleBookGraphKeys();
+    const exact = !wanted.length || wanted.every(key => visible.includes(key) && bookGraphPanelReady(key));
+    const enough = !expectedCount || visible.length >= expectedCount;
+    if(exact && enough) return true;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise(resolve => setTimeout(resolve, 35 + attempt * 20));
+  }
+  return false;
+}
 function forceBookPrintGraphState(expectedKeys=[]){
   if(!(activeFocus === 'book_multiscene' || activeBookSceneState)) return;
   const wanted = (expectedKeys.length ? expectedKeys : (activeBookSceneState?.graphs || [])).slice(0, 3);
@@ -4017,7 +4046,7 @@ async function stabilizeBookPrintScene(){
   }
   const expectedKeys = getExpectedPrintGraphKeys();
   const expectedCount = getExpectedPrintGraphCount(expectedKeys);
-  for(let attempt = 0; attempt < 8; attempt++){
+  for(let attempt = 0; attempt < 12; attempt++){
     forceBookPrintGraphState(expectedKeys);
     try{ scheduleRendererResize(); }catch(_e){}
     graphState.dynamicDirty = true;
@@ -4026,11 +4055,17 @@ async function stabilizeBookPrintScene(){
     applyUI();
     drawGraphs(true);
     try{ renderer.render(scene, camera); }catch(_e){}
-    await new Promise(resolve => setTimeout(resolve, 80 + attempt * 25));
+    await waitForBookPrintGraphs(expectedKeys, expectedCount);
+    await new Promise(resolve => setTimeout(resolve, 110 + attempt * 35));
     const visible = getVisibleBookGraphKeys();
     const enough = !expectedCount || visible.length >= expectedCount;
     const exact = !expectedKeys.length || expectedKeys.every(k => visible.includes(k));
     if(enough && exact) break;
+  }
+  for(let frame = 0; frame < 3; frame++){
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    drawGraphs(true);
+    try{ renderer.render(scene, camera); }catch(_e){}
   }
 }
 function getBookPrintSnapshotScale(){
@@ -4043,58 +4078,28 @@ async function captureBookSceneSnapshot(){
   if(!sourceRoot) return null;
   await stabilizeBookPrintScene();
   await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  if(typeof window.html2canvas !== 'function'){
-    throw new Error('html2canvas-not-loaded');
-  }
   const rect = sourceRoot.getBoundingClientRect();
   const width = Math.max(1, Math.round(rect.width));
   const height = Math.max(1, Math.round(rect.height));
-  const scale = getBookPrintSnapshotScale();
-  const bodyBackground = getComputedStyle(document.body).backgroundColor;
-  const liveBackground = (!bodyBackground || bodyBackground === 'transparent' || bodyBackground === 'rgba(0, 0, 0, 0)')
-    ? '#0b0f14'
-    : bodyBackground;
-  const canvas = await window.html2canvas(sourceRoot, {
-    backgroundColor:liveBackground,
-    scale,
-    width,
-    height,
-    scrollX:0,
-    scrollY:0,
-    useCORS:false,
-    allowTaint:false,
-    logging:false,
-    imageTimeout:5000,
-    removeContainer:true,
-    ignoreElements:(el) => {
-      try{
-        return el.matches('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar');
-      }catch(_e){ return false; }
-    },
-    onclone:(doc) => {
-      if(doc.documentElement) doc.documentElement.style.background=liveBackground;
-      if(doc.body) doc.body.style.background=liveBackground;
-      const clonedRoot = doc.querySelector('.card.viewport');
-      if(clonedRoot){
-        clonedRoot.style.margin='0';
-        clonedRoot.style.boxShadow='none';
-        clonedRoot.style.border='0';
-        clonedRoot.style.overflow='hidden';
-      }
-      doc.querySelectorAll('.machineHud, .focusMiniControls, #hiddenSettings, .top, .titleBar').forEach(el => el.remove());
-    }
-  });
-  const dataUrl = canvas.toDataURL('image/png');
+  const clone = buildViewportSnapshotClone(sourceRoot);
+  clone.style.width = `${width}px`;
+  clone.style.height = `${height}px`;
+  const sceneBackground = getComputedStyle(document.body).backgroundColor || '#0b0f14';
+  clone.style.background = sceneBackground;
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const foreign = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden;background:${sceneBackground};">${serialized}</div>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${foreign}</foreignObject></svg>`;
+  const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   window.__BOOK_PRINT_SNAPSHOT_LAST__ = Object.freeze({
-    renderer:'html2canvas',
-    format:'image/png',
+    renderer:'serialized-dom-svg',
+    format:'image/svg+xml',
     cssWidth:width,
     cssHeight:height,
-    pixelWidth:canvas.width,
-    pixelHeight:canvas.height,
-    scale,
-    backgroundPolicy:'preserve-live-dark',
-    backgroundColor:liveBackground
+    visibleGraphKeys:getVisibleBookGraphKeys(),
+    expectedGraphKeys:getExpectedPrintGraphKeys(),
+    dataUrlBytes:dataUrl.length,
+    backgroundPolicy:'scene-background',
+    protocol:'book-scene-v1'
   });
   return dataUrl;
 }
@@ -4140,7 +4145,8 @@ window.addEventListener('message', (event) => {
             protocol:'book-scene-v1',
             requestId:data.requestId,
             executedPath:'book-scene-v1',
-            dataUrl
+            dataUrl,
+            meta:window.__BOOK_PRINT_SNAPSHOT_LAST__ || null
           }, '*');
         }catch(_e){}
       }).catch((error) => {
